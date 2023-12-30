@@ -13,7 +13,23 @@ class Session {
                         Redux.combineReducers({
                             freq: (state = this.data.estacions[estacio].parametres.freq, action) => {
                                 switch (action.type) {
-                                    case 'SET_FREQ':
+                                    case 'SET_freq':
+                                    return action.value;
+                                    default:
+                                    return state;
+                                }
+                            },
+                            amplitud: (state = this.data.estacions[estacio].parametres.amplitud, action) => {
+                                switch (action.type) {
+                                    case 'SET_amplitud':
+                                    return action.value;
+                                    default:
+                                    return state;
+                                }
+                            },
+                            tipus: (state = this.data.estacions[estacio].parametres.tipus, action) => {
+                                switch (action.type) {
+                                    case 'SET_tipus':
                                     return action.value;
                                     default:
                                     return state;
@@ -28,11 +44,10 @@ class Session {
         
         updateParameter(nomEstacio, nomParametre, valor) {
             const estacio = this.data.estacions[nomEstacio];
-            estacio.parametres[nomParametre] = valor;  // Això no seria necessari si ja està guardat a l'store
-            switch (estacio.tipus) {
-                case 'oscilador':
-                    estacio.store.dispatch({ type: 'SET_FREQ', value: valor });
-            }
+            estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
+
+            // També actualitzem el valor fora de l'store, tot i que això no seria necessari si ja està guardat a l'store (informació duplicada)
+            estacio.parametres[nomParametre] = valor;
         }
         
         updateParameterInServer(nomEstacio, nomParametre, valor) {
@@ -87,7 +102,6 @@ class Session {
     
     socket.on('update_session_parameter', function (data) {
         if (currentSession !== undefined) {
-            console.log('Updating session parameter for estacio ' + data.nom_estacio + ': ' + data.nom_parametre + ' to ' + data.valor);
             currentSession.updateParameter(data.nom_estacio, data.nom_parametre, data.valor);
         }
     });

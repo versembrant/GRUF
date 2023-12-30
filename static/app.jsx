@@ -24,6 +24,19 @@ function EstacioOsciladorUI({ nomEstacio }) {
       {'type': 'range', 'min': '100', 'max': '4000', 'value': state.freq, onInput: (evt) => currentSession.updateParameterInServer(nomEstacio, 'freq', evt.target.value)},
       null
     ),
+    e('p', null, 'Osc amp: ', state.amplitud),
+    e(
+      'input',
+      {'type': 'range', 'min': '0.0', 'max': '1.0', 'step': 0.05, 'value': state.amplitud, onInput: (evt) => currentSession.updateParameterInServer(nomEstacio, 'amplitud', evt.target.value)},
+      null
+    ),
+    e('p', null, 'Osc tipus: ', state.tipus),
+    e(
+      'select',
+      {'value': state.tipus, onChange: (evt) => currentSession.updateParameterInServer(nomEstacio, 'tipus', evt.target.value)},
+      e('option', {value: 'sinusoidal'}, 'sinusoidal'),
+      e('option', {value: 'quadrada'}, 'quadrada'),
+    ),
   );
 }
 
