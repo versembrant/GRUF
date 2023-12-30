@@ -3,7 +3,7 @@ import uuid
 import json
 
 import redis
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, emit, send, join_room, leave_room
 
 r = redis.Redis(host='redis', port=16379, db=0)
@@ -17,23 +17,33 @@ def log(message):
     sys.stdout.flush()
 
 
-sessions = []
-
-
 class Session(object):
-    name = None
-    uuid = None
     data = {}
-    connected_users = []
 
-    def __init__(self, name, session_uuid=None, session_data={}):
-        self.name = name
-        self.uuid = session_uuid if session_uuid is not None else str(uuid.uuid4())
-        self.data = session_data if session_data is not None else {}
+    def __init__(self, data):
+        self.data = data
+        self.data['connected_users'] = []
+        self.save_to_redis()
+        
+    @property
+    def uuid(self):
+        return self.data['uuid']
+    
+    @property
+    def name(self):
+        return self.data['name']
+    
+    @property
+    def connected_users(self):
+        return self.data['connected_users']
 
     @property
     def cache_key(self):
         return 'session:' + self.uuid
+    
+    @property
+    def num_estacions(self):
+        return len(self.data['estacions'])
     
     @property
     def room_name(self):
@@ -46,11 +56,7 @@ class Session(object):
         r.delete(self.cache_key)
 
     def get_full_data(self):
-        return {
-            'name': self.name,
-            'uuid': self.uuid,
-            'data': self.data,
-        }
+        return self.data
     
     def add_user(self, username):
         self.connected_users.append(username)
@@ -61,22 +67,60 @@ class Session(object):
     def update_parameter(self, nom_estacio, nom_parametre, valor):
         try:
             self.data['estacions'][nom_estacio]['parametres'][nom_parametre] = valor
-            # TODO: potser no guardar a cada parametre?, només de tant en tant?
-            #self.save_to_redis()
+            self.save_to_redis()
         except KeyError:
             pass
 
 
 def get_session_by_uuid(uuid):
-    for s in sessions:
-        if s.uuid == uuid:
-            return s
+    session_redis = r.get('session:' + uuid)
+    if session_redis is not None:
+        session_raw_data = json.loads(session_redis)
+        return Session(session_raw_data)
     return None
 
 
+def delete_session_by_uuid(uuid):
+    s_to_delete = get_session_by_uuid(uuid)
+    if s_to_delete is not None:
+        s_to_delete.delete_from_redis()
+        
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    log('Loading existing sessions from redis')
+    sessions = []
+    for key in r.scan_iter("session:*"):
+        s = Session(json.loads(r.get(key)))
+        sessions.append(s)
+    return render_template('index.html', sessions=sessions)
+
+
+@app.route('/new_session/', methods=['GET', 'POST'])
+def new():
+    if request.method == 'POST':
+        name = request.form['name']
+        data = json.loads(request.form['data'])
+        data['name'] = name
+        data['uuid'] = str(uuid.uuid4())
+        s = Session(data)
+        log(f'New session created: {s.name} ({s.uuid})\n{json.dumps(s.get_full_data(), indent=4)}')
+        return redirect(url_for('session', session_uuid=s.uuid))
+    return render_template('new_session.html')
+
+
+@app.route('/session/<session_uuid>/')
+def session(session_uuid):
+    s = get_session_by_uuid(session_uuid)
+    if s is None:
+        raise Exception('Session not found')
+    return render_template('session.html', session=s)
+
+
+@app.route('/delete_session/<session_uuid>/')
+def delete_session(session_uuid):
+    delete_session_by_uuid(session_uuid)
+    return redirect(url_for('index'))
 
 
 def _add_user_to_session(s, username):
@@ -86,15 +130,6 @@ def _add_user_to_session(s, username):
     send(username + ' has entered the room.', to=s.room_name)
     emit('set_session_data', s.get_full_data())
 
-
-@socketio.on('new_session')
-def on_new_session(data):  # name, username
-    s = Session(data['name'], session_data=data['session_data'])
-    s.save_to_redis()
-    sessions.append(s)
-    _add_user_to_session(s, data['username'])
-    log(f'New session created: {s.name} ({s.uuid})\n{json.dumps(s.get_full_data(), indent=4)}')
-    
 
 @socketio.on('join_session')
 def on_join_session(data):  # session_uuid, username
@@ -125,20 +160,10 @@ def on_update_session_parameter(data):  # session_uuid, nom_estacio, nom_paramet
     if s is None:
         raise Exception('Session not found')
     s.update_parameter(data['nom_estacio'], data['nom_parametre'], data['valor'])
-    log(f'Updated session parameter: {data["nom_estacio"]}.{data["nom_parametre"]} = {data["valor"]}')
     emit('update_session_parameter', data, to=s.room_name)
 
 
 if __name__ == '__main__':
-
-    # Load existing sessions from redis
-    log('Loading existing sessions from redis')
-    for key in r.scan_iter("session:*"):
-        session_uuid = str(key).split(':')[1]
-        session_raw_data = json.loads(r.get(key))
-        s = Session(session_raw_data['name'], session_uuid=session_uuid, session_data=session_raw_data['data'])
-        sessions.append(s)
-        print(f'Session availble: {s.name} ({s.uuid})')
 
     # Start server
     log('Starting server')

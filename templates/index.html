@@ -1,39 +1,11 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-</head>
-<body>
-    <h1>Test</h1>
-    <div id="root"></div>
+{% extends "base.html" %}
 
-    <!-- Load React, babel, recoil -->
-    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-    <script type="text/javascript" src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script type="text/javascript" src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script type="text/javascript" src="https://unpkg.com/babel-standalone@6/babel.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/redux@4.2.1/dist/redux.js"
-      crossorigin="anonymous"
-    ></script>
-
-    <!-- Load socket io stuff and initialize -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        const socket = io();
-        // Defult log socket.io event handler
-        socket.on('message', function (message) {
-            console.log(message);
-        });
-        // NOTE: other socket.io event handlers are defined in the session manager component
-    </script>
-    
-    <!-- Load our session manager component -->
-    <script type="text/javascript" src="/static/sessionManager.js"></script>
-    
-    <!-- Load our React components -->
-    <script type="text/babel" src="/static/app.jsx"></script>
-
-</body>
-</html>
+{% block content %}
+<h1>Sessions</h1>
+<a href="/new_session/">Create new</a>
+<ul>
+{% for session in sessions %}
+    <li><a href="/session/{{ session.uuid }}/">Join "{{ session.name }}" ({{ session.num_estacions }} estacions, {{ session.uuid }})</a> - <a href="/delete_session/{{ session.uuid }}/">delete</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
