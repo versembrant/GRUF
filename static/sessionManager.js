@@ -1,5 +1,7 @@
 class Session {
-    constructor(data) {
+    constructor(data, local=false) {
+        this.local_mode = local
+
         // Copy passed data to this object
         Object.assign(this, data);
 
@@ -35,7 +37,13 @@ class Session {
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
-        socket.emit('update_session_parameter', {session_uuid: this.uuid, nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+        if (!this.local_mode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            socket.emit('update_session_parameter', {session_uuid: this.uuid, nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+        } else {
+            // In local mode, we update parameter in the same object as it is not synced with the server
+            this.updateParametreEstacio(nomEstacio, nomParametre, valor)
+        }
     }
 }
 

@@ -114,7 +114,7 @@ def session(session_uuid):
     s = get_session_by_uuid(session_uuid)
     if s is None:
         raise Exception('Session not found')
-    return render_template('session.html', session=s)
+    return render_template('session.html', session=s, local_mode=request.args.get('local') == '1')
 
 
 @app.route('/delete_session/<session_uuid>/')
