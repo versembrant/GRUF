@@ -101,7 +101,7 @@ class Session {
     });
     
     socket.on('update_session_parameter', function (data) {
-        if (currentSession !== undefined) {
+        if ((currentSession !== undefined) && (data.session_uuid === currentSession.uuid)) {
             currentSession.updateParameter(data.nom_estacio, data.nom_parametre, data.valor);
         }
     });

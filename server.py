@@ -126,7 +126,7 @@ def on_update_session_parameter(data):  # session_uuid, nom_estacio, nom_paramet
         raise Exception('Session not found')
     s.update_parameter(data['nom_estacio'], data['nom_parametre'], data['valor'])
     log(f'Updated session parameter: {data["nom_estacio"]}.{data["nom_parametre"]} = {data["valor"]}')
-    emit('update_session_parameter', {'nom_estacio': data['nom_estacio'], 'nom_parametre': data['nom_parametre'], 'valor': data['valor']}, to=s.room_name)
+    emit('update_session_parameter', data, to=s.room_name)
 
 
 if __name__ == '__main__':
