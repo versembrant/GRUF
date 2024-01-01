@@ -1,18 +1,37 @@
 // Definició estació
-class EstacioOscilador {
-    getPlantilla() {
+class EstacioOsciladorFactory {
+    constructor(factoryName) {
+        this.factoryName = factoryName
+        this.defaultUiWidget = 'EstacioOsciladorUI'
+    }    
+    getParametersData() {
         return {
-            tipus: 'oscilador',
-            uiWidget: 'EstacioOsciladorUI',
-            parametres: {
-                freq: 440 + Math.random() * 100,
-                amplitud: 0.3 + Math.random() * 0.7,
-                tipus: 'sinusoidal'
-            }
+            freq: {type: 'float', min: '20.0', max: '4000.0', initial: 440},
+            amplitud: {type: 'float', min: '0.0', max: '1.0', initial: 1.0},
+            tipus: {type: 'enum', options: ['sinusoidal', 'quadrada', 'serra'], initial: 'sinusoidal'},
+        }
+    }
+    // TODO: move these methods to abstract class
+    getInitialParametersState(){
+        const initialParametersState = {}
+        this.getParameterNames().forEach(parameterName => {
+            initialParametersState[parameterName] = this.getParametersData()[parameterName].initial;
+        })
+        return initialParametersState;
+    }
+    getParameterNames() {
+        return Object.keys(this.getParametersData())
+    }    
+    getInitialState() {
+        return {
+            factoryName: this.factoryName,
+            uiWidget: this.defaultUiWidget,
+            parametres: this.getInitialParametersState(),
         };
     }        
 }
-const fabricaEstacioOscilador = new EstacioOscilador();
+
+const factoryEstacioOscilador = new EstacioOsciladorFactory('factoryEstacioOscilador');
 
 // Component UI
 function EstacioOsciladorUI({ nomEstacio }) {
@@ -27,6 +46,14 @@ function EstacioOsciladorUI({ nomEstacio }) {
         });
         return () => unsubscribe();
     }, [setState]);
+
+    const parametersData = factoryEstacioOscilador.getParametersData()
+    
+    // TODO: move this to util function to creat react elements from enum options
+    const tipusOpcionsElements = [] 
+    parametersData.tipus.options.forEach(option => {
+        tipusOpcionsElements.push(e('option', {value: option}, option),)
+    });
     
     return e(
         'div',
@@ -36,21 +63,20 @@ function EstacioOsciladorUI({ nomEstacio }) {
         e('p', null, 'Osc freq: ', state.freq),
         e(
             'input',
-            {'type': 'range', 'min': '100', 'max': '4000', 'value': state.freq, onInput: (evt) => currentSession.updateParametreEstacioInServer(nomEstacio, 'freq', evt.target.value)},
+            {'type': 'range', 'min': parametersData.freq.min, 'max': parametersData.freq.max, 'value': state.freq, onInput: (evt) => currentSession.updateParametreEstacioInServer(nomEstacio, 'freq', evt.target.value)},
             null
         ),
         e('p', null, 'Osc amp: ', state.amplitud),
         e(
             'input',
-            {'type': 'range', 'min': '0.0', 'max': '1.0', 'step': 0.05, 'value': state.amplitud, onInput: (evt) => currentSession.updateParametreEstacioInServer(nomEstacio, 'amplitud', evt.target.value)},
+            {'type': 'range', 'min': parametersData.amplitud.min, 'max': parametersData.amplitud.max, 'step': 0.05, 'value': state.amplitud, onInput: (evt) => currentSession.updateParametreEstacioInServer(nomEstacio, 'amplitud', evt.target.value)},
             null
         ),
         e('p', null, 'Osc tipus: ', state.tipus),
         e(
             'select',
             {'value': state.tipus, onChange: (evt) => currentSession.updateParametreEstacioInServer(nomEstacio, 'tipus', evt.target.value)},
-            e('option', {value: 'sinusoidal'}, 'sinusoidal'),
-            e('option', {value: 'quadrada'}, 'quadrada'),
+            ...tipusOpcionsElements
         ),
     );
 }
