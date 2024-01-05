@@ -1,6 +1,8 @@
-import './sessionManager.js'
-import './estacioOscilador.jsx'
-import './newSession.js'
-import './session.js'
+import './socket'
+import './sessionManager'
+import './newSession'
+import './session'
+
+import './estacioOscilador'
 
 import '../styles/index.scss'

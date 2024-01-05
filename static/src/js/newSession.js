@@ -1,8 +1,9 @@
-import {estacioOsciladorHelper} from './estacioOscilador.jsx';
+import { getEstacioHelperInstance } from "./estacionsUtils";
 
 const newSessionForm = document.getElementById('createSessionForm');
 if (newSessionForm !== null){
     // Estem a la pàgina de creació de nova sessió
+    const estacioOsciladorHelper = getEstacioHelperInstance('oscilador');
     const defaultSessionData = {
         estacions: {
             oscilador1: estacioOsciladorHelper.getInitialState(), 

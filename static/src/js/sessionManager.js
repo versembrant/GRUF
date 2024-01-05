@@ -1,10 +1,20 @@
-import { estacionsHelpers } from "./estacionsUtils";
-import {createStore, combineReducers} from "redux";
+import { createStore, combineReducers } from "redux";
+import { getEstacioHelperInstance } from "./estacionsUtils";
+import { socket } from "./socket";
 
+var currentSession = undefined; 
 
-class Session {
+export const getCurrentSession = () => {
+    return currentSession;
+}
+
+export const setCurrentSession = (session) => {
+    currentSession = session;
+}
+
+export class Session {
     constructor(data, local=false) {
-        this.local_mode = local
+        this.localMode = local
 
         // Copy passed data to this object
         Object.assign(this, data);
@@ -16,7 +26,7 @@ class Session {
         for (var estacio in this.estacions) {
             if (Object.prototype.hasOwnProperty.call(this.estacions, estacio)) {
                 const estacioObj = this.estacions[estacio];
-                const estacioHelper = estacionsHelpers[estacioObj.helperName];
+                const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
                 const reducers = {};
                 estacioHelper.getParameterNames().forEach(nom_parametre => {
                     reducers[nom_parametre] = (state = this.estacions[estacio].parametres[nom_parametre], action) => {
@@ -43,7 +53,7 @@ class Session {
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
-        if (!this.local_mode) {
+        if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
             socket.emit('update_session_parameter', {session_uuid: this.uuid, nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
         } else {
@@ -52,5 +62,3 @@ class Session {
         }
     }
 }
-
-export {Session}

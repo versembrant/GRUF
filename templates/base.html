@@ -7,30 +7,6 @@
 <body>
     {% block content %}
     {% endblock %}
-
-    <!-- Load React, babel, recoil -->
-    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-    <!--script type="text/javascript" src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script type="text/javascript" src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script type="text/javascript" src="https://unpkg.com/babel-standalone@6/babel.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/redux@4.2.1/dist/redux.js" crossorigin="anonymous"></script-->
-
-    <!-- Load socket io stuff and initialize -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        const socket = io();
-        // Defult log socket.io event handler
-        socket.on('message', function (message) {
-            console.log(message);
-        });
-        // NOTE: other socket.io event handlers are defined in the session manager component
-    </script>
-
-    <!-- Load our js bundle -->
     <script type="text/javascript" src="/static/dist/index.js"></script>
-
-    {% block extra_body %}
-    {% endblock %}
-
 </body>
 </html>
