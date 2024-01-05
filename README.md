@@ -15,4 +15,4 @@ Run server (including static build watcher):
     docker-compose up
 
 
-Open running application at `http://localhost:5555/``
+Open running application at `http://localhost:5555/`
