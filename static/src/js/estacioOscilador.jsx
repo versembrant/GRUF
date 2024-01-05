@@ -1,7 +1,13 @@
+import { EstacioHelperBase, estacionsHelpers } from "./estacionsUtils";
+import React from "react";
+
+const { createElement: e } = React; // Util used in other react components: e = React.createElement
+
+
 // Definició estació
-class EstacioOsciladorFactory {
-    constructor(factoryName) {
-        this.factoryName = factoryName
+class EstacioOsciladorHelper extends EstacioHelperBase {
+    constructor(helperName) {
+        super(helperName);
         this.defaultUiWidget = 'EstacioOsciladorUI'
     }    
     getParametersData() {
@@ -10,31 +16,15 @@ class EstacioOsciladorFactory {
             amplitud: {type: 'float', min: '0.0', max: '1.0', initial: 1.0},
             tipus: {type: 'enum', options: ['sinusoidal', 'quadrada', 'serra'], initial: 'sinusoidal'},
         }
-    }
-    // TODO: move these methods to abstract class
-    getInitialParametersState(){
-        const initialParametersState = {}
-        this.getParameterNames().forEach(parameterName => {
-            initialParametersState[parameterName] = this.getParametersData()[parameterName].initial;
-        })
-        return initialParametersState;
-    }
-    getParameterNames() {
-        return Object.keys(this.getParametersData())
-    }    
-    getInitialState() {
-        return {
-            factoryName: this.factoryName,
-            uiWidget: this.defaultUiWidget,
-            parametres: this.getInitialParametersState(),
-        };
     }        
 }
 
-const factoryEstacioOscilador = new EstacioOsciladorFactory('factoryEstacioOscilador');
+export const estacioOsciladorHelper = new EstacioOsciladorHelper('estacioOsciladorHelper');
+estacionsHelpers['estacioOsciladorHelper'] = estacioOsciladorHelper;
+
 
 // Component UI
-function EstacioOsciladorUI({ nomEstacio }) {
+export function EstacioOsciladorUI({ nomEstacio }) {
     
     const estacio = currentSession.estacions[nomEstacio];
     const store = estacio.store;
@@ -47,7 +37,7 @@ function EstacioOsciladorUI({ nomEstacio }) {
         return () => unsubscribe();
     }, [setState]);
 
-    const parametersData = factoryEstacioOscilador.getParametersData()
+    const parametersData = estacioOsciladorHelper.getParametersData()
     
     // TODO: move this to util function to creat react elements from enum options
     const tipusOpcionsElements = [] 
@@ -80,3 +70,4 @@ function EstacioOsciladorUI({ nomEstacio }) {
         ),
     );
 }
+

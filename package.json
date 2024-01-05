@@ -1,0 +1,16 @@
+{
+  "name": "versembrant-bruixit",
+  "source": "static/src/js/index.js",
+  "scripts": {
+    "watch": "parcel watch --no-cache --dist-dir static/dist",
+    "build": "parcel build --dist-dir static/dist"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.11.0",
+    "parcel": "^2.11.0",
+    "process": "^0.11.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "redux": "^5.0.1"
+  }
+}

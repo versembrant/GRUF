@@ -1,3 +1,7 @@
+import { estacionsHelpers } from "./estacionsUtils";
+import {createStore, combineReducers} from "redux";
+
+
 class Session {
     constructor(data, local=false) {
         this.local_mode = local
@@ -12,9 +16,9 @@ class Session {
         for (var estacio in this.estacions) {
             if (Object.prototype.hasOwnProperty.call(this.estacions, estacio)) {
                 const estacioObj = this.estacions[estacio];
-                const factoryEstacio = window[estacioObj.factoryName];
+                const estacioHelper = estacionsHelpers[estacioObj.helperName];
                 const reducers = {};
-                factoryEstacio.getParameterNames().forEach(nom_parametre => {
+                estacioHelper.getParameterNames().forEach(nom_parametre => {
                     reducers[nom_parametre] = (state = this.estacions[estacio].parametres[nom_parametre], action) => {
                         // TODO: add methods to check if value is in valid range, options, etc...
                         switch (action.type) {
@@ -25,7 +29,7 @@ class Session {
                         }
                     }
                 });
-                this.estacions[estacio].store = Redux.createStore(Redux.combineReducers(reducers));
+                this.estacions[estacio].store = createStore(combineReducers(reducers));
             }
         }
     }
@@ -49,3 +53,4 @@ class Session {
     }
 }
 
+export {Session}

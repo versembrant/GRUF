@@ -8,21 +8,3 @@
     <button>Create!</button>
 </form>
 {% endblock %}
-
-{% block extra_body %}
-<script type="text/javascript">
-    setTimeout(function() {
-        // Use a timeout to make sure all other scripts have been loaded and "fabricaEstacioOscilador" is defined
-        // NOTE: not sure why this is needed here...
-        const defaultSessionData = {
-            estacions: {
-                oscilador1: factoryEstacioOscilador.getInitialState(), 
-                oscilador2: factoryEstacioOscilador.getInitialState(), 
-            },
-        }
-        const dataInput = document.getElementsByName('data')[0];
-        dataInput.value = JSON.stringify(defaultSessionData);
-    }, 1000);
-    
-</script>
-{% endblock %}
