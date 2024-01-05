@@ -1,16 +1,18 @@
 # versembrant-bruixit
 
+Build Docker images:
 
-Install static deps:
-
-docker-compose run --rm server yarn install
-
-
-Build (with watch) static:
-
-docker-compose run --rm server yarn watch
+    docker-compose build
 
 
-Run server:
+Install static dependencies:
 
-docker-compose up
+    docker-compose run --rm server yarn install
+
+
+Run server (including static build watcher):
+
+    docker-compose up
+
+
+Open running application at `http://localhost:5555/``

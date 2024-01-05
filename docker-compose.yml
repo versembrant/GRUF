@@ -14,3 +14,11 @@ services:
     redis:
         image: redis:alpine
         command: redis-server --port 16379
+
+    static_watch:
+        build: .
+        volumes:
+            - .:/code
+        command: 
+            - yarn 
+            - watch
