@@ -47,7 +47,7 @@ class Session(object):
     
     @property
     def num_estacions(self):
-        return self.estacions
+        return len(self.estacions)
     
     @property
     def room_name(self):

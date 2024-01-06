@@ -60,7 +60,7 @@ class EstacioHelperBase {
             return createElement(
                 'div',
                 null,
-                createElement('h1', null, nomEstacio),
+                createElement('h2', null, nomEstacio),
                 createElement('p', null, 'Tipus:', estacioObj.tipus),
                 createElement('p', null, 'Osc freq: ', state.freq),
                 createElement(
