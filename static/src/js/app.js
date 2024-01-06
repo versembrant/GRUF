@@ -10,7 +10,8 @@ const selectorEstacio = document.getElementById('selectorEstacio');
 
 const renderEstacio = (nomEstacio) => {
     const estacioElement = document.getElementById('estacio-' + nomEstacio);
-    const estacioReactRoot = document.createElement('div');    
+    const estacioReactRoot = document.createElement('div');
+    estacioReactRoot.className = 'estacio';
     estacioElement.innerHTML = '';
     estacioElement.appendChild(estacioReactRoot);
     const estacioObj = getCurrentSession().getEstacio(nomEstacio);
