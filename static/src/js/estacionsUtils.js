@@ -2,6 +2,44 @@ import { createElement, useState, useEffect} from "react";
 import { getCurrentSession } from "./sessionManager";
 
 
+const creaWidgetPerParametre = (parameterData, nomEstacio, nomParametre, parametreValorState) => {
+
+    if (parameterData.type === 'float') {
+        return (
+            createElement(
+                'div',
+                null,
+                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement(
+                    'input',
+                    {'type': 'range', 'min': parameterData.min, 'max': parameterData.max, 'step': parameterData.step || 0.05, 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, nomParametre, evt.target.value)},
+                    null
+                )
+            )
+        );
+    } else if (parameterData.type === 'enum') {
+        const opcionsElements = [] 
+        parameterData.options.forEach(option => {
+            opcionsElements.push(createElement('option', {value: option}, option),)
+        });
+        return (
+            createElement(
+                'div',
+                null,
+                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement(
+                    'select',
+                    {'value': parametreValorState, onChange: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, nomParametre, evt.target.value)},
+                    ...opcionsElements
+                )
+            )
+        );
+    } else {
+        return createElement('div', null, 'Tipus de paràmetre no suportat');
+    }
+}
+
+
 class EstacioHelperBase {
 
     constructor() {
@@ -12,7 +50,7 @@ class EstacioHelperBase {
 
     getInitialParametersState(){
         const initialParametersState = {}
-        this.parameterNames.forEach(parameterName => {
+        this.getParameterNames().forEach(parameterName => {
             initialParametersState[parameterName] = this.getParametersData()[parameterName].initial;
         })
         return initialParametersState;
@@ -49,12 +87,10 @@ class EstacioHelperBase {
                 return () => unsubscribe();
             }, [setState]);
         
-            const parametersData = estacioHelper.getParametersData()
-            
-            // TODO: move this to util function to creat react elements from enum options
-            const tipusOpcionsElements = [] 
-            parametersData.tipus.options.forEach(option => {
-                tipusOpcionsElements.push(createElement('option', {value: option}, option),)
+            const parametresElements = [];
+            estacioHelper.getParameterNames().forEach(nom_parametre => {
+                const parameterData = estacioHelper.getParametersData()[nom_parametre];
+                parametresElements.push(creaWidgetPerParametre(parameterData, nomEstacio, nom_parametre, state[nom_parametre]));
             });
             
             return createElement(
@@ -62,24 +98,7 @@ class EstacioHelperBase {
                 null,
                 createElement('h2', null, nomEstacio),
                 createElement('p', null, 'Tipus:', estacioObj.tipus),
-                createElement('p', null, 'Osc freq: ', state.freq),
-                createElement(
-                    'input',
-                    {'type': 'range', 'min': parametersData.freq.min, 'max': parametersData.freq.max, 'value': state.freq, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, 'freq', evt.target.value)},
-                    null
-                ),
-                createElement('p', null, 'Osc amp: ', state.amplitud),
-                createElement(
-                    'input',
-                    {'type': 'range', 'min': parametersData.amplitud.min, 'max': parametersData.amplitud.max, 'step': 0.05, 'value': state.amplitud, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, 'amplitud', evt.target.value)},
-                    null
-                ),
-                createElement('p', null, 'Osc tipus: ', state.tipus),
-                createElement(
-                    'select',
-                    {'value': state.tipus, onChange: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, 'tipus', evt.target.value)},
-                    ...tipusOpcionsElements
-                ),
+                [...parametresElements]
             );
         }
     }
