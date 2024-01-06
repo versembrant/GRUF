@@ -7,7 +7,7 @@ class EstacioHelperBase {
     constructor() {
         this.tipus = 'base'
         this.versio = '0.0'
-        this.parameterNames = Object.keys(this.getParametersData())
+        this.parametersData = {}
     }
 
     getInitialParametersState(){
@@ -19,8 +19,13 @@ class EstacioHelperBase {
     }
 
     getParameterNames() {
+        if (this.parameterNames === undefined) { this.parameterNames = Object.keys(this.getParametersData()) }
         return this.parameterNames
-    }  
+    }
+    
+    getParametersData() {
+        return this.parametersData
+    }
 
     getInitialState() {
         return {
@@ -30,9 +35,8 @@ class EstacioHelperBase {
         };
     }
 
-    getUserInterface() {    
-        return function DefaultEstacioUI({ nomEstacio, estacioObj }) {        
-
+    getDefaultUserInterface() {    
+        return ({ nomEstacio, estacioObj }) => {
             const estacio = estacioObj;
             const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
             const store = estacio.store;

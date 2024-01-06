@@ -1,6 +1,8 @@
 import { createStore, combineReducers } from "redux";
 import { getEstacioHelperInstance } from "./estacionsUtils";
 import { socket } from "./socket";
+import { ensureValidValue } from "./utils";
+
 
 var currentSession = undefined; 
 
@@ -14,6 +16,8 @@ export const setCurrentSession = (session) => {
 
 export class Session {
     constructor(data, local=false) {
+        console.log("Initializing session manager")
+
         this.localMode = local
 
         // Copy passed data to this object
@@ -22,18 +26,18 @@ export class Session {
         // TODO: Create Redux store for the common session data (transport, users connected, etc...)
         
         // Create Redux stores for each estacio so this can be binded to corresponding react components
-        // These stores are created automatically for each parmetre in estacio.parametres.
+        // These stores are created automatically for each parmetre of estacio
         for (var estacio in this.estacions) {
             if (Object.prototype.hasOwnProperty.call(this.estacions, estacio)) {
                 const estacioObj = this.estacions[estacio];
                 const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
                 const reducers = {};
                 estacioHelper.getParameterNames().forEach(nom_parametre => {
-                    reducers[nom_parametre] = (state = this.estacions[estacio].parametres[nom_parametre], action) => {
-                        // TODO: add methods to check if value is in valid range, options, etc...
+                    const parameterData = estacioHelper.getParametersData()[nom_parametre];
+                    reducers[nom_parametre] = (state = ensureValidValue(this.estacions[estacio].parametres[nom_parametre], parameterData), action) => {
                         switch (action.type) {
                             case 'SET_' + nom_parametre:
-                            return action.value;
+                            return ensureValidValue(action.value, parameterData);  // Do some checks to make sure the parameter value is valid
                             default:
                             return state;
                         }
