@@ -7,7 +7,7 @@ import './estacioOscilador'
 
 // JS per pàgina
 import './newSession'
-import './session'
+import './app'
 
 // CSS
 import '../styles/index.scss'

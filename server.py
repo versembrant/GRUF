@@ -42,8 +42,12 @@ class Session(object):
         return 'session:' + self.uuid
     
     @property
+    def estacions(self):
+        return self.data['estacions']
+    
+    @property
     def num_estacions(self):
-        return len(self.data['estacions'])
+        return self.estacions
     
     @property
     def room_name(self):

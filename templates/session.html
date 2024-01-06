@@ -3,6 +3,19 @@
 {% block content %}
 <h1>Sessió "{{ session.name }}"{% if local_mode %} (local){% endif %}</h1>
 <a href="/">Torna a la llista de sessions</a>
-<session data-uuid="{{ session.uuid }}" data-local="{{ local_mode|tojson }}" data-data="{{ session.get_full_data() }}" />
-<div id="root"></div>
+<session data-uuid="{{ session.uuid }}" data-local="{{ local_mode|tojson }}" data-data="{{ session.get_full_data() }}"></session>
+<div>
+    Estació: <select id="selectorEstacio">
+        <option value="all">Totes</option>
+        {% for estacio in session.estacions %}
+        <option value="{{ estacio }}">{{ estacio }}</option>
+        {% endfor %}
+    </select>
+    <div class="estacions">
+        {% for estacio in session.estacions %}
+        <div id="estacio-{{ estacio }}" class="estacio"></div>
+        {% endfor %}
+    </div>
+</div>
+
 {% endblock %}

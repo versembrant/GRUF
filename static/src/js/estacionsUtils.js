@@ -59,7 +59,7 @@ class EstacioHelperBase {
             
             return createElement(
                 'div',
-                {className: 'estacio', id: nomEstacio},
+                null,
                 createElement('h1', null, nomEstacio),
                 createElement('p', null, 'Tipus:', estacioObj.tipus),
                 createElement('p', null, 'Osc freq: ', state.freq),

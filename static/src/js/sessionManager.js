@@ -47,6 +47,14 @@ export class Session {
             }
         }
     }
+
+    getNomsEstacions() {
+        return Object.keys(this.estacions);
+    }
+
+    getEstacio(nomEstacio) {
+        return this.estacions[nomEstacio];
+    }
     
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
         const estacio = this.estacions[nomEstacio];
