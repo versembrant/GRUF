@@ -6,29 +6,31 @@ class EstacioHelperBase {
 
     constructor() {
         this.tipus = 'base'
+        this.versio = '0.0'
+        this.parameterNames = Object.keys(this.getParametersData())
     }
 
     getInitialParametersState(){
         const initialParametersState = {}
-        this.getParameterNames().forEach(parameterName => {
+        this.parameterNames.forEach(parameterName => {
             initialParametersState[parameterName] = this.getParametersData()[parameterName].initial;
         })
         return initialParametersState;
     }
 
     getParameterNames() {
-        return Object.keys(this.getParametersData())
+        return this.parameterNames
     }  
 
     getInitialState() {
         return {
             tipus: this.tipus,
+            versio: this.versio,
             parametres: this.getInitialParametersState(),
         };
     }
 
-    getDefaultUI() {
-        
+    getUserInterface() {    
         return function DefaultEstacioUI({ nomEstacio, estacioObj }) {        
 
             const estacio = estacioObj;
@@ -76,13 +78,13 @@ class EstacioHelperBase {
                 ),
             );
         }
-        
     }
 }
 
 const estacionsHelperInstances = {};
 
 const registerEstacioHelperInstance = (estacioHelperInstance) => {
+    console.log('Registering estacio helper', estacioHelperInstance.tipus)
     estacionsHelperInstances[estacioHelperInstance.tipus] = estacioHelperInstance;
 }
 

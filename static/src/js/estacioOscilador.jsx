@@ -6,6 +6,7 @@ class EstacioOsciladorHelper extends EstacioHelperBase {
     constructor() {
         super();
         this.tipus = 'oscilador'
+        this.versio = '0.1'
     }    
     
     getParametersData() {

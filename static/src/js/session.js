@@ -47,10 +47,8 @@ document.addEventListener("newSessionDataLoaded", (evt) => {
         if (Object.prototype.hasOwnProperty.call(getCurrentSession().estacions, nomEstacio)) {
             const estacioObj = getCurrentSession().estacions[nomEstacio];
             const estacioHelper = getEstacioHelperInstance(estacioObj.tipus)
-            estacionsReactElements.push(createElement(estacioHelper.getDefaultUI(), {nomEstacio: nomEstacio, estacioObj: estacioObj}));
+            estacionsReactElements.push(createElement(estacioHelper.getUserInterface(), {nomEstacio: nomEstacio, estacioObj: estacioObj}));
         }   
         reactRoot.render(createElement(StrictMode, null, ...estacionsReactElements));
     }
-},
-false,
-);
+});
