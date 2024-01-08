@@ -34,6 +34,45 @@ const creaWidgetPerParametre = (parameterData, nomEstacio, nomParametre, paramet
                 )
             )
         );
+    } else if (parameterData.type === 'text') {
+        return (
+            createElement(
+                'div',
+                null,
+                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement(
+                    'input',
+                    {'type': 'text', 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, nomParametre, evt.target.value)},
+                    null
+                )
+            )
+        );
+    } else if (parameterData.type === 'steps') {
+        const stepsElements = []
+        const numSteps = parameterData.initial.length;
+        for (let i = 0; i < numSteps; i++) {
+            const filledClass = parametreValorState[i] == 1.0 ? 'filled' : '';
+            stepsElements.push(createElement(
+                    'div', 
+                    {className: 'step ' + filledClass, onClick: (evt) => {
+                        var updatedSteps = [...parametreValorState];
+                        if (updatedSteps[i] == 1.0) {
+                            updatedSteps[i] = 0.0;
+                        } else {
+                            updatedSteps[i] = 1.0;
+                        }
+                        getCurrentSession().updateParametreEstacioInServer(nomEstacio, nomParametre, updatedSteps)}
+                    }, 
+                    null
+                )
+            )
+        }
+        return createElement(
+            'div',
+            null,
+            createElement('p', null, nomParametre + ': ', parametreValorState.join(',')),
+            createElement('div', {className: 'steps'}, ...stepsElements)
+        );
     } else {
         return createElement('div', null, 'Tipus de paràmetre no suportat');
     }
@@ -102,6 +141,11 @@ class EstacioHelperBase {
             );
         }
     }
+
+    getUserInterface() {
+        return this.getDefaultUserInterface()
+    }
+    
 }
 
 const estacionsHelperInstances = {};

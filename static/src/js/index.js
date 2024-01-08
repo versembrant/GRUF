@@ -4,6 +4,7 @@ import './sessionManager'
 
 // JS estacions de treball
 import './estacioOscilador'
+import './estacioSequenciador'
 
 // JS per pàgina
 import './newSession'

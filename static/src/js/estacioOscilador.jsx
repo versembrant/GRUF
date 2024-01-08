@@ -1,6 +1,5 @@
 import { EstacioHelperBase, registerEstacioHelperInstance } from "./estacionsUtils";
 
-
 class EstacioOsciladorHelper extends EstacioHelperBase {
     
     constructor() {
@@ -13,12 +12,6 @@ class EstacioOsciladorHelper extends EstacioHelperBase {
             tipus: {type: 'enum', options: ['sinusoidal', 'quadrada', 'serra'], initial: 'sinusoidal'},
         }
     }
-
-    getUserInterface() {
-        // If no custom user interface is defined, return the default one implemented in the base class
-        return super.getDefaultUserInterface()
-    }
 }
 
-const estacioOsciladorHelper = new EstacioOsciladorHelper();
-registerEstacioHelperInstance(estacioOsciladorHelper);
+registerEstacioHelperInstance(new EstacioOsciladorHelper());

@@ -7,3 +7,18 @@
     margin: 10px;
     border: 1px solid black;
 }
+
+.steps {
+    display: flex;
+
+    .step {
+        border: 1px solid gray;
+        height: 20px;
+        width: 20px;
+    }
+
+    .filled {
+        background-color: black;
+    }
+}
+
