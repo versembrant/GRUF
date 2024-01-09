@@ -12,7 +12,6 @@ const selectorEstacio = document.getElementById('selectorEstacio');
 const onSessionDataLoaded = () => {
     console.log('Set currentSession', getCurrentSession());
     renderEstacions();
-    getAudioGraphInstance().buildAudioGraph();  // TODO: only do that if/when audio is requested
 }
 
 const localMode = sessionElement.dataset.localMode === 'true';
@@ -76,9 +75,13 @@ const stopAudioButton = document.getElementById('stopAudio');
 
 startAudioButton.addEventListener('click', async (event) => {
     await getAudioGraphInstance().startAudioContext();
-    getAudioGraphInstance().runAudioGraph();
+    if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt))) {
+        // Only build audio graph the first time "play" is pressed
+        getAudioGraphInstance().buildAudioGraph();  
+    }
+    getAudioGraphInstance().transportStart();
 });
 
 stopAudioButton.addEventListener('click', (event) => {
-    getAudioGraphInstance().stopAudioGraph();
+    getAudioGraphInstance().transportStop();
 });

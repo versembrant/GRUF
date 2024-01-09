@@ -16,27 +16,26 @@ class EstacioSequenciadorHelper extends EstacioHelperBase {
         }
     }
 
-    getAudioGraph(estacioObj) {
-        // Init volatile state
+    loadSoundInSamplerNote(samplerNode, note, url, estacioObj) {
+        if (estacioObj.volatileState.loadedSoundURLsPerNote[note] !== url) {
+            // Només carreguem el so si no estava carregat ja
+            const buffer = new Tone.ToneAudioBuffer(url, () => {
+                samplerNode.add(note, buffer);
+                
+            });
+            estacioObj.volatileState.loadedSoundURLsPerNote[note] = url;
+        }
+    }
+
+    buildEstacioAudioGraph(estacioObj, estacioMasterGainNode) {
+        // Inicialitzem estat volàtil
         estacioObj.volatileState = {
             currentStep: 0,
-            loadedSound1URL: "",
-            loadedSound2URL: "",
+            loadedSoundURLsPerNote: {},
         }
-        const estacioObjState = estacioObj.store.getState();
 
-        // Create sampler and add initial sounds
-        const sampler = new Tone.Sampler().toDestination();
-        const bufferSound1 = new Tone.ToneAudioBuffer(estacioObjState.sound1URL, () => {
-            sampler.add('C4', bufferSound1);
-            estacioObj.volatileState.loadedSound1URL = estacioObjState.sound1URL;
-        });
-        const bufferSound2 = new Tone.ToneAudioBuffer(estacioObjState.sound2URL, () => {
-            sampler.add('D#4', bufferSound2);
-            estacioObj.volatileState.loadedSound2URL = estacioObjState.sound2URL;
-        });
-
-        // Create loop sequencer
+        // Creem els nodes del graph
+        const sampler = new Tone.Sampler().connect(estacioMasterGainNode);
         const loopSequencer = new Tone.Loop(time => {
             // Check if sounds should be played in the current step and do it
             const estacioObjState = estacioObj.store.getState();
@@ -48,36 +47,32 @@ class EstacioSequenciadorHelper extends EstacioHelperBase {
             if (shouldPlaySound2) {
                 sampler.triggerAttack("D#4", time);
             }
-            
             // Advance current step and update volatile state
             estacioObj.volatileState.currentStep += 1;
             if (estacioObj.volatileState.currentStep >= this.numSteps) {
                 estacioObj.volatileState.currentStep = 0;
             }
         }, "16n").start(0);
-        
+
         return {
             sampler: sampler,
             loopSequencer: loopSequencer,
-        };
+        }
     }
 
-    updateAudioGraph(audioGraphEstacio, estacioObj, nomParametre, valor) {
-        
+    updateAudioGraphFromState(audioGraphEstacio, estacioObj) {
+        const estacioObjState = estacioObj.store.getState();        
+
+        // Carreguem els sons al sampler
+        this.loadSoundInSamplerNote(audioGraphEstacio.sampler, 'C4', estacioObjState.sound1URL, estacioObj);
+        this.loadSoundInSamplerNote(audioGraphEstacio.sampler, 'D#4', estacioObjState.sound2URL, estacioObj);
+    }
+
+    updateAudioGraphParameter(audioGraphEstacio, estacioObj, nomParametre) {
         if (nomParametre === 'sound1URL') {
-            if (valor !== estacioObj.volatileState.loadedSound1URL) {
-                const buffer = new Tone.ToneAudioBuffer(valor, () => {
-                    audioGraphEstacio.sampler.add('C4', buffer);
-                    estacioObj.volatileState.loadedSound1URL = valor;
-                });
-            }
+            this.loadSoundInSamplerNote(audioGraphEstacio.sampler, 'C4', estacioObjState.sound1URL, estacioObj);
         } else if (nomParametre === 'sound2URL') {
-            if (valor !== estacioObj.volatileState.loadedSound2URL) {
-                const buffer = new Tone.ToneAudioBuffer(valor, () => {
-                    audioGraphEstacio.sampler.add('D#4', buffer);
-                    estacioObj.volatileState.loadedSound2URL = valor;
-                });
-            }
+            this.loadSoundInSamplerNote(audioGraphEstacio.sampler, 'D#4', estacioObjState.sound2URL, estacioObj);
         }
         // Per els altres parmetres no cal actualitzar res en el graph perqupè els steps ja es llegeixen directament del store
     }

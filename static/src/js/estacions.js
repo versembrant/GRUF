@@ -66,7 +66,7 @@ const creaUIWidgetPerParametre = (parameterData, nomEstacio, nomParametre, param
             const filledClass = parametreValorState[i] == 1.0 ? 'filled' : '';
             stepsElements.push(createElement(
                     'div', 
-                    {className: 'step ' + filledClass, onClick: (evt) => {
+                    {className: 'step ' + filledClass, onClick: (evt) => {  //
                         var updatedSteps = [...parametreValorState];
                         if (updatedSteps[i] == 1.0) {
                             updatedSteps[i] = 0.0;
@@ -158,19 +158,23 @@ export class EstacioHelperBase {
         return this.getDefaultUserInterface()
     }
 
-    getAudioGraph(estacioObj) {
+    buildEstacioAudioGraph(estacioObj, estacioMasterGainNode) {
         return {}
     }
 
-    updateAudioGraph(audioGraphEstacio, estacioObj, nomParametre, valor) {
+    updateAudioGraphFromState(audioGraphEstacio, estacioObj) {
+        // Called when we want to update the whole audio graph from the state (for example, to force syncing with the state)
+    }
+    
+    updateAudioGraphParameter(audioGraphEstacio, estacioObj, nomParametre) {
         // Called when a parameter of an station's audio graph is updated
     }
 
-    onStartAudioGraph(audioGraphEstacio, estacioObj) {
+    onTransportStart(audioGraphEstacio, estacioObj) {
         // Called when audio graph is started
     }
 
-    onStopAudioGraph(audioGraphEstacio, estacioObj) {
+    onTransportStop(audioGraphEstacio, estacioObj) {
         // Called when audio graph is stopped
     }
 }

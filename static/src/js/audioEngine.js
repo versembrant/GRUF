@@ -13,15 +13,33 @@ export class AudioGraph {
 
   buildAudioGraph() {
     console.log("Building audio graph")
-    // TODO: check if setting graph to {} will "garbage collect" the previous graph properly
     this.graph = {};
     this.graphIsBuilt = false;
+
+    // Crea node master gain (per tenir un volum general)
+    this.masterGainNode = new Tone.Gain(1.0).toDestination();
+
+    // Crea els nodes de cada estació i crea un gain individual per cada node
+    // Guarda referències als nodes a this.graph perquè hi puguem accedir després per actualitzar els paràmetres
     getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
         const estacioObj = getCurrentSession().getEstacio(nomEstacio);
         const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
-        this.graph[nomEstacio] = estacioHelper.getAudioGraph(estacioObj);
+        const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
+        const estacioAudioGraph = estacioHelper.buildEstacioAudioGraph(estacioObj, estacioMasterGainNode);
+        estacioHelper.updateAudioGraphFromState(estacioAudioGraph, estacioObj);
+        estacioAudioGraph['_masterGain'] = estacioMasterGainNode;
+        this.graph[nomEstacio] = estacioAudioGraph;
     })
+
+    // Marca el graph com a construït
     this.graphIsBuilt = true;
+  }
+
+  updatePrametreEstacio(nomEstacio, estacioObj, nomParametre) {
+    if (this.graphIsBuilt){
+        const audioGraphEstacio = this.graph[nomEstacio];
+        getEstacioHelperInstance(estacioObj.tipus).updateAudioGraphParameter(audioGraphEstacio, estacioObj, nomParametre);
+    }
   }
 
   async startAudioContext() {
@@ -32,35 +50,44 @@ export class AudioGraph {
     }
   }
 
-  runAudioGraph() {
+  transportStart() {
     if (this.graphIsBuilt === true) {
-        console.log("Running audio graph")
+        console.log("Transport start")
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacioObj = getCurrentSession().getEstacio(nomEstacio);
             const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
-            estacioHelper.onStartAudioGraph(this.graph[nomEstacio], estacioObj);
+            estacioHelper.onTransportStart(this.graph[nomEstacio], estacioObj);
         });
         Tone.Transport.start()
     }
   }
 
-  stopAudioGraph() {
+  transportStop() {
     if (this.graphIsBuilt === true) {
-        console.log("Stopping audio graph")
+        console.log("Transport stop")
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacioObj = getCurrentSession().getEstacio(nomEstacio);
             const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
-            estacioHelper.onStopAudioGraph(this.graph[nomEstacio], estacioObj);
+            estacioHelper.onTransportStop(this.graph[nomEstacio], estacioObj);
         });
         Tone.Transport.stop()
     }
   }
 
-  updatePrametreEstacio(nomEstacio, estacioObj, nomParametre, valor) {
-    if (this.graphIsBuilt){
-        const audioGraphEstacio = this.graph[nomEstacio];
-        getEstacioHelperInstance(estacioObj.tipus).updateAudioGraph(audioGraphEstacio, estacioObj, nomParametre, valor);
-    }
+  getMasterGain() {
+    return this.masterGainNode.gain.value;
+  }
+
+  setMasterGain(gain) {
+    this.masterGainNode.gain.rampTo(gain);
+  }
+
+  getBpm() {
+    return Tone.Transport.bpm.value;
+  }
+
+  setBpm(bpm) {
+    Tone.Transport.bpm.rampTo(bpm);
   }
 }
 

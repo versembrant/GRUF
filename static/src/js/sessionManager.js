@@ -60,13 +60,11 @@ export class Session {
         const estacioObj = this.estacions[nomEstacio];
         estacioObj.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
 
-        const valorGuardat = estacioObj.store.getState()[nomParametre]  // Aquí agafem el valor guardat per si l'store l'havia modificat (perquè estava fora de rang, per exemple)
-
         // Actualitzem el valor fora de l'store, tot i que això no seria necessari si ja està guardat a l'store (tindrem informació duplicada)
-        estacioObj.parametres[nomParametre] = valorGuardat;
+        estacioObj.parametres[nomParametre] = estacioObj.store.getState()[nomParametre]  // Aquí agafem el valor guardat per si l'store l'havia modificat (perquè estava fora de rang, per exemple)
 
         // Triguejem canvi a l'audio graph
-        getAudioGraphInstance().updatePrametreEstacio(nomEstacio, estacioObj, nomParametre, valorGuardat)
+        getAudioGraphInstance().updatePrametreEstacio(nomEstacio, estacioObj, nomParametre)
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {

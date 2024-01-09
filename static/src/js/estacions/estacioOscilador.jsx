@@ -13,28 +13,35 @@ class EstacioOsciladorHelper extends EstacioHelperBase {
         }
     }
 
-    getAudioGraph(estacioObj) {
-        // This one requires no volatile state
-        const estacioObjState = estacioObj.store.getState();        
-        const oscilator = new Tone.Oscillator(estacioObjState.freq, "sine").toDestination();
-        oscilator.volume.value = Tone.gainToDb(estacioObjState.amplitud);
+    buildEstacioAudioGraph(estacioObj, estacioMasterGainNode) {
+        // Aquesta estació no ha de guardar cap estat volàtil, igualment l'inicialitzem amb un objecte buit per consistència
+        estacioObj.volatileState = {};
+
+        // Creem els nodes del graph
+        const oscilator = new Tone.Oscillator().connect(estacioMasterGainNode);
+        
+        // Retornem l'objecte amb tots els nodes del graph
         return {
             oscilator: oscilator,
         };
     }
 
-    updateAudioGraph(audioGraphEstacio, estacioObj, nomParametre, valor) {
-        // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat
+    updateAudioGraphFromState(audioGraphEstacio, estacioObj) {
         const estacioObjState = estacioObj.store.getState();        
-        audioGraphEstacio.oscilator.frequency.value = estacioObjState.freq;
-        audioGraphEstacio.oscilator.volume.value = Tone.gainToDb(estacioObjState.amplitud);
+        audioGraphEstacio.oscilator.frequency.rampTo(estacioObjState.freq);
+        audioGraphEstacio.oscilator.volume.rampTo(Tone.gainToDb(estacioObjState.amplitud));
     }
 
-    onStartAudioGraph(audioGraphEstacio, estacioObj) {
+    updateAudioGraphParameter(audioGraphEstacio, estacioObj, nomParametre) {
+        // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
+        this.updateAudioGraphFromState(audioGraphEstacio, estacioObj);
+    }
+
+    onTransportStart(audioGraphEstacio, estacioObj) {
         audioGraphEstacio.oscilator.start()
     }
 
-    onStopAudioGraph(audioGraphEstacio, estacioObj) {
+    onTransportStop(audioGraphEstacio, estacioObj) {
         audioGraphEstacio.oscilator.stop()
     }
 }
