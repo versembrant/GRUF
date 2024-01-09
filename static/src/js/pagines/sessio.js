@@ -1,7 +1,6 @@
 import { createElement, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
-import { getEstacioHelperInstance } from "../estacions";
 import { socket } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 
@@ -32,7 +31,7 @@ if (localMode){
         onSessionDataLoaded();
     });
     socket.on('update_session_parameter', function (data) {
-        if ((getCurrentSession() !== undefined) && (data.session_uuid === getCurrentSession().uuid)) {
+        if ((getCurrentSession() !== undefined) && (data.session_uuid === getCurrentSession().getUUID())) {
             getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
         }
     });
@@ -45,10 +44,9 @@ const renderEstacio = (nomEstacio) => {
     estacioReactRoot.className = 'estacio';
     estacioElement.innerHTML = '';
     estacioElement.appendChild(estacioReactRoot);
-    const estacioObj = getCurrentSession().getEstacio(nomEstacio);
-    const estacioHelper = getEstacioHelperInstance(estacioObj.tipus)
+    const estacio = getCurrentSession().getEstacio(nomEstacio);
     createRoot(estacioReactRoot).render(
-        createElement(StrictMode, null, createElement(estacioHelper.getUserInterface(), {nomEstacio: nomEstacio, estacioObj: estacioObj}))
+        createElement(StrictMode, null, createElement(estacio.getUserInterface(), null))
     );
 }
 

@@ -1,49 +1,43 @@
 import * as Tone from 'tone'
-import { EstacioHelperBase, registerEstacioHelperInstance } from "../estacions";
+import { EstacioBase, registerEstacioDisponible } from "../sessionManager";
 
-class EstacioOsciladorHelper extends EstacioHelperBase {
+class EstacioOscilador extends EstacioBase {
     
-    constructor() {
-        super();
+    constructor(nom) {
+        super(nom);
         this.tipus = 'oscilador'
         this.versio = '0.1'
-        this.parametersData = {
-            freq: {type: 'float', min: '20.0', max: '4000.0', initial: 440},
-            amplitud: {type: 'float', min: '0.0', max: '1.0', initial: 1.0}
+        this.parametersDescription = {
+            freq: {type: 'float', label:'Freqüència', min: '20.0', max: '4000.0', initial: 440},
+            amplitud: {type: 'float', label:'Gain', min: '0.0', max: '1.0', initial: 1.0}
         }
     }
 
-    buildEstacioAudioGraph(estacioObj, estacioMasterGainNode) {
-        // Aquesta estació no ha de guardar cap estat volàtil, igualment l'inicialitzem amb un objecte buit per consistència
-        estacioObj.volatileState = {};
-
-        // Creem els nodes del graph
+    buildEstacioAudioGraph(estacioMasterGainNode) {
+        // Creem els nodes del graph i els guardem
         const oscilator = new Tone.Oscillator().connect(estacioMasterGainNode);
-        
-        // Retornem l'objecte amb tots els nodes del graph
-        return {
+        this.audioNodes = {
             oscilator: oscilator,
         };
     }
 
-    updateAudioGraphFromState(audioGraphEstacio, estacioObj) {
-        const estacioObjState = estacioObj.store.getState();        
-        audioGraphEstacio.oscilator.frequency.rampTo(estacioObjState.freq);
-        audioGraphEstacio.oscilator.volume.rampTo(Tone.gainToDb(estacioObjState.amplitud));
+    updateAudioGraphFromState() {
+        this.audioNodes.oscilator.frequency.rampTo(this.getParameterValue('freq'));
+        this.audioNodes.oscilator.volume.rampTo(Tone.gainToDb(this.getParameterValue('amplitud')));
     }
 
-    updateAudioGraphParameter(audioGraphEstacio, estacioObj, nomParametre) {
+    updateAudioGraphParameter(nomParametre) {
         // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
-        this.updateAudioGraphFromState(audioGraphEstacio, estacioObj);
+        this.updateAudioGraphFromState();
     }
 
-    onTransportStart(audioGraphEstacio, estacioObj) {
-        audioGraphEstacio.oscilator.start()
+    onTransportStart() {
+        this.audioNodes.oscilator.start()
     }
 
-    onTransportStop(audioGraphEstacio, estacioObj) {
-        audioGraphEstacio.oscilator.stop()
+    onTransportStop() {
+        this.audioNodes.oscilator.stop()
     }
 }
 
-registerEstacioHelperInstance(new EstacioOsciladorHelper());
+registerEstacioDisponible('oscilador', EstacioOscilador);

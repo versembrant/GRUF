@@ -1,7 +1,6 @@
+import { createElement, useState, useEffect} from "react";
 import { createStore, combineReducers } from "redux";
-import { getEstacioHelperInstance } from "./estacions";
-import { socket, ensureValidValue } from "./utils";
-import { getAudioGraphInstance } from "./audioEngine";
+import { socket, ensureValidValue, creaUIWidgetPerParametre } from "./utils";
 
 
 var currentSession = undefined; 
@@ -14,38 +13,147 @@ export const setCurrentSession = (session) => {
     currentSession = session;
 }
 
+export const estacionsDisponibles = {};
+
+export const registerEstacioDisponible = (nom, estacioClass) => {
+    console.log('Registering estacio helper', nom, estacioClass)
+    estacionsDisponibles[nom] = estacioClass;
+}
+
+
+export class EstacioBase {
+
+    constructor(nom) {
+        this.nom = nom
+        this.tipus = 'base'
+        this.versio = '0.0'
+        this.parametersDescription = {}
+        this.store = undefined
+        this.audioNodes = {}
+        this.volatileState = {}
+    }
+
+    initialize(initialState = undefined) {
+        this.initializeStore(initialState)
+    }
+
+    initializeStore(initialState = undefined) {
+        // Crea un store Redux per a cada paràmetre de l'estació
+        const reducers = {};
+        this.getParameterNames().forEach(parameterName => {
+            const parameterDescription = this.getParameterDescription(parameterName);
+            let initialValue = parameterDescription.initial;
+            if (initialValue !== undefined) {
+                initialValue = initialState.parametres[parameterName];
+            }
+            reducers[parameterName] = (state = ensureValidValue(initialValue, parameterDescription), action) => {
+                switch (action.type) {
+                    case 'SET_' + parameterName:
+                    return ensureValidValue(action.value, parameterDescription);  // Do some checks to make sure the parameter value is valid
+                    default:
+                    return state;
+                }
+            }
+        });
+        this.store = createStore(combineReducers(reducers));
+    }
+
+    getStateForServer() {
+        return {
+            tipus: this.tipus,
+            versio: this.versio,
+            parametres: this.store.getState(),
+        }
+    }
+
+    getParameterNames() {
+        return Object.keys(this.parametersDescription)
+    }
+    
+    getParameterDescription(parameterName) {
+        return this.parametersDescription[parameterName]
+    }
+
+    getParameterValue(parameterName) {
+        return this.store.getState()[parameterName];
+    }
+
+    // UI stuff
+
+    getDefaultUserInterface() {    
+        return () => {
+            const [state, setState] = useState(this.store.getState());
+            useEffect(() => {
+                const unsubscribe = this.store.subscribe(() => {
+                    setState(this.store.getState());
+                });
+                return () => unsubscribe();
+            }, [setState]);
+        
+            const parametresElements = [];
+            this.getParameterNames().forEach(nomParametre => {
+                parametresElements.push(creaUIWidgetPerParametre(this, nomParametre));
+            });
+            
+            return createElement(
+                'div',
+                null,
+                createElement('h2', null, this.nom),
+                createElement('p', null, 'Tipus:', this.tipus),
+                [...parametresElements]
+            );
+        }
+    }
+
+    getUserInterface() {
+        return this.getDefaultUserInterface()
+    }
+
+    // AUDIO stuff
+
+    buildEstacioAudioGraph(estacioMasterGainNode) {
+        return {}
+    }
+
+    updateAudioGraphFromState() {
+        // Called when we want to update the whole audio graph from the state (for example, to force syncing with the state)
+    }
+    
+    updateAudioGraphParameter(nomParametre) {
+        // Called when a parameter of an station's audio graph is updated
+    }
+
+    onTransportStart() {
+        // Called when audio graph is started
+    }
+
+    onTransportStop() {
+        // Called when audio graph is stopped
+    }
+}
+
+
 export class Session {
     constructor(data, local=false) {
         console.log("Initializing session manager")
 
         this.localMode = local
-
-        // Copy passed data to this object
-        Object.assign(this, data);
-
-        // TODO: Create Redux store for the common session data (transport, users connected, etc...)
         
-        // Create Redux stores for each estacio so this can be binded to corresponding react components
-        // These stores are created automatically for each parmetre of estacio
-        for (var estacio in this.estacions) {
-            if (Object.prototype.hasOwnProperty.call(this.estacions, estacio)) {
-                const estacioObj = this.estacions[estacio];
-                const estacioHelper = getEstacioHelperInstance(estacioObj.tipus);
-                const reducers = {};
-                estacioHelper.getParameterNames().forEach(nom_parametre => {
-                    const parameterData = estacioHelper.getParametersData()[nom_parametre];
-                    reducers[nom_parametre] = (state = ensureValidValue(this.estacions[estacio].parametres[nom_parametre], parameterData), action) => {
-                        switch (action.type) {
-                            case 'SET_' + nom_parametre:
-                            return ensureValidValue(action.value, parameterData);  // Do some checks to make sure the parameter value is valid
-                            default:
-                            return state;
-                        }
-                    }
-                });
-                this.estacions[estacio].store = createStore(combineReducers(reducers));
-            }
-        }
+        // Copia totes les dades "raw" de la sessió per tenir-les guardades
+        this.rawData = data
+
+        // Crea objectes per cada estació i guardal's a la sessió
+        this.estacions = {}
+        Object.keys(this.rawData.estacions).forEach(nomEstacio => {
+            const estacioRawData = this.rawData.estacions[nomEstacio]
+            const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
+            estacioObj.initialize(estacioRawData)
+            this.estacions[nomEstacio] = estacioObj
+        })
+    }
+
+    getUUID() {
+        return this.rawData.uuid
     }
 
     getNomsEstacions() {
@@ -57,20 +165,19 @@ export class Session {
     }
     
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
-        const estacioObj = this.estacions[nomEstacio];
-        estacioObj.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
+        const estacio = this.getEstacio(nomEstacio);
 
-        // Actualitzem el valor fora de l'store, tot i que això no seria necessari si ja està guardat a l'store (tindrem informació duplicada)
-        estacioObj.parametres[nomParametre] = estacioObj.store.getState()[nomParametre]  // Aquí agafem el valor guardat per si l'store l'havia modificat (perquè estava fora de rang, per exemple)
+        // Triguejem canvi a l'store (que generarà canvi a la UI)
+        estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
 
         // Triguejem canvi a l'audio graph
-        getAudioGraphInstance().updatePrametreEstacio(nomEstacio, estacioObj, nomParametre)
+        estacio.updateAudioGraphParameter(nomParametre)
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
-            socket.emit('update_session_parameter', {session_uuid: this.uuid, nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+            socket.emit('update_session_parameter', {session_uuid: this.getUUID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
         } else {
             // In local mode, we update parameter in the same object as it is not synced with the server
             this.updateParametreEstacio(nomEstacio, nomParametre, valor)
