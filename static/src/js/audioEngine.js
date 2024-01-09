@@ -17,6 +17,20 @@ export class AudioGraph {
     // Crea node master gain (per tenir un volum general)
     this.masterGainNode = new Tone.Gain(1.0).toDestination();
 
+    // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
+    this.masterSequencer = new Tone.Loop(time => {
+      // Update store de la sessió amb el current step del main sequencer local
+      getCurrentSession().store.dispatch({ type: 'SET_mainSequencerCurrentStepLocal', value: this.masterSequencerCurrentStep });
+
+      // Call sequencer tick functions on all stations
+      getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+          const estacio = getCurrentSession().getEstacio(nomEstacio);
+          estacio.onSequencerTick(this.masterSequencerCurrentStep, time);
+      });
+      // Advance current step and update volatile state
+      this.masterSequencerCurrentStep += 1;
+  }, "16n").start(0);
+
     // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
     getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
         const estacio = getCurrentSession().getEstacio(nomEstacio);
@@ -41,6 +55,7 @@ export class AudioGraph {
   transportStart() {
     if (this.graphIsBuilt === true) {
         console.log("Transport start")
+        this.masterSequencerCurrentStep = 0  // TODO: si hi ha alguna altra instància del navegador que ja està tocant, aquest valor s'hauria de llegir del servidor per anar el més sincronitzats possible
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             estacio.onTransportStart();
@@ -57,6 +72,8 @@ export class AudioGraph {
             estacio.onTransportStop();
         });
         Tone.Transport.stop()
+        this.masterSequencerCurrentStep = -1
+        getCurrentSession().store.dispatch({ type: 'SET_mainSequencerCurrentStepLocal', value: this.masterSequencerCurrentStep });
     }
   }
 

@@ -31,6 +31,7 @@ export class EstacioBase {
         this.store = undefined
         this.audioNodes = {}
         this.volatileState = {}
+        this.updatesUiWithMainSequencer = false;
     }
 
     initialize(initialState = undefined) {
@@ -82,14 +83,25 @@ export class EstacioBase {
 
     getDefaultUserInterface() {    
         return () => {
-            const [state, setState] = useState(this.store.getState());
+            const [_, setState] = useState(this.store.getState());
             useEffect(() => {
                 const unsubscribe = this.store.subscribe(() => {
                     setState(this.store.getState());
                 });
                 return () => unsubscribe();
             }, [setState]);
-        
+
+            if (this.updatesUiWithMainSequencer === true) {
+                // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), we register to main session store changes as well
+                const [_, setStateSession] = useState(getCurrentSession().store.getState());
+                useEffect(() => {
+                    const unsubscribe = getCurrentSession().store.subscribe(() => {
+                        setStateSession(getCurrentSession().store.getState());
+                    });
+                    return () => unsubscribe();
+                }, [setStateSession]);
+            }
+            
             const parametresElements = [];
             this.getParameterNames().forEach(nomParametre => {
                 parametresElements.push(creaUIWidgetPerParametre(this, nomParametre));
@@ -130,6 +142,11 @@ export class EstacioBase {
     onTransportStop() {
         // Called when audio graph is stopped
     }
+
+    onSequencerTick(currentMainSequencerStep, time) {
+        // Called at each tick (16th note) of the main sequencer so the station can trigger notes, etc.
+    }
+
 }
 
 
@@ -150,6 +167,19 @@ export class Session {
             estacioObj.initialize(estacioRawData)
             this.estacions[nomEstacio] = estacioObj
         })
+
+        // Inicialitza un redux store per informació volàtil de la sessió
+        const reducers = {
+            mainSequencerCurrentStepLocal: (state = -1, action) => {
+                switch (action.type) {
+                    case 'SET_mainSequencerCurrentStepLocal':
+                    return action.value;
+                    default:
+                    return state;
+                }
+            }
+        };
+        this.store = createStore(combineReducers(reducers));
     }
 
     getUUID() {
@@ -162,6 +192,14 @@ export class Session {
 
     getEstacio(nomEstacio) {
         return this.estacions[nomEstacio];
+    }
+
+    getMainSequencerCurrentStep() {
+        // NOTA: aquesta funció retornarà el current step del main sequencer local si n'hi ha (és a dir, si hi 
+        // ha un audio graph construït en aquesta instància del navegador), sino retornarà el current step del main
+        // sequencer que vingui del servidor (és a dir, el current step d'un main sequencer que està corrent en alguna
+        // altra instància de la sessió en algun altre lloc del món). De moment només retornem el local.
+        return this.store.getState()['mainSequencerCurrentStepLocal']
     }
     
     updateParametreEstacio(nomEstacio, nomParametre, valor) {

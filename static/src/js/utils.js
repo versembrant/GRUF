@@ -48,7 +48,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
             createElement(
                 'div',
                 null,
-                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
                 createElement(
                     'input',
                     {'type': 'range', 'min': parameterDescription.min, 'max': parameterDescription.max, 'step': parameterDescription.step || 0.05, 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
@@ -65,7 +65,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
             createElement(
                 'div',
                 null,
-                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
                 createElement(
                     'select',
                     {'value': parametreValorState, onChange: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
@@ -78,7 +78,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
             createElement(
                 'div',
                 null,
-                createElement('p', null, nomParametre + ': ', parametreValorState),
+                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
                 createElement(
                     'input',
                     {'type': 'text', 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
@@ -89,11 +89,13 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     } else if (parameterDescription.type === 'steps') {
         const stepsElements = []
         const numSteps = parameterDescription.initial.length;
+        const currentStep = getCurrentSession().getMainSequencerCurrentStep() % numSteps;
         for (let i = 0; i < numSteps; i++) {
             const filledClass = parametreValorState[i] == 1.0 ? 'filled' : '';
+            const activeStep = currentStep == i ? 'active' : '';
             stepsElements.push(createElement(
                     'div', 
-                    {className: 'step ' + filledClass, onClick: (evt) => {  //
+                    {className: 'step ' + filledClass + ' ' + activeStep, onClick: (evt) => {  //
                         var updatedSteps = [...parametreValorState];
                         if (updatedSteps[i] == 1.0) {
                             updatedSteps[i] = 0.0;
@@ -109,7 +111,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         return createElement(
             'div',
             null,
-            createElement('p', null, nomParametre + ': ', parametreValorState.join(',')),
+            createElement('p', null, parameterDescription.label + ': ', parametreValorState.join(',')),
             createElement('div', {className: 'steps'}, ...stepsElements)
         );
     } else {

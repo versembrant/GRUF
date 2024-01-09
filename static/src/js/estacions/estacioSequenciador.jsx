@@ -16,6 +16,7 @@ class EstacioSequenciador extends EstacioBase {
             sound2URL: {type: 'text', label: 'URL so 2', initial: 'https://cdn.freesound.org/previews/561/561514_12517458-hq.mp3'},
             sound2Steps: {type: 'steps', label: 'Steps so 2', initial: new Array(this.numSteps).fill(0.0)},
         }
+        this.updatesUiWithMainSequencer = true;
     }
 
     loadSoundInSamplerNote(note, url) {
@@ -30,34 +31,14 @@ class EstacioSequenciador extends EstacioBase {
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
-        // Inicialitzem estat volàtil
+        // Inicialitzem estat volàtil que utilizem per saber quins sons ja hem carregat al sampler
         this.volatileState = {
-            currentStep: 0,
             loadedSoundURLsPerNote: {},
         }
 
         // Creem els nodes del graph
-        const sampler = new Tone.Sampler().connect(estacioMasterGainNode);
-        const loopSequencer = new Tone.Loop(time => {
-            // Check if sounds should be played in the current step and do it
-            const shouldPlaySound1 = this.getParameterValue('sound1Steps')[this.volatileState.currentStep] === 1;
-            const shouldPlaySound2 = this.getParameterValue('sound2Steps')[this.volatileState.currentStep] === 1;
-            if (shouldPlaySound1) {
-                sampler.triggerAttack("C4", time);
-            }
-            if (shouldPlaySound2) {
-                sampler.triggerAttack("D#4", time);
-            }
-            // Advance current step and update volatile state
-            this.volatileState.currentStep += 1;
-            if (this.volatileState.currentStep >= this.numSteps) {
-                this.volatileState.currentStep = 0;
-            }
-        }, "16n").start(0);
-
         this.audioNodes = {
-            sampler: sampler,
-            loopSequencer: loopSequencer,
+            sampler: new Tone.Sampler().connect(estacioMasterGainNode),
         }
     }
 
@@ -74,6 +55,19 @@ class EstacioSequenciador extends EstacioBase {
             this.loadSoundInSamplerNote('C4', this.getParameterValue('sound1URL'));
         } else if (nomParametre === 'sound2URL') {
             this.loadSoundInSamplerNote('D#4', this.getParameterValue('sound2URL'));
+        }
+    }
+
+    onSequencerTick(currentMainSequencerStep, time) {
+        // Check if sounds should be played in the current step and do it
+        const currentStep = currentMainSequencerStep % this.numSteps;
+        const shouldPlaySound1 = this.getParameterValue('sound1Steps')[currentStep] === 1;
+        const shouldPlaySound2 = this.getParameterValue('sound2Steps')[currentStep] === 1;
+        if (shouldPlaySound1) {
+            this.audioNodes.sampler.triggerAttack("C4", time);
+        }
+        if (shouldPlaySound2) {
+            this.audioNodes.sampler.triggerAttack("D#4", time);
         }
     }
 }
