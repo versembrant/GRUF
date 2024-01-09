@@ -43,7 +43,7 @@ export class EstacioBase {
         this.getParameterNames().forEach(parameterName => {
             const parameterDescription = this.getParameterDescription(parameterName);
             let initialValue = parameterDescription.initial;
-            if (initialValue !== undefined) {
+            if (initialState !== undefined) {
                 initialValue = initialState.parametres[parameterName];
             }
             reducers[parameterName] = (state = ensureValidValue(initialValue, parameterDescription), action) => {

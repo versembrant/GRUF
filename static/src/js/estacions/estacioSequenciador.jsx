@@ -1,11 +1,13 @@
 import * as Tone from 'tone'
 import { EstacioBase, registerEstacioDisponible } from "../sessionManager";
 
+const tipus = 'sequenciador'
+
 class EstacioSequenciador extends EstacioBase {
     
     constructor(nom) {
         super(nom);
-        this.tipus = 'sequenciador'
+        this.tipus = tipus
         this.versio = '0.1'
         this.numSteps = 16
         this.parametersDescription = {
@@ -76,4 +78,4 @@ class EstacioSequenciador extends EstacioBase {
     }
 }
 
-registerEstacioDisponible('sequenciador', EstacioSequenciador);
+registerEstacioDisponible(tipus, EstacioSequenciador);
