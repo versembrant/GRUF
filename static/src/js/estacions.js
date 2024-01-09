@@ -157,5 +157,20 @@ export class EstacioHelperBase {
     getUserInterface() {
         return this.getDefaultUserInterface()
     }
-    
+
+    getAudioGraph(estacioObj) {
+        return {}
+    }
+
+    updateAudioGraph(audioGraphEstacio, estacioObj, nomParametre, valor) {
+        // Called when a parameter of an station's audio graph is updated
+    }
+
+    onStartAudioGraph(audioGraphEstacio, estacioObj) {
+        // Called when audio graph is started
+    }
+
+    onStopAudioGraph(audioGraphEstacio, estacioObj) {
+        // Called when audio graph is stopped
+    }
 }

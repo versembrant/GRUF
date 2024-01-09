@@ -5,6 +5,10 @@
 <a href="/">Torna a la llista de sessions</a>
 <session data-uuid="{{ session.uuid }}" data-local="{{ local_mode|tojson }}" data-data="{{ session.get_full_data() }}"></session>
 <div>
+    <button id="startAudio">Connecta audio</button>
+    <button id="stopAudio">Desconnecta audio</button>
+</div>
+<div>
     Estació: <select id="selectorEstacio">
         <option value="all">Totes</option>
         {% for estacio in session.estacions %}

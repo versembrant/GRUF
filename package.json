@@ -1,6 +1,10 @@
 {
   "name": "versembrant-bruixit",
-  "source": ["static/src/js/index.js", "static/src/js/pagines/sessio.js", "static/src/js/pagines/novaSessio.js"],
+  "source": [
+    "static/src/js/index.js",
+    "static/src/js/pagines/sessio.js",
+    "static/src/js/pagines/novaSessio.js"
+  ],
   "scripts": {
     "watch": "parcel watch --no-cache --no-hmr --dist-dir static/dist",
     "build": "parcel build --dist-dir static/dist"
@@ -13,6 +17,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "redux": "^5.0.1",
-    "socket.io-client": "^4.7.3"
+    "socket.io-client": "^4.7.3",
+    "tone": "^14.7.77"
   }
 }

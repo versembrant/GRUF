@@ -1,6 +1,7 @@
 import { createStore, combineReducers } from "redux";
 import { getEstacioHelperInstance } from "./estacions";
 import { socket, ensureValidValue } from "./utils";
+import { getAudioGraphInstance } from "./audioEngine";
 
 
 var currentSession = undefined; 
@@ -56,11 +57,16 @@ export class Session {
     }
     
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
-        const estacio = this.estacions[nomEstacio];
-        estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
+        const estacioObj = this.estacions[nomEstacio];
+        estacioObj.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
 
-        // També actualitzem el valor fora de l'store, tot i que això no seria necessari si ja està guardat a l'store (tindrem informació duplicada)
-        estacio.parametres[nomParametre] = valor;
+        const valorGuardat = estacioObj.store.getState()[nomParametre]  // Aquí agafem el valor guardat per si l'store l'havia modificat (perquè estava fora de rang, per exemple)
+
+        // Actualitzem el valor fora de l'store, tot i que això no seria necessari si ja està guardat a l'store (tindrem informació duplicada)
+        estacioObj.parametres[nomParametre] = valorGuardat;
+
+        // Triguejem canvi a l'audio graph
+        getAudioGraphInstance().updatePrametreEstacio(nomEstacio, estacioObj, nomParametre, valorGuardat)
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {

@@ -3,10 +3,43 @@ import { createRoot } from "react-dom/client";
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
 import { getEstacioHelperInstance } from "../estacions";
 import { socket } from "../utils";
+import { getAudioGraphInstance } from "../audioEngine";
 
 const sessionElement = document.getElementsByTagName('session')[0];
 const selectorEstacio = document.getElementById('selectorEstacio');
 
+// Carrega les dades de sessió
+const onSessionDataLoaded = () => {
+    console.log('Set currentSession', getCurrentSession());
+    renderEstacions();
+    getAudioGraphInstance().buildAudioGraph();  // TODO: only do that if/when audio is requested
+}
+
+const localMode = sessionElement.dataset.localMode === 'true';
+const sessionUUID = sessionElement.dataset.uuid;
+if (localMode){
+    // In local mode, session data is passed directly and server is not involved
+    const sessionData = JSON.parse(sessionElement.dataset.data);
+    setCurrentSession(new Session(sessionData, localMode)); 
+    onSessionDataLoaded();
+} else {
+    // In remote mode, all session updates go through the server and come from the server
+    socket.on('connect', function() {
+        const username = (Math.random() + 1).toString(36).substring(7);
+        socket.emit('join_session', {session_uuid: sessionUUID, username: username})
+    });
+    socket.on('set_session_data', function (data) {
+        setCurrentSession(new Session(data, localMode)); 
+        onSessionDataLoaded();
+    });
+    socket.on('update_session_parameter', function (data) {
+        if ((getCurrentSession() !== undefined) && (data.session_uuid === getCurrentSession().uuid)) {
+            getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
+        }
+    });
+}
+
+// Render UI estacions
 const renderEstacio = (nomEstacio) => {
     const estacioElement = document.getElementById('estacio-' + nomEstacio);
     const estacioReactRoot = document.createElement('div');
@@ -32,40 +65,20 @@ const renderEstacions = () => {
     });
 }
 
-const onSessionDataLoaded = () => {
-    console.log('Set currentSession', getCurrentSession());
+// Bind events selector estació
+selectorEstacio.addEventListener('change', (event) => {
     renderEstacions();
-}
+});
 
-if (sessionElement !== undefined) { // Estem a la pàgina de sessió
+// Audio
+const startAudioButton = document.getElementById('startAudio');
+const stopAudioButton = document.getElementById('stopAudio');
 
-    // Carrega les dades de sessió
-    const localMode = sessionElement.dataset.localMode === 'true';
-    const sessionUUID = sessionElement.dataset.uuid;
-    if (localMode){
-        // In local mode, session data is passed directly and server is not involved
-        const sessionData = JSON.parse(sessionElement.dataset.data);
-        setCurrentSession(new Session(sessionData, localMode)); 
-        onSessionDataLoaded();
-    } else {
-        // In remote mode, all session updates go through the server and come from the server
-        socket.on('connect', function() {
-            const username = (Math.random() + 1).toString(36).substring(7);
-            socket.emit('join_session', {session_uuid: sessionUUID, username: username})
-        });
-        socket.on('set_session_data', function (data) {
-            setCurrentSession(new Session(data, localMode)); 
-            onSessionDataLoaded();
-        });
-        socket.on('update_session_parameter', function (data) {
-            if ((getCurrentSession() !== undefined) && (data.session_uuid === getCurrentSession().uuid)) {
-                getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
-            }
-        });
-    }
+startAudioButton.addEventListener('click', async (event) => {
+    await getAudioGraphInstance().startAudioContext();
+    getAudioGraphInstance().runAudioGraph();
+});
 
-    // Bind events selector estació
-    selectorEstacio.addEventListener('change', (event) => {
-        renderEstacions();
-    });
-}
+stopAudioButton.addEventListener('click', (event) => {
+    getAudioGraphInstance().stopAudioGraph();
+});
