@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>New session</h1>
+<h1>Nova sessió</h1>
 <form method="POST" action="." id="createSessionForm">
     <input type="text" name="name" placeholder="Nom de la sessió"></input>
     <input type="hidden" name="data" value=""/>
-    <button>Create!</button>
+    <button>Crear!</button>
 </form>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/dist/pagines/novaSessio.js"></script>
 {% endblock %}

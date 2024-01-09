@@ -2,7 +2,19 @@ import { createElement, useState, useEffect} from "react";
 import { getCurrentSession } from "./sessionManager";
 
 
-const creaWidgetPerParametre = (parameterData, nomEstacio, nomParametre, parametreValorState) => {
+const estacionsHelperInstances = {};
+
+export const registerEstacioHelperInstance = (estacioHelperInstance) => {
+    console.log('Registering estacio helper', estacioHelperInstance.tipus)
+    estacionsHelperInstances[estacioHelperInstance.tipus] = estacioHelperInstance;
+}
+
+export const getEstacioHelperInstance = (tipus) => {
+    return estacionsHelperInstances[tipus];
+}
+
+
+const creaUIWidgetPerParametre = (parameterData, nomEstacio, nomParametre, parametreValorState) => {
 
     if (parameterData.type === 'float') {
         return (
@@ -79,7 +91,7 @@ const creaWidgetPerParametre = (parameterData, nomEstacio, nomParametre, paramet
 }
 
 
-class EstacioHelperBase {
+export class EstacioHelperBase {
 
     constructor() {
         this.tipus = 'base'
@@ -129,7 +141,7 @@ class EstacioHelperBase {
             const parametresElements = [];
             estacioHelper.getParameterNames().forEach(nom_parametre => {
                 const parameterData = estacioHelper.getParametersData()[nom_parametre];
-                parametresElements.push(creaWidgetPerParametre(parameterData, nomEstacio, nom_parametre, state[nom_parametre]));
+                parametresElements.push(creaUIWidgetPerParametre(parameterData, nomEstacio, nom_parametre, state[nom_parametre]));
             });
             
             return createElement(
@@ -147,16 +159,3 @@ class EstacioHelperBase {
     }
     
 }
-
-const estacionsHelperInstances = {};
-
-const registerEstacioHelperInstance = (estacioHelperInstance) => {
-    console.log('Registering estacio helper', estacioHelperInstance.tipus)
-    estacionsHelperInstances[estacioHelperInstance.tipus] = estacioHelperInstance;
-}
-
-const getEstacioHelperInstance = (tipus) => {
-    return estacionsHelperInstances[tipus];
-}
-
-export { EstacioHelperBase, registerEstacioHelperInstance, getEstacioHelperInstance }

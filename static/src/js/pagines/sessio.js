@@ -1,9 +1,8 @@
 import { createElement, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Session } from "./sessionManager";
-import { getCurrentSession, setCurrentSession } from "./sessionManager";
-import { getEstacioHelperInstance } from "./estacionsUtils";
-import { socket } from "./socket";
+import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
+import { getEstacioHelperInstance } from "../estacions";
+import { socket } from "../utils";
 
 const sessionElement = document.getElementsByTagName('session')[0];
 const selectorEstacio = document.getElementById('selectorEstacio');

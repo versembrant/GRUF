@@ -1,4 +1,4 @@
-import { getEstacioHelperInstance } from "./estacionsUtils";
+import { getEstacioHelperInstance } from "../estacions";
 
 const newSessionForm = document.getElementById('createSessionForm');
 if (newSessionForm !== null){

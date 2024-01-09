@@ -1,7 +1,6 @@
 import { createStore, combineReducers } from "redux";
-import { getEstacioHelperInstance } from "./estacionsUtils";
-import { socket } from "./socket";
-import { ensureValidValue } from "./utils";
+import { getEstacioHelperInstance } from "./estacions";
+import { socket, ensureValidValue } from "./utils";
 
 
 var currentSession = undefined; 

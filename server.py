@@ -110,7 +110,7 @@ def new():
         s = Session(data)
         log(f'New session created: {s.name} ({s.uuid})\n{json.dumps(s.get_full_data(), indent=4)}')
         return redirect(url_for('session', session_uuid=s.uuid))
-    return render_template('new_session.html')
+    return render_template('nova_sessio.html')
 
 
 @app.route('/session/<session_uuid>/')
@@ -118,7 +118,7 @@ def session(session_uuid):
     s = get_session_by_uuid(session_uuid)
     if s is None:
         raise Exception('Session not found')
-    return render_template('session.html', session=s, local_mode=request.args.get('local') == '1')
+    return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1')
 
 
 @app.route('/delete_session/<session_uuid>/')

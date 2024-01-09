@@ -1,4 +1,4 @@
-import { EstacioHelperBase, registerEstacioHelperInstance } from "./estacionsUtils";
+import { EstacioHelperBase, registerEstacioHelperInstance } from "../estacions";
 
 class EstacioSequenciadorHelper extends EstacioHelperBase {
     

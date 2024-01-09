@@ -1,6 +1,6 @@
 {
   "name": "versembrant-bruixit",
-  "source": "static/src/js/index.js",
+  "source": ["static/src/js/index.js", "static/src/js/pagines/sessio.js", "static/src/js/pagines/novaSessio.js"],
   "scripts": {
     "watch": "parcel watch --no-cache --no-hmr --dist-dir static/dist",
     "build": "parcel build --dist-dir static/dist"
