@@ -1,6 +1,7 @@
 import { createElement, useState, useEffect} from "react";
 import { createStore, combineReducers } from "redux";
 import { socket, ensureValidValue, creaUIWidgetPerParametre } from "./utils";
+import { getAudioGraphInstance } from "./audioEngine";
 
 
 var currentSession = undefined; 
@@ -152,8 +153,6 @@ export class EstacioBase {
 
 export class Session {
     constructor(data, local=false) {
-        console.log("Initializing session manager")
-
         this.localMode = local
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
@@ -172,7 +171,7 @@ export class Session {
         const reducers = {
             mainSequencerCurrentStepLocal: (state = -1, action) => {
                 switch (action.type) {
-                    case 'SET_mainSequencerCurrentStepLocal':
+                    case 'SET_mainSequencerCurrentStep':
                     return action.value;
                     default:
                     return state;
@@ -180,6 +179,8 @@ export class Session {
             }
         };
         this.store = createStore(combineReducers(reducers));
+
+        console.log("Session initialized!")
     }
 
     getUUID() {
@@ -209,7 +210,9 @@ export class Session {
         estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
 
         // Triguejem canvi a l'audio graph
-        estacio.updateAudioGraphParameter(nomParametre)
+        if (getAudioGraphInstance().graphIsBuilt){
+            estacio.updateAudioGraphParameter(nomParametre)
+        }
     }
     
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {

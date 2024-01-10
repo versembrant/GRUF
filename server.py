@@ -3,8 +3,9 @@ import uuid
 import json
 
 import redis
+from collections import defaultdict
 from flask import Flask, render_template, request, redirect, url_for
-from flask_socketio import SocketIO, emit, send, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 r = redis.Redis(host='redis', port=16379, db=0)
 
@@ -17,12 +18,16 @@ def log(message):
     sys.stdout.flush()
 
 
+usernames_connected_per_session = defaultdict(list)
+
+
 class Session(object):
     data = {}
 
     def __init__(self, data):
         self.data = data
-        self.data['connected_users'] = []
+        if 'connected_users' not in self.data:
+            self.data['connected_users'] = []
         self.save_to_redis()
         
     @property
@@ -63,10 +68,14 @@ class Session(object):
         return self.data
     
     def add_user(self, username):
+        usernames_connected_per_session[self.uuid].append(username)
         self.connected_users.append(username)
+        self.save_to_redis()
 
     def remove_user(self, username):
+        usernames_connected_per_session[self.uuid].remove(username)
         self.connected_users.remove(username)
+        self.save_to_redis()
 
     def update_parameter(self, nom_estacio, nom_parametre, valor):
         try:
@@ -127,12 +136,16 @@ def delete_session(session_uuid):
     return redirect(url_for('index'))
 
 
-def _add_user_to_session(s, username):
-    s.add_user(username)
-    join_room(s.room_name)
-    log(f'{username} joined session {s.room_name}')
-    send(username + ' has entered the room.', to=s.room_name)
-    emit('set_session_data', s.get_full_data())
+@socketio.on('disconnect')
+def test_disconnect():
+    username = request.sid
+    print(f'User {username} disconnected, removing it from all sessions')
+    for session_uuid, usernames in usernames_connected_per_session.items():
+        if username in usernames:
+            s = get_session_by_uuid(session_uuid)
+            if s is not None:
+                s.remove_user(username)
+                log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
 
 
 @socketio.on('join_session')
@@ -140,22 +153,22 @@ def on_join_session(data):  # session_uuid, username
     s = get_session_by_uuid(data['session_uuid'])
     if s is None:
         raise Exception('Session not found')
-    _add_user_to_session(s, data['username'])
+    username = request.sid
+    s.add_user(username)
+    join_room(s.room_name)
+    log(f'{username} joined session {s.room_name} (users in room: {s.connected_users})')
+    emit('set_session_data', s.get_full_data())
     
-
-def _remove_user_from_session(s, username):
-    s.remove_user(username)
-    leave_room(s.room_name)
-    log(f'{username} left session {s.room_name}')
-    send(username + ' has left the room.', to=s.room_name)
-
 
 @socketio.on('leave_session')
 def on_leave_session(data):  # session_uuid, username
     s = get_session_by_uuid(data['session_uuid'])
     if s is None:
         raise Exception('Session not found')
-    _remove_user_from_session(s, data['username'])
+    username = request.sid
+    s.remove_user(username)
+    leave_room(s.room_name)
+    log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
 
 
 @socketio.on('update_session_parameter')
@@ -165,6 +178,14 @@ def on_update_session_parameter(data):  # session_uuid, nom_estacio, nom_paramet
         raise Exception('Session not found')
     s.update_parameter(data['nom_estacio'], data['nom_parametre'], data['valor'])
     emit('update_session_parameter', data, to=s.room_name)
+
+
+@socketio.on('update_master_sequencer_current_step')
+def on_update_master_sequencer_current_step(data):  # session_uuid, current_step
+    s = get_session_by_uuid(data['session_uuid'])
+    if s is None:
+        raise Exception('Session not found')
+    emit('update_master_sequencer_current_step', data, to=s.room_name)
 
 
 if __name__ == '__main__':

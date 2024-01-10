@@ -9,25 +9,28 @@ const selectorEstacio = document.getElementById('selectorEstacio');
 
 // Carrega les dades de sessió
 const onSessionDataLoaded = () => {
-    console.log('Set currentSession', getCurrentSession());
+    const currentSession = getCurrentSession();
+    console.log('Set currentSession', currentSession);
+    const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
+    getAudioGraphInstance().isMasterAudioEngine = isMasterAudioEngine;
+    masterEngineCheckbox.checked = getAudioGraphInstance().isMasterAudioEngine;
     renderEstacions();
 }
 
-const localMode = sessionElement.dataset.localMode === 'true';
+const localMode = sessionElement.dataset.local === 'true';
 const sessionUUID = sessionElement.dataset.uuid;
 if (localMode){
     // In local mode, session data is passed directly and server is not involved
     const sessionData = JSON.parse(sessionElement.dataset.data);
     setCurrentSession(new Session(sessionData, localMode)); 
-    onSessionDataLoaded();
+    setTimeout(onSessionDataLoaded, 100)  // Use timeout here to give the app some time to initialize stuff. TODO: find a better way to do this
 } else {
     // In remote mode, all session updates go through the server and come from the server
     socket.on('connect', function() {
-        const username = (Math.random() + 1).toString(36).substring(7);
-        socket.emit('join_session', {session_uuid: sessionUUID, username: username})
+        socket.emit('join_session', {session_uuid: sessionUUID})
     });
     socket.on('set_session_data', function (data) {
-        setCurrentSession(new Session(data, localMode)); 
+        setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
     socket.on('update_session_parameter', function (data) {
@@ -70,6 +73,11 @@ selectorEstacio.addEventListener('change', (event) => {
 // Audio
 const startAudioButton = document.getElementById('startAudio');
 const stopAudioButton = document.getElementById('stopAudio');
+const masterEngineCheckbox = document.getElementById('masterAudioEngine');
+
+masterEngineCheckbox.addEventListener('change', (event) => {
+    getAudioGraphInstance().isMasterAudioEngine = masterEngineCheckbox.checked;
+})
 
 startAudioButton.addEventListener('click', async (event) => {
     await getAudioGraphInstance().startAudioContext();
