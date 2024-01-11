@@ -10,24 +10,11 @@ class EstacioSequenciador extends EstacioBase {
         this.tipus = tipus
         this.versio = '0.1'
         this.numSteps = 16
-
-        const initialPattern1 = new Array(this.numSteps).fill(0.0);
-        initialPattern1[0] = 1.0;
-        initialPattern1[3] = 1.0;
-        initialPattern1[4] = 1.0;
-        initialPattern1[8] = 1.0;
-
-        const initialPattern2 = new Array(this.numSteps).fill(0.0);
-        initialPattern2[2] = 1.0;
-        initialPattern2[7] = 1.0;
-        initialPattern2[12] = 1.0;
-        initialPattern2[13] = 1.0;
-
         this.parametersDescription = {
             sound1URL: {type: 'text', label: 'URL so 1', initial: 'https://cdn.freesound.org/previews/0/808_797-hq.mp3'},
-            sound1Steps: {type: 'steps', label: 'Steps so 1', initial: initialPattern1},
+            sound1Steps: {type: 'steps', label: 'Steps so 1', numSteps: this.numSteps, initial: [0, 3, 4, 8]},
             sound2URL: {type: 'text', label: 'URL so 2', initial: 'https://cdn.freesound.org/previews/561/561514_12517458-hq.mp3'},
-            sound2Steps: {type: 'steps', label: 'Steps so 2', initial: initialPattern2},
+            sound2Steps: {type: 'steps', label: 'Steps so 2', numSteps: this.numSteps, initial: [2, 7, 12, 13]},
         }
         this.updatesUiWithMainSequencer = true;
     }
@@ -74,8 +61,8 @@ class EstacioSequenciador extends EstacioBase {
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.numSteps;
-        const shouldPlaySound1 = this.getParameterValue('sound1Steps')[currentStep] === 1;
-        const shouldPlaySound2 = this.getParameterValue('sound2Steps')[currentStep] === 1;
+        const shouldPlaySound1 = this.getParameterValue('sound1Steps').includes(currentStep);
+        const shouldPlaySound2 = this.getParameterValue('sound2Steps').includes(currentStep);
         if (shouldPlaySound1) {
             this.audioNodes.sampler.triggerAttack("C4", time);
         }

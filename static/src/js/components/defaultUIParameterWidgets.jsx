@@ -1,6 +1,5 @@
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from "../audioEngine";
-import { createElement } from "react";
 
 
 export const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
@@ -47,23 +46,26 @@ export const EnumParameterDefaultWidget = ({parameterDescription, parameterValue
 
 
 export const StepsParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
-    const numSteps = parameterDescription.initial.length;
+    const numSteps = parameterDescription.numSteps;
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElements = []
     for (let i = 0; i < numSteps; i++) {
-        const filledClass = parameterValue[i] == 1.0 ? 'filled' : '';
+        const filledClass = parameterValue.includes(i) ? 'filled' : '';
         const activeStep = currentStep == i ? 'active' : '';
-        stepsElements.push(<div 
+        stepsElements.push(
+        <div 
             className={'step ' + filledClass + ' ' + activeStep}
-            onClick={(evt) => {  //
-                var updatedSteps = [...parameterValue];
-                if (updatedSteps[i] == 1.0) {
-                    updatedSteps[i] = 0.0;
+            onClick={(evt) => {
+                let updatedParameterValue = [...parameterValue]
+                if (parameterValue.includes(i)){
+                    updatedParameterValue.splice(parameterValue.indexOf(i), 1);
                 } else {
-                    updatedSteps[i] = 1.0;
+                    updatedParameterValue.push(i)
                 }
-                getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, updatedSteps)
-            }}></div>)
+                getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, updatedParameterValue)
+            }}>
+        </div>
+        )
     }
     return (
         <div>
