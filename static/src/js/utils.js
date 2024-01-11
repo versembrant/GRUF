@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { createElement} from "react";
+import { createElement, useState, useEffect} from "react";
 import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
 
@@ -37,8 +37,19 @@ export const ensureValidValue = (value, parameterDescription) => {
     return value;
 }
 
-// Util function to create UI widgets for the default UIs
+// Util function to subscribe a react component to changes of a redux store of an object
+export const subscribeToStoreChanges = (objectWithStore) => {
+    const [_, setState] = useState(objectWithStore.store.getState());
+    useEffect(() => {
+        const unsubscribe = objectWithStore.store.subscribe(() => {
+            setState(objectWithStore.store.getState());
+        });
+        return () => unsubscribe();
+    }, [setState]);
+}
 
+
+// Util function to create UI widgets for the default UIs
 export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
 
     const parameterDescription = estacio.getParameterDescription(nomParametre);

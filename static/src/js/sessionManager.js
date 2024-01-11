@@ -1,6 +1,6 @@
-import { createElement, useState, useEffect} from "react";
+import { createElement } from "react";
 import { createStore, combineReducers } from "redux";
-import { socket, ensureValidValue, creaUIWidgetPerParametre } from "./utils";
+import { socket, ensureValidValue, creaUIWidgetPerParametre, subscribeToStoreChanges } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 
 
@@ -84,23 +84,11 @@ export class EstacioBase {
 
     getDefaultUserInterface() {    
         return () => {
-            const [_, setState] = useState(this.store.getState());
-            useEffect(() => {
-                const unsubscribe = this.store.subscribe(() => {
-                    setState(this.store.getState());
-                });
-                return () => unsubscribe();
-            }, [setState]);
-
+            // Subscribe to store changes of the station itself
+            subscribeToStoreChanges(this);
             if (this.updatesUiWithMainSequencer === true) {
-                // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), we register to main session store changes as well
-                const [_, setStateAudioTransport] = useState(getAudioGraphInstance().store.getState());
-                useEffect(() => {
-                    const unsubscribe = getAudioGraphInstance().store.subscribe(() => {
-                        setStateAudioTransport(getAudioGraphInstance().store.getState());
-                    });
-                    return () => unsubscribe();
-                }, [setStateAudioTransport]);
+                // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), also subscribe to stroe changes of the audio engine store
+                subscribeToStoreChanges(getAudioGraphInstance());
             }
             
             const parametresElements = [];
@@ -193,6 +181,10 @@ export class Session {
         return this.store.getState().id
     }
 
+    getConnectedUsers() {
+        return this.store.getState().connected_users
+    }
+
     getNomsEstacions() {
         return Object.keys(this.estacions);
     }
@@ -231,7 +223,7 @@ export class Session {
 }
 
 socket.on('update_parametre_sessio', function (data) {
-    getCurrentSession().setParametreInStore(data.nomParametre, data.value);
+    getCurrentSession().setParametreInStore(data.nom_parametre, data.valor);
 });
 
 socket.on('update_parametre_estacio', function (data) {

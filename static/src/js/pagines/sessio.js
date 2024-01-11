@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
 import { socket } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
+import { AudioTransportControls } from "../components/audioTransport";
+import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 
 const sessionElement = document.getElementsByTagName('session')[0];
 const selectorEstacio = document.getElementById('selectorEstacio');
@@ -12,11 +14,12 @@ const onSessionDataLoaded = () => {
     // Configure some session-related things of the audio graph
     const currentSession = getCurrentSession();
     const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
-    getAudioGraphInstance().setParametreInStore('isMasterAudioEngine', isMasterAudioEngine);
-    masterEngineCheckbox.checked = getAudioGraphInstance().isMasterAudioEngine();
+    getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
 
     // Render UI
+    renderConnectedUsers();
+    renderAudioTransport();
     renderEstacions();
 
     // Some log statements useful for debugging
@@ -40,6 +43,20 @@ if (localMode){
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
+}
+
+// Render UI connected users
+const renderConnectedUsers = () => {
+    createRoot(document.getElementById('sessionConnectedUsers')).render(
+        createElement(StrictMode, null, createElement(SessionConnectedUsers, null))
+    );
+}
+
+// Render UI audio transport
+const renderAudioTransport = () => {
+    createRoot(document.getElementById('audioTransportControls')).render(
+        createElement(StrictMode, null, createElement(AudioTransportControls, null))
+    );
 }
 
 // Render UI estacions
@@ -70,26 +87,4 @@ const renderEstacions = () => {
 // Bind events selector estació
 selectorEstacio.addEventListener('change', (event) => {
     renderEstacions();
-});
-
-// Audio
-const startAudioButton = document.getElementById('startAudio');
-const stopAudioButton = document.getElementById('stopAudio');
-const masterEngineCheckbox = document.getElementById('masterAudioEngine');
-
-masterEngineCheckbox.addEventListener('change', (event) => {
-    getAudioGraphInstance().setParametreInStore('isMasterAudioEngine', masterEngineCheckbox.checked);
-})
-
-startAudioButton.addEventListener('click', async (event) => {
-    await getAudioGraphInstance().startAudioContext();
-    if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt()))) {
-        // Only build audio graph the first time "play" is pressed
-        getAudioGraphInstance().buildAudioGraph();  
-    }
-    getAudioGraphInstance().transportStart();
-});
-
-stopAudioButton.addEventListener('click', (event) => {
-    getAudioGraphInstance().transportStop();
 });

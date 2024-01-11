@@ -228,6 +228,7 @@ def on_update_parametre_audio_transport(data):  # session_id, nom_estacio, nom_p
         raise Exception('Session not found')
     s.update_parametre_sessio(data['nom_parametre'], data['valor'], emit_msg_name='update_parametre_audio_transport')
 
+
 @socketio.on('update_parametre_sessio')
 def on_update_parametre_sessio(data):  # session_id, nom_estacio, nom_parametre, valor
     s = get_session_by_id(data['session_id'])

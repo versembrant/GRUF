@@ -2,7 +2,6 @@ import * as Tone from 'tone'
 import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager'
 import { socket } from './utils';
-import { log } from 'tone/build/esm/core/util/Debug';
 
 var audioContextIsReady = false;
 
@@ -52,6 +51,10 @@ export class AudioGraph {
 
     isMasterAudioEngine() {
         return this.store.getState().isMasterAudioEngine;
+    }
+
+    setMasterAudioEngine(valor) {
+        this.setParametreInStore('isMasterAudioEngine', valor);
     }
 
     audioEngineIsSyncedToRemote() {
@@ -169,7 +172,7 @@ export class AudioGraph {
     setMasterGain(gain) {
         this.setParametreInStore('masterGain', gain);
         if (this.graphIsBuilt()){
-            this.masterGainNode.gain.rampTo(gain);
+            this.masterGainNode.gain.value = gain;
         }
     }
     
@@ -182,6 +185,10 @@ export class AudioGraph {
         if (this.graphIsBuilt()){
             Tone.Transport.bpm.rampTo(bpm);
         }
+    }
+
+    updateBpmInServer(bpm) {
+        socket.emit('update_parametre_audio_transport', {session_id: getCurrentSession().getID(), nom_parametre: 'bpm', valor: bpm});
     }
 }
 
@@ -197,11 +204,11 @@ socket.on('update_master_sequencer_current_step', function (data) {
 
 socket.on('update_parametre_audio_transport', function (data) {
     // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but are actually not likely to be set from remote server)
-    if (data.nomParametre === 'bpm') {
-        getAudioGraphInstance().setBpm(data.value);
-    } else if (data.nomParametre === 'masterGain') {
-        getAudioGraphInstance().setMasterGain(data.value);
+    if (data.nom_parametre === 'bpm') {
+        getAudioGraphInstance().setBpm(data.valor);
+    } else if (data.nom_parametre === 'masterGain') {
+        getAudioGraphInstance().setMasterGain(data.valor);
     } else {
-        getAudioGraphInstance().setParametreInStore(data.nomParametre, data.value);
+        getAudioGraphInstance().setParametreInStore(data.nom_parametre, data.valor);
     }
 });
