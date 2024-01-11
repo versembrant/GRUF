@@ -9,12 +9,19 @@ const selectorEstacio = document.getElementById('selectorEstacio');
 
 // Carrega les dades de sessió
 const onSessionDataLoaded = () => {
+    // Configure some session-related things of the audio graph
     const currentSession = getCurrentSession();
-    console.log('Set currentSession', currentSession);
     const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
-    getAudioGraphInstance().isMasterAudioEngine = isMasterAudioEngine;
-    masterEngineCheckbox.checked = getAudioGraphInstance().isMasterAudioEngine;
+    getAudioGraphInstance().setParametreInStore('isMasterAudioEngine', isMasterAudioEngine);
+    masterEngineCheckbox.checked = getAudioGraphInstance().isMasterAudioEngine();
+    getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
+
+    // Render UI
     renderEstacions();
+
+    // Some log statements useful for debugging
+    console.log(getCurrentSession());
+    console.log(getAudioGraphInstance());
 }
 
 const localMode = sessionElement.dataset.local === 'true';
@@ -32,11 +39,6 @@ if (localMode){
     socket.on('set_session_data', function (data) {
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
-    });
-    socket.on('update_session_parameter', function (data) {
-        if ((getCurrentSession() !== undefined) && (data.session_id === getCurrentSession().getID())) {
-            getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
-        }
     });
 }
 
@@ -76,12 +78,12 @@ const stopAudioButton = document.getElementById('stopAudio');
 const masterEngineCheckbox = document.getElementById('masterAudioEngine');
 
 masterEngineCheckbox.addEventListener('change', (event) => {
-    getAudioGraphInstance().isMasterAudioEngine = masterEngineCheckbox.checked;
+    getAudioGraphInstance().setParametreInStore('isMasterAudioEngine', masterEngineCheckbox.checked);
 })
 
 startAudioButton.addEventListener('click', async (event) => {
     await getAudioGraphInstance().startAudioContext();
-    if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt))) {
+    if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt()))) {
         // Only build audio graph the first time "play" is pressed
         getAudioGraphInstance().buildAudioGraph();  
     }

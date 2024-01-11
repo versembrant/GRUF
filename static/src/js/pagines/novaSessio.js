@@ -2,6 +2,7 @@ import { estacionsDisponibles } from "../sessionManager";
 
 const creaSessioAmbUnaEstacioDeCada = () => {
     const sessionData = {}
+    sessionData.bpm = 120;
     sessionData.estacions = {}
     Object.keys(estacionsDisponibles).forEach(tipusEstacio => {
         const estacio = new estacionsDisponibles[tipusEstacio]();

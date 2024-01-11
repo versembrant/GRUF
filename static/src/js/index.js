@@ -1,3 +1,4 @@
+import './audioEngine'
 import './sessionManager'
 
 import './components/audioTransport'

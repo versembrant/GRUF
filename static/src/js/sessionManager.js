@@ -94,13 +94,13 @@ export class EstacioBase {
 
             if (this.updatesUiWithMainSequencer === true) {
                 // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), we register to main session store changes as well
-                const [_, setStateSession] = useState(getCurrentSession().store.getState());
+                const [_, setStateAudioTransport] = useState(getAudioGraphInstance().store.getState());
                 useEffect(() => {
-                    const unsubscribe = getCurrentSession().store.subscribe(() => {
-                        setStateSession(getCurrentSession().store.getState());
+                    const unsubscribe = getAudioGraphInstance().store.subscribe(() => {
+                        setStateAudioTransport(getAudioGraphInstance().store.getState());
                     });
                     return () => unsubscribe();
-                }, [setStateSession]);
+                }, [setStateAudioTransport]);
             }
             
             const parametresElements = [];
@@ -167,24 +167,30 @@ export class Session {
             this.estacions[nomEstacio] = estacioObj
         })
 
-        // Inicialitza un redux store per informació volàtil de la sessió
-        const reducers = {
-            mainSequencerCurrentStepLocal: (state = -1, action) => {
+        // Inicialitza un redux store amb les propietats de la sessió
+        const propertiesInStore = ['id', 'name', 'connected_users'];
+        const reducers = {};
+        propertiesInStore.forEach(propertyName => {
+            reducers[propertyName] = (state = this.rawData[propertyName], action) => {
                 switch (action.type) {
-                    case 'SET_mainSequencerCurrentStep':
+                    case 'SET_' + propertyName:
                     return action.value;
                     default:
                     return state;
                 }
             }
-        };
+        });
         this.store = createStore(combineReducers(reducers));
 
         console.log("Session initialized!")
     }
 
+    setParametreInStore(nomParametre, valor) {
+        this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
+    }
+
     getID() {
-        return this.rawData.id
+        return this.store.getState().id
     }
 
     getNomsEstacions() {
@@ -194,14 +200,6 @@ export class Session {
     getEstacio(nomEstacio) {
         return this.estacions[nomEstacio];
     }
-
-    getMainSequencerCurrentStep() {
-        // NOTA: aquesta funció retornarà el current step del main sequencer local si n'hi ha (és a dir, si hi 
-        // ha un audio graph construït en aquesta instància del navegador), sino retornarà el current step del main
-        // sequencer que vingui del servidor (és a dir, el current step d'un main sequencer que està corrent en alguna
-        // altra instància de la sessió en algun altre lloc del món). De moment només retornem el local.
-        return this.store.getState()['mainSequencerCurrentStepLocal']
-    }
     
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
         const estacio = this.getEstacio(nomEstacio);
@@ -210,7 +208,7 @@ export class Session {
         estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
 
         // Triguejem canvi a l'audio graph
-        if (getAudioGraphInstance().graphIsBuilt){
+        if (getAudioGraphInstance().graphIsBuilt()){
             estacio.updateAudioGraphParameter(nomParametre)
         }
     }
@@ -218,7 +216,7 @@ export class Session {
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
-            socket.emit('update_session_parameter', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+            socket.emit('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
         } else {
             // In local mode, we update parameter in the same object as it is not synced with the server
             this.updateParametreEstacio(nomEstacio, nomParametre, valor)
@@ -231,3 +229,11 @@ export class Session {
         }
     }
 }
+
+socket.on('update_parametre_sessio', function (data) {
+    getCurrentSession().setParametreInStore(data.nomParametre, data.value);
+});
+
+socket.on('update_parametre_estacio', function (data) {
+    getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
+});

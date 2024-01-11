@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { createElement} from "react";
 import { getCurrentSession } from './sessionManager';
+import { getAudioGraphInstance } from './audioEngine';
 
 
 // Export socket object to be used by other modules and communicate with server
@@ -89,7 +90,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     } else if (parameterDescription.type === 'steps') {
         const stepsElements = []
         const numSteps = parameterDescription.initial.length;
-        const currentStep = getCurrentSession().getMainSequencerCurrentStep() % numSteps;
+        const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
         for (let i = 0; i < numSteps; i++) {
             const filledClass = parametreValorState[i] == 1.0 ? 'filled' : '';
             const activeStep = currentStep == i ? 'active' : '';

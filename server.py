@@ -29,23 +29,26 @@ class Session(object):
     data = {}
 
     def __init__(self, data):
-        if not self.data_is_valid(data):
-            raise InvalidSessionDataException
-
-        self.data = data
-        if 'connected_users' not in self.data:
-            self.data['connected_users'] = []
+        self.data = self.validate_data(data)
         self.save_to_redis()
 
-    def data_is_valid(self, data):
-        # TODO: implement several checks to make sure data is valid for a session
+    def validate_data(self, data):
+        # Check some properties that sould be there and raise exception if not
         if 'id' not in data:
-            return False
+            raise InvalidSessionDataException
         if 'name' not in data:
-            return False
+            raise InvalidSessionDataException
         if 'estacions' not in data:
-            return False
-        return True
+            raise InvalidSessionDataException
+        
+        # Set default values for some properties
+        if 'connected_users' not in data:
+            data['connected_users'] = []
+        if 'bpm' not in data:
+            data['bpm'] = 120
+
+        # Return updated data if all ok
+        return data
         
     @property
     def id(self):
@@ -86,15 +89,32 @@ class Session(object):
     
     def add_user(self, username):
         usernames_connected_per_session[self.id].append(username)
-        self.connected_users.append(username)
-        self.save_to_redis()
+        updated_users = self.connected_users.copy()
+        updated_users.append(username)
+        self.update_parametre_sessio('connected_users', updated_users)
 
     def remove_user(self, username):
         usernames_connected_per_session[self.id].remove(username)
-        self.connected_users.remove(username)
-        self.save_to_redis()
+        updated_users = self.connected_users.copy()
+        updated_users.remove(username)
+        self.update_parametre_sessio('connected_users', updated_users)
 
-    def update_parameter(self, nom_estacio, nom_parametre, valor):
+    def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio'):
+        # NOTE: en aquest cas tenim un 'emit_msg_name' parametre perquè els paràmetres relacionat amb àudio han de fer
+        # servir un nom de missatge diferent perquè el client els pugui diferenciar i tractar-los de forma diferent (encara
+        # que siguin paràmetres de la sessió).
+        # Envia el nou paràmetre als clients connectats
+        emit(emit_msg_name, {'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+
+        # Guarda el canvi a la sessió al servidor
+        self.data[nom_parametre] = valor  
+        self.save_to_redis()
+        
+    def update_parametre_estacio(self, nom_estacio, nom_parametre, valor):
+        # Envia el nou paràmetre als clients connectats
+        emit('update_parametre_estacio',  {'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+
+        # Guarda el canvi a la sessió al servidor
         try:
             self.data['estacions'][nom_estacio]['parametres'][nom_parametre] = valor
             self.save_to_redis()
@@ -193,13 +213,27 @@ def on_leave_session(data):  # session_id, username
     log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
 
 
-@socketio.on('update_session_parameter')
-def on_update_session_parameter(data):  # session_id, nom_estacio, nom_parametre, valor
+@socketio.on('update_parametre_estacio')
+def on_update_parametre_estacio(data):  # session_id, nom_estacio, nom_parametre, valor
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_parameter(data['nom_estacio'], data['nom_parametre'], data['valor'])
-    emit('update_session_parameter', data, to=s.room_name)
+    s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'])
+    
+
+@socketio.on('update_parametre_audio_transport')
+def on_update_parametre_audio_transport(data):  # session_id, nom_estacio, nom_parametre, valor
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    s.update_parametre_sessio(data['nom_parametre'], data['valor'], emit_msg_name='update_parametre_audio_transport')
+
+@socketio.on('update_parametre_sessio')
+def on_update_parametre_sessio(data):  # session_id, nom_estacio, nom_parametre, valor
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    s.update_parametre_sessio(data['nom_parametre'], data['valor'])
 
 
 @socketio.on('update_master_sequencer_current_step')

@@ -1,47 +1,97 @@
 import * as Tone from 'tone'
+import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager'
 import { socket } from './utils';
+import { log } from 'tone/build/esm/core/util/Debug';
 
 var audioContextIsReady = false;
 
 
 export class AudioGraph {
     constructor() {
-        this.graphIsBuilt = false;
-        this.isMasterAudioEngine = true;
-        this.audioEngineSyncedToRemote = true;
-        this.remoteMainSequencerCurrentStep = -1;
-        this.running = false;
+        this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
+
+        // Inicialitza un redux store amb les propietats relacionades amb audio
+        const defaultsForPropertiesInStore = {
+            bpm: 120,
+            masterGain: 1.0,
+            mainSequencerCurrentStep: -1,
+            graphIsBuilt: false,
+            isMasterAudioEngine: true,
+            audioEngineSyncedToRemote: true,
+            running: false
+        }
+        const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
+        const reducers = {};
+        propertiesInStore.forEach(propertyName => {
+            reducers[propertyName] = (state = defaultsForPropertiesInStore[propertyName], action) => {
+                switch (action.type) {
+                    case 'SET_' + propertyName:
+                    return action.value;
+                    default:
+                    return state;
+                }
+            }
+        });
+        this.store = createStore(combineReducers(reducers));
+
         console.log("Audio Graph initialized!")
+    }
+
+    setParametreInStore(nomParametre, valor) {
+        this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
+    }
+
+    isRunning() {
+        return this.store.getState().running;
+    }
+
+    graphIsBuilt() {
+        return this.store.getState().graphIsBuilt;
+    }
+
+    isMasterAudioEngine() {
+        return this.store.getState().isMasterAudioEngine;
+    }
+
+    audioEngineIsSyncedToRemote() {
+        return this.store.getState().audioEngineSyncedToRemote;
     }
     
     setMainSequencerCurrentStep(currentStep) {
         this.mainSequencerCurrentStep = currentStep;
-        if (this.isMasterAudioEngine === true) {
+        if (this.isMasterAudioEngine()) {
             getCurrentSession().updateMasterSequencerCurrentStepInServer(this.mainSequencerCurrentStep);
         }
-        getCurrentSession().store.dispatch({ type: 'SET_mainSequencerCurrentStep', value: this.mainSequencerCurrentStep });
+        this.setParametreInStore('mainSequencerCurrentStep', this.mainSequencerCurrentStep);
+    }
+
+    getMainSequencerCurrentStep() {
+        return this.store.getState().mainSequencerCurrentStep
     }
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
         this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine && !this.running && this.audioEngineSyncedToRemote){
-            getCurrentSession().store.dispatch({ type: 'SET_mainSequencerCurrentStep', value: this.remoteMainSequencerCurrentStep });
+        if (!this.isMasterAudioEngine() && !this.isRunning() && this.audioEngineIsSyncedToRemote()){
+            this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
     
     buildAudioGraph() {
         console.log("Building audio graph")
         this.estacionsMasterGainNodes = {};
-        this.graphIsBuilt = false;
+        this.setParametreInStore('graphIsBuilt', false);
         this.setMainSequencerCurrentStep(-1);
+
+        // Setteja el bpm al valor guardat
+        Tone.Transport.bpm.value = this.getBpm();
         
         // Crea node master gain (per tenir un volum general)
-        this.masterGainNode = new Tone.Gain(1.0).toDestination();
+        this.masterGainNode = new Tone.Gain(this.getMasterGain()).toDestination();
         
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
-            if (this.running) {
+            if (this.isRunning()) {
                 // Call sequencer tick functions on all stations
                 getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                     const estacio = getCurrentSession().getEstacio(nomEstacio);
@@ -63,7 +113,7 @@ export class AudioGraph {
         })
         
         // Marca el graph com a construït
-        this.graphIsBuilt = true;
+        this.setParametreInStore('graphIsBuilt', true);
     }
     
     async startAudioContext() {
@@ -75,15 +125,15 @@ export class AudioGraph {
     }
     
     transportStart() {
-        if (this.graphIsBuilt === true) {
+        if (this.graphIsBuilt()) {
             console.log("Transport start")
-            this.running = true;
+            this.setParametreInStore('running', true);
             
             // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
-            if (this.isMasterAudioEngine){
+            if (this.isMasterAudioEngine()){
                 this.setMainSequencerCurrentStep(0);
             } else {
-                if (this.audioEngineSyncedToRemote){
+                if (this.audioEngineIsSyncedToRemote()){
                     this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : 0);
                 } else {
                     this.setMainSequencerCurrentStep(0);
@@ -100,9 +150,9 @@ export class AudioGraph {
     }
     
     transportStop() {
-        if (this.graphIsBuilt === true) {
+        if (this.graphIsBuilt()) {
             console.log("Transport stop")
-            this.running = false;
+            this.setParametreInStore('running', false);
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onTransportStop();
@@ -111,21 +161,27 @@ export class AudioGraph {
             this.setMainSequencerCurrentStep(-1);
         }
     }
-    
+
     getMasterGain() {
-        return this.masterGainNode.gain.value;
+        return this.store.getState().masterGain;
     }
     
     setMasterGain(gain) {
-        this.masterGainNode.gain.rampTo(gain);
+        this.setParametreInStore('masterGain', gain);
+        if (this.graphIsBuilt()){
+            this.masterGainNode.gain.rampTo(gain);
+        }
     }
     
     getBpm() {
-        return Tone.Transport.bpm.value;
+        return this.store.getState().bpm;
     }
     
     setBpm(bpm) {
-        Tone.Transport.bpm.rampTo(bpm);
+        this.setParametreInStore('bpm', bpm);
+        if (this.graphIsBuilt()){
+            Tone.Transport.bpm.rampTo(bpm);
+        }
     }
 }
 
@@ -136,5 +192,16 @@ export const getAudioGraphInstance = () => {
 }
 
 socket.on('update_master_sequencer_current_step', function (data) {
-    audioGraph.receiveRemoteMainSequencerCurrentStep(data.current_step);
+    getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
+});
+
+socket.on('update_parametre_audio_transport', function (data) {
+    // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but are actually not likely to be set from remote server)
+    if (data.nomParametre === 'bpm') {
+        getAudioGraphInstance().setBpm(data.value);
+    } else if (data.nomParametre === 'masterGain') {
+        getAudioGraphInstance().setMasterGain(data.value);
+    } else {
+        getAudioGraphInstance().setParametreInStore(data.nomParametre, data.value);
+    }
 });
