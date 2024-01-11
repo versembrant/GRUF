@@ -1,9 +1,7 @@
-// JS comú
 import './sessionManager'
 
-// JS estacions de treball
-import './estacions/estacioOscilador'
-import './estacions/estacioSequenciador'
+import './components/audioTransport'
+import './components/estacioOscilador'
+import './components/estacioSequenciador'
 
-// CSS
 import '../styles/index.scss'
