@@ -112,7 +112,7 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
             'div',
             null,
             createElement('p', null, parameterDescription.label + ': ', parametreValorState.join(',')),
-            createElement('div', {className: 'steps'}, ...stepsElements)
+            createElement('div', {className: 'steps-default'}, ...stepsElements)
         );
     } else {
         return createElement('div', null, 'Tipus de paràmetre no suportat');
