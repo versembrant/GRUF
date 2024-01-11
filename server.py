@@ -1,11 +1,11 @@
 import sys
-import uuid
 import json
-
-import redis
+import random
 from collections import defaultdict
+
 from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, emit, join_room, leave_room
+import redis
 
 r = redis.Redis(host='redis', port=16379, db=0)
 
@@ -39,13 +39,17 @@ class Session(object):
 
     def data_is_valid(self, data):
         # TODO: implement several checks to make sure data is valid for a session
+        if 'id' not in data:
+            return False
+        if 'name' not in data:
+            return False
         if 'estacions' not in data:
             return False
         return True
         
     @property
-    def uuid(self):
-        return self.data['uuid']
+    def id(self):
+        return self.data['id']
     
     @property
     def name(self):
@@ -57,7 +61,7 @@ class Session(object):
 
     @property
     def cache_key(self):
-        return 'session:' + self.uuid
+        return 'session:' + self.id
     
     @property
     def estacions(self):
@@ -69,7 +73,7 @@ class Session(object):
     
     @property
     def room_name(self):
-        return self.uuid
+        return self.id
 
     def save_to_redis(self):
         r.set(self.cache_key, json.dumps(self.get_full_data()))
@@ -81,12 +85,12 @@ class Session(object):
         return self.data
     
     def add_user(self, username):
-        usernames_connected_per_session[self.uuid].append(username)
+        usernames_connected_per_session[self.id].append(username)
         self.connected_users.append(username)
         self.save_to_redis()
 
     def remove_user(self, username):
-        usernames_connected_per_session[self.uuid].remove(username)
+        usernames_connected_per_session[self.id].remove(username)
         self.connected_users.remove(username)
         self.save_to_redis()
 
@@ -98,16 +102,16 @@ class Session(object):
             pass
 
 
-def get_session_by_uuid(uuid):
-    session_redis = r.get('session:' + uuid)
+def get_session_by_id(id):
+    session_redis = r.get('session:' + id)
     if session_redis is not None:
         session_raw_data = json.loads(session_redis)
         return Session(session_raw_data)
     return None
 
 
-def delete_session_by_uuid(uuid):
-    s_to_delete = get_session_by_uuid(uuid)
+def delete_session_by_id(id):
+    s_to_delete = get_session_by_id(id)
     if s_to_delete is not None:
         s_to_delete.delete_from_redis()
         
@@ -133,24 +137,24 @@ def new():
         name = request.form['name']
         data = json.loads(request.form['data'])
         data['name'] = name
-        data['uuid'] = str(uuid.uuid4())[0:6]
+        data['id'] = str(random.randint(100000, 999999))
         s = Session(data)
-        log(f'New session created: {s.name} ({s.uuid})\n{json.dumps(s.get_full_data(), indent=4)}')
-        return redirect(url_for('session', session_uuid=s.uuid))
+        log(f'New session created: {s.name} ({s.id})\n{json.dumps(s.get_full_data(), indent=4)}')
+        return redirect(url_for('session', session_id=s.id))
     return render_template('nova_sessio.html')
 
 
-@app.route('/session/<session_uuid>/')
-def session(session_uuid):
-    s = get_session_by_uuid(session_uuid)
+@app.route('/session/<session_id>/')
+def session(session_id):
+    s = get_session_by_id(session_id)
     if s is None:
         raise Exception('Session not found')
     return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1')
 
 
-@app.route('/delete_session/<session_uuid>/')
-def delete_session(session_uuid):
-    delete_session_by_uuid(session_uuid)
+@app.route('/delete_session/<session_id>/')
+def delete_session(session_id):
+    delete_session_by_id(session_id)
     return redirect(url_for('index'))
 
 
@@ -158,17 +162,17 @@ def delete_session(session_uuid):
 def test_disconnect():
     username = request.sid
     print(f'User {username} disconnected, removing it from all sessions')
-    for session_uuid, usernames in usernames_connected_per_session.items():
+    for session_id, usernames in usernames_connected_per_session.items():
         if username in usernames:
-            s = get_session_by_uuid(session_uuid)
+            s = get_session_by_id(session_id)
             if s is not None:
                 s.remove_user(username)
                 log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
 
 
 @socketio.on('join_session')
-def on_join_session(data):  # session_uuid, username
-    s = get_session_by_uuid(data['session_uuid'])
+def on_join_session(data):  # session_id, username
+    s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     username = request.sid
@@ -179,8 +183,8 @@ def on_join_session(data):  # session_uuid, username
     
 
 @socketio.on('leave_session')
-def on_leave_session(data):  # session_uuid, username
-    s = get_session_by_uuid(data['session_uuid'])
+def on_leave_session(data):  # session_id, username
+    s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     username = request.sid
@@ -190,8 +194,8 @@ def on_leave_session(data):  # session_uuid, username
 
 
 @socketio.on('update_session_parameter')
-def on_update_session_parameter(data):  # session_uuid, nom_estacio, nom_parametre, valor
-    s = get_session_by_uuid(data['session_uuid'])
+def on_update_session_parameter(data):  # session_id, nom_estacio, nom_parametre, valor
+    s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     s.update_parameter(data['nom_estacio'], data['nom_parametre'], data['valor'])
@@ -199,8 +203,8 @@ def on_update_session_parameter(data):  # session_uuid, nom_estacio, nom_paramet
 
 
 @socketio.on('update_master_sequencer_current_step')
-def on_update_master_sequencer_current_step(data):  # session_uuid, current_step
-    s = get_session_by_uuid(data['session_uuid'])
+def on_update_master_sequencer_current_step(data):  # session_id, current_step
+    s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     emit('update_master_sequencer_current_step', data, to=s.room_name)

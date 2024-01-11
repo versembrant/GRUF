@@ -183,8 +183,8 @@ export class Session {
         console.log("Session initialized!")
     }
 
-    getUUID() {
-        return this.rawData.uuid
+    getID() {
+        return this.rawData.id
     }
 
     getNomsEstacions() {
@@ -218,7 +218,7 @@ export class Session {
     updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
-            socket.emit('update_session_parameter', {session_uuid: this.getUUID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+            socket.emit('update_session_parameter', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
         } else {
             // In local mode, we update parameter in the same object as it is not synced with the server
             this.updateParametreEstacio(nomEstacio, nomParametre, valor)
@@ -227,7 +227,7 @@ export class Session {
 
     updateMasterSequencerCurrentStepInServer(current_step) {
         if (!this.localMode) {
-            socket.emit('update_master_sequencer_current_step', {session_uuid: this.getUUID(), current_step: current_step});
+            socket.emit('update_master_sequencer_current_step', {session_id: this.getID(), current_step: current_step});
         }
     }
 }

@@ -18,7 +18,7 @@ const onSessionDataLoaded = () => {
 }
 
 const localMode = sessionElement.dataset.local === 'true';
-const sessionUUID = sessionElement.dataset.uuid;
+const sessionID = sessionElement.dataset.id;
 if (localMode){
     // In local mode, session data is passed directly and server is not involved
     const sessionData = JSON.parse(sessionElement.dataset.data);
@@ -27,14 +27,14 @@ if (localMode){
 } else {
     // In remote mode, all session updates go through the server and come from the server
     socket.on('connect', function() {
-        socket.emit('join_session', {session_uuid: sessionUUID})
+        socket.emit('join_session', {session_id: sessionID})
     });
     socket.on('set_session_data', function (data) {
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
     socket.on('update_session_parameter', function (data) {
-        if ((getCurrentSession() !== undefined) && (data.session_uuid === getCurrentSession().getUUID())) {
+        if ((getCurrentSession() !== undefined) && (data.session_id === getCurrentSession().getID())) {
             getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
         }
     });
