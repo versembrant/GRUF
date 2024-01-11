@@ -13,7 +13,9 @@ class EstacioOscilador extends EstacioBase {
             freq: {type: 'float', label:'Freqüència', min: '20.0', max: '4000.0', initial: 440},
             amplitud: {type: 'float', label:'Gain', min: '0.0', max: '1.0', initial: 0.15},
             waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
+            notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
         }
+        this.updatesUiWithMainSequencer = true;
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {

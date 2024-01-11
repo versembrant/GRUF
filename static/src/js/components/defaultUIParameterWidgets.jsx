@@ -69,10 +69,60 @@ export const StepsParameterDefaultWidget = ({parameterDescription, parameterValu
     }
     return (
         <div>
-            <p>{parameterDescription.label}: {parameterValue.join(',')}</p>
+            <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
             <div class="steps-default">
                 {stepsElements}
             </div>
+        </div>
+    )
+};
+
+
+const listABIndex = (list, a, b) => { // TODO: replace by indexOf?
+    for (let i = 0; i < list.length; i++) {
+        if ((list[i][0] === a) && (list[i][1] === b)){
+            return i;
+        }
+    }
+    return -1;        
+}
+
+
+export const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
+    const numRows = parameterDescription.numRows;
+    const numSteps = parameterDescription.numCols;
+    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
+    const stepsElementsPerRow = []
+    for (let i = 0; i < numRows; i++) {
+        const stepsElements = []
+        for (let j = 0; j < numSteps; j++) {
+            const filledClass = listABIndex(parameterValue, i, j) > -1 ? 'filled' : '';
+            const activeStep = currentStep == j ? 'active' : '';
+            stepsElements.push(
+            <div 
+                className={'step ' + filledClass + ' ' + activeStep}
+                onClick={(evt) => {
+                    let updatedParameterValue = [...parameterValue]
+                    const index = listABIndex(parameterValue, i, j);
+                    if (index > -1){
+                        updatedParameterValue.splice(index, 1);
+                    } else {
+                        updatedParameterValue.push([i, j])
+                    }
+                    getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, updatedParameterValue)
+                }}>
+            </div>
+            )
+        }
+        stepsElementsPerRow.push(stepsElements)
+    }
+
+    return (
+        <div>
+            <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
+            {stepsElementsPerRow.map(function(stepsElements, i){
+                return <div class="steps-default">{stepsElements}</div>;
+            })}
         </div>
     )
 };

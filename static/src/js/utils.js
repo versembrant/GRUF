@@ -1,8 +1,6 @@
 import { io } from 'socket.io-client';
 import { createElement, useState, useEffect} from "react";
-import { getCurrentSession } from './sessionManager';
-import { getAudioGraphInstance } from './audioEngine';
-import { FloatParameterDefaultWidget, EnumParameterDefaultWidget, TextParameterDefaultWidget, StepsParameterDefaultWidget } from './components/defaultUIParameterWidgets';
+import { FloatParameterDefaultWidget, EnumParameterDefaultWidget, TextParameterDefaultWidget, StepsParameterDefaultWidget, GridParameterDefaultWidget } from './components/defaultUIParameterWidgets';
 
 
 // Export socket object to be used by other modules and communicate with server
@@ -58,7 +56,8 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
         text: TextParameterDefaultWidget,
-        steps: StepsParameterDefaultWidget
+        steps: StepsParameterDefaultWidget,
+        grid: GridParameterDefaultWidget
     }
     const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
     if (widgetUIClass === undefined) {
