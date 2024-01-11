@@ -1,16 +1,15 @@
 import { estacionsDisponibles } from "../sessionManager";
 
-const estacioSequenciador = new estacionsDisponibles['sequenciador']();
-estacioSequenciador.initialize()
-
-const estacioOscilador = new estacionsDisponibles['oscilador']();
-estacioOscilador.initialize()
-
-const defaultSessionData = {
-    estacions: {
-        oscilador1: estacioOscilador.getStateForServer(), 
-        sequenciador1: estacioSequenciador.getStateForServer(), 
-    },
+const creaSessioAmbUnaEstacioDeCada = () => {
+    const sessionData = {}
+    sessionData.estacions = {}
+    Object.keys(estacionsDisponibles).forEach(tipusEstacio => {
+        const estacio = new estacionsDisponibles[tipusEstacio]();
+        estacio.initialize()
+        sessionData.estacions[`${tipusEstacio}1`] = estacio.getFullStateObject();
+    })
+    return sessionData;
 }
+
 const dataInput = document.getElementsByName('data')[0];
-dataInput.value = JSON.stringify(defaultSessionData);    
+dataInput.value = JSON.stringify(creaSessioAmbUnaEstacioDeCada());    

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Sessió "{{ session.name }}"{% if local_mode %} (local){% endif %}</h1>
+<h1>Sessió "{{ session.name }}" (ID: {{ session.uuid }}{% if local_mode %} - local{% endif %})</h1>
 <a href="/">Torna a la llista de sessions</a>
 <session data-uuid="{{ session.uuid }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
 <div>

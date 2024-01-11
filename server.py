@@ -21,14 +21,27 @@ def log(message):
 usernames_connected_per_session = defaultdict(list)
 
 
+class InvalidSessionDataException(Exception):
+    pass
+
+
 class Session(object):
     data = {}
 
     def __init__(self, data):
+        if not self.data_is_valid(data):
+            raise InvalidSessionDataException
+
         self.data = data
         if 'connected_users' not in self.data:
             self.data['connected_users'] = []
         self.save_to_redis()
+
+    def data_is_valid(self, data):
+        # TODO: implement several checks to make sure data is valid for a session
+        if 'estacions' not in data:
+            return False
+        return True
         
     @property
     def uuid(self):
@@ -104,7 +117,12 @@ def index():
     log('Loading existing sessions from redis')
     sessions = []
     for key in r.scan_iter("session:*"):
-        s = Session(json.loads(r.get(key)))
+        try:
+            s = Session(json.loads(r.get(key)))
+        except InvalidSessionDataException:
+            log(f'Error loading session form redis with key {key}, invalid session data. Will remove it from redis.')
+            r.delete(key)
+            continue
         sessions.append(s)
     return render_template('index.html', sessions=sessions)
 
@@ -115,7 +133,7 @@ def new():
         name = request.form['name']
         data = json.loads(request.form['data'])
         data['name'] = name
-        data['uuid'] = str(uuid.uuid4())
+        data['uuid'] = str(uuid.uuid4())[0:6]
         s = Session(data)
         log(f'New session created: {s.name} ({s.uuid})\n{json.dumps(s.get_full_data(), indent=4)}')
         return redirect(url_for('session', session_uuid=s.uuid))
@@ -189,7 +207,6 @@ def on_update_master_sequencer_current_step(data):  # session_uuid, current_step
 
 
 if __name__ == '__main__':
-
     # Start server
     log('Starting server')
     socketio.run(app, debug=True, host='0.0.0.0', port=5555, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True

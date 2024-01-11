@@ -60,7 +60,7 @@ export class EstacioBase {
         this.store = createStore(combineReducers(reducers));
     }
 
-    getStateForServer() {
+    getFullStateObject() {
         return {
             tipus: this.tipus,
             versio: this.versio,
