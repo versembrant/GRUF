@@ -10,11 +10,24 @@ class EstacioSequenciador extends EstacioBase {
         this.tipus = tipus
         this.versio = '0.1'
         this.numSteps = 16
+
+        const initialPattern1 = new Array(this.numSteps).fill(0.0);
+        initialPattern1[0] = 1.0;
+        initialPattern1[3] = 1.0;
+        initialPattern1[4] = 1.0;
+        initialPattern1[8] = 1.0;
+
+        const initialPattern2 = new Array(this.numSteps).fill(0.0);
+        initialPattern2[2] = 1.0;
+        initialPattern2[7] = 1.0;
+        initialPattern2[12] = 1.0;
+        initialPattern2[13] = 1.0;
+
         this.parametersDescription = {
             sound1URL: {type: 'text', label: 'URL so 1', initial: 'https://cdn.freesound.org/previews/0/808_797-hq.mp3'},
-            sound1Steps: {type: 'steps', label: 'Steps so 1', initial: new Array(this.numSteps).fill(0.0)},
+            sound1Steps: {type: 'steps', label: 'Steps so 1', initial: initialPattern1},
             sound2URL: {type: 'text', label: 'URL so 2', initial: 'https://cdn.freesound.org/previews/561/561514_12517458-hq.mp3'},
-            sound2Steps: {type: 'steps', label: 'Steps so 2', initial: new Array(this.numSteps).fill(0.0)},
+            sound2Steps: {type: 'steps', label: 'Steps so 2', initial: initialPattern2},
         }
         this.updatesUiWithMainSequencer = true;
     }

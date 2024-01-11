@@ -11,7 +11,7 @@ class EstacioOscilador extends EstacioBase {
         this.versio = '0.1'
         this.parametersDescription = {
             freq: {type: 'float', label:'Freqüència', min: '20.0', max: '4000.0', initial: 440},
-            amplitud: {type: 'float', label:'Gain', min: '0.0', max: '1.0', initial: 0.5}
+            amplitud: {type: 'float', label:'Gain', min: '0.0', max: '1.0', initial: 0.15}
         }
     }
 
