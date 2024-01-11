@@ -2,6 +2,7 @@ import { io } from 'socket.io-client';
 import { createElement, useState, useEffect} from "react";
 import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
+import { FloatParameterDefaultWidget, EnumParameterDefaultWidget, TextParameterDefaultWidget, StepsParameterDefaultWidget } from './components/defaultUIParameterWidgets';
 
 
 // Export socket object to be used by other modules and communicate with server
@@ -51,83 +52,29 @@ export const subscribeToStoreChanges = (objectWithStore) => {
 
 // Util function to create UI widgets for the default UIs
 export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
-
     const parameterDescription = estacio.getParameterDescription(nomParametre);
     const parametreValorState = estacio.getParameterValue(nomParametre);
-
-    if (parameterDescription.type === 'float') {
-        return (
-            createElement(
-                'div',
-                null,
-                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
-                createElement(
-                    'input',
-                    {'type': 'range', 'min': parameterDescription.min, 'max': parameterDescription.max, 'step': parameterDescription.step || 0.05, 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
-                    null
-                )
-            )
-        );
-    } else if (parameterDescription.type === 'enum') {
-        const opcionsElements = [] 
-        parameterDescription.options.forEach(option => {
-            opcionsElements.push(createElement('option', {value: option}, option),)
-        });
-        return (
-            createElement(
-                'div',
-                null,
-                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
-                createElement(
-                    'select',
-                    {'value': parametreValorState, onChange: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
-                    ...opcionsElements
-                )
-            )
-        );
-    } else if (parameterDescription.type === 'text') {
-        return (
-            createElement(
-                'div',
-                null,
-                createElement('p', null, parameterDescription.label + ': ', parametreValorState),
-                createElement(
-                    'input',
-                    {'type': 'text', 'value': parametreValorState, onInput: (evt) => getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, evt.target.value)},
-                    null
-                )
-            )
-        );
-    } else if (parameterDescription.type === 'steps') {
-        const stepsElements = []
-        const numSteps = parameterDescription.initial.length;
-        const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
-        for (let i = 0; i < numSteps; i++) {
-            const filledClass = parametreValorState[i] == 1.0 ? 'filled' : '';
-            const activeStep = currentStep == i ? 'active' : '';
-            stepsElements.push(createElement(
-                    'div', 
-                    {className: 'step ' + filledClass + ' ' + activeStep, onClick: (evt) => {  //
-                        var updatedSteps = [...parametreValorState];
-                        if (updatedSteps[i] == 1.0) {
-                            updatedSteps[i] = 0.0;
-                        } else {
-                            updatedSteps[i] = 1.0;
-                        }
-                        getCurrentSession().updateParametreEstacioInServer(estacio.nom, nomParametre, updatedSteps)}
-                    }, 
-                    null
-                )
-            )
-        }
+    const widgetUIClassParameterType = {
+        float: FloatParameterDefaultWidget,
+        enum: EnumParameterDefaultWidget,
+        text: TextParameterDefaultWidget,
+        steps: StepsParameterDefaultWidget
+    }
+    const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
+    if (widgetUIClass === undefined) {
         return createElement(
             'div',
             null,
-            createElement('p', null, parameterDescription.label + ': ', parametreValorState.join(',')),
-            createElement('div', {className: 'steps-default'}, ...stepsElements)
+            createElement('p', null, 'No UI widget for parameter type: ', parameterDescription.type)
         );
     } else {
-        return createElement('div', null, 'Tipus de paràmetre no suportat');
+        return (
+            createElement(
+                widgetUIClass,
+                {parameterDescription:parameterDescription, parameterValue:parametreValorState, nomEstacio:estacio.nom},
+                null
+            )
+        );
     }
 }
 

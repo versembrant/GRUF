@@ -36,6 +36,12 @@ export class EstacioBase {
     }
 
     initialize(initialState = undefined) {
+        // Copia els noms dels parametres a parametersDescription 
+        // Ho fem aquí per no duplicar els noms quan definim els paràmetres. En alguns casos és còmode tenir el nom a part de la descripció del paràmetre
+        this.getParameterNames().forEach(parameterName => {
+            this.parametersDescription[parameterName].nom = parameterName;
+        })
+        // Inicialitza l'store Redux
         this.initializeStore(initialState)
     }
 
