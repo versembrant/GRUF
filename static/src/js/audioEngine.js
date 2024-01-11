@@ -12,14 +12,13 @@ export class AudioGraph {
         this.audioEngineSyncedToRemote = true;
         this.remoteMainSequencerCurrentStep = -1;
         this.running = false;
-
         console.log("Audio Graph initialized!")
     }
     
     setMainSequencerCurrentStep(currentStep) {
         this.mainSequencerCurrentStep = currentStep;
         if (this.isMasterAudioEngine === true) {
-            socket.emit('update_master_sequencer_current_step', {session_uuid: getCurrentSession().getUUID(), current_step: this.mainSequencerCurrentStep});
+            getCurrentSession().updateMasterSequencerCurrentStepInServer(this.mainSequencerCurrentStep);
         }
         getCurrentSession().store.dispatch({ type: 'SET_mainSequencerCurrentStep', value: this.mainSequencerCurrentStep });
     }

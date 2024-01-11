@@ -224,4 +224,10 @@ export class Session {
             this.updateParametreEstacio(nomEstacio, nomParametre, valor)
         }
     }
+
+    updateMasterSequencerCurrentStepInServer(current_step) {
+        if (!this.localMode) {
+            socket.emit('update_master_sequencer_current_step', {session_uuid: this.getUUID(), current_step: current_step});
+        }
+    }
 }
