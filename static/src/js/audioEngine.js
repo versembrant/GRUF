@@ -35,8 +35,6 @@ export class AudioGraph {
             }
         });
         this.store = createStore(combineReducers(reducers));
-
-        console.log("Audio Graph initialized!")
     }
 
     setParametreInStore(nomParametre, valor) {

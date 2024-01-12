@@ -19,9 +19,9 @@ export const AudioMixerEstacions = () => {
         <div className="mixer">
             {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
                 return (
-                <div>
-                    <input key={i}
-                        type="range" 
+                <div key={i}>
+                    <input 
+                        type="range"
                         min="0.0" 
                         max="1.0"
                         step="0.1"

@@ -43,6 +43,7 @@ if (localMode){
         socket.emit('join_session', {session_id: sessionID})
     });
     socket.on('set_session_data', function (data) {
+        console.log('Session data received', data);
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });

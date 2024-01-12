@@ -17,7 +17,7 @@ export const setCurrentSession = (session) => {
 export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (nom, estacioClass) => {
-    console.log('Registering estacio helper', nom, estacioClass)
+    console.log('Registering estacio disponible:', nom, estacioClass)
     estacionsDisponibles[nom] = estacioClass;
 }
 
@@ -175,8 +175,6 @@ export class Session {
             }
         });
         this.store = createStore(combineReducers(reducers));
-
-        console.log("Session initialized!")
     }
 
     setParametreInStore(nomParametre, valor) {
