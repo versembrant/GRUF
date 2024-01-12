@@ -10,6 +10,9 @@
     "build": "parcel build --dist-dir static/dist"
   },
   "devDependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.4",
     "@parcel/transformer-sass": "2.11.0",
     "buffer": "^5.5.0||^6.0.0",
     "parcel": "^2.11.0",
