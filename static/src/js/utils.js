@@ -36,6 +36,29 @@ export const ensureValidValue = (value, parameterDescription) => {
     return value;
 }
 
+// IndexOf like function for arrays of arrays (useful for "grid" parameter type)
+/*
+E.g.:
+indexOfArray([[1,1], [2,3]], [1,1]) = 0
+indexOfArray([[1,1], [2,3]], [2,3]) = 1
+indexOfArray([[1,1], [2,3]], [3,3]) = -1
+*/
+export const indexOfArray = (arrayOfArrays, targetArray) => {
+    for (let i = 0; i < arrayOfArrays.length; i++) {
+        let isMatch = true;
+        for (let j = 0; j < targetArray.length; j++) {
+            if (arrayOfArrays[i][j] !== targetArray[j]) {
+                isMatch = false;
+                break;
+            }
+        }
+        if (isMatch) {
+            return i;
+        }
+    }
+    return -1;  
+}
+
 // Util function to subscribe a react component to changes of a redux store of an object
 export const subscribeToStoreChanges = (objectWithStore) => {
     const [_, setState] = useState(objectWithStore.store.getState());

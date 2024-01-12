@@ -1,5 +1,6 @@
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from "../audioEngine";
+import { indexOfArray } from "../utils";
 
 
 export const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
@@ -38,7 +39,7 @@ export const EnumParameterDefaultWidget = ({parameterDescription, parameterValue
             <select
                 value={parameterValue}
                 onChange={(evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, evt.target.value)}>
-                {parameterDescription.options.map((option, index) => <option value={option}>{option}</option>)}
+                {parameterDescription.options.map((option, i) => <option value={option} key={i}>{option}</option>)}
             </select>
         </div>
     )
@@ -54,6 +55,7 @@ export const StepsParameterDefaultWidget = ({parameterDescription, parameterValu
         const activeStep = currentStep == i ? 'active' : '';
         stepsElements.push(
         <div 
+            key={i} // To avoid React warning
             className={'step ' + filledClass + ' ' + activeStep}
             onClick={(evt) => {
                 let updatedParameterValue = [...parameterValue]
@@ -70,22 +72,12 @@ export const StepsParameterDefaultWidget = ({parameterDescription, parameterValu
     return (
         <div>
             <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
-            <div class="steps-default">
+            <div className="steps-default">
                 {stepsElements}
             </div>
         </div>
     )
 };
-
-
-const listABIndex = (list, a, b) => { // TODO: replace by indexOf?
-    for (let i = 0; i < list.length; i++) {
-        if ((list[i][0] === a) && (list[i][1] === b)){
-            return i;
-        }
-    }
-    return -1;        
-}
 
 
 export const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
@@ -96,14 +88,15 @@ export const GridParameterDefaultWidget = ({parameterDescription, parameterValue
     for (let i = 0; i < numRows; i++) {
         const stepsElements = []
         for (let j = 0; j < numSteps; j++) {
-            const filledClass = listABIndex(parameterValue, i, j) > -1 ? 'filled' : '';
+            const filledClass = indexOfArray(parameterValue, [i, j]) > -1 ? 'filled' : '';
             const activeStep = currentStep == j ? 'active' : '';
             stepsElements.push(
             <div 
+                key={i + "_" + j} // To avoid React warning
                 className={'step ' + filledClass + ' ' + activeStep}
                 onClick={(evt) => {
                     let updatedParameterValue = [...parameterValue]
-                    const index = listABIndex(parameterValue, i, j);
+                    const index = indexOfArray(parameterValue, [i, j]);
                     if (index > -1){
                         updatedParameterValue.splice(index, 1);
                     } else {
@@ -120,9 +113,11 @@ export const GridParameterDefaultWidget = ({parameterDescription, parameterValue
     return (
         <div>
             <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
-            {stepsElementsPerRow.map(function(stepsElements, i){
-                return <div class="steps-default">{stepsElements}</div>;
-            })}
+            <div className="grid-default">
+                {stepsElementsPerRow.map(function(stepsElements, i){
+                    return <div className="steps-default" key={i}>{stepsElements}</div>;
+                })}
+            </div>
         </div>
     )
 };

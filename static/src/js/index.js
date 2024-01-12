@@ -1,7 +1,7 @@
 import './audioEngine'
 import './sessionManager'
 
-import './estacions/estacioOscilador'
-import './estacions/estacioSequenciador'
+import './estacions/estacioSynth'
+import './estacions/estacioDrumMachine'
 
 import '../styles/index.scss'
