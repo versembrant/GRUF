@@ -11,11 +11,11 @@ class EstacioSynth extends EstacioBase {
         this.tipus = tipus
         this.versio = '0.1'
         this.parametersDescription = {
-            noteBase: {type: 'float', label:'Nota base', min: '0', max: '127', step: '1', initial: 64},
-            attack: {type: 'float', label:'Attack', min: '0.00', max: '2.0', initial: 0.01},
-            decay: {type: 'float', label:'Decay', min: '0.00', max: '2.0', initial: 0.01},
-            sustain: {type: 'float', label:'Sustain', min: '0.00', max: '1.0', initial: 1.0},
-            release: {type: 'float', label:'Release', min: '0.00', max: '5.0', initial: 0.01},
+            noteBase: {type: 'float', label:'Nota base', min: 0, max: 127, step: 1, initial: 64},
+            attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
+            decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
+            sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
+            release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
             waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
             notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
         }
