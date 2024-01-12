@@ -1,10 +1,11 @@
 import { createElement, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
-import { socket } from "../utils";
+import { socket, renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { AudioTransportControls } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
+import { AudioMixerEstacions } from "../components/audioMixerEstacions";
 
 const sessionElement = document.getElementsByTagName('session')[0];
 const selectorEstacio = document.getElementById('selectorEstacio');
@@ -16,10 +17,12 @@ const onSessionDataLoaded = () => {
     const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
+    getAudioGraphInstance().setGainsEstacions(currentSession.rawData.gainsEstacions);
 
     // Render UI
-    renderConnectedUsers();
-    renderAudioTransport();
+    renderReactComponentInElement(SessionConnectedUsers, 'sessionConnectedUsers')
+    renderReactComponentInElement(AudioTransportControls, 'audioTransportControls')
+    renderReactComponentInElement(AudioMixerEstacions, 'audioMixerEstacions')
     renderEstacions();
 
     // Some log statements useful for debugging
@@ -43,20 +46,6 @@ if (localMode){
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
-}
-
-// Render UI connected users
-const renderConnectedUsers = () => {
-    createRoot(document.getElementById('sessionConnectedUsers')).render(
-        createElement(StrictMode, null, createElement(SessionConnectedUsers, null))
-    );
-}
-
-// Render UI audio transport
-const renderAudioTransport = () => {
-    createRoot(document.getElementById('audioTransportControls')).render(
-        createElement(StrictMode, null, createElement(AudioTransportControls, null))
-    );
 }
 
 // Render UI estacions

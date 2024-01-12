@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
-import { createElement, useState, useEffect} from "react";
+import { createRoot } from "react-dom/client";
+import { createElement, useState, useEffect, StrictMode } from "react";
 import { FloatParameterDefaultWidget, EnumParameterDefaultWidget, TextParameterDefaultWidget, StepsParameterDefaultWidget, GridParameterDefaultWidget } from './components/defaultUIParameterWidgets';
 
 
@@ -100,3 +101,9 @@ export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     }
 }
 
+// Util function to render a react component in a DOM element
+export const renderReactComponentInElement = (reactComponent, elementID) => {
+    createRoot(document.getElementById(elementID)).render(
+        createElement(StrictMode, null, createElement(reactComponent, null))
+    );
+}

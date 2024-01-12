@@ -40,6 +40,8 @@ class Session(object):
             raise InvalidSessionDataException
         if 'estacions' not in data:
             raise InvalidSessionDataException
+        if 'gainsEstacions' not in data:
+            raise InvalidSessionDataException
         
         # Set default values for some properties
         if 'connected_users' not in data:

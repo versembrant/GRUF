@@ -9,11 +9,13 @@ var audioContextIsReady = false;
 export class AudioGraph {
     constructor() {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
+        this.estacionsMasterGainNodes = {};
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
         const defaultsForPropertiesInStore = {
             bpm: 120,
             masterGain: 1.0,
+            gainsEstacions: {},
             mainSequencerCurrentStep: -1,
             graphIsBuilt: false,
             isMasterAudioEngine: true,
@@ -79,10 +81,13 @@ export class AudioGraph {
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
+
+    getMasterGainNodeForEstacio(nomEstacio) {
+        return this.estacionsMasterGainNodes[nomEstacio]
+    }
     
     buildAudioGraph() {
         console.log("Building audio graph")
-        this.estacionsMasterGainNodes = {};
         this.setParametreInStore('graphIsBuilt', false);
         this.setMainSequencerCurrentStep(-1);
 
@@ -190,6 +195,26 @@ export class AudioGraph {
     updateBpmInServer(bpm) {
         socket.emit('update_parametre_audio_transport', {session_id: getCurrentSession().getID(), nom_parametre: 'bpm', valor: bpm});
     }
+
+    getGainsEstacions() {
+        return this.store.getState().gainsEstacions;
+    }
+    
+    setGainsEstacions(gainsEstacions) {
+        this.setParametreInStore('gainsEstacions', gainsEstacions);
+        if (this.graphIsBuilt()){
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                const gainNode = this.getMasterGainNodeForEstacio(nomEstacio);
+                gainNode.gain.value = gainsEstacions[nomEstacio];
+            })
+        }
+    }
+
+    updateGainsEstacionsInServer(gainsEstacions) {
+        socket.emit('update_parametre_audio_transport', {session_id: getCurrentSession().getID(), nom_parametre: 'gainsEstacions', valor: gainsEstacions});
+    }
+
+    
 }
 
 const audioGraph = new AudioGraph();
@@ -208,6 +233,8 @@ socket.on('update_parametre_audio_transport', function (data) {
         getAudioGraphInstance().setBpm(data.valor);
     } else if (data.nom_parametre === 'masterGain') {
         getAudioGraphInstance().setMasterGain(data.valor);
+    } else if (data.nom_parametre === 'gainsEstacions') {
+        getAudioGraphInstance().setGainsEstacions(data.valor);
     } else {
         getAudioGraphInstance().setParametreInStore(data.nom_parametre, data.valor);
     }
