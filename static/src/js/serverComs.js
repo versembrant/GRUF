@@ -1,9 +1,24 @@
 import { io } from 'socket.io-client';
 import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
+import throttle from 'lodash.throttle'
 
 // Initialize socket
 const socket = io();
+
+const throttledFunctionsMap = {}
+
+const getThrottledFuctionKey = (name, data) => {
+    if (name === 'update_master_sequencer_current_step'){
+        // Never throttle step sequencer clock messages
+        return undefined;
+    }
+    let key = name + '_';
+    key += data.nom_estacio + '_'  // this will be undefined if no estacio but it is fine
+    key += data.nom_parametre + '_'  // this will be undefined if no estacio but it is fine
+    return key
+}
+
 
 // Event handlers for messages received from the server
 socket.on('message', function (message) {
@@ -28,7 +43,18 @@ socket.on('update_parametre_audio_graph', function (data) {
 
 // Methods to send a message to the server
 export const sendMessageToServer = (name, data) => {
-    socket.emit(name, data);
+    const throttledFunctionKey = getThrottledFuctionKey(name, data);
+    if (throttledFunctionKey === undefined){
+        // No throttle
+        socket.emit(name, data);
+    } else {
+        if (!throttledFunctionsMap.hasOwnProperty(throttledFunctionKey)){
+            // If no throttled function exists, create it
+            throttledFunctionsMap[throttledFunctionKey] = throttle((name, data) => socket.emit(name, data), 50);
+        }
+        // Call the throttled version of the funcion
+        throttledFunctionsMap[throttledFunctionKey](name, data)
+    }
 }
 
 // Method used to connect to a session in the server and receive the initial session data
