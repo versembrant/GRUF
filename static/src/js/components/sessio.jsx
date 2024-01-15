@@ -3,7 +3,6 @@ import { getCurrentSession } from "../sessionManager";
 import { AudioTransportControls } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { AudioMixerEstacions } from "../components/audioMixerEstacions";
-import { Sessio } from "../components/sessio";
 
 const Estacio = ({estacio}) => {
     return (

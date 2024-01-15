@@ -9,7 +9,7 @@
     "watch": "parcel watch --no-cache --no-hmr --dist-dir static/dist",
     "build": "parcel build --dist-dir static/dist"
   },
-  "devDependencies": {
+  "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.4",
