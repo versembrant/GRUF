@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager'
-import { socket } from './utils';
+import { sendMessageToServer } from './serverComs';
 
 var audioContextIsReady = false;
 
@@ -64,20 +64,15 @@ export class AudioGraph {
     setMainSequencerCurrentStep(currentStep) {
         this.mainSequencerCurrentStep = currentStep;
         if (this.isMasterAudioEngine()) {
-            getCurrentSession().updateMasterSequencerCurrentStepInServer(this.mainSequencerCurrentStep);
+            if (!getCurrentSession().localMode) {
+                sendMessageToServer('update_master_sequencer_current_step', {session_id: getCurrentSession().getID(), current_step: currentStep});
+            }
         }
         this.setParametreInStore('mainSequencerCurrentStep', this.mainSequencerCurrentStep);
     }
 
     getMainSequencerCurrentStep() {
         return this.store.getState().mainSequencerCurrentStep
-    }
-
-    receiveRemoteMainSequencerCurrentStep(currentStep) {
-        this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine() && !this.isRunning() && this.audioEngineIsSyncedToRemote()){
-            this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
-        }
     }
 
     getMasterGainNodeForEstacio(nomEstacio) {
@@ -190,10 +185,6 @@ export class AudioGraph {
         }
     }
 
-    updateBpmInServer(bpm) {
-        socket.emit('update_parametre_audio_transport', {session_id: getCurrentSession().getID(), nom_parametre: 'bpm', valor: bpm});
-    }
-
     getGainsEstacions() {
         return this.store.getState().gainsEstacions;
     }
@@ -208,11 +199,42 @@ export class AudioGraph {
         }
     }
 
-    updateGainsEstacionsInServer(gainsEstacions) {
-        socket.emit('update_parametre_audio_transport', {session_id: getCurrentSession().getID(), nom_parametre: 'gainsEstacions', valor: gainsEstacions});
+    updateParametreAudioGraph(nomParametre, valor) {
+        if (!getCurrentSession().localMode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
+                getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
+            }
+            sendMessageToServer('update_parametre_audio_graph', {session_id: getCurrentSession().getID(), nom_parametre: nomParametre, valor: valor});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
+        }
     }
 
-    
+    receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
+        // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but 
+        // are actually not likely to be set from the remote server)
+        if (nomParametre === 'bpm') {
+            this.setBpm(valor);
+        } else if (nomParametre === 'masterGain') {
+            this.setMasterGain(valor);
+        } else if (nomParametre === 'gainsEstacions') {
+            this.setGainsEstacions(valor);
+        } else {
+            this.setParametreInStore(nomParametre, valor);
+        }
+    } 
+
+    receiveRemoteMainSequencerCurrentStep(currentStep) {
+        this.remoteMainSequencerCurrentStep = currentStep;
+        if (!this.isMasterAudioEngine() && !this.isRunning() && this.audioEngineIsSyncedToRemote()){
+            this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
+        }
+    }
 }
 
 const audioGraph = new AudioGraph();
@@ -220,20 +242,3 @@ const audioGraph = new AudioGraph();
 export const getAudioGraphInstance = () => {
     return audioGraph;
 }
-
-socket.on('update_master_sequencer_current_step', function (data) {
-    getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
-});
-
-socket.on('update_parametre_audio_transport', function (data) {
-    // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but are actually not likely to be set from remote server)
-    if (data.nom_parametre === 'bpm') {
-        getAudioGraphInstance().setBpm(data.valor);
-    } else if (data.nom_parametre === 'masterGain') {
-        getAudioGraphInstance().setMasterGain(data.valor);
-    } else if (data.nom_parametre === 'gainsEstacions') {
-        getAudioGraphInstance().setGainsEstacions(data.valor);
-    } else {
-        getAudioGraphInstance().setParametreInStore(data.nom_parametre, data.valor);
-    }
-});

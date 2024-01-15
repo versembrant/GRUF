@@ -13,7 +13,7 @@ export const FloatParameterDefaultWidget = ({parameterDescription, parameterValu
                 max={parameterDescription.max}
                 step={parameterDescription.step || 0.05}
                 value={parameterValue}
-                onInput={(evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, evt.target.value)} />
+                onInput={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)} />
         </div>
     )
 };
@@ -26,7 +26,7 @@ export const TextParameterDefaultWidget = ({parameterDescription, parameterValue
             <input
                 type="text"
                 value={parameterValue}
-                onInput={(evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, evt.target.value)} />
+                onInput={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)} />
         </div>
     )
 };
@@ -38,7 +38,7 @@ export const EnumParameterDefaultWidget = ({parameterDescription, parameterValue
             <p>{parameterDescription.label}: {parameterValue}</p>
             <select
                 value={parameterValue}
-                onChange={(evt) => getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, evt.target.value)}>
+                onChange={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)}>
                 {parameterDescription.options.map((option, i) => <option value={option} key={i}>{option}</option>)}
             </select>
         </div>
@@ -64,7 +64,7 @@ export const StepsParameterDefaultWidget = ({parameterDescription, parameterValu
                 } else {
                     updatedParameterValue.push(i)
                 }
-                getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, updatedParameterValue)
+                getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, updatedParameterValue)
             }}>
         </div>
         )
@@ -102,7 +102,7 @@ export const GridParameterDefaultWidget = ({parameterDescription, parameterValue
                     } else {
                         updatedParameterValue.push([i, j])
                     }
-                    getCurrentSession().updateParametreEstacioInServer(nomEstacio, parameterDescription.nom, updatedParameterValue)
+                    getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, updatedParameterValue)
                 }}>
             </div>
             )

@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { createStore, combineReducers } from "redux";
-import { socket, ensureValidValue, creaUIWidgetPerParametre, subscribeToStoreChanges } from "./utils";
+import { sendMessageToServer } from "./serverComs";
+import { ensureValidValue, creaUIWidgetPerParametre, subscribeToStoreChanges } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 
 
@@ -146,6 +147,7 @@ export class EstacioBase {
 export class Session {
     constructor(data, local=false) {
         this.localMode = local
+        this.performLocalUpdatesBeforeServerUpdates = true
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data
@@ -194,8 +196,24 @@ export class Session {
     getEstacio(nomEstacio) {
         return this.estacions[nomEstacio];
     }
-    
+
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
+        if (!this.localMode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (this.performLocalUpdatesBeforeServerUpdates) {
+                this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor)
+            }
+            sendMessageToServer('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor)
+        }
+    }
+    
+    receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor) {
         const estacio = this.getEstacio(nomEstacio);
 
         // Triguejem canvi a l'store (que generarà canvi a la UI)
@@ -206,28 +224,25 @@ export class Session {
             estacio.updateAudioGraphParameter(nomParametre)
         }
     }
-    
-    updateParametreEstacioInServer(nomEstacio, nomParametre, valor) {
+
+    updateParametreSessioInServer(nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
-            socket.emit('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor});
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (this.performLocalUpdatesBeforeServerUpdates) {
+                this.receiveUpdateParametreSessioFromServer(nomParametre, valor)
+            }
+            sendMessageToServer('update_parametre_sessio', {session_id: this.getID(), nom_parametre: nomParametre, valor: valor});
         } else {
-            // In local mode, we update parameter in the same object as it is not synced with the server
-            this.updateParametreEstacio(nomEstacio, nomParametre, valor)
+            // In local mode, simulate the message coming from the server and perform the actual action
+            this.receiveUpdateParametreSessioFromServer(nomParametre, valor)
         }
     }
 
-    updateMasterSequencerCurrentStepInServer(current_step) {
-        if (!this.localMode) {
-            socket.emit('update_master_sequencer_current_step', {session_id: this.getID(), current_step: current_step});
-        }
+    receiveUpdateParametreSessioFromServer(nomParametre, valor) {
+        this.setParametreInStore(nomParametre, valor)
     }
+    
 }
-
-socket.on('update_parametre_sessio', function (data) {
-    getCurrentSession().setParametreInStore(data.nom_parametre, data.valor);
-});
-
-socket.on('update_parametre_estacio', function (data) {
-    getCurrentSession().updateParametreEstacio(data.nom_estacio, data.nom_parametre, data.valor);
-});

@@ -11,8 +11,7 @@ export const AudioMixerEstacions = () => {
         evt.target.closest('.mixer').querySelectorAll('input').forEach((inputElement) => {
             allGainValues[inputElement.name] = parseFloat(inputElement.value, 10);
         });
-        getAudioGraphInstance().setGainsEstacions(allGainValues);
-        getAudioGraphInstance().updateGainsEstacionsInServer(allGainValues);
+        getAudioGraphInstance().updateParametreAudioGraph('gainsEstacions', allGainValues);
     }
 
     return (

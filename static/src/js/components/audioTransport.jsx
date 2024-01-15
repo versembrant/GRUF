@@ -18,8 +18,7 @@ export const AudioTransportControls = () => {
     }
 
     const handleSetBpm = (e) => {
-        getAudioGraphInstance().setBpm(e.target.value)
-        getAudioGraphInstance().updateBpmInServer(e.target.value)
+        getAudioGraphInstance().updateParametreAudioGraph('bpm', e.target.value)
     }
 
     return (

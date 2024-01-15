@@ -1,5 +1,6 @@
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
-import { socket, renderReactComponentInElement } from "../utils";
+import { joinSessionInServer } from "../serverComs";
+import { renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { Sessio } from "../components/sessio";
 
@@ -41,13 +42,11 @@ if (localMode){
     }, 2000)
 
     // In remote mode, all session updates go through the server and come from the server
-    socket.on('connect', function() {
-        socket.emit('join_session', {session_id: sessionID})
-    });
-    socket.on('set_session_data', function (data) {
+    joinSessionInServer(sessionID, (data) => {
         clearInterval(checkLoadedCorrectlyInterval);
         console.log('Session data received', data);
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
 }
+
