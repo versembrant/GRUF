@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
-import { FloatParameterDefaultWidget, EnumParameterDefaultWidget, TextParameterDefaultWidget, StepsParameterDefaultWidget, GridParameterDefaultWidget } from './components/defaultUIParameterWidgets';
 
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
