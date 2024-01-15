@@ -32,7 +32,7 @@ export class EstacioBase {
         this.store = undefined
         this.audioNodes = {}
         this.volatileState = {}
-        this.updatesUiWithMainSequencer = false;
+        this.followsMainSequencer = false;
     }
 
     initialize(initialState = undefined) {
@@ -89,27 +89,25 @@ export class EstacioBase {
     // UI stuff
 
     getDefaultUserInterface() {    
-        return () => {
-            // Subscribe to store changes of the station itself
-            subscribeToStoreChanges(this);
-            if (this.updatesUiWithMainSequencer === true) {
-                // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), also subscribe to stroe changes of the audio engine store
-                subscribeToStoreChanges(getAudioGraphInstance());
-            }
-            
-            const parametresElements = [];
-            this.getParameterNames().forEach(nomParametre => {
-                parametresElements.push(creaUIWidgetPerParametre(this, nomParametre));
-            });
-            
-            return createElement(
-                'div',
-                null,
-                createElement('h2', null, this.nom),
-                createElement('p', null, 'Tipus:', this.tipus),
-                [...parametresElements]
-            );
+        // Subscribe to store changes of the station itself
+        subscribeToStoreChanges(this);
+        if (this.followsMainSequencer === true) {
+            // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), also subscribe to stroe changes of the audio engine store
+            subscribeToStoreChanges(getAudioGraphInstance());
         }
+        
+        const parametresElements = [];
+        this.getParameterNames().forEach(nomParametre => {
+            parametresElements.push(creaUIWidgetPerParametre(this, nomParametre));
+        });
+        
+        return createElement(
+            'div',
+            null,
+            createElement('h2', null, this.nom),
+            createElement('p', null, 'Tipus:', this.tipus),
+            [...parametresElements]
+        );
     }
 
     getUserInterface() {

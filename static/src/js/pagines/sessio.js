@@ -1,17 +1,15 @@
-import { createElement, StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import { Session, getCurrentSession, setCurrentSession } from "../sessionManager";
 import { socket, renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
-import { AudioTransportControls } from "../components/audioTransport";
-import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
-import { AudioMixerEstacions } from "../components/audioMixerEstacions";
+import { Sessio } from "../components/sessio";
 
 const sessionElement = document.getElementsByTagName('session')[0];
-const selectorEstacio = document.getElementById('selectorEstacio');
+let checkLoadedCorrectlyInterval = undefined;
 
 // Carrega les dades de sessió
 const onSessionDataLoaded = () => {
+    sessionElement.dataset.loaded = true;
+
     // Configure some session-related things of the audio graph
     const currentSession = getCurrentSession();
     const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
@@ -19,15 +17,12 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setGainsEstacions(currentSession.rawData.gainsEstacions);
 
-    // Render UI
-    renderReactComponentInElement(SessionConnectedUsers, 'sessionConnectedUsers')
-    renderReactComponentInElement(AudioTransportControls, 'audioTransportControls')
-    renderReactComponentInElement(AudioMixerEstacions, 'audioMixerEstacions')
-    renderEstacions();
-
     // Some log statements useful for debugging
     console.log(getCurrentSession());
     console.log(getAudioGraphInstance());
+
+    // Render UI
+    renderReactComponentInElement(Sessio, 'sessioUIRoot')
 }
 
 const localMode = sessionElement.dataset.local === 'true';
@@ -38,43 +33,21 @@ if (localMode){
     setCurrentSession(new Session(sessionData, localMode)); 
     setTimeout(onSessionDataLoaded, 100)  // Use timeout here to give the app some time to initialize stuff. TODO: find a better way to do this
 } else {
+    // For some reason, sometimes the ws connection is not properly set and no session data
+    // is recieved the first time the session is loaded. Using this interval we'll keep
+    // on retrying until it succeeds.
+    checkLoadedCorrectlyInterval = setInterval(() => {
+        location.reload();
+    }, 2000)
+
     // In remote mode, all session updates go through the server and come from the server
     socket.on('connect', function() {
         socket.emit('join_session', {session_id: sessionID})
     });
     socket.on('set_session_data', function (data) {
+        clearInterval(checkLoadedCorrectlyInterval);
         console.log('Session data received', data);
         setCurrentSession(new Session(data, localMode));
         onSessionDataLoaded();
     });
 }
-
-// Render UI estacions
-const renderEstacio = (nomEstacio) => {
-    const estacioElement = document.getElementById('estacio-' + nomEstacio);
-    const estacioReactRoot = document.createElement('div');
-    estacioReactRoot.className = 'estacio';
-    estacioElement.innerHTML = '';
-    estacioElement.appendChild(estacioReactRoot);
-    const estacio = getCurrentSession().getEstacio(nomEstacio);
-    createRoot(estacioReactRoot).render(
-        createElement(StrictMode, null, createElement(estacio.getUserInterface(), null))
-    );
-}
-
-const renderEstacions = () => {
-    const selectOptionValue = selectorEstacio.value;
-    getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-        if ((selectOptionValue === 'all') || (nomEstacio === selectOptionValue)) {
-            renderEstacio(nomEstacio);
-        } else {
-            const estacioElement = document.getElementById('estacio-' + nomEstacio);
-            estacioElement.innerHTML = '';
-        }
-    });
-}
-
-// Bind events selector estació
-selectorEstacio.addEventListener('change', (event) => {
-    renderEstacions();
-});

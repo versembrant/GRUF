@@ -19,7 +19,7 @@ class EstacioSynth extends EstacioBase {
             waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
             notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
         }
-        this.updatesUiWithMainSequencer = true;
+        this.followsMainSequencer = true;
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {

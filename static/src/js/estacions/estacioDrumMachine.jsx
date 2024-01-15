@@ -17,7 +17,7 @@ class EstacioDrumMachine extends EstacioBase {
             sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
             pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]}
         }
-        this.updatesUiWithMainSequencer = true;
+        this.followsMainSequencer = true;
     }
 
     loadSoundInSamplerNote(note, url) {
