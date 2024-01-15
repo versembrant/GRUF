@@ -101,6 +101,14 @@ class Session(object):
         updated_users.remove(username)
         self.update_parametre_sessio('connected_users', updated_users)
 
+    def clear_connected_users(self, update_clients=True):
+        self.data['connected_users'] = []
+        self.save_to_redis()
+        if self.id in usernames_connected_per_session:
+            del usernames_connected_per_session[self.id]
+        if update_clients:
+            self.update_parametre_sessio('connected_users', [])
+
     def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio'):
         # NOTE: en aquest cas tenim un 'emit_msg_name' parametre perquè els paràmetres relacionat amb àudio han de fer
         # servir un nom de missatge diferent perquè el client els pugui diferenciar i tractar-los de forma diferent (encara
@@ -124,6 +132,19 @@ class Session(object):
             pass
 
 
+def get_stored_sessions():
+    sessions = []
+    for key in r.scan_iter("session:*"):
+        try:
+            s = Session(json.loads(r.get(key)))
+        except InvalidSessionDataException:
+            log(f'Error loading session form redis with key {key}, invalid session data. Will remove it from redis.')
+            r.delete(key)
+            continue
+        sessions.append(s)
+    return sessions
+
+
 def get_session_by_id(id):
     session_redis = r.get('session:' + id)
     if session_redis is not None:
@@ -141,16 +162,7 @@ def delete_session_by_id(id):
 @app.route('/')
 def index():
     log('Loading existing sessions from redis')
-    sessions = []
-    for key in r.scan_iter("session:*"):
-        try:
-            s = Session(json.loads(r.get(key)))
-        except InvalidSessionDataException:
-            log(f'Error loading session form redis with key {key}, invalid session data. Will remove it from redis.')
-            r.delete(key)
-            continue
-        sessions.append(s)
-    return render_template('index.html', sessions=sessions)
+    return render_template('index.html', sessions=get_stored_sessions())
 
 
 @app.route('/new_session/', methods=['GET', 'POST'])
@@ -181,7 +193,7 @@ def delete_session(session_id):
 
 
 @socketio.on('disconnect')
-def test_disconnect():
+def on_disconnect():
     username = request.sid
     print(f'User {username} disconnected, removing it from all sessions')
     for session_id, usernames in usernames_connected_per_session.items():
@@ -248,6 +260,10 @@ def on_update_master_sequencer_current_step(data):  # session_id, current_step
 
 
 if __name__ == '__main__':
+    # Clean existing users connected in stored sessions
+    for session in get_stored_sessions():
+        session.clear_connected_users(update_clients=False)
+    
     # Start server
     log('Starting server')
     socketio.run(app, debug=True, host='0.0.0.0', port=5555, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True

@@ -5,7 +5,7 @@
 <a href="/new_session/">Crear nova sessió</a>
 <ul>
 {% for session in sessions %}
-    <li><a href="/session/{{ session.id }}/">"{{ session.name }}" ({{ session.num_estacions }} estacions, ID: {{ session.id }})</a> - <a href="/delete_session/{{ session.id }}/">eliminar</a></li>
+    <li><a href="/session/{{ session.id }}/">{{ session.id }} "{{ session.name }}" ({{ session.num_estacions }} estacions, {{ session.connected_users|length }} usuaris)</a> - <a href="/delete_session/{{ session.id }}/">eliminar</a></li>
 {% endfor %}
 </ul>
 {% endblock %}
