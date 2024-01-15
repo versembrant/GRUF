@@ -61,36 +61,6 @@ export const subscribeToStoreChanges = (objectWithStore) => {
     }, [setState]);
 }
 
-
-// Util function to create UI widgets for the default UIs
-export const creaUIWidgetPerParametre = (estacio, nomParametre) => {
-    const parameterDescription = estacio.getParameterDescription(nomParametre);
-    const parametreValorState = estacio.getParameterValue(nomParametre);
-    const widgetUIClassParameterType = {
-        float: FloatParameterDefaultWidget,
-        enum: EnumParameterDefaultWidget,
-        text: TextParameterDefaultWidget,
-        steps: StepsParameterDefaultWidget,
-        grid: GridParameterDefaultWidget
-    }
-    const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
-    if (widgetUIClass === undefined) {
-        return createElement(
-            'div',
-            null,
-            createElement('p', null, 'No UI widget for parameter type: ', parameterDescription.type)
-        );
-    } else {
-        return (
-            createElement(
-                widgetUIClass,
-                {parameterDescription:parameterDescription, parameterValue:parametreValorState, nomEstacio:estacio.nom},
-                null
-            )
-        );
-    }
-}
-
 // Util function to render a react component in a DOM element
 export const renderReactComponentInElement = (reactComponent, elementID) => {
     createRoot(document.getElementById(elementID)).render(

@@ -1,8 +1,8 @@
-import { createElement } from "react";
 import { createStore, combineReducers } from "redux";
 import { sendMessageToServer } from "./serverComs";
-import { ensureValidValue, creaUIWidgetPerParametre, subscribeToStoreChanges } from "./utils";
+import { ensureValidValue } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
+import { EstacioDefaultUI } from "./components/estacioDefaultUI";
 
 
 var currentSession = undefined; 
@@ -33,7 +33,6 @@ export class EstacioBase {
         this.store = undefined
         this.audioNodes = {}
         this.volatileState = {}
-        this.followsMainSequencer = false;
     }
 
     initialize(initialState = undefined) {
@@ -89,30 +88,8 @@ export class EstacioBase {
 
     // UI stuff
 
-    getDefaultUserInterface() {    
-        // Subscribe to store changes of the station itself
-        subscribeToStoreChanges(this);
-        if (this.followsMainSequencer === true) {
-            // If UI needs to be updated with the main sequencer (e.g., to show sequencer current step), also subscribe to stroe changes of the audio engine store
-            subscribeToStoreChanges(getAudioGraphInstance());
-        }
-        
-        const parametresElements = [];
-        this.getParameterNames().forEach(nomParametre => {
-            parametresElements.push(creaUIWidgetPerParametre(this, nomParametre));
-        });
-        
-        return createElement(
-            'div',
-            null,
-            createElement('h2', null, this.nom),
-            createElement('p', null, 'Tipus:', this.tipus),
-            [...parametresElements]
-        );
-    }
-
-    getUserInterface() {
-        return this.getDefaultUserInterface()
+    getUserInterfaceComponent() {
+        return EstacioDefaultUI  // If not overriden, use the default UI
     }
 
     // AUDIO stuff

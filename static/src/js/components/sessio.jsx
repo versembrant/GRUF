@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { AudioTransportControls } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { AudioMixerEstacions } from "../components/audioMixerEstacions";
 import { Sessio } from "../components/sessio";
-import { Estacio } from './estacio';
+
+const Estacio = ({estacio}) => {
+    return (
+        <div className="estacio">
+            {createElement(estacio.getUserInterfaceComponent(), {estacio})}
+        </div>
+    )
+};
 
 export const Sessio = () => {
     const [estacioSelected, setEstacioSelected] = useState("all");  // Local state for component Sessio
@@ -22,7 +29,7 @@ export const Sessio = () => {
                     {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option value={nomEstacio} key={i}>{nomEstacio}</option>)}
                 </select>
                 <div className="estacions">
-                    {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio + '_' + i} nomEstacio={nomEstacio}/>)}
+                    {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio + '_' + i} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
                 </div>
             </div>
         </div>
