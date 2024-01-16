@@ -4,7 +4,6 @@ import { ensureValidValue } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 import { EstacioDefaultUI } from "./components/estacioDefaultUI";
 
-
 var currentSession = undefined; 
 
 export const getCurrentSession = () => {
@@ -17,22 +16,22 @@ export const setCurrentSession = (session) => {
 
 export const estacionsDisponibles = {};
 
-export const registerEstacioDisponible = (nom, estacioClass) => {
-    console.log('Registering estacio disponible:', nom, estacioClass)
-    estacionsDisponibles[nom] = estacioClass;
+export const registerEstacioDisponible = (estacioClass) => {
+    console.log('Registering estacio disponible:', estacioClass)
+    estacionsDisponibles[estacioClass.name] = estacioClass;
 }
-
 
 export class EstacioBase {
 
+    versio = '0.0'
+    parametersDescription = {}
+    store = undefined
+    audioNodes = {}
+    volatileState = {}
+
     constructor(nom) {
         this.nom = nom
-        this.tipus = 'base'
-        this.versio = '0.0'
-        this.parametersDescription = {}
-        this.store = undefined
-        this.audioNodes = {}
-        this.volatileState = {}
+        this.tipus = this.constructor.name
     }
 
     initialize(initialState = undefined) {
@@ -120,7 +119,6 @@ export class EstacioBase {
 
 }
 
-
 export class Session {
     constructor(data, local=false) {
         this.localMode = local
@@ -133,9 +131,11 @@ export class Session {
         this.estacions = {}
         Object.keys(this.rawData.estacions).forEach(nomEstacio => {
             const estacioRawData = this.rawData.estacions[nomEstacio]
-            const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
-            estacioObj.initialize(estacioRawData)
-            this.estacions[nomEstacio] = estacioObj
+            if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
+                const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
+                estacioObj.initialize(estacioRawData)
+                this.estacions[nomEstacio] = estacioObj
+            }
         })
 
         // Inicialitza un redux store amb les propietats de la sessió

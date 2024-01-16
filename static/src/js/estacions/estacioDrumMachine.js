@@ -1,22 +1,16 @@
 import * as Tone from 'tone'
-import { EstacioBase, registerEstacioDisponible } from "../sessionManager";
+import { EstacioBase } from "../sessionManager";
 import { indexOfArray } from '../utils';
 
-const tipus = 'drumMachine'
-
-class EstacioDrumMachine extends EstacioBase {
+export class EstacioDrumMachine extends EstacioBase {
     
-    constructor(nom) {
-        super(nom);
-        this.tipus = tipus
-        this.versio = '0.1'
-        this.parametersDescription = {
-            sound1URL: {type: 'text', label: 'Clap', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // Clap
-            sound2URL: {type: 'text', label: 'HiHat', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, // Hat
-            sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
-            sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
-            pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]}
-        }
+    versio = '0.1'
+    parametersDescription = {
+        sound1URL: {type: 'text', label: 'Clap', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // Clap
+        sound2URL: {type: 'text', label: 'HiHat', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, // Hat
+        sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
+        sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]}
     }
 
     loadSoundInSamplerNote(note, url) {
@@ -86,5 +80,3 @@ class EstacioDrumMachine extends EstacioBase {
         }
     }
 }
-
-registerEstacioDisponible(tipus, EstacioDrumMachine);

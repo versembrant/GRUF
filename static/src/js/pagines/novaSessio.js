@@ -5,11 +5,12 @@ const creaSessioAmbUnaEstacioDeCada = () => {
     sessionData.bpm = 120;
     sessionData.gainsEstacions = {}
     sessionData.estacions = {}
-    Object.keys(estacionsDisponibles).forEach(tipusEstacio => {
-        const estacio = new estacionsDisponibles[tipusEstacio]();
-        estacio.initialize()
-        sessionData.estacions[`${tipusEstacio}1`] = estacio.getFullStateObject();
-        sessionData.gainsEstacions[`${tipusEstacio}1`] = 1.0;
+    Object.keys(estacionsDisponibles).forEach(estacioClassName => {
+        const nomEstacio = `${estacioClassName}1`;
+        const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
+        estacio.initialize();
+        sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
+        sessionData.gainsEstacions[nomEstacio] = 1.0;
     })
     return sessionData;
 }
