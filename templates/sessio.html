@@ -5,7 +5,6 @@
 <a href="/">Torna a la llista de sessions</a>
 <session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
 <div id="sessioUIRoot">Loading...</div>
-<div id="sessionConnectedUsers"></div>
 {% endblock %}
 
 {% block js %}
