@@ -27,3 +27,16 @@ docker-compose up
 ```
 
 5) Open running application by poiting the browser at `http://localhost:5555/`
+
+
+## Diagrames
+
+### Diagrama de blocs general
+
+![alt text](_docs/Diagrama_de_blocs_general.png)
+
+
+### Diagrama de blocs del model
+
+![alt text](_docs/Diagrama_de_blocs_model.png)
+
