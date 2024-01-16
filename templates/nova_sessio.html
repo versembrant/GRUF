@@ -2,11 +2,8 @@
 
 {% block content %}
 <h1>Nova sessió</h1>
-<form method="POST" action="." id="createSessionForm">
-    <input type="text" name="name" placeholder="Nom de la sessió"></input>
-    <input type="hidden" name="data" value=""/>
-    <button>Crear!</button>
-</form>
+<a href="/">Torna a la llista de sessions</a>
+<div id="newSessioUIRoot">Loading...</div>
 {% endblock %}
 
 {% block js %}
