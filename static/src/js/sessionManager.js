@@ -18,11 +18,12 @@ export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (estacioClass) => {
     console.log('Registering estacio disponible:', estacioClass)
-    estacionsDisponibles[estacioClass.name] = estacioClass;
+    estacionsDisponibles[new estacioClass().tipus] = estacioClass;
 }
 
 export class EstacioBase {
 
+    tipus = 'base'
     versio = '0.0'
     parametersDescription = {}
     store = undefined
@@ -31,7 +32,6 @@ export class EstacioBase {
 
     constructor(nom) {
         this.nom = nom
-        this.tipus = this.constructor.name
     }
 
     initialize(initialState = undefined) {

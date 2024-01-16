@@ -4,6 +4,7 @@ import { indexOfArray } from '../utils';
 
 export class EstacioDrumMachine extends EstacioBase {
     
+    tipus = 'drum machine'
     versio = '0.1'
     parametersDescription = {
         sound1URL: {type: 'text', label: 'Clap', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // Clap
