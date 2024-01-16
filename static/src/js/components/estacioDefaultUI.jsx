@@ -6,7 +6,7 @@ import { indexOfArray } from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div>
+        <div key={nomEstacio + '_' + parameterDescription.nom}>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <input
                 type="range"
@@ -21,7 +21,7 @@ const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomE
 
 const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div>
+        <div key={nomEstacio + '_' + parameterDescription.nom}>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <input
                 type="text"
@@ -33,46 +33,13 @@ const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 
 const EnumParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div>
+        <div key={nomEstacio + '_' + parameterDescription.nom}>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <select
                 value={parameterValue}
                 onChange={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)}>
-                {parameterDescription.options.map((option, i) => <option value={option} key={i}>{option}</option>)}
+                {parameterDescription.options.map((option, i) => <option key={option} value={option}>{option}</option>)}
             </select>
-        </div>
-    )
-};
-
-const StepsParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
-    const numSteps = parameterDescription.numSteps;
-    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
-    const stepsElements = []
-    for (let i = 0; i < numSteps; i++) {
-        const filledClass = parameterValue.includes(i) ? 'filled' : '';
-        const activeStep = currentStep == i ? 'active' : '';
-        stepsElements.push(
-        <div 
-            key={i} // To avoid React warning
-            className={'step ' + filledClass + ' ' + activeStep}
-            onClick={(evt) => {
-                let updatedParameterValue = [...parameterValue]
-                if (parameterValue.includes(i)){
-                    updatedParameterValue.splice(parameterValue.indexOf(i), 1);
-                } else {
-                    updatedParameterValue.push(i)
-                }
-                getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, updatedParameterValue)
-            }}>
-        </div>
-        )
-    }
-    return (
-        <div>
-            <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
-            <div className="steps-default">
-                {stepsElements}
-            </div>
         </div>
     )
 };
@@ -106,13 +73,13 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
         }
         stepsElementsPerRow.push(stepsElements)
     }
-
+    
     return (
-        <div>
+        <div key={nomEstacio + '_' + parameterDescription.nom}>
             <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
             <div className="grid-default">
                 {stepsElementsPerRow.map(function(stepsElements, i){
-                    return <div className="steps-default" key={i}>{stepsElements}</div>;
+                    return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
         </div>
@@ -127,16 +94,13 @@ const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
         text: TextParameterDefaultWidget,
-        steps: StepsParameterDefaultWidget,
         grid: GridParameterDefaultWidget
     }
     const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
     if (widgetUIClass === undefined) {
-        return createElement(
-            'div',
-            null,
-            createElement('p', null, 'No UI widget for parameter type: ', parameterDescription.type)
-        );
+        return (<div key={estacio.nom + '_' + nomParametre}>
+            <p>No UI widget for parameter type: {parameterDescription.type}</p>
+        </div>);
     } else {
         return (
             createElement(
@@ -157,9 +121,11 @@ export const EstacioDefaultUI = ({estacio}) => {
         parametresElements.push(creaUIWidgetPerParametre(estacio, nomParametre));
     });
 
-    return (<div>
+    return (<div key={estacio.nom}>
         <h2>{ estacio.nom }</h2>
         <p>Tipus: { estacio.tipus }</p>
-        {parametresElements}
+        <div>
+            {parametresElements}
+        </div>
     </div>)
 };

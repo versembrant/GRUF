@@ -6,7 +6,7 @@ import { AudioMixerEstacions } from "../components/audioMixerEstacions";
 
 const Estacio = ({estacio}) => {
     return (
-        <div className="estacio">
+        <div key={estacio.nom} className="estacio">
             {createElement(estacio.getUserInterfaceComponent(), {estacio})}
         </div>
     )
@@ -24,11 +24,11 @@ export const Sessio = () => {
                 <select
                     value={estacioSelected}
                     onChange={(evt) => setEstacioSelected(evt.target.value)}>
-                    <option value="all">Totes</option>
-                    {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option value={nomEstacio} key={i}>{nomEstacio}</option>)}
+                    <option key={"all"} value="all">Totes</option>
+                    {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option key={nomEstacio} value={nomEstacio}>{nomEstacio}</option>)}
                 </select>
                 <div className="estacions">
-                    {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio + '_' + i} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
+                    {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
                 </div>
             </div>
         </div>
