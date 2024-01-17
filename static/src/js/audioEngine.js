@@ -5,8 +5,6 @@ import { sendMessageToServer } from './serverComs';
 
 var audioContextIsReady = false;
 
-const audioGraph = new AudioGraph();
-
 export const getAudioGraphInstance = () => {
     return audioGraph;
 }
@@ -241,3 +239,5 @@ export class AudioGraph {
         }
     }
 }
+
+const audioGraph = new AudioGraph();
