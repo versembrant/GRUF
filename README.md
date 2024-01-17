@@ -55,4 +55,8 @@ Hi ha un script de python/fabric que s'encarrega d'agafar la última versio de c
 docker compose run --rm server fab deploy
 ```
 
-NOTE: aquest repositori ja inclou les claus ssh necessàries per poder accedir al servidor remot. OJU, no compartiu aquest repositori!
+OJU!: aquest repositori ja inclou les claus ssh necessàries per poder accedir al servidor remot, no el compartiu!
+
+Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net
+
+TODO: afegir certificats SSL perquè funcioni per HTTPS.
