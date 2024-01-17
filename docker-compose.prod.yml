@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+
+    server:
+        build: .
+        init: true
+        command: uwsgi --die-on-term uwsgi.ini
+        ports:
+            - "5555:5555"
+        restart: always
+        stop_signal: SIGINT
+        depends_on:
+            - redis
+        volumes:
+            - .:/code
+    
+    redis:
+        image: redis:alpine
+        command: redis-server --port 16379
