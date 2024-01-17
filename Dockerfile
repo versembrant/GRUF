@@ -15,4 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Add ssh files with correct permissions (needed for deploying)
+RUN mkdir /ssh && cp /code/deploy/ssh/* /ssh && chmod -R 600 /ssh
+
 CMD [ "python", "./server.py" ]

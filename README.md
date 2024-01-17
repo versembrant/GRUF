@@ -44,3 +44,15 @@ docker compose up
 ### Diagrama de l'aplicació
 
 ![alt text](_docs/Diagrama_aplicacio.png)
+
+
+## Instruccions de desplegament en el servidor (swhosting)
+
+Hi ha un script de python/fabric que s'encarrega d'agafar la última versio de codi de la branca `main`, actualizar el codi del servidor, fer un build dels arxius static, i fer un restart del `docker compose`. Només s'ha de córrer aquesta comanda:
+
+```
+# NOTA: això afectarà al servidor remot, no ho feu si no ho hem acordat abans :)
+docker compose run --rm server fab deploy
+```
+
+NOTE: aquest repositori ja inclou les claus ssh necessàries per poder accedir al servidor remot. OJU, no compartiu aquest repositori!

@@ -1,4 +1,5 @@
 flask-socketio==5.3.6
 redis==5.0.1
 uwsgi==2.0.23
-gevent
+gevent==23.9.1
+fabric==3.2.2
