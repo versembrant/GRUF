@@ -21,24 +21,38 @@ const getThrottledFuctionKey = (name, data) => {
 
 
 // Event handlers for messages received from the server
+const onMessageFromServer = (name, data) => {
+    if (name === 'message'){
+        console.log(message);
+    } else if (name === 'update_parametre_sessio'){
+        getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
+    } else if (name === 'update_parametre_estacio'){
+        getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor);
+    } else if (name === 'update_master_sequencer_current_step'){
+        getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
+    } else if (name === 'update_parametre_audio_graph'){
+        getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(data.nom_parametre, data.valor);
+    } 
+}
+
 socket.on('message', function (message) {
-    console.log(message);
+    onMessageFromServer('message', message);
 });
 
 socket.on('update_parametre_sessio', function (data) {
-    getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
+    onMessageFromServer('update_parametre_sessio', data);
 });
 
 socket.on('update_parametre_estacio', function (data) {
-    getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor);
+    onMessageFromServer('update_parametre_estacio', data);
 });
 
 socket.on('update_master_sequencer_current_step', function (data) {
-    getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
+    onMessageFromServer('update_master_sequencer_current_step', data);
 });
 
 socket.on('update_parametre_audio_graph', function (data) {
-    getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(data.nom_parametre, data.valor);
+    onMessageFromServer('update_parametre_audio_graph', data);
 });
 
 // Methods to send a message to the server
