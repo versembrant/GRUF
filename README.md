@@ -12,18 +12,18 @@ cd versembrant-bruixit/
 
 2) Build Docker images:
 ```
-docker-compose build
+docker compose build
 ```
 
 3) Install static dependencies and build static:
 ```
-docker-compose run --rm server yarn install
-docker-compose run --rm server yarn build
+docker compose run --rm server yarn install
+docker compose run --rm server yarn build
 ```
 
 4) Run server (this also inclues a static build watcher so that static files will be automatically rebuilt when modifying files):
 ```
-docker-compose up
+docker compose up
 ```
 
 5) Open running application by poiting the browser at `http://localhost:5555/`
