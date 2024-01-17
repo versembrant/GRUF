@@ -36,7 +36,11 @@ docker-compose up
 ![alt text](_docs/Diagrama_de_blocs_general.png)
 
 
-### Diagrama de blocs del model
+### Diagrama de blocs del model de dades
 
 ![alt text](_docs/Diagrama_de_blocs_model.png)
 
+
+### Diagrama de l'aplicació
+
+![alt text](_docs/Diagrama_aplicacio.png)
