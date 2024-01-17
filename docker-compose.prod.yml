@@ -5,11 +5,12 @@ services:
     server:
         build: .
         init: true
-        command: uwsgi --die-on-term uwsgi.ini
+        command: uwsgi --http :5555 --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_bruixit.sock
         ports:
             - "5555:5555"
         restart: always
         stop_signal: SIGINT
+        user: 1000:1000
         depends_on:
             - redis
         volumes:
