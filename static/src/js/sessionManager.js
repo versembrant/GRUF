@@ -202,7 +202,7 @@ export class Session {
         }
     }
 
-    updateParametreSessioInServer(nomParametre, valor) {
+    updateParametreSessio(nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
             // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter

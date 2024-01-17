@@ -5,6 +5,11 @@ import { sendMessageToServer } from './serverComs';
 
 var audioContextIsReady = false;
 
+const audioGraph = new AudioGraph();
+
+export const getAudioGraphInstance = () => {
+    return audioGraph;
+}
 
 export class AudioGraph {
     constructor() {
@@ -235,10 +240,4 @@ export class AudioGraph {
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
-}
-
-const audioGraph = new AudioGraph();
-
-export const getAudioGraphInstance = () => {
-    return audioGraph;
 }
