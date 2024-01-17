@@ -17,8 +17,9 @@ export const setCurrentSession = (session) => {
 export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (estacioClass) => {
-    console.log('Registering estacio disponible:', estacioClass)
-    estacionsDisponibles[new estacioClass().tipus] = estacioClass;
+    const tipusEstacio = new estacioClass().tipus;
+    console.log('Registering estacio disponible:', tipusEstacio)
+    estacionsDisponibles[tipusEstacio] = estacioClass;
 }
 
 export class EstacioBase {
