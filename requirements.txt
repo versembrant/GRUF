@@ -1,2 +1,3 @@
-flask-socketio
-redis
+flask-socketio==5.3.6
+redis==5.0.1
+uwsgi==2.0.23
