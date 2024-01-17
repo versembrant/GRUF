@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import random
@@ -266,4 +267,5 @@ if __name__ == '__main__':
     
     # Start server
     log('Starting server')
-    socketio.run(app, debug=True, host='0.0.0.0', port=5555, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
+    debug_mode = os.getenv('DEPLOY') == None
+    socketio.run(app, debug=debug_mode, host='0.0.0.0', port=5555, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
