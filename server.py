@@ -2,9 +2,11 @@ import os
 import sys
 import json
 import random
+import hashlib
 from collections import defaultdict
 
 from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import safe_join
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
 
@@ -175,10 +177,31 @@ def notifica_available_sessions():
     socketio.emit('set_available_sessions', data, to=available_sessions_room_name)
 
 
+hash_cache = {}
+get_hash = lambda content, length: hashlib.md5(content).hexdigest()[:length]
+
+@app.url_defaults
+def add_hash_for_static_files(endpoint, values):
+    '''Add content hash argument for url to make url unique.
+    It's have sense for updates to avoid caches.
+    '''
+    if endpoint != 'static':
+        return
+    filename = values['filename']
+    if filename in hash_cache:
+        values['hash'] = hash_cache[filename]
+        return
+    filepath = safe_join(app.static_folder, filename)
+    if os.path.isfile(filepath):
+        with open(filepath, 'rb') as static_file:
+            filehash = get_hash(static_file.read(), 8)
+            values['hash'] = hash_cache[filename] = filehash
+
+
 @app.route('/')
-def index():
+def llista_sessions():
     log('Loading existing sessions from redis')
-    return render_template('index.html', sessions=get_stored_sessions())
+    return render_template('llista_sessions.html')
 
 
 @app.route('/new_session/', methods=['GET', 'POST'])

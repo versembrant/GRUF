@@ -16,6 +16,8 @@ export const Sessio = () => {
     const [estacioSelected, setEstacioSelected] = useState("all");  // Local state for component Sessio
     return(
         <div>
+            <h1>Sessió "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h1>
+            <a href="/">Torna a la llista de sessions</a>
             <SessionConnectedUsers/>
             <AudioTransportControls/>
             <AudioMixerEstacions/>

@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Sessió "{{ session.name }}" (ID: {{ session.id }}{% if local_mode %} - local{% endif %})</h1>
-<a href="/">Torna a la llista de sessions</a>
 <session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
-<div id="sessioUIRoot">Carregant...</div>
+<div id="root">Carregant...</div>
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="/static/dist/pagines/sessio.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/sessio.js') }}"></script>
 {% endblock %}
