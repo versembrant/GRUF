@@ -24,7 +24,7 @@ const onSessionDataLoaded = () => {
     console.log(getAudioGraphInstance());
 
     // Render UI
-    reactRoot = renderReactComponentInElement(Sessio, 'sessioUIRoot', {}, reactRoot)
+    reactRoot = renderReactComponentInElement(Sessio, 'root', {}, reactRoot)
 }
 
 const localMode = sessionElement.dataset.local === 'true';

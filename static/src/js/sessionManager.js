@@ -163,6 +163,10 @@ export class Session {
         return this.store.getState().id
     }
 
+    getNom() {
+        return this.store.getState().name
+    }
+
     getConnectedUsers() {
         return this.store.getState().connected_users
     }

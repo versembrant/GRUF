@@ -49,6 +49,8 @@ export const NovaSessio = () => {
 
     return(
         <div>
+            <h1>Nova sessió</h1>
+            <a href="/">Torna a la llista de sessions</a>
             <div>
                 Estacions triades:
                 <ul>

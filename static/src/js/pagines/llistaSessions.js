@@ -12,5 +12,5 @@ let reactRoot = undefined;
 
 subscribeToAvailableSessions((infoSessions) => {
     clearInterval(checkLoadedCorrectlyInterval);
-    reactRoot = renderReactComponentInElement(LlistaSessions, 'llistaSessionsUIRoot', {infoSessions}, reactRoot)
+    reactRoot = renderReactComponentInElement(LlistaSessions, 'root', {infoSessions}, reactRoot)
 });
