@@ -1,4 +1,5 @@
 import { renderReactComponentInElement } from "../utils";
 import { NovaSessio } from "../components/novaSessio";
 
-renderReactComponentInElement(NovaSessio, 'newSessioUIRoot')
+let reactRoot = undefined;
+reactRoot = renderReactComponentInElement(NovaSessio, 'newSessioUIRoot', {}, reactRoot)
