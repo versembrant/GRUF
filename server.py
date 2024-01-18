@@ -8,18 +8,20 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
 
-r = redis.Redis(host='redis', port=16379, db=0)
+from gevent import monkey
+monkey.patch_all()
 
+r = redis.Redis(host='redis', port=16379, db=0)
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
+socketio = SocketIO(app, message_queue="redis://redis:16379/1")
+available_sessions_room_name = 'available_sessions'
+usernames_connected_per_session = defaultdict(list)
+
 
 def log(message):
     print(message)
     sys.stdout.flush()
-
-
-usernames_connected_per_session = defaultdict(list)
 
 
 class InvalidSessionDataException(Exception):
@@ -109,6 +111,7 @@ class Session(object):
             del usernames_connected_per_session[self.id]
         if update_clients:
             self.update_parametre_sessio('connected_users', [])
+            notifica_available_sessions()
 
     def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio'):
         # NOTE: en aquest cas tenim un 'emit_msg_name' parametre perquè els paràmetres relacionat amb àudio han de fer
@@ -160,6 +163,18 @@ def delete_session_by_id(id):
         s_to_delete.delete_from_redis()
         
 
+def notifica_available_sessions():
+    data = []
+    for s in get_stored_sessions():
+        data.append({
+            'id': s.id,
+            'name': s.name,
+            'connected_users': s.connected_users,
+            'num_estacions': s.num_estacions,
+        })
+    socketio.emit('set_available_sessions', data, to=available_sessions_room_name)
+
+
 @app.route('/')
 def index():
     log('Loading existing sessions from redis')
@@ -175,6 +190,7 @@ def new():
         data['id'] = str(random.randint(100000, 999999))
         s = Session(data)
         log(f'New session created: {s.name} ({s.id})\n{json.dumps(s.get_full_data(), indent=4)}')
+        notifica_available_sessions()
         return redirect(url_for('session', session_id=s.id))
     return render_template('nova_sessio.html')
 
@@ -202,6 +218,7 @@ def on_disconnect():
             s = get_session_by_id(session_id)
             if s is not None:
                 s.remove_user(username)
+                notifica_available_sessions()
                 log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
 
 
@@ -213,6 +230,7 @@ def on_join_session(data):  # session_id, username
     username = request.sid
     s.add_user(username)
     join_room(s.room_name)
+    notifica_available_sessions()
     log(f'{username} joined session {s.room_name} (users in room: {s.connected_users})')
     emit('set_session_data', s.get_full_data())
     
@@ -225,7 +243,14 @@ def on_leave_session(data):  # session_id, username
     username = request.sid
     s.remove_user(username)
     leave_room(s.room_name)
+    notifica_available_sessions()
     log(f'{username} left session {s.room_name} (users in room: {s.connected_users})')
+
+
+@socketio.on('subscribe_to_available_sessions')
+def on_subscribe_to_available_sessions(data):  # no data
+    join_room(available_sessions_room_name)
+    notifica_available_sessions()
 
 
 @socketio.on('update_parametre_estacio')

@@ -61,8 +61,13 @@ export const subscribeToStoreChanges = (objectWithStore) => {
 }
 
 // Util function to render a react component in a DOM element
-export const renderReactComponentInElement = (reactComponent, elementID) => {
-    createRoot(document.getElementById(elementID)).render(
-        createElement(StrictMode, null, createElement(reactComponent, null))
+export const renderReactComponentInElement = (reactComponent, elementID, props={}, reactRoot=undefined) => {
+    let root = reactRoot
+    if (reactRoot === undefined) {
+        root = createRoot(document.getElementById(elementID))
+    }
+    root.render(
+        createElement(StrictMode, null, createElement(reactComponent, props))
     );
+    return root;
 }
