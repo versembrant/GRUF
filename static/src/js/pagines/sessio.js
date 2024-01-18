@@ -6,6 +6,7 @@ import { Sessio } from "../components/sessio";
 
 const sessionElement = document.getElementsByTagName('session')[0];
 let checkLoadedCorrectlyInterval = undefined;
+let reactRoot = undefined;
 
 // Carrega les dades de sessió
 const onSessionDataLoaded = () => {
@@ -23,7 +24,7 @@ const onSessionDataLoaded = () => {
     console.log(getAudioGraphInstance());
 
     // Render UI
-    renderReactComponentInElement(Sessio, 'sessioUIRoot')
+    reactRoot = renderReactComponentInElement(Sessio, 'sessioUIRoot', {}, reactRoot)
 }
 
 const localMode = sessionElement.dataset.local === 'true';
