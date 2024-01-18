@@ -18,7 +18,7 @@ export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (estacioClass) => {
     const tipusEstacio = new estacioClass().tipus;
-    console.log('Registering estacio disponible:', tipusEstacio)
+    //console.log('Registering estacio disponible:', tipusEstacio)
     estacionsDisponibles[tipusEstacio] = estacioClass;
 }
 

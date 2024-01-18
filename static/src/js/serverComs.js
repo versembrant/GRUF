@@ -81,4 +81,14 @@ export const joinSessionInServer = (sessionID, callback) => {
     });
 }
 
+// Mrthod to request a list of available sessions ans subscribe to server updated from this list
+export const subscribeToAvailableSessions = (callback) => {
+    socket.on('connect', function() {
+        socket.emit('subscribe_to_available_sessions', {})
+    });
+    socket.on('set_available_sessions', function (data) {
+        callback(data);
+    });
+}
+
 

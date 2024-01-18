@@ -3,7 +3,8 @@
   "source": [
     "static/src/js/index.js",
     "static/src/js/pagines/sessio.js",
-    "static/src/js/pagines/novaSessio.js"
+    "static/src/js/pagines/novaSessio.js",
+    "static/src/js/pagines/llistaSessions.js"
   ],
   "scripts": {
     "watch": "parcel watch --no-cache --no-hmr --dist-dir static/dist",
