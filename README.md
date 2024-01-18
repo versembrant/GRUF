@@ -59,4 +59,17 @@ OJU!: aquest repositori ja inclou les claus ssh necessàries per poder accedir a
 
 Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net
 
-TODO: afegir certificats SSL perquè funcioni per HTTPS.
+### SSL
+
+Per fer funcionar HTTPS fem servir certificats de letsencrypt. Aquí hi ha instruccions: https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
+Bàsicament `certboot` de letsencrypt modifica la configuració de Nginx, així que si actualitzem la configuació hauriem d'actualitzar també amb `certbot`. La primera instal·lació de certificats es fa amb aquesta comanda:
+
+```
+sudo certbot --nginx -d
+```
+
+Després es pot renovar amb un `cronjob` automaticament (veure instruccions del link) o amb la comanda:
+
+```
+certbot renew --quiet
+```
