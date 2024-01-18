@@ -79,17 +79,6 @@ def deploy_nginx_conf(ctx):  # nginx config done with root user
     messages = ["Deploying nginx conf...", "Host: %s" % host_root, "Using pem: %s" % pem_file]
     print_banner(messages)
     with Connection(host=host_root, connect_kwargs={"key_filename": pem_file}) as c:
-        # Copy SSL certificate files
-        '''
-        c.put(
-            "deploy/Certificado_STAR_granoller_cat_2020-2021/nginx/granollers.cat.nginx.crt",
-            os.path.join("/etc/ssl/swhosting/certs"),
-        )
-        c.put(
-            "deploy/Certificado_STAR_granoller_cat_2020-2021/nginx/granollers.cat.key",
-            os.path.join("/etc/ssl/swhosting/private"),
-        )
-        '''
 
         # Copy nginx config files and restart
         c.put(
@@ -100,4 +89,5 @@ def deploy_nginx_conf(ctx):  # nginx config done with root user
             "deploy/nginx/sites-enabled/default",
             os.path.join("/etc/nginx/sites-enabled/default"),
         )
+        c.run("certbot renew --quiet")
         c.run("service nginx reload && service nginx restart")
