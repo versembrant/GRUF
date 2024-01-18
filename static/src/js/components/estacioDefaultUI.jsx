@@ -25,6 +25,7 @@ const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             <p>{parameterDescription.label}: {parameterValue}</p>
             <input
                 type="text"
+                style={{width: "100%"}}
                 value={parameterValue}
                 onInput={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)} />
         </div>
