@@ -18,6 +18,14 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setGainsEstacions(currentSession.rawData.gainsEstacions);
+    if (getAudioGraphInstance().graphIsBuilt()) {
+        // Si el graph ja està construït, vol dir que estem rebent info nova d'una sessió que
+        // ja està carregada. El que fem és re-carregar l'estat a l'audio graph
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+            const estacio = getCurrentSession().getEstacio(nomEstacio);
+            estacio.updateAudioGraphFromState()
+        })
+    }
 
     // Some log statements useful for debugging
     console.log(getCurrentSession());

@@ -19,6 +19,7 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
 socketio = SocketIO(app, message_queue="redis://redis:16379/1")
 available_sessions_room_name = 'available_sessions'
 usernames_connected_per_session = defaultdict(list)
+update_count_per_session = defaultdict(int)
 
 
 def log(message):
@@ -120,15 +121,17 @@ class Session(object):
         # servir un nom de missatge diferent perquè el client els pugui diferenciar i tractar-los de forma diferent (encara
         # que siguin paràmetres de la sessió).
         # Envia el nou paràmetre als clients connectats
-        emit(emit_msg_name, {'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
-
+        update_count_per_session[self.id] += 1
+        emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+        
         # Guarda el canvi a la sessió al servidor
         self.data[nom_parametre] = valor  
         self.save_to_redis()
         
     def update_parametre_estacio(self, nom_estacio, nom_parametre, valor):
         # Envia el nou paràmetre als clients connectats
-        emit('update_parametre_estacio',  {'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+        update_count_per_session[self.id] += 1
+        emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
 
         # Guarda el canvi a la sessió al servidor
         try:
@@ -256,7 +259,15 @@ def on_join_session(data):  # session_id, username
     notifica_available_sessions()
     log(f'{username} joined session {s.room_name} (users in room: {s.connected_users})')
     emit('set_session_data', s.get_full_data())
-    
+
+
+@socketio.on('request_session_data')
+def on_request_session_data(data):  # session_id   
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    emit('set_session_data', s.get_full_data())
+
 
 @socketio.on('leave_session')
 def on_leave_session(data):  # session_id, username
