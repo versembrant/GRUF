@@ -6,7 +6,7 @@ import { indexOfArray } from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div key={nomEstacio + '_' + parameterDescription.nom}>
+        <div>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <input
                 type="range"
@@ -21,7 +21,7 @@ const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomE
 
 const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div key={nomEstacio + '_' + parameterDescription.nom}>
+        <div>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <input
                 type="text"
@@ -34,7 +34,7 @@ const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 
 const EnumParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
-        <div key={nomEstacio + '_' + parameterDescription.nom}>
+        <div>
             <p>{parameterDescription.label}: {parameterValue}</p>
             <select
                 value={parameterValue}
@@ -76,7 +76,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
     }
     
     return (
-        <div key={nomEstacio + '_' + parameterDescription.nom}>
+        <div>
             <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
             <div className="grid-default">
                 {stepsElementsPerRow.map(function(stepsElements, i){
@@ -106,7 +106,7 @@ const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         return (
             createElement(
                 widgetUIClass,
-                {parameterDescription:parameterDescription, parameterValue:parametreValorState, nomEstacio:estacio.nom},
+                {key:estacio.nom + '_' + nomParametre, parameterDescription:parameterDescription, parameterValue:parametreValorState, nomEstacio:estacio.nom},
                 null
             )
         );
