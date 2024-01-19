@@ -26,11 +26,6 @@ export class EstacioDrumMachine extends EstacioBase {
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
-        // Inicialitzem estat volàtil que utilizem per saber quins sons ja hem carregat al sampler
-        this.volatileState = {
-            loadedSoundURLsPerNote: {},
-        }
-
         // Creem els nodes del graph
         this.audioNodes = {
             sampler: new Tone.Sampler().connect(estacioMasterGainNode),
@@ -38,7 +33,10 @@ export class EstacioDrumMachine extends EstacioBase {
     }
 
     updateAudioGraphFromState() {
-        // Carreguem els sons al sampler
+        // Carreguem els sons al sampler (i inicialitzem els estat "volàtil" perquè hi voldrem guardar quins sons ja hem carregat)
+        this.volatileState = {
+            loadedSoundURLsPerNote: {},
+        }
         this.loadSoundInSamplerNote('C4', this.getParameterValue('sound1URL'));
         this.loadSoundInSamplerNote('C#4', this.getParameterValue('sound2URL'));
         this.loadSoundInSamplerNote('D4', this.getParameterValue('sound3URL'));

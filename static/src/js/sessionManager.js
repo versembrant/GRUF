@@ -14,6 +14,27 @@ export const setCurrentSession = (session) => {
     currentSession = session;
 }
 
+export const updateCurrentSessionWithNewData = (data) => {
+    console.log('Updating current session with new data')
+    
+    // Update session data
+    currentSession.rawData = data;
+
+    // Update session store parameters
+    currentSession.propertiesInStore.forEach(propertyName => {
+        currentSession.setParametreInStore(propertyName, data[propertyName]);
+    })
+
+    // Update estacions parameters
+    currentSession.getNomsEstacions().forEach(nomEstacio => {
+        const estacio = currentSession.getEstacio(nomEstacio);
+        const receivedParametresEstacio = data.estacions[nomEstacio].parametres;
+        Object.keys(receivedParametresEstacio).forEach(nomParametreEstacio => {
+            estacio.setParametreInStore(nomParametreEstacio, receivedParametresEstacio[nomParametreEstacio])
+        })
+    })
+}
+
 export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (estacioClass) => {
@@ -64,6 +85,10 @@ export class EstacioBase {
             }
         });
         this.store = createStore(combineReducers(reducers));
+    }
+
+    setParametreInStore(nomParametre, valor) {
+        this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
     }
 
     getFullStateObject() {
@@ -140,9 +165,9 @@ export class Session {
         })
 
         // Inicialitza un redux store amb les propietats de la sessió
-        const propertiesInStore = ['id', 'name', 'connected_users'];
+        this.propertiesInStore = ['id', 'name', 'connected_users'];
         const reducers = {};
-        propertiesInStore.forEach(propertyName => {
+        this.propertiesInStore.forEach(propertyName => {
             reducers[propertyName] = (state = this.rawData[propertyName], action) => {
                 switch (action.type) {
                     case 'SET_' + propertyName:
@@ -199,7 +224,7 @@ export class Session {
         const estacio = this.getEstacio(nomEstacio);
 
         // Triguejem canvi a l'store (que generarà canvi a la UI)
-        estacio.store.dispatch({ type: 'SET_' + nomParametre, value: valor });
+        estacio.setParametreInStore(nomParametre, valor);
 
         // Triguejem canvi a l'audio graph
         if (getAudioGraphInstance().graphIsBuilt()){
