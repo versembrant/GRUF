@@ -19,6 +19,11 @@ socket.on('disconnect', function(reason) {
     console.log('Disconnected from WS server! Reason: ' + reason)
 });
 
+
+export const getSocketID = () => { 
+    return socket.id 
+}
+
 const throttledFunctionsMap = {}
 
 const getThrottledFuctionKey = (name, data) => {
