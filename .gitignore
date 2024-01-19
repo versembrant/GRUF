@@ -3,3 +3,4 @@ node_modules
 static/dist
 __pycache__/
 versembrant_bruixit.sock
+redis-data
