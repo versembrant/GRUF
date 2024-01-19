@@ -70,7 +70,7 @@ const requestSessionData = (sessionID) => {
 }
 
 // Version of requestSessionData which is not going to be called more than once every 5 seconds
-const debouncedRequestSessionData = debounce(sessionID => requestSessionData(sessionID), 5000, {trailing: false});
+const debouncedRequestSessionData = debounce(sessionID => requestSessionData(sessionID), 5000, {leading:true, trailing: false});
 
 // Method to request a list of available sessions ans subscribe to server updated from this list
 export const subscribeToAvailableSessions = (callback) => {
