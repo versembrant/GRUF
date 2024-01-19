@@ -22,3 +22,5 @@ services:
     redis:
         image: redis:alpine
         command: redis-server --port 16379
+        volumes:
+            - ./redis-data:/data
