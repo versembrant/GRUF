@@ -16,7 +16,7 @@ monkey.patch_all()
 r = redis.Redis(host='redis', port=16379, db=0)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
-socketio = SocketIO(app, message_queue="redis://redis:16379/1")
+socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5)
 available_sessions_room_name = 'available_sessions'
 usernames_connected_per_session = defaultdict(list)
 update_count_per_session = defaultdict(int)
