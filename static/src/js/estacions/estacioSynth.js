@@ -13,12 +13,14 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
+        cutoff: {type: 'float', label: 'Cutoff', min: 100, max: 12000, initial: 12000},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
         // Creem els nodes del graph i els guardem
-        const synth = new Tone.PolySynth(Tone.Synth).connect(estacioMasterGainNode);
+        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterGainNode);
+        const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
