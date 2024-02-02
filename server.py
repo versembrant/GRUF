@@ -55,6 +55,14 @@ class Session(object):
         if 'bpm' not in data:
             data['bpm'] = 120
 
+        # If we're loading a session which has not been saved with multiple values per parameter (presets), duplicate the parameters
+        for nom_estacio, estacio_data in data['estacions'].items():
+            parametres = estacio_data['parametres']
+            _, valor = list(parametres.items())[0]
+            if type(valor) != list:
+                for nom_parametre, valor in parametres.items():
+                    data['estacions'][nom_estacio]['parametres'][nom_parametre] = [valor, valor, valor, valor]
+
         # Return updated data if all ok
         return data
         
