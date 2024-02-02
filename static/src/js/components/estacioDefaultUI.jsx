@@ -128,5 +128,8 @@ export const EstacioDefaultUI = ({estacio}) => {
         <div>
             {parametresElements}
         </div>
+        <div>
+            Preset: {[...Array(estacio.numPresets).keys()].map(i => <button onClick={(evt) => {getCurrentSession().setSelectedPresetForEstacio(estacio.nom, i)}}>{getCurrentSession().getSelectedPresetForEstacio(estacio.nom) == i ? (i + '*'): i}</button>)}
+        </div>
     </div>)
 };
