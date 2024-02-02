@@ -123,8 +123,21 @@ export const EstacioDefaultUI = ({estacio}) => {
     });
 
     return (<div key={estacio.nom}>
-        <h2>{ estacio.nom }</h2>
-        <p>Tipus: { estacio.tipus }</p>
+        <div>
+            <div className="preset-buttons grid-default">
+                <div className="grid-row-default">
+                    {[...Array(estacio.numPresets).keys()].map(i => 
+                    <div key={"preset_" + i}
+                        className={"step" + (getCurrentSession().getSelectedPresetForEstacio(estacio.nom) == i ? " filled": "")}
+                        onClick={(evt) => {getCurrentSession().setSelectedPresetForEstacio(estacio.nom, i)}}>
+                            {i}
+                    </div>
+                    )}
+                </div>
+            </div>
+            <h2>{ estacio.nom }</h2>
+            <p>Tipus: { estacio.tipus }</p>
+        </div>
         <div>
             {parametresElements}
         </div>

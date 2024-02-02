@@ -55,6 +55,14 @@ class Session(object):
         if 'bpm' not in data:
             data['bpm'] = 120
 
+        # If we're loading a session which has not been saved with multiple values per parameter (presets), duplicate the parameters
+        for nom_estacio, estacio_data in data['estacions'].items():
+            parametres = estacio_data['parametres']
+            _, valor = list(parametres.items())[0]
+            if type(valor) != list:
+                for nom_parametre, valor in parametres.items():
+                    data['estacions'][nom_estacio]['parametres'][nom_parametre] = [valor, valor, valor, valor]
+
         # Return updated data if all ok
         return data
         
@@ -128,14 +136,14 @@ class Session(object):
         self.data[nom_parametre] = valor  
         self.save_to_redis()
         
-    def update_parametre_estacio(self, nom_estacio, nom_parametre, valor):
+    def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset):
         # Envia el nou paràmetre als clients connectats
         update_count_per_session[self.id] += 1
-        emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+        emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor, 'preset': preset}, to=self.room_name)
 
         # Guarda el canvi a la sessió al servidor
         try:
-            self.data['estacions'][nom_estacio]['parametres'][nom_parametre] = valor
+            self.data['estacions'][nom_estacio]['parametres'][nom_parametre][preset] = valor
             self.save_to_redis()
         except KeyError:
             pass
@@ -232,7 +240,7 @@ def session(session_id):
 @app.route('/delete_session/<session_id>/')
 def delete_session(session_id):
     delete_session_by_id(session_id)
-    return redirect(url_for('index'))
+    return redirect(url_for('llista_sessions'))
 
 
 @socketio.on('disconnect')
@@ -292,7 +300,7 @@ def on_update_parametre_estacio(data):  # session_id, nom_estacio, nom_parametre
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'])
+    s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'], data['preset'])
     
 
 @socketio.on('update_parametre_audio_graph')

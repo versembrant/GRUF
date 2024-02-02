@@ -20,6 +20,7 @@ export const NovaSessio = () => {
         const sessionData = {}
         sessionData.bpm = 120;
         sessionData.gainsEstacions = {}
+        sessionData.presetsEstacions = {}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
@@ -28,6 +29,7 @@ export const NovaSessio = () => {
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
             sessionData.gainsEstacions[nomEstacio] = 1.0;
+            sessionData.presetsEstacions[nomEstacio] = 0
         })
         
         // Create HTML form with the data and submit it
