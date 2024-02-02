@@ -112,7 +112,7 @@ const onMessageFromServer = (name, data) => {
     } else if (name === 'update_parametre_sessio'){
         getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
     } else if (name === 'update_parametre_estacio'){
-        getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor);
+        getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor, data.preset);
     } else if (name === 'update_master_sequencer_current_step'){
         getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
     } else if (name === 'update_parametre_audio_graph'){
