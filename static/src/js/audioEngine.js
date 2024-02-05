@@ -115,7 +115,7 @@ export class AudioGraph {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
             estacio.buildEstacioAudioGraph(estacioMasterGainNode);
-            estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset());
+            estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
         })
         
@@ -186,6 +186,10 @@ export class AudioGraph {
                 if (clip.beatInici <= this.mainSequencerCurrentStep && (clip.duradaBeats + clip.beatInici) > this.mainSequencerCurrentStep){
                     const estacio = getCurrentSession().getEstacio(clip.estacio);
                     const beatIntern = this.mainSequencerCurrentStep - clip.beatInici;
+                    if (clip.preset !== estacio.currentPreset){
+                        // If required preset not loaded, do it now
+                        estacio.setCurrentPreset(clip.preset)
+                    }
                     estacio.onSequencerTick(beatIntern, time, clip.preset);
                 }
             })
