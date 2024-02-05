@@ -54,6 +54,8 @@ class Session(object):
             data['connected_users'] = []
         if 'bpm' not in data:
             data['bpm'] = 120
+        if 'arranjament' not in data:
+            data['arranjament'] = {'clips': []}
 
         # Return updated data if all ok
         return data
@@ -126,6 +128,19 @@ class Session(object):
         
         # Guarda el canvi a la sessió al servidor
         self.data[nom_parametre] = valor  
+        self.save_to_redis()
+
+    def update_arranjament_sessio(self, update_data):
+        update_count_per_session[self.id] += 1
+        emit('update_arranjament_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data}, to=self.room_name)
+
+        # Guarda el canvi a la sessió al servidor
+        if update_data['accio'] == 'add_clip':
+            self.data['arranjament']['clips'].append(update_data['clip_data'])
+        elif update_data['accio'] == 'remove_clip':
+            self.data['arranjament']['clips'] = [c for c in self.data['arranjament']['clips'] if c['id'] != update_data['clip_id']]
+        elif update_data['accio'] == 'update_clip':
+            self.data['arranjament']['clips'] = [c if c['id'] != update_data['clip_id'] else update_data['clip_data'] for c in self.data['arranjament']['clips']]
         self.save_to_redis()
         
     def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset):
@@ -309,6 +324,14 @@ def on_update_parametre_sessio(data):  # session_id, nom_estacio, nom_parametre,
     if s is None:
         raise Exception('Session not found')
     s.update_parametre_sessio(data['nom_parametre'], data['valor'])
+
+
+@socketio.on('update_arranjament_sessio')
+def on_update_arranjament_sessio(data):  # session_id, update_data
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    s.update_arranjament_sessio(data['update_data'])
 
 
 @socketio.on('update_master_sequencer_current_step')

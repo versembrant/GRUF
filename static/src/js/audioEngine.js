@@ -23,7 +23,8 @@ export class AudioGraph {
             graphIsBuilt: false,
             isMasterAudioEngine: true,
             audioEngineSyncedToRemote: true,
-            running: false
+            playing: false,
+            playingArranjement: false,
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -44,8 +45,16 @@ export class AudioGraph {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
     }
 
-    isRunning() {
-        return this.store.getState().running;
+    isPlaying() {
+        return this.store.getState().playing;
+    }
+
+    isPlayingArranjement() {
+        return this.store.getState().playingArranjement;
+    }
+
+    isPlayingLive() {
+        return !this.isPlayingArranjement();
     }
 
     graphIsBuilt() {
@@ -95,14 +104,8 @@ export class AudioGraph {
         
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
-            if (this.isRunning()) {
-                // Call sequencer tick functions on all stations
-                getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                    const estacio = getCurrentSession().getEstacio(nomEstacio);
-                    estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
-                });
-
-                // Advance master sequencer current step
+            if (this.isPlaying()) {
+                this.onMainSequencerTick(time)
                 this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1)
             }
         }, "16n").start(0);
@@ -131,7 +134,7 @@ export class AudioGraph {
     transportStart() {
         if (this.graphIsBuilt()) {
             console.log("Transport start")
-            this.setParametreInStore('running', true);
+            this.setParametreInStore('playing', true);
             
             // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
             if (this.isMasterAudioEngine()){
@@ -156,7 +159,7 @@ export class AudioGraph {
     transportStop() {
         if (this.graphIsBuilt()) {
             console.log("Transport stop")
-            this.setParametreInStore('running', false);
+            this.setParametreInStore('playing', false);
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onTransportStop();
@@ -164,6 +167,53 @@ export class AudioGraph {
             Tone.Transport.stop()
             this.setMainSequencerCurrentStep(-1);
         }
+    }
+
+    onMainSequencerTick(time) {
+        if (this.isPlayingLive()){
+            // En mode live, trigueja el tick del sequenciador a totes les estacions
+            // amb el referent de temps actual i el beat general. Les estacions s'encarreguen
+            // de transformar el número de beat global a la seva duració interna
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                const estacio = getCurrentSession().getEstacio(nomEstacio);
+                estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
+            });
+        } else if (this.isPlayingArranjement()) {
+            this.prepareEstacionsPresetsForArranjament();
+            
+            // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
+            // i si hi ha clips de cada estació que s'haurien de reproduir en aquest beat global, els disparem
+            const arranjament = getCurrentSession().getArranjament();
+            arranjament.clips.forEach(clip => {
+                if (clip.beatInici <= this.mainSequencerCurrentStep && (clip.duradaBeats + clip.beatInici) > this.mainSequencerCurrentStep){
+                    const estacio = getCurrentSession().getEstacio(clip.estacio);
+                    const beatIntern = this.mainSequencerCurrentStep - clip.beatInici;
+                    estacio.onSequencerTick(beatIntern, time);
+                }
+            })
+        }
+    }
+
+    prepareEstacionsPresetsForArranjament() {
+        const arranjament = getCurrentSession().getArranjament();
+        // Per cada estació, mirar si el preset triat és el preset que li toca segons l'arranjament o el següent
+        // que s'haurà de reproduïr i es precarrga.
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+            let presetToSet = undefined;
+            // Buscar el proper preset (o l'actual) que s'haurà de reproduïr segons l'arranjament
+            // Aquest codi només funciona si els clips estan ordenats per beatInici
+            for (let i = 0; i < arranjament.clips.length; i++) {
+                const clip = arranjament.clips[i];
+                if ((clip.estacio == nomEstacio) && (this.mainSequencerCurrentStep < (clip.beatInici + clip.duradaBeats))) {
+                    presetToSet = clip.preset;
+                    break;
+                }
+            }
+            const currentPreset = getCurrentSession().getSelectedPresetForEstacio(nomEstacio)
+            if ((presetToSet !== undefined) && (currentPreset !== presetToSet)) {
+                getCurrentSession().setSelectedPresetForEstacio(nomEstacio, presetToSet)
+            }
+        })
     }
 
     getMasterGain() {
@@ -234,7 +284,7 @@ export class AudioGraph {
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
         this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine() && !this.isRunning() && this.audioEngineIsSyncedToRemote()){
+        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.audioEngineIsSyncedToRemote()){
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
