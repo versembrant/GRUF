@@ -110,9 +110,12 @@ export class EstacioBase {
         return this.parametersDescription[parameterName]
     }
 
-    getParameterValue(parameterName, preset=undefined) {
-        const presetToUse = preset || getCurrentSession().getSelectedPresetForEstacio(this.nom)
-        return this.store.getState()[parameterName][presetToUse];
+    getParameterValue(parameterName, preset) {
+        return this.store.getState()[parameterName][preset];
+    }
+
+    getCurrentLivePreset() {
+        return getCurrentSession().liveGetPresetForEstacio(this.nom)
     }
 
     // UI stuff
@@ -134,11 +137,11 @@ export class EstacioBase {
         return {}
     }
 
-    updateAudioGraphFromState() {
+    updateAudioGraphFromState(preset) {
         // Called when we want to update the whole audio graph from the state (for example, to force syncing with the state)
     }
     
-    updateAudioGraphParameter(nomParametre) {
+    updateAudioGraphParameter(nomParametre, preset) {
         // Called when a parameter of an station's audio graph is updated
     }
 
@@ -150,7 +153,7 @@ export class EstacioBase {
         // Called when audio graph is stopped
     }
 
-    onSequencerTick(currentMainSequencerStep, time) {
+    onSequencerTick(currentMainSequencerStep, time, preset) {
         // Called at each tick (16th note) of the main sequencer so the station can trigger notes, etc.
     }
 
@@ -176,7 +179,7 @@ export class Session {
         })
 
         // Inicialitza un redux store amb les propietats de la sessió
-        this.propertiesInStore = ['id', 'name', 'connected_users', 'presetsEstacions', 'arranjament'];
+        this.propertiesInStore = ['id', 'name', 'connected_users', 'live', 'arranjament'];
         const reducers = {};
         this.propertiesInStore.forEach(propertyName => {
             reducers[propertyName] = (state = this.rawData[propertyName], action) => {
@@ -214,35 +217,31 @@ export class Session {
     getEstacio(nomEstacio) {
         return this.estacions[nomEstacio];
     }
+    
+    liveGetPresetForEstacio(nomEstacio) {
+        return this.store.getState().live.presetsEstacions[nomEstacio]
+    }
 
-    getSelectedPresets() {
-        return this.store.getState()['presetsEstacions']
+    liveSetPresetForEstacio(nomEstacio, preset) {
+        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
+        newLiveParameter.presetsEstacions[nomEstacio] = preset
+        this.updateParametreSessio('live', newLiveParameter)
+    }
+
+    liveSetPresetsEstacions(presetsEstacions) {
+        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
+        newLiveParameter.presetsEstacions = presetsEstacions
+        this.setParametreInStore('live', newLiveParameter)
+    }
+
+    liveGetGainsEstacions() {
+        return this.store.getState().live.gainsEstacions;
     }
     
-    getSelectedPresetForEstacio(nomEstacio) {
-        return this.store.getState()['presetsEstacions'][nomEstacio]
-    }
-
-    setSelectedPresetForEstacio(nomEstacio, preset) {
-        const newPresetsEstacions = Object.assign({}, this.store.getState()['presetsEstacions'])
-        newPresetsEstacions[nomEstacio] = preset
-        this.updateParametreSessio('presetsEstacions', newPresetsEstacions)
-    }
-
-    setPresetsEstacions(presetsEstacions) {
-        const oldPresetsEstacions = Object.assign({}, this.store.getState()['presetsEstacions'])
-        this.setParametreInStore('presetsEstacions', presetsEstacions)
-        this.getNomsEstacions().forEach(nomEstacio => {
-            if (oldPresetsEstacions[nomEstacio] != presetsEstacions[nomEstacio]){
-                // Si el preset d'aquesta estació ha canviat
-                const estacio = this.getEstacio(nomEstacio)
-                if (getAudioGraphInstance().graphIsBuilt()){
-                    // Si l'audio graph existeix, recarrega l'estació
-                    estacio.updateAudioGraphFromState()
-                }
-                estacio.forceUpdateUIComponents()
-            }
-        })
+    liveSetGainsEstacions(gainsEstacions) {
+        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
+        newLiveParameter.gainsEstacions = gainsEstacions
+        this.updateParametreSessio('live', newLiveParameter)
     }
 
     getArranjament() {
@@ -256,12 +255,12 @@ export class Session {
             // locally before sending it to the sever and in this way the user experience is better as
             // parameter changes are more responsive
             if (this.performLocalUpdatesBeforeServerUpdates) {
-                this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.getSelectedPresetForEstacio(nomEstacio))
+                this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.liveGetPresetForEstacio(nomEstacio))
             }
-            sendMessageToServer('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor, preset: this.getSelectedPresetForEstacio(nomEstacio)});
+            sendMessageToServer('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor, preset: this.liveGetPresetForEstacio(nomEstacio)});
         } else {
             // In local mode, simulate the message coming from the server and perform the actual action
-            this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.getSelectedPresetForEstacio(nomEstacio))
+            this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.liveGetPresetForEstacio(nomEstacio))
         }
     }
     
@@ -294,12 +293,38 @@ export class Session {
     }
 
     receiveUpdateParametreSessioFromServer(nomParametre, valor) {
-        if (nomParametre === 'presetsEstacions') {
-            // Aquest paràmetre requereix un tracte especial perquè s'ha de fer un update de l'àudio graph i de la UI
-            this.setPresetsEstacions(valor);
-        } else {
-            this.setParametreInStore(nomParametre, valor);
+        if (nomParametre === 'live') {
+            // Aquest paràmetre requereix un tracte especial perquè s'han de fer canvis a l'àudio graph i a la UI
+            
+            // Update presets
+            this.getNomsEstacions().forEach(nomEstacio => {
+                const estacio = this.getEstacio(nomEstacio)
+                /*if (oldLiveParameter.presetsEstacions[nomEstacio] != valor.presetsEstacions[nomEstacio]){
+                    // Si el preset d'aquesta estació ha canviat
+                    if (getAudioGraphInstance().graphIsBuilt()){
+                        // Si l'audio graph existeix, recarrega l'estació
+                        estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
+                    }
+                    estacio.forceUpdateUIComponents()
+                }*/
+                if (getAudioGraphInstance().graphIsBuilt()){
+                    // Si l'audio graph existeix, recarrega l'estació
+                    estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
+                }
+                estacio.forceUpdateUIComponents()
+            })
+            
+            // Update gains
+            if (getAudioGraphInstance().graphIsBuilt()){
+                getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                    const gainNode = getAudioGraphInstance().getMasterGainNodeForEstacio(nomEstacio);
+                    gainNode.gain.value = valor.gainsEstacions[nomEstacio];
+                })
+            }
         }
+        
+        // Guardem valors a l'store
+        this.setParametreInStore(nomParametre, valor);
     }
 
     arranjamentAfegirClip(clipData) {

@@ -115,7 +115,7 @@ export class AudioGraph {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
             estacio.buildEstacioAudioGraph(estacioMasterGainNode);
-            estacio.updateAudioGraphFromState();
+            estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset());
             this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
         })
         
@@ -176,11 +176,9 @@ export class AudioGraph {
             // de transformar el número de beat global a la seva duració interna
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
-                estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
+                estacio.onSequencerTick(this.mainSequencerCurrentStep, time, estacio.getCurrentLivePreset());
             });
         } else if (this.isPlayingArranjement()) {
-            this.prepareEstacionsPresetsForArranjament();
-            
             // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
             // i si hi ha clips de cada estació que s'haurien de reproduir en aquest beat global, els disparem
             const arranjament = getCurrentSession().getArranjament();
@@ -188,32 +186,10 @@ export class AudioGraph {
                 if (clip.beatInici <= this.mainSequencerCurrentStep && (clip.duradaBeats + clip.beatInici) > this.mainSequencerCurrentStep){
                     const estacio = getCurrentSession().getEstacio(clip.estacio);
                     const beatIntern = this.mainSequencerCurrentStep - clip.beatInici;
-                    estacio.onSequencerTick(beatIntern, time);
+                    estacio.onSequencerTick(beatIntern, time, clip.preset);
                 }
             })
         }
-    }
-
-    prepareEstacionsPresetsForArranjament() {
-        const arranjament = getCurrentSession().getArranjament();
-        // Per cada estació, mirar si el preset triat és el preset que li toca segons l'arranjament o el següent
-        // que s'haurà de reproduïr i es precarrga.
-        getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-            let presetToSet = undefined;
-            // Buscar el proper preset (o l'actual) que s'haurà de reproduïr segons l'arranjament
-            // Aquest codi només funciona si els clips estan ordenats per beatInici
-            for (let i = 0; i < arranjament.clips.length; i++) {
-                const clip = arranjament.clips[i];
-                if ((clip.estacio == nomEstacio) && (this.mainSequencerCurrentStep < (clip.beatInici + clip.duradaBeats))) {
-                    presetToSet = clip.preset;
-                    break;
-                }
-            }
-            const currentPreset = getCurrentSession().getSelectedPresetForEstacio(nomEstacio)
-            if ((presetToSet !== undefined) && (currentPreset !== presetToSet)) {
-                getCurrentSession().setSelectedPresetForEstacio(nomEstacio, presetToSet)
-            }
-        })
     }
 
     getMasterGain() {
@@ -235,20 +211,6 @@ export class AudioGraph {
         this.setParametreInStore('bpm', bpm);
         if (this.graphIsBuilt()){
             Tone.Transport.bpm.rampTo(bpm);
-        }
-    }
-
-    getGainsEstacions() {
-        return this.store.getState().gainsEstacions;
-    }
-    
-    setGainsEstacions(gainsEstacions) {
-        this.setParametreInStore('gainsEstacions', gainsEstacions);
-        if (this.graphIsBuilt()){
-            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                const gainNode = this.getMasterGainNodeForEstacio(nomEstacio);
-                gainNode.gain.value = gainsEstacions[nomEstacio];
-            })
         }
     }
 
@@ -275,8 +237,6 @@ export class AudioGraph {
             this.setBpm(valor);
         } else if (nomParametre === 'masterGain') {
             this.setMasterGain(valor);
-        } else if (nomParametre === 'gainsEstacions') {
-            this.setGainsEstacions(valor);
         } else {
             this.setParametreInStore(nomParametre, valor);
         }
