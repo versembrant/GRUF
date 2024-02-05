@@ -111,6 +111,8 @@ const onMessageFromServer = (name, data) => {
         console.log(message);
     } else if (name === 'update_parametre_sessio'){
         getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
+    } else if (name === 'update_arranjament_sessio'){
+        getCurrentSession().receiveUpdateArranjamentSessioFromServer(data.update_data);
     } else if (name === 'update_parametre_estacio'){
         getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor, data.preset);
     } else if (name === 'update_master_sequencer_current_step'){
@@ -130,6 +132,10 @@ socket.on('update_parametre_sessio', function (data) {
 
 socket.on('update_parametre_estacio', function (data) {
     onMessageFromServer('update_parametre_estacio', data);
+});
+
+socket.on('update_arranjament_sessio', function (data) {
+    onMessageFromServer('update_arranjament_sessio', data);
 });
 
 socket.on('update_master_sequencer_current_step', function (data) {

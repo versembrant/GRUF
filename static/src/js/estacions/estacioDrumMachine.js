@@ -50,9 +50,9 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSamplerNote('C4', this.getParameterValue('sound1URL'));
         } else if (nomParametre === 'sound2URL') {
             this.loadSoundInSamplerNote('C#4', this.getParameterValue('sound2URL'));
-        } else if (nomParametre === 'sound2URL') {
+        } else if (nomParametre === 'sound3URL') {
             this.loadSoundInSamplerNote('D4', this.getParameterValue('sound3URL'));
-        } else if (nomParametre === 'sound2URL') {
+        } else if (nomParametre === 'sound4URL') {
             this.loadSoundInSamplerNote('D#4', this.getParameterValue('sound4URL'));
         }
     }

@@ -3,6 +3,7 @@ import { getCurrentSession } from "../sessionManager";
 import { AudioTransportControls } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { AudioMixerEstacions } from "../components/audioMixerEstacions";
+import { Arranjament } from "../components/arranjament";
 
 const Estacio = ({estacio}) => {
     return (
@@ -33,6 +34,7 @@ export const Sessio = () => {
                     {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
                 </div>
             </div>
+            <Arranjament/>
         </div>
     )
 };
