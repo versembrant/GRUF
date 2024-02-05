@@ -15,12 +15,30 @@ export const Arranjament = () => {
             beatInici: 0,
             duradaBeats: 32,
         });
-        getCurrentSession().arranjamentAfegirClip({
-            estacio: nomsEstacions[0],
-            preset: 1,
-            beatInici: 32,
-            duradaBeats: 44,
-        });
+        setTimeout(() => {
+            getCurrentSession().arranjamentAfegirClip({
+                estacio: nomsEstacions[0],
+                preset: 1,
+                beatInici: 32,
+                duradaBeats: 44,
+            });
+        }, 100)
+        setTimeout(() => {
+            getCurrentSession().arranjamentAfegirClip({
+                estacio: nomsEstacions[1],
+                preset: 0,
+                beatInici: 0,
+                duradaBeats: 32,
+            });
+        }, 200)
+        setTimeout(() => {
+            getCurrentSession().arranjamentAfegirClip({
+                estacio: nomsEstacions[1],
+                preset: 1,
+                beatInici: 32,
+                duradaBeats: 44,
+            });
+        }, 300)
     }
 
     handleEditarClip = () => {

@@ -90,7 +90,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 // Util function to create UI widgets for the default UIs
 const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     const parameterDescription = estacio.getParameterDescription(nomParametre);
-    const parametreValorState = estacio.getParameterValue(nomParametre);
+    const parametreValorState = estacio.getParameterValue(nomParametre, estacio.getCurrentLivePreset());
     const widgetUIClassParameterType = {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
@@ -128,8 +128,8 @@ export const EstacioDefaultUI = ({estacio}) => {
                 <div className="grid-row-default">
                     {[...Array(estacio.numPresets).keys()].map(i => 
                     <div key={"preset_" + i}
-                        className={"step" + (getCurrentSession().getSelectedPresetForEstacio(estacio.nom) == i ? " filled": "")}
-                        onClick={(evt) => {getCurrentSession().setSelectedPresetForEstacio(estacio.nom, i)}}>
+                        className={"step" + (getCurrentSession().liveGetPresetForEstacio(estacio.nom) == i ? " filled": "")}
+                        onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
                             {i}
                     </div>
                     )}
