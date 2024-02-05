@@ -176,7 +176,7 @@ export class Session {
         })
 
         // Inicialitza un redux store amb les propietats de la sessió
-        this.propertiesInStore = ['id', 'name', 'connected_users', 'presetsEstacions'];
+        this.propertiesInStore = ['id', 'name', 'connected_users', 'presetsEstacions', 'arranjament'];
         const reducers = {};
         this.propertiesInStore.forEach(propertyName => {
             reducers[propertyName] = (state = this.rawData[propertyName], action) => {
@@ -215,6 +215,10 @@ export class Session {
         return this.estacions[nomEstacio];
     }
 
+    getSelectedPresets() {
+        return this.store.getState()['presetsEstacions']
+    }
+    
     getSelectedPresetForEstacio(nomEstacio) {
         return this.store.getState()['presetsEstacions'][nomEstacio]
     }
@@ -239,6 +243,10 @@ export class Session {
                 estacio.forceUpdateUIComponents()
             }
         })
+    }
+
+    getArranjament() {
+        return this.store.getState()['arranjament']
     }
 
     updateParametreEstacio(nomEstacio, nomParametre, valor) {
@@ -293,5 +301,60 @@ export class Session {
             this.setParametreInStore(nomParametre, valor);
         }
     }
-    
+
+    arranjamentAfegirClip(clipData) {
+        clipData.id = Date.now()
+        this.updateParametreArranjament({
+            accio: 'add_clip',
+            clip_data: clipData
+        })
+    }
+
+    arranjamentEliminarClip(clipID) {
+        this.updateParametreArranjament({
+            accio: 'remove_clip',
+            clip_id: clipID
+        })
+    }
+
+    arranjamentEditarClip(clipID, clipData) {
+        this.updateParametreArranjament({
+            accio: 'update_clip',
+            clip_id: clipID,
+            clip_data: clipData
+        })
+    }
+
+    updateParametreArranjament(updateData) {
+        if (!this.localMode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            // For the arranjament we can't perform local updates before server updates as this could result in
+            // duplicated data as we're not setting a parameter but updating it's contents based on what is already
+            // stored locally. Therefore we don't check performLocalUpdatesBeforeServerUpdates as we do for other
+            // similar parameter updates
+            sendMessageToServer('update_arranjament_sessio', {session_id: this.getID(), update_data: updateData});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            this.receiveUpdateArranjamentSessioFromServer(updateData)
+        }
+    }
+
+    receiveUpdateArranjamentSessioFromServer(updateData) {
+        const arranjamentActualitat = Object.assign({}, this.getArranjament());
+        if (updateData.accio === 'add_clip') {
+            arranjamentActualitat.clips.push(updateData.clip_data);
+        } else if (updateData.accio === 'remove_clip') {
+            arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => clip.id != updateData.clip_id);
+        } else if (updateData.accio === 'update_clip') {
+            arranjamentActualitat.clips = arranjamentActualitat.clips.map(clip => {
+                if (clip.id === updateData.clip_id) {
+                    return updateData.clip_data;
+                } else {
+                    return clip;
+                }
+            });
+        }
+        arranjamentActualitat.clips.sort((a, b) => b.beatInici - a.beatInici)  // Ordenem els clips per ordre d'aparició
+        this.setParametreInStore('arranjament', arranjamentActualitat);
+    }
 }
