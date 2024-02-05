@@ -52,6 +52,7 @@ export class EstacioBase {
     audioNodes = {}
     volatileState = {}
     numPresets = 4
+    currentPreset = -1
 
     constructor(nom) {
         this.nom = nom
@@ -132,6 +133,13 @@ export class EstacioBase {
     }
 
     // AUDIO stuff
+
+    setCurrentPreset(preset) {
+        this.currentPreset = preset
+        if (getAudioGraphInstance().graphIsBuilt()){
+            this.updateAudioGraphFromState(preset)
+        }
+    }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
         return {}
@@ -272,7 +280,7 @@ export class Session {
 
         // Triguejem canvi a l'audio graph
         if (getAudioGraphInstance().graphIsBuilt()){
-            estacio.updateAudioGraphParameter(nomParametre)
+            estacio.updateAudioGraphParameter(nomParametre, preset)
         }
     }
 
@@ -299,19 +307,10 @@ export class Session {
             // Update presets
             this.getNomsEstacions().forEach(nomEstacio => {
                 const estacio = this.getEstacio(nomEstacio)
-                /*if (oldLiveParameter.presetsEstacions[nomEstacio] != valor.presetsEstacions[nomEstacio]){
-                    // Si el preset d'aquesta estació ha canviat
-                    if (getAudioGraphInstance().graphIsBuilt()){
-                        // Si l'audio graph existeix, recarrega l'estació
-                        estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
-                    }
+                if (estacio.currentPreset != valor.presetsEstacions[nomEstacio]){
+                    estacio.setCurrentPreset(valor.presetsEstacions[nomEstacio])
                     estacio.forceUpdateUIComponents()
-                }*/
-                if (getAudioGraphInstance().graphIsBuilt()){
-                    // Si l'audio graph existeix, recarrega l'estació
-                    estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
                 }
-                estacio.forceUpdateUIComponents()
             })
             
             // Update gains
