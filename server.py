@@ -55,7 +55,7 @@ class Session(object):
         if 'bpm' not in data:
             data['bpm'] = 120
         if 'arranjament' not in data:
-            data['arranjament'] = {'clips': []}
+            data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
 
         # Return updated data if all ok
         return data

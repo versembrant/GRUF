@@ -19,7 +19,7 @@ export const NovaSessio = () => {
         // Create session data object
         const sessionData = {}
         sessionData.bpm = 120;
-        sessionData.arranjament = {'clips': []}
+        sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'presetsEstacions': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
