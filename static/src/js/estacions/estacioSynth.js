@@ -45,19 +45,16 @@ export class EstacioSynth extends EstacioBase {
         this.updateAudioGraphFromState(preset);
     }
 
-    onSequencerTick(currentMainSequencerStep, time, preset) {
-        // Check if node properties should be changed depending on the current step
-        this.updateAudioGraphFromState(preset);
-
+    onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.getParameterDescription('notes').numCols;
-        const notes = this.getParameterValue('notes', preset);
+        const notes = this.getParameterValue('notes', this.currentPreset);
         const notesToPlay = [];
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
             if (indexOfArray(notes, [i, currentStep]) > -1){
                 const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
                 const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
-                const midiNoteNumber = this.getParameterValue('noteBase', preset) + noteOffsetMap[noteOffset];  // Midi numbers
+                const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
                 notesToPlay.push(Tone.Frequency(midiNoteNumber, "midi").toNote());
             }
         }
