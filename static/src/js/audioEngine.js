@@ -176,7 +176,7 @@ export class AudioGraph {
             // de transformar el número de beat global a la seva duració interna
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
-                estacio.onSequencerTick(this.mainSequencerCurrentStep, time, estacio.getCurrentLivePreset());
+                estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
             });
         } else if (this.isPlayingArranjement()) {
             // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
@@ -190,7 +190,7 @@ export class AudioGraph {
                         // If required preset not loaded, do it now
                         estacio.setCurrentPreset(clip.preset)
                     }
-                    estacio.onSequencerTick(beatIntern, time, clip.preset);
+                    estacio.onSequencerTick(beatIntern, time);
                 }
             })
         }

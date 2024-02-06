@@ -65,25 +65,25 @@ export class EstacioDrumMachine extends EstacioBase {
         }
     }
 
-    onSequencerTick(currentMainSequencerStep, time, preset) {
+    onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.getParameterDescription('pattern').numCols;
-        const pattern = this.getParameterValue('pattern', preset);
+        const pattern = this.getParameterValue('pattern', this.currentPreset);
         const shouldPlaySound1 = indexOfArray(pattern, [0, currentStep]) > -1;
         const shouldPlaySound2 = indexOfArray(pattern, [1, currentStep]) > -1;
         const shouldPlaySound3 = indexOfArray(pattern, [2, currentStep]) > -1;
         const shouldPlaySound4 = indexOfArray(pattern, [3, currentStep]) > -1;
         if (shouldPlaySound1) {
-            this.playSoundFromUrl(this.getParameterValue('sound1URL', preset), time)
+            this.playSoundFromUrl(this.getParameterValue('sound1URL', this.currentPreset), time)
         }
         if (shouldPlaySound2) {
-            this.playSoundFromUrl(this.getParameterValue('sound2URL', preset), time)
+            this.playSoundFromUrl(this.getParameterValue('sound2URL', this.currentPreset), time)
         }
         if (shouldPlaySound3) {
-            this.playSoundFromUrl(this.getParameterValue('sound3URL', preset), time)
+            this.playSoundFromUrl(this.getParameterValue('sound3URL', this.currentPreset), time)
         }
         if (shouldPlaySound4) {
-            this.playSoundFromUrl(this.getParameterValue('sound4URL', preset), time)
+            this.playSoundFromUrl(this.getParameterValue('sound4URL', this.currentPreset), time)
         }
     }
 }
