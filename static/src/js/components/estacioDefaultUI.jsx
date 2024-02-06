@@ -14,7 +14,7 @@ const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomE
                 max={parameterDescription.max}
                 step={parameterDescription.step || 0.05}
                 value={parameterValue}
-                onInput={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)} />
+                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.value)} />
         </div>
     )
 };
@@ -27,7 +27,7 @@ const TextParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 type="text"
                 style={{width: "100%"}}
                 value={parameterValue}
-                onInput={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)} />
+                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.value)} />
         </div>
     )
 };
@@ -38,7 +38,7 @@ const EnumParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             <p>{parameterDescription.label}: {parameterValue}</p>
             <select
                 value={parameterValue}
-                onChange={(evt) => getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, evt.target.value)}>
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.value)}>
                 {parameterDescription.options.map((option, i) => <option key={option} value={option}>{option}</option>)}
             </select>
         </div>
@@ -59,7 +59,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             <div 
                 key={i + "_" + j} // To avoid React warning
                 className={'step ' + filledClass + ' ' + activeStep}
-                onClick={(evt) => {
+                onMouseDown={(evt) => {
                     let updatedParameterValue = [...parameterValue]
                     const index = indexOfArray(parameterValue, [i, j]);
                     if (index > -1){
@@ -67,7 +67,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                     } else {
                         updatedParameterValue.push([i, j])
                     }
-                    getCurrentSession().updateParametreEstacio(nomEstacio, parameterDescription.nom, updatedParameterValue)
+                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, updatedParameterValue)
                 }}>
             </div>
             )
@@ -90,7 +90,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 // Util function to create UI widgets for the default UIs
 const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     const parameterDescription = estacio.getParameterDescription(nomParametre);
-    const parametreValorState = estacio.getParameterValue(nomParametre);
+    const parametreValorState = estacio.getParameterValue(nomParametre, estacio.getCurrentLivePreset());
     const widgetUIClassParameterType = {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
@@ -128,8 +128,8 @@ export const EstacioDefaultUI = ({estacio}) => {
                 <div className="grid-row-default">
                     {[...Array(estacio.numPresets).keys()].map(i => 
                     <div key={"preset_" + i}
-                        className={"step" + (getCurrentSession().getSelectedPresetForEstacio(estacio.nom) == i ? " filled": "")}
-                        onClick={(evt) => {getCurrentSession().setSelectedPresetForEstacio(estacio.nom, i)}}>
+                        className={"step" + (getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " filled": "")}
+                        onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
                             {i}
                     </div>
                     )}

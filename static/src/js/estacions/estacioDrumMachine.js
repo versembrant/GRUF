@@ -13,15 +13,22 @@ export class EstacioDrumMachine extends EstacioBase {
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]}
     }
+    noteURLsNumbers = {}
 
-    loadSoundInSamplerNote(note, url) {
-        if (this.volatileState.loadedSoundURLsPerNote[note] !== url) {
+    getNoteNumber(url) {
+        if (this.noteURLsNumbers.hasOwnProperty(url)){
+            return this.noteURLsNumbers[url]
+        }
+    }
+
+    loadSoundInSampler(url) {
+        if (!this.noteURLsNumbers.hasOwnProperty(url)){
             // Només carreguem el so si no estava carregat ja
+            const note = Tone.Frequency(Object.keys(this.noteURLsNumbers).length, "midi").toNote();
+            this.noteURLsNumbers[url] = note
             const buffer = new Tone.ToneAudioBuffer(url, () => {
                 this.audioNodes.sampler.add(note, buffer);
-                
             });
-            this.volatileState.loadedSoundURLsPerNote[note] = url;
         }
     }
 
@@ -32,50 +39,51 @@ export class EstacioDrumMachine extends EstacioBase {
         }
     }
 
-    updateAudioGraphFromState() {
-        // Carreguem els sons al sampler (i inicialitzem els estat "volàtil" perquè hi voldrem guardar quins sons ja hem carregat)
-        this.volatileState = {
-            loadedSoundURLsPerNote: {},
+    updateAudioGraphFromState(preset) {
+        // Carreguem tots els sons de tots els presets (si n'hi ha de repetits es carregaran només un cop)
+        // Ignorem l'argument "preset" perquè volem carregar tots els sons de tots els presets
+        for (let i=0; i<this.numPresets; i++) {
+            this.loadSoundInSampler(this.getParameterValue('sound1URL', i));
+            this.loadSoundInSampler(this.getParameterValue('sound2URL', i));
+            this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
+            this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
-        this.loadSoundInSamplerNote('C4', this.getParameterValue('sound1URL'));
-        this.loadSoundInSamplerNote('C#4', this.getParameterValue('sound2URL'));
-        this.loadSoundInSamplerNote('D4', this.getParameterValue('sound3URL'));
-        this.loadSoundInSamplerNote('D#4', this.getParameterValue('sound4URL'));
     }
 
-    updateAudioGraphParameter(nomParametre) {
+    updateAudioGraphParameter(nomParametre, preset) {
         // Si el parametre que ha canviat és la URL d'un so, el carreguem al sampler
-        // Per els altres parmetres no cal actualitzar res en el graph perqupè els steps ja es llegeixen directament del store
-        if (nomParametre === 'sound1URL') {
-            this.loadSoundInSamplerNote('C4', this.getParameterValue('sound1URL'));
-        } else if (nomParametre === 'sound2URL') {
-            this.loadSoundInSamplerNote('C#4', this.getParameterValue('sound2URL'));
-        } else if (nomParametre === 'sound2URL') {
-            this.loadSoundInSamplerNote('D4', this.getParameterValue('sound3URL'));
-        } else if (nomParametre === 'sound2URL') {
-            this.loadSoundInSamplerNote('D#4', this.getParameterValue('sound4URL'));
+        // Per els altres parmetres no cal actualitzar res en el graph perquè els steps ja es llegeixen directament del store
+        if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
+            this.loadSoundInSampler(this.getParameterValue(nomParametre, preset))
+        }
+    }
+
+    playSoundFromUrl(url, time) {
+        const note = this.getNoteNumber(url)
+        if (note !== undefined){
+            this.audioNodes.sampler.triggerAttack(note, time);
         }
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.getParameterDescription('pattern').numCols;
-        const pattern = this.getParameterValue('pattern');
+        const pattern = this.getParameterValue('pattern', this.currentPreset);
         const shouldPlaySound1 = indexOfArray(pattern, [0, currentStep]) > -1;
         const shouldPlaySound2 = indexOfArray(pattern, [1, currentStep]) > -1;
         const shouldPlaySound3 = indexOfArray(pattern, [2, currentStep]) > -1;
         const shouldPlaySound4 = indexOfArray(pattern, [3, currentStep]) > -1;
         if (shouldPlaySound1) {
-            this.audioNodes.sampler.triggerAttack("C4", time);
+            this.playSoundFromUrl(this.getParameterValue('sound1URL', this.currentPreset), time)
         }
         if (shouldPlaySound2) {
-            this.audioNodes.sampler.triggerAttack("C#4", time);
+            this.playSoundFromUrl(this.getParameterValue('sound2URL', this.currentPreset), time)
         }
         if (shouldPlaySound3) {
-            this.audioNodes.sampler.triggerAttack("D4", time);
+            this.playSoundFromUrl(this.getParameterValue('sound3URL', this.currentPreset), time)
         }
         if (shouldPlaySound4) {
-            this.audioNodes.sampler.triggerAttack("D#4", time);
+            this.playSoundFromUrl(this.getParameterValue('sound4URL', this.currentPreset), time)
         }
     }
 }
