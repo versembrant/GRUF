@@ -108,13 +108,15 @@ const onMessageFromServer = (name, data) => {
     }
 
     if (name === 'message'){
-        console.log(message);
+        console.log(data);
     } else if (name === 'update_parametre_sessio'){
         getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
     } else if (name === 'update_arranjament_sessio'){
-        getCurrentSession().receiveUpdateArranjamentSessioFromServer(data.update_data);
+        getCurrentSession().receiveUpdateArranjamentFromServer(data.update_data);
+    } else if (name === 'update_live_sessio'){
+        getCurrentSession().receiveUpdateLiveFromServer(data.update_data);
     } else if (name === 'update_parametre_estacio'){
-        getCurrentSession().receiveUpdateParametreEstacioFromServer(data.nom_estacio, data.nom_parametre, data.valor, data.preset);
+        getCurrentSession().getEstacio(data.nom_estacio).receiveUpdateParametreEstacioFromServer(data.nom_parametre, data.valor, data.preset);
     } else if (name === 'update_master_sequencer_current_step'){
         getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
     } else if (name === 'update_parametre_audio_graph'){
@@ -136,6 +138,10 @@ socket.on('update_parametre_estacio', function (data) {
 
 socket.on('update_arranjament_sessio', function (data) {
     onMessageFromServer('update_arranjament_sessio', data);
+});
+
+socket.on('update_live_sessio', function (data) {
+    onMessageFromServer('update_live_sessio', data);
 });
 
 socket.on('update_master_sequencer_current_step', function (data) {

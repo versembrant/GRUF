@@ -39,7 +39,6 @@ export const estacionsDisponibles = {};
 
 export const registerEstacioDisponible = (estacioClass) => {
     const tipusEstacio = new estacioClass().tipus;
-    //console.log('Registering estacio disponible:', tipusEstacio)
     estacionsDisponibles[tipusEstacio] = estacioClass;
 }
 
@@ -116,7 +115,33 @@ export class EstacioBase {
     }
 
     getCurrentLivePreset() {
-        return getCurrentSession().liveGetPresetForEstacio(this.nom)
+        return getCurrentSession().getLivePresetsEstacions()[this.nom]
+    }
+
+    updateParametreEstacio(nomParametre, valor) {
+        if (!getCurrentSession().localMode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
+                this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, this.getCurrentLivePreset())
+            }
+            sendMessageToServer('update_parametre_estacio', {session_id: getCurrentSession().getID(), nom_estacio: this.nom, nom_parametre: nomParametre, valor: valor, preset: this.getCurrentLivePreset()});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, this.getCurrentLivePreset())
+        }
+    }
+    
+    receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset) {
+        // Triguejem canvi a l'store (que generarà canvi a la UI)
+        this.setParametreInStore(nomParametre, valor, preset);
+
+        // Triguejem canvi a l'audio graph
+        if (getAudioGraphInstance().graphIsBuilt()){
+            this.updateAudioGraphParameter(nomParametre, preset)
+        }
     }
 
     // UI stuff
@@ -226,64 +251,6 @@ export class Session {
         return this.estacions[nomEstacio];
     }
     
-    liveGetPresetForEstacio(nomEstacio) {
-        return this.store.getState().live.presetsEstacions[nomEstacio]
-    }
-
-    liveSetPresetForEstacio(nomEstacio, preset) {
-        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
-        newLiveParameter.presetsEstacions[nomEstacio] = preset
-        this.updateParametreSessio('live', newLiveParameter)
-    }
-
-    liveSetPresetsEstacions(presetsEstacions) {
-        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
-        newLiveParameter.presetsEstacions = presetsEstacions
-        this.setParametreInStore('live', newLiveParameter)
-    }
-
-    liveGetGainsEstacions() {
-        return this.store.getState().live.gainsEstacions;
-    }
-    
-    liveSetGainsEstacions(gainsEstacions) {
-        const newLiveParameter = Object.assign({}, this.store.getState()['live'])
-        newLiveParameter.gainsEstacions = gainsEstacions
-        this.updateParametreSessio('live', newLiveParameter)
-    }
-
-    getArranjament() {
-        return this.store.getState()['arranjament']
-    }
-
-    updateParametreEstacio(nomEstacio, nomParametre, valor) {
-        if (!this.localMode) {
-            // In remote mode, we send parameter update to the server and the server will send it back
-            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-            // locally before sending it to the sever and in this way the user experience is better as
-            // parameter changes are more responsive
-            if (this.performLocalUpdatesBeforeServerUpdates) {
-                this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.liveGetPresetForEstacio(nomEstacio))
-            }
-            sendMessageToServer('update_parametre_estacio', {session_id: this.getID(), nom_estacio: nomEstacio, nom_parametre: nomParametre, valor: valor, preset: this.liveGetPresetForEstacio(nomEstacio)});
-        } else {
-            // In local mode, simulate the message coming from the server and perform the actual action
-            this.receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, this.liveGetPresetForEstacio(nomEstacio))
-        }
-    }
-    
-    receiveUpdateParametreEstacioFromServer(nomEstacio, nomParametre, valor, preset) {
-        const estacio = this.getEstacio(nomEstacio);
-
-        // Triguejem canvi a l'store (que generarà canvi a la UI)
-        estacio.setParametreInStore(nomParametre, valor, preset);
-
-        // Triguejem canvi a l'audio graph
-        if (getAudioGraphInstance().graphIsBuilt()){
-            estacio.updateAudioGraphParameter(nomParametre, preset)
-        }
-    }
-
     updateParametreSessio(nomParametre, valor) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -301,29 +268,98 @@ export class Session {
     }
 
     receiveUpdateParametreSessioFromServer(nomParametre, valor) {
-        if (nomParametre === 'live') {
-            // Aquest paràmetre requereix un tracte especial perquè s'han de fer canvis a l'àudio graph i a la UI
-            
-            // Update presets
-            this.getNomsEstacions().forEach(nomEstacio => {
+        // Guardem valors a l'store
+        this.setParametreInStore(nomParametre, valor);
+    }
+
+    // LIVE mode stuff
+
+    getLive() {
+        return this.store.getState().live
+    }
+
+    getLivePresetsEstacions() {
+        return this.store.getState().live.presetsEstacions
+    }
+
+    getLiveGainsEstacions() {
+        return this.store.getState().live.gainsEstacions
+    }
+
+    liveSetPresetForEstacio(nomEstacio, preset) {
+        const presets_estacions = {}
+        presets_estacions[nomEstacio] = preset
+        this.updateParametreLive({
+            accio: 'set_presets',
+            presets_estacions: presets_estacions,
+        })
+    }
+
+    liveSetPresetsEstacions(presetsEstacions) {
+        this.updateParametreLive({
+            accio: 'set_presets',
+            presets_estacions: presetsEstacions,
+        })
+    }
+
+    liveSetGainsEstacions(gainsEstacions) {
+        this.updateParametreLive({
+            accio: 'set_gains',
+            gains_estacions: gainsEstacions,
+        })
+    }
+
+    updateParametreLive(updateData) {
+        if (!this.localMode) {
+            // In remote mode, we send parameter update to the server and the server will send it back
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (this.performLocalUpdatesBeforeServerUpdates) {
+                this.receiveUpdateLiveFromServer(updateData)
+            }
+            sendMessageToServer('update_live_sessio', {session_id: this.getID(), update_data: updateData});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            this.receiveUpdateLiveFromServer(updateData)
+        }
+    }
+
+    receiveUpdateLiveFromServer(updateData) {
+        const liveActualitat = Object.assign({}, this.getLive());
+        if (updateData.accio === 'set_gains') {
+            Object.keys(updateData.gains_estacions).forEach(nomEstacio => {
+                liveActualitat.gainsEstacions[nomEstacio] = updateData.gains_estacions[nomEstacio];
+                // Update audio graph gain nodes
+                const gainNode = getAudioGraphInstance().getMasterGainNodeForEstacio(nomEstacio);
+                if (gainNode !== undefined){
+                    gainNode.gain.value = updateData.gains_estacions[nomEstacio];
+                }
+                
+            })
+        } else if (updateData.accio === 'set_presets') {
+            Object.keys(updateData.presets_estacions).forEach(nomEstacio => {
+                liveActualitat.presetsEstacions[nomEstacio] = updateData.presets_estacions[nomEstacio];
+                // Set presets in estacions
                 const estacio = this.getEstacio(nomEstacio)
-                if (estacio.currentPreset != valor.presetsEstacions[nomEstacio]){
-                    estacio.setCurrentPreset(valor.presetsEstacions[nomEstacio])
+                if (estacio.currentPreset != updateData.presets_estacions[nomEstacio]){
+                    estacio.setCurrentPreset(updateData.presets_estacions[nomEstacio])
                     estacio.forceUpdateUIComponents()
                 }
             })
-            
-            // Update gains
-            if (getAudioGraphInstance().graphIsBuilt()){
-                getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                    const gainNode = getAudioGraphInstance().getMasterGainNodeForEstacio(nomEstacio);
-                    gainNode.gain.value = valor.gainsEstacions[nomEstacio];
-                })
-            }
         }
-        
-        // Guardem valors a l'store
-        this.setParametreInStore(nomParametre, valor);
+        // Update parametre in store
+        this.setParametreInStore('live', liveActualitat); 
+    }
+
+    // ARRANJAMENT mode stuff
+
+    getArranjament() {
+        return this.store.getState().arranjament
+    }
+
+    getArranjamentClips() {
+        return this.store.getState().arranjament.clips
     }
 
     arranjamentAfegirClips(clipsData) {
@@ -346,18 +382,20 @@ export class Session {
     updateParametreArranjament(updateData) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
-            // For the arranjament we can't perform local updates before server updates as this could result in
-            // duplicated data as we're not setting a parameter but updating it's contents based on what is already
-            // stored locally. Therefore we don't check performLocalUpdatesBeforeServerUpdates as we do for other
-            // similar parameter updates
+            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+            // locally before sending it to the sever and in this way the user experience is better as
+            // parameter changes are more responsive
+            if (this.performLocalUpdatesBeforeServerUpdates) {
+                this.receiveUpdateArranjamentFromServer(updateData)
+            }
             sendMessageToServer('update_arranjament_sessio', {session_id: this.getID(), update_data: updateData});
         } else {
             // In local mode, simulate the message coming from the server and perform the actual action
-            this.receiveUpdateArranjamentSessioFromServer(updateData)
+            this.receiveUpdateArranjamentFromServer(updateData)
         }
     }
 
-    receiveUpdateArranjamentSessioFromServer(updateData) {
+    receiveUpdateArranjamentFromServer(updateData) {
         const arranjamentActualitat = Object.assign({}, this.getArranjament());
         if (updateData.accio === 'add_clips') {
             const clipIDs = arranjamentActualitat.clips.map(clip => clip.id);
