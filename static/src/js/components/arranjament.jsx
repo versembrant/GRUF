@@ -40,7 +40,7 @@ export const Arranjament = () => {
 
     handleEditarClips = () => {
         const modifiedClips = [];
-        getCurrentSession().getArranjament().clips.forEach(clip => {
+        getCurrentSession().getArranjamentClips().forEach(clip => {
             const newClipData = Object.assign({}, clip);
             newClipData.beatInici = clip.beatInici + 1;
             modifiedClips.push(newClipData)
@@ -49,13 +49,13 @@ export const Arranjament = () => {
     }
 
     handleClearClips = () => {
-        const clipIDs = getCurrentSession().getArranjament().clips.map(clip => clip.id);
+        const clipIDs = getCurrentSession().getArranjamentClips().map(clip => clip.id);
         getCurrentSession().arranjamentEliminarClips(clipIDs);
     }
 
     return (
         <div className="arranjament">
-            {JSON.stringify(getCurrentSession().getArranjament())}
+            {JSON.stringify(getCurrentSession().getArranjamentClips())}
             <button onClick={handleAddClips}>Afegir clips</button>
             <button onClick={handleEditarClips}>Editar clips</button>
             <button onClick={handleClearClips}>Eliminar cips</button>

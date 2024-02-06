@@ -142,6 +142,19 @@ class Session(object):
             self.data['arranjament']['clips'] = [c for c in self.data['arranjament']['clips'] if c['id'] not in update_data['clip_ids']]
         self.data['arranjament']['clips'] = sorted(self.data['arranjament']['clips'], key=lambda c: c['beatInici'])
         self.save_to_redis()
+
+    def update_live_sessio(self, update_data):
+        update_count_per_session[self.id] += 1
+        emit('update_live_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data}, to=self.room_name)
+
+        # Guarda el canvi a la sessió al servidor
+        if update_data['accio'] == 'set_gains':
+            for nom_estacio, valor in update_data['gains_estacions'].items():
+                self.data['live']['gainsEstacions'][nom_estacio] = valor
+        elif update_data['accio'] == 'set_presets':
+            for nom_estacio, valor in update_data['presets_estacions'].items():
+                self.data['live']['presetsEstacions'][nom_estacio] = valor
+        self.save_to_redis()
         
     def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset):
         # Envia el nou paràmetre als clients connectats
@@ -332,6 +345,14 @@ def on_update_arranjament_sessio(data):  # session_id, update_data
     if s is None:
         raise Exception('Session not found')
     s.update_arranjament_sessio(data['update_data'])
+
+
+@socketio.on('update_live_sessio')
+def on_update_live_sessio(data):  # session_id, update_data
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    s.update_live_sessio(data['update_data'])
 
 
 @socketio.on('update_master_sequencer_current_step')

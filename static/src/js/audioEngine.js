@@ -181,8 +181,7 @@ export class AudioGraph {
         } else if (this.isPlayingArranjement()) {
             // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
             // i si hi ha clips de cada estació que s'haurien de reproduir en aquest beat global, els disparem
-            const arranjament = getCurrentSession().getArranjament();
-            arranjament.clips.forEach(clip => {
+            getCurrentSession().getArranjamentClips().forEach(clip => {
                 if (clip.beatInici <= this.mainSequencerCurrentStep && (clip.duradaBeats + clip.beatInici) > this.mainSequencerCurrentStep){
                     const estacio = getCurrentSession().getEstacio(clip.estacio);
                     const beatIntern = this.mainSequencerCurrentStep - clip.beatInici;
