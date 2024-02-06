@@ -192,6 +192,11 @@ export class AudioGraph {
                     estacio.onSequencerTick(beatIntern, time);
                 }
             })
+
+            // Check if we have to stop the arranjament
+            if (this.mainSequencerCurrentStep >= (getCurrentSession().getArranjament().numSteps * getCurrentSession().getArranjament().beatsPerStep) -1){
+                this.transportStop();
+            }
         }
     }
 

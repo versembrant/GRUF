@@ -363,9 +363,6 @@ export class Session {
     }
 
     arranjamentAfegirClips(clipsData) {
-        clipsData.forEach(clipData => {
-            if (clipData.id === undefined) Object.assign(clipData, {id: Date.now()})
-        })
         this.updateParametreArranjament({
             accio: 'add_clips',
             clips_data: clipsData
@@ -398,7 +395,7 @@ export class Session {
     receiveUpdateArranjamentFromServer(updateData) {
         const arranjamentActualitat = Object.assign({}, this.getArranjament());
         if (updateData.accio === 'add_clips') {
-            const clipIDs = arranjamentActualitat.clips.map(clip => clip.id);
+            const clipIDs = updateData.clips_data.map(clip => clip.id);
             arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => clipIDs.includes(clip.id) === false);
             arranjamentActualitat.clips = arranjamentActualitat.clips.concat(updateData.clips_data);
         } else if (updateData.accio === 'remove_clips') {
