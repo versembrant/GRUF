@@ -7,61 +7,57 @@ export const Arranjament = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
-    handleAddClip = () => {
+    handleAddClips = () => {
         const nomsEstacions = getCurrentSession().getNomsEstacions();
-        getCurrentSession().arranjamentAfegirClip({
+        const clipsToAdd = []
+        clipsToAdd.push({
             estacio: nomsEstacions[0],
             preset: 0,
             beatInici: 0,
             duradaBeats: 32,
         });
-        setTimeout(() => {
-            getCurrentSession().arranjamentAfegirClip({
-                estacio: nomsEstacions[0],
-                preset: 1,
-                beatInici: 32,
-                duradaBeats: 44,
-            });
-        }, 100)
-        setTimeout(() => {
-            getCurrentSession().arranjamentAfegirClip({
-                estacio: nomsEstacions[1],
-                preset: 0,
-                beatInici: 0,
-                duradaBeats: 32,
-            });
-        }, 200)
-        setTimeout(() => {
-            getCurrentSession().arranjamentAfegirClip({
-                estacio: nomsEstacions[1],
-                preset: 1,
-                beatInici: 32,
-                duradaBeats: 44,
-            });
-        }, 300)
+        clipsToAdd.push({
+            estacio: nomsEstacions[0],
+            preset: 1,
+            beatInici: 32,
+            duradaBeats: 44,
+        });
+        clipsToAdd.push({
+            estacio: nomsEstacions[1],
+            preset: 0,
+            beatInici: 0,
+            duradaBeats: 32,
+        });
+    
+        clipsToAdd.push({
+            estacio: nomsEstacions[1],
+            preset: 1,
+            beatInici: 32,
+            duradaBeats: 44,
+        });
+        getCurrentSession().arranjamentAfegirClips(clipsToAdd);
     }
 
-    handleEditarClip = () => {
+    handleEditarClips = () => {
+        const modifiedClips = [];
         getCurrentSession().getArranjament().clips.forEach(clip => {
             const newClipData = Object.assign({}, clip);
             newClipData.beatInici = clip.beatInici + 1;
-            getCurrentSession().arranjamentEditarClip(clip.id, newClipData);
-        
+            modifiedClips.push(newClipData)
         })
+        getCurrentSession().arranjamentAfegirClips(modifiedClips);
     }
 
     handleClearClips = () => {
-        getCurrentSession().getArranjament().clips.forEach(clip => {
-            getCurrentSession().arranjamentEliminarClip(clip.id);
-        
-        }) 
+        const clipIDs = getCurrentSession().getArranjament().clips.map(clip => clip.id);
+        getCurrentSession().arranjamentEliminarClips(clipIDs);
     }
 
     return (
         <div className="arranjament">
             {JSON.stringify(getCurrentSession().getArranjament())}
-            <button onClick={handleAddClip}>Afegir clip</button>
-            <button onClick={handleEditarClip}>Editar clip</button>
+            <button onClick={handleAddClips}>Afegir clips</button>
+            <button onClick={handleEditarClips}>Editar clips</button>
             <button onClick={handleClearClips}>Eliminar cips</button>
         </div>
     )
