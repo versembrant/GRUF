@@ -326,26 +326,20 @@ export class Session {
         this.setParametreInStore(nomParametre, valor);
     }
 
-    arranjamentAfegirClip(clipData) {
-        clipData.id = Date.now()
+    arranjamentAfegirClips(clipsData) {
+        clipsData.forEach(clipData => {
+            if (clipData.id === undefined) Object.assign(clipData, {id: Date.now()})
+        })
         this.updateParametreArranjament({
-            accio: 'add_clip',
-            clip_data: clipData
+            accio: 'add_clips',
+            clips_data: clipsData
         })
     }
 
-    arranjamentEliminarClip(clipID) {
+    arranjamentEliminarClips(clipIDs) {
         this.updateParametreArranjament({
-            accio: 'remove_clip',
-            clip_id: clipID
-        })
-    }
-
-    arranjamentEditarClip(clipID, clipData) {
-        this.updateParametreArranjament({
-            accio: 'update_clip',
-            clip_id: clipID,
-            clip_data: clipData
+            accio: 'remove_clips',
+            clip_ids: clipIDs
         })
     }
 
@@ -365,20 +359,14 @@ export class Session {
 
     receiveUpdateArranjamentSessioFromServer(updateData) {
         const arranjamentActualitat = Object.assign({}, this.getArranjament());
-        if (updateData.accio === 'add_clip') {
-            arranjamentActualitat.clips.push(updateData.clip_data);
-        } else if (updateData.accio === 'remove_clip') {
-            arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => clip.id != updateData.clip_id);
-        } else if (updateData.accio === 'update_clip') {
-            arranjamentActualitat.clips = arranjamentActualitat.clips.map(clip => {
-                if (clip.id === updateData.clip_id) {
-                    return updateData.clip_data;
-                } else {
-                    return clip;
-                }
-            });
+        if (updateData.accio === 'add_clips') {
+            const clipIDs = arranjamentActualitat.clips.map(clip => clip.id);
+            arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => clipIDs.includes(clip.id) === false);
+            arranjamentActualitat.clips = arranjamentActualitat.clips.concat(updateData.clips_data);
+        } else if (updateData.accio === 'remove_clips') {
+            arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => updateData.clip_ids.includes(clip.id) === false);
         }
-        arranjamentActualitat.clips.sort((a, b) => b.beatInici - a.beatInici)  // Ordenem els clips per ordre d'aparició
+        arranjamentActualitat.clips.sort((a, b) => a.beatInici - b.beatInici)  // Ordenem els clips per ordre d'aparició en la linia temporal
         this.setParametreInStore('arranjament', arranjamentActualitat);
     }
 }

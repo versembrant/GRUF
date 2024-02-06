@@ -135,12 +135,12 @@ class Session(object):
         emit('update_arranjament_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data}, to=self.room_name)
 
         # Guarda el canvi a la sessió al servidor
-        if update_data['accio'] == 'add_clip':
-            self.data['arranjament']['clips'].append(update_data['clip_data'])
-        elif update_data['accio'] == 'remove_clip':
-            self.data['arranjament']['clips'] = [c for c in self.data['arranjament']['clips'] if c['id'] != update_data['clip_id']]
-        elif update_data['accio'] == 'update_clip':
-            self.data['arranjament']['clips'] = [c if c['id'] != update_data['clip_id'] else update_data['clip_data'] for c in self.data['arranjament']['clips']]
+        if update_data['accio'] == 'add_clips':
+            new_clip_ids = [c['id'] for c in update_data['clips_data']]
+            self.data['arranjament']['clips'] = [c for c in self.data['arranjament']['clips'] if c['id'] not in new_clip_ids] + update_data['clips_data']
+        elif update_data['accio'] == 'remove_clips':
+            self.data['arranjament']['clips'] = [c for c in self.data['arranjament']['clips'] if c['id'] not in update_data['clip_ids']]
+        self.data['arranjament']['clips'] = sorted(self.data['arranjament']['clips'], key=lambda c: c['beatInici'])
         self.save_to_redis()
         
     def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset):
