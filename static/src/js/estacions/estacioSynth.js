@@ -13,7 +13,8 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
-        cutoff: {type: 'float', label: 'Cutoff', min: 100, max: 12000, initial: 12000},
+        cutoff: {type: 'float', label: 'Filtre', min: 100, max: 12000, initial: 12000},
+        //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
     }
 
@@ -24,6 +25,7 @@ export class EstacioSynth extends EstacioBase {
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
+            filtre: filtre 
         };
     }
 
@@ -40,6 +42,7 @@ export class EstacioSynth extends EstacioBase {
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         });
+        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff'), 0.01);
     }
 
     updateAudioGraphParameter(nomParametre) {
