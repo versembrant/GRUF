@@ -7,7 +7,7 @@ export const AudioTransportControls = () => {
 
     const handlePlayButton = async () => {  
         await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
-        if (!getAudioGraphInstance().isRunning()){
+        if (!getAudioGraphInstance().isPlaying()){
             if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt()))) {
                 getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
             }
@@ -24,7 +24,13 @@ export const AudioTransportControls = () => {
     return (
         <div>
             <div>
-                <button onClick={handlePlayButton}>{getAudioGraphInstance().isRunning() ? 'Stop' : 'Play'}</button>
+                <button onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? 'Stop' : 'Play'}</button>
+                <label>
+                    <input type="checkbox" checked={getAudioGraphInstance().isPlayingArranjement()} onChange={() => getAudioGraphInstance().updateParametreAudioGraph('playingArranjement', !getAudioGraphInstance().isPlayingArranjement())}/> Play arranjement
+                </label>
+                
+            </div>
+            <div>
                 Current step: {getAudioGraphInstance().getMainSequencerCurrentStep()}
             </div>
             <div>

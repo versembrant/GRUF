@@ -29,37 +29,37 @@ export class EstacioSynth extends EstacioBase {
         };
     }
 
-    updateAudioGraphFromState() {
+    updateAudioGraphFromState(preset) {
         this.audioNodes.synth.set({
             'envelope': {
-                attack:  this.getParameterValue('attack'),
-                decay: this.getParameterValue('decay'),
-                sustain: this.getParameterValue('sustain'),
-                release: this.getParameterValue('release'),
+                attack:  this.getParameterValue('attack', preset),
+                decay: this.getParameterValue('decay', preset),
+                sustain: this.getParameterValue('sustain', preset),
+                release: this.getParameterValue('release', preset),
             },
             'oscillator': {
-                type: this.getParameterValue('waveform'),
+                type: this.getParameterValue('waveform', preset),
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         });
         this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff'), 0.01);
     }
 
-    updateAudioGraphParameter(nomParametre) {
+    updateAudioGraphParameter(nomParametre, preset) {
         // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
-        this.updateAudioGraphFromState();
+        this.updateAudioGraphFromState(preset);
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.getParameterDescription('notes').numCols;
-        const notes = this.getParameterValue('notes');
+        const notes = this.getParameterValue('notes', this.currentPreset);
         const notesToPlay = [];
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
             if (indexOfArray(notes, [i, currentStep]) > -1){
                 const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
                 const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
-                const midiNoteNumber = this.getParameterValue('noteBase') + noteOffsetMap[noteOffset];  // Midi numbers
+                const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
                 notesToPlay.push(Tone.Frequency(midiNoteNumber, "midi").toNote());
             }
         }
