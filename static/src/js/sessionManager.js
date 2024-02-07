@@ -74,7 +74,9 @@ export class EstacioBase {
             const parameterDescription = this.getParameterDescription(parameterName);
             let initialValues = Array(this.numPresets).fill(parameterDescription.initial);
             if (initialState !== undefined) {
-                initialValues = initialState.parametres[parameterName];
+                if (initialState.parametres.hasOwnProperty(parameterName)) {
+                    initialValues = initialState.parametres[parameterName];
+                }
             }
             reducers[parameterName] = (state = initialValues.map(value => ensureValidValue(value, parameterDescription)), action) => {
                 switch (action.type) {
