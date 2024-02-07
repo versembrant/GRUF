@@ -179,6 +179,12 @@ export class AudioGraph {
                 estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
             });
         } else if (this.isPlayingArranjement()) {
+            // Primer settejem la propietat arranjamentPreset de totes les estacions a -1, més tard canviarem aquest valor si hi ha clips que s'han de 
+            // reproduir en aquest beat. Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                getCurrentSession().getEstacio(nomEstacio).arranjementPreset = -1;
+            })
+
             // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
             // i si hi ha clips de cada estació que s'haurien de reproduir en aquest beat global, els disparem
             getCurrentSession().getArranjamentClips().forEach(clip => {
@@ -189,6 +195,7 @@ export class AudioGraph {
                         // If required preset not loaded, do it now
                         estacio.setCurrentPreset(clip.preset)
                     }
+                    estacio.arranjementPreset = clip.preset // Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
                     estacio.onSequencerTick(beatIntern, time);
                 }
             })
