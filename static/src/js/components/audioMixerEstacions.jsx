@@ -5,13 +5,14 @@ import { subscribeToStoreChanges } from "../utils";
 
 export const AudioMixerEstacions = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
+    subscribeToStoreChanges(getCurrentSession());
 
     const handleAnyInputSlider = (evt) => {
         const allGainValues = {};
         evt.target.closest('.mixer').querySelectorAll('input').forEach((inputElement) => {
             allGainValues[inputElement.name] = parseFloat(inputElement.value, 10);
         });
-        getAudioGraphInstance().updateParametreAudioGraph('gainsEstacions', allGainValues);
+        getCurrentSession().liveSetGainsEstacions(allGainValues);
     }
 
     return (
@@ -24,7 +25,7 @@ export const AudioMixerEstacions = () => {
                         min="0.0" 
                         max="1.0"
                         step="0.1"
-                        value={getAudioGraphInstance().getGainsEstacions()[nomEstacio]}
+                        value={getCurrentSession().getLiveGainsEstacions()[nomEstacio]}
                         name={nomEstacio}
                         onInput={(evt) => handleAnyInputSlider(evt)}
                     />{nomEstacio}

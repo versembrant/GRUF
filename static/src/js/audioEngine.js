@@ -23,7 +23,8 @@ export class AudioGraph {
             graphIsBuilt: false,
             isMasterAudioEngine: true,
             audioEngineSyncedToRemote: true,
-            running: false
+            playing: false,
+            playingArranjement: false,
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -44,8 +45,16 @@ export class AudioGraph {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
     }
 
-    isRunning() {
-        return this.store.getState().running;
+    isPlaying() {
+        return this.store.getState().playing;
+    }
+
+    isPlayingArranjement() {
+        return this.store.getState().playingArranjement;
+    }
+
+    isPlayingLive() {
+        return !this.isPlayingArranjement();
     }
 
     graphIsBuilt() {
@@ -95,14 +104,8 @@ export class AudioGraph {
         
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
-            if (this.isRunning()) {
-                // Call sequencer tick functions on all stations
-                getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                    const estacio = getCurrentSession().getEstacio(nomEstacio);
-                    estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
-                });
-
-                // Advance master sequencer current step
+            if (this.isPlaying()) {
+                this.onMainSequencerTick(time)
                 this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1)
             }
         }, "16n").start(0);
@@ -112,7 +115,7 @@ export class AudioGraph {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
             estacio.buildEstacioAudioGraph(estacioMasterGainNode);
-            estacio.updateAudioGraphFromState();
+            estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
         })
         
@@ -131,7 +134,7 @@ export class AudioGraph {
     transportStart() {
         if (this.graphIsBuilt()) {
             console.log("Transport start")
-            this.setParametreInStore('running', true);
+            this.setParametreInStore('playing', true);
             
             // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
             if (this.isMasterAudioEngine()){
@@ -156,13 +159,44 @@ export class AudioGraph {
     transportStop() {
         if (this.graphIsBuilt()) {
             console.log("Transport stop")
-            this.setParametreInStore('running', false);
+            this.setParametreInStore('playing', false);
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onTransportStop();
             });
             Tone.Transport.stop()
             this.setMainSequencerCurrentStep(-1);
+        }
+    }
+
+    onMainSequencerTick(time) {
+        if (this.isPlayingLive()){
+            // En mode live, trigueja el tick del sequenciador a totes les estacions
+            // amb el referent de temps actual i el beat general. Les estacions s'encarreguen
+            // de transformar el número de beat global a la seva duració interna
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                const estacio = getCurrentSession().getEstacio(nomEstacio);
+                estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
+            });
+        } else if (this.isPlayingArranjement()) {
+            // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
+            // i si hi ha clips de cada estació que s'haurien de reproduir en aquest beat global, els disparem
+            getCurrentSession().getArranjamentClips().forEach(clip => {
+                if (clip.beatInici <= this.mainSequencerCurrentStep && (clip.duradaBeats + clip.beatInici) > this.mainSequencerCurrentStep){
+                    const estacio = getCurrentSession().getEstacio(clip.estacio);
+                    const beatIntern = this.mainSequencerCurrentStep - clip.beatInici;
+                    if (clip.preset !== estacio.currentPreset){
+                        // If required preset not loaded, do it now
+                        estacio.setCurrentPreset(clip.preset)
+                    }
+                    estacio.onSequencerTick(beatIntern, time);
+                }
+            })
+
+            // Check if we have to stop the arranjament
+            if (this.mainSequencerCurrentStep >= (getCurrentSession().getArranjament().numSteps * getCurrentSession().getArranjament().beatsPerStep) -1){
+                this.transportStop();
+            }
         }
     }
 
@@ -185,20 +219,6 @@ export class AudioGraph {
         this.setParametreInStore('bpm', bpm);
         if (this.graphIsBuilt()){
             Tone.Transport.bpm.rampTo(bpm);
-        }
-    }
-
-    getGainsEstacions() {
-        return this.store.getState().gainsEstacions;
-    }
-    
-    setGainsEstacions(gainsEstacions) {
-        this.setParametreInStore('gainsEstacions', gainsEstacions);
-        if (this.graphIsBuilt()){
-            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                const gainNode = this.getMasterGainNodeForEstacio(nomEstacio);
-                gainNode.gain.value = gainsEstacions[nomEstacio];
-            })
         }
     }
 
@@ -225,8 +245,6 @@ export class AudioGraph {
             this.setBpm(valor);
         } else if (nomParametre === 'masterGain') {
             this.setMasterGain(valor);
-        } else if (nomParametre === 'gainsEstacions') {
-            this.setGainsEstacions(valor);
         } else {
             this.setParametreInStore(nomParametre, valor);
         }
@@ -234,7 +252,7 @@ export class AudioGraph {
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
         this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine() && !this.isRunning() && this.audioEngineIsSyncedToRemote()){
+        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.audioEngineIsSyncedToRemote()){
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
