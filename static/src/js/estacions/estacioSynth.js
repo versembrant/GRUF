@@ -42,7 +42,7 @@ export class EstacioSynth extends EstacioBase {
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         });
-        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff'), 0.01);
+        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset),0.01);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
