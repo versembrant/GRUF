@@ -25,6 +25,7 @@ export class AudioGraph {
             audioEngineSyncedToRemote: true,
             playing: false,
             playingArranjement: false,
+            swing: 0
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -99,6 +100,10 @@ export class AudioGraph {
         // Setteja el bpm al valor guardat
         Tone.Transport.bpm.value = this.getBpm();
         
+        // Setteja el swing al valor guardat
+        Tone.Transport.swing = this.getSwing();
+
+
         // Crea node master gain (per tenir un volum general)
         this.masterGainNode = new Tone.Gain(this.getMasterGain()).toDestination();
         
@@ -229,6 +234,17 @@ export class AudioGraph {
         }
     }
 
+    getSwing(){
+        return this.store.getState().swing;
+    }
+
+    setSwing(swing){
+        this.setParametreInStore('swing', swing);
+        if(this.graphIsBuilt()){
+            Tone.Transport.swing = swing;
+        }
+    }
+
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -252,7 +268,10 @@ export class AudioGraph {
             this.setBpm(valor);
         } else if (nomParametre === 'masterGain') {
             this.setMasterGain(valor);
-        } else {
+        } else if (nomParametre === 'swing'){
+            this.setSwing(valor);
+        }
+        else {
             this.setParametreInStore(nomParametre, valor);
         }
     } 
