@@ -12,7 +12,7 @@ export class EstacioDrumMachine extends EstacioBase {
         sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
-        swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0}
+        //swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0}
     }
     noteURLsNumbers = {}
 
@@ -61,11 +61,11 @@ export class EstacioDrumMachine extends EstacioBase {
 
     playSoundFromUrl(url, time) {
         const note = this.getNoteNumber(url)
-        const swing = this.getParameterValue ('swing1', preset)
+        //let swing = this.getParameterValue ('swing1')
         if (note !== undefined){
             this.audioNodes.sampler.triggerAttack(note, time);
         }
-        Tone.Sampler.Transport.swing = swing;
+        //this.audioNodes.sampler.Transport.swing = swing;
 
     }
 
