@@ -54,6 +54,8 @@ class Session(object):
             data['connected_users'] = []
         if 'bpm' not in data:
             data['bpm'] = 120
+        if 'swing' not in data:
+            data ['swing'] = 0
         if 'arranjament' not in data:
             data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
 
