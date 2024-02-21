@@ -16,7 +16,7 @@ export class EstacioDrumMachine extends EstacioBase {
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
-        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 32, initial:[]},
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
     }
     noteURLsNumbers = {}
 
