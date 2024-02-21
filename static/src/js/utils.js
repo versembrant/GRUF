@@ -71,3 +71,8 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
     );
     return root;
 }
+
+// Util function to check if a beat is a swing beat
+export const necessitaSwing = (numeroBeat) => {
+    return ((numeroBeat - 2) % 4) == 0
+}

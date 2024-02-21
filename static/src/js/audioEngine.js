@@ -99,10 +99,6 @@ export class AudioGraph {
 
         // Setteja el bpm al valor guardat
         Tone.Transport.bpm.value = this.getBpm();
-        
-        // Setteja el swing al valor guardat
-        Tone.Transport.swing = this.getSwing();
-
 
         // Crea node master gain (per tenir un volum general)
         this.masterGainNode = new Tone.Gain(this.getMasterGain()).toDestination();
@@ -240,9 +236,6 @@ export class AudioGraph {
 
     setSwing(swing){
         this.setParametreInStore('swing', swing);
-        if(this.graphIsBuilt()){
-            Tone.Transport.swing = swing;
-        }
     }
 
     updateParametreAudioGraph(nomParametre, valor) {
