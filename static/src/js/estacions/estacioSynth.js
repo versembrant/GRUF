@@ -20,13 +20,17 @@ export class EstacioSynth extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
         // Creem els nodes del graph i els guardem
-        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterGainNode);
+        const synthChannel = new Tone.Channel().connect(estacioMasterGainNode);
+        const filtre = new Tone.Filter(500, "lowpass").connect(synthChannel);
         const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
-            filtre: filtre 
+            filtre: filtre,
         };
+        synthChannel.send("chorus");
+        synthChannel.send("reverb");
+        synthChannel.send("delay"); 
     }
 
     updateAudioGraphFromState(preset) {
@@ -43,6 +47,7 @@ export class EstacioSynth extends EstacioBase {
             'volume': -12,  // Avoid clipping, specially when using sine
         });
         this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset),0.01);
+        this.audioNodes.synthBusChannel
     }
 
     updateAudioGraphParameter(nomParametre, preset) {

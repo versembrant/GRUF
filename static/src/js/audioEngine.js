@@ -110,7 +110,23 @@ export class AudioGraph {
                 this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1)
             }
         }, "16n").start(0);
-        
+
+        // Crea uns efectes
+
+        this.chorus = new Tone.Chorus({
+            wet: 1,
+        }).connect(this.masterGainNode).start();
+        this.chorusChannel = new Tone.Channel({ volume: -60 }).connect(this.chorus);
+        this.chorusChannel.receive("chorus");
+
+        this.reverb = new Tone.Reverb(3).connect(this.masterGainNode).start();
+        this.reverbChannel = new Tone.Channel({ volume: -60 }).connect(this.reverb);
+        this.reverbChannel.receive("reverb");
+
+        this.delay = new Tone.Delay(3).connect(this.masterGainNode).start();
+        this.delayChannel = new Tone.Channel({ volume: -60 }).connect(this.delay);
+        this.delayChannel.receive("delay");
+
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
@@ -275,6 +291,7 @@ export class AudioGraph {
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
+    
 }
 
 const audioGraph = new AudioGraph();
