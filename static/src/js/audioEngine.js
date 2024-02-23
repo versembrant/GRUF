@@ -113,17 +113,15 @@ export class AudioGraph {
 
         // Crea uns efectes
 
-        this.chorus = new Tone.Chorus({
-            wet: 1,
-        }).connect(this.masterGainNode).start();
+        this.chorus = new Tone.Chorus({wet: 1,}).connect(this.masterGainNode);
         this.chorusChannel = new Tone.Channel({ volume: -60 }).connect(this.chorus);
         this.chorusChannel.receive("chorus");
-
-        this.reverb = new Tone.Reverb(3).connect(this.masterGainNode).start();
+        
+        this.reverb = new Tone.Reverb(3).connect(this.masterGainNode);
         this.reverbChannel = new Tone.Channel({ volume: -60 }).connect(this.reverb);
         this.reverbChannel.receive("reverb");
 
-        this.delay = new Tone.Delay(3).connect(this.masterGainNode).start();
+        this.delay = new Tone.Delay(0.1).connect(this.masterGainNode);
         this.delayChannel = new Tone.Channel({ volume: -60 }).connect(this.delay);
         this.delayChannel.receive("delay");
 
@@ -134,7 +132,7 @@ export class AudioGraph {
             estacio.buildEstacioAudioGraph(estacioMasterGainNode);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
-        })
+        }) 
         
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
@@ -148,6 +146,12 @@ export class AudioGraph {
         }
     }
     
+    effectsStart (){
+        this.chorus.start();
+        this.reverb.start();
+        this.delay.start();
+    }
+
     transportStart() {
         if (this.graphIsBuilt()) {
             console.log("Transport start")
