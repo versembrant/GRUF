@@ -15,7 +15,10 @@ export class EstacioSynth extends EstacioBase {
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         cutoff: {type: 'float', label: 'Filtre', min: 100, max: 12000, initial: 12000},
         //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
-        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
+        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
+        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
+        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
     }
 
     buildEstacioAudioGraph(estacioMasterGainNode) {
