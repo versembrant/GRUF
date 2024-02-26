@@ -31,9 +31,9 @@ export class EstacioSynth extends EstacioBase {
             synth: synth,
             filtre: filtre,
         };
-        synthChannel.send("chorus");
-        synthChannel.send("reverb");
-        synthChannel.send("delay"); 
+        synthChannel.send("chorus", this.getParameterValue('chorusSend'));
+        synthChannel.send("reverb", this.getParameterValue('reverbSend'));
+        synthChannel.send("delay", this.getParameterValue('delaySend')); 
     }
 
     updateAudioGraphFromState(preset) {

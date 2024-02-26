@@ -47,9 +47,9 @@ export class EstacioDrumMachine extends EstacioBase {
         this.audioNodes = {
             sampler: new Tone.Sampler().connect(drumMachineChannel),
         }
-        drumMachineChannel.send("chorus");
-        drumMachineChannel.send("reverb");
-        drumMachineChannel.send("delay");
+        drumMachineChannel.send("chorus", this.getParameterValue('chorusSend'));
+        drumMachineChannel.send("reverb", this.getParameterValue('reverbSend'));
+        drumMachineChannel.send("delay", this.getParameterValue('delaySend')); 
     }
 
     updateAudioGraphFromState(preset) {
