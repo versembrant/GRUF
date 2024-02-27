@@ -15,8 +15,9 @@ monkey.patch_all()
 
 app_prefix = os.getenv('APP_PREFIX', '')
 port = int(os.getenv('PORT', 5555))
+test = int(os.getenv('TEST', 0)) == 1
 
-r = redis.Redis(host='redis', port=16379, db=0)
+r = redis.Redis(host='redis' if not test else 'redis-test', port=16379, db=0)
 app = Flask(__name__, static_url_path='/static' if not app_prefix else f'/{app_prefix}/static', static_folder='static')
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
 socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5, path='socket.io' if not app_prefix else f'{app_prefix}/socket.io')
