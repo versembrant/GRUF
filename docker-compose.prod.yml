@@ -5,6 +5,7 @@ services:
     server:
         build: .
         init: true
+        image: versembrant-bruixit-server-${APP_PREFIX}:latest
         command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_bruixit.sock
         ports:
             - "${PORT}:${PORT}"
