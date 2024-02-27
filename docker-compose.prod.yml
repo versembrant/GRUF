@@ -18,6 +18,8 @@ services:
         environment:
             - DEPLOY=1
             - FLASK_SECRET=hsau65aygasjhd5553ggjhff
+        env_file:
+            - .env
     
     redis:
         image: redis:alpine

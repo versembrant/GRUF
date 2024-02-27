@@ -5,10 +5,10 @@ export const LlistaSessions = ({infoSessions}) => {
             <div>
                 Sessions existents:
                 <ul>
-                    {infoSessions.map((item, index) => <li key={item.id}><a href={"/session/" + item.id}>{ item.id } "{ item.name }" ({ item.num_estacions } estacions, { item.connected_users.length } usuaris)</a> - <a href={"/delete_session/" + item.id}><button>eliminar</button></a></li>)}
+                    {infoSessions.map((item, index) => <li key={item.id}><a href={appPrefix + "/session/" + item.id}>{ item.id } "{ item.name }" ({ item.num_estacions } estacions, { item.connected_users.length } usuaris)</a> - <a href={appPrefix + "/delete_session/" + item.id}><button>eliminar</button></a></li>)}
                 </ul>
             </div>
-            <a href="/new_session/">Crear nova sessió</a>
+            <a href={appPrefix + "/new_session/"}>Crear nova sessió</a>
         </div>
     )
 };
