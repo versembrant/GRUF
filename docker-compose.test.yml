@@ -17,6 +17,7 @@ services:
             - .:/code
         environment:
             - DEPLOY=1
+            - TEST=1
             - FLASK_SECRET=hsau65aygasjhd5553ggjhff
         env_file:
             - .env
