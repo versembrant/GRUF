@@ -18,7 +18,7 @@ export const Sessio = () => {
     return(
         <div>
             <h1>Sessió "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h1>
-            <a href="/">Torna a la llista de sessions</a>
+            <a href={appPrefix + "/"}>Torna a la llista de sessions</a>
             <SessionConnectedUsers/>
             <AudioTransportControls/>
             <AudioMixerEstacions/>

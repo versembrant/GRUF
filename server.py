@@ -5,7 +5,7 @@ import random
 import hashlib
 from collections import defaultdict
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Blueprint
 from werkzeug.utils import safe_join
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
@@ -13,18 +13,51 @@ import redis
 from gevent import monkey
 monkey.patch_all()
 
+app_prefix = os.getenv('APP_PREFIX', '')
+
 r = redis.Redis(host='redis', port=16379, db=0)
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static' if not app_prefix else f'/{app_prefix}/static', static_folder='static')
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
-socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5)
+socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5, path='socket.io' if not app_prefix else f'{app_prefix}/socket.io')
 available_sessions_room_name = 'available_sessions'
 usernames_connected_per_session = defaultdict(list)
 update_count_per_session = defaultdict(int)
+bp = Blueprint('app', __name__, template_folder='templates')
 
 
 def log(message):
     print(message)
     sys.stdout.flush()
+
+
+hash_cache = {}
+get_hash = lambda content, length: hashlib.md5(content).hexdigest()[:length]
+
+@app.url_defaults
+def add_hash_for_static_files(endpoint, values):
+    '''Add content hash argument for url to make url unique.
+    It's have sense for updates to avoid caches.
+    '''
+    if endpoint != 'static':
+        return
+    filename = values['filename']
+    if filename in hash_cache:
+        values['hash'] = hash_cache[filename]
+        return
+    filepath = safe_join(app.static_folder, filename)
+    if os.path.isfile(filepath):
+        with open(filepath, 'rb') as static_file:
+            filehash = get_hash(static_file.read(), 8)
+            values['hash'] = hash_cache[filename] = filehash
+
+
+@bp.context_processor
+def inject_app_prefix():
+    # App prefix will be '' if not set, otherwise it will be '/app_prefix' (starting with slash, no trailing slash)
+    if app_prefix != '':
+        return dict(app_prefix='/' + app_prefix)
+    else:
+        return dict(app_prefix='')
 
 
 class InvalidSessionDataException(Exception):
@@ -210,34 +243,13 @@ def notifica_available_sessions():
     socketio.emit('set_available_sessions', data, to=available_sessions_room_name)
 
 
-hash_cache = {}
-get_hash = lambda content, length: hashlib.md5(content).hexdigest()[:length]
-
-@app.url_defaults
-def add_hash_for_static_files(endpoint, values):
-    '''Add content hash argument for url to make url unique.
-    It's have sense for updates to avoid caches.
-    '''
-    if endpoint != 'static':
-        return
-    filename = values['filename']
-    if filename in hash_cache:
-        values['hash'] = hash_cache[filename]
-        return
-    filepath = safe_join(app.static_folder, filename)
-    if os.path.isfile(filepath):
-        with open(filepath, 'rb') as static_file:
-            filehash = get_hash(static_file.read(), 8)
-            values['hash'] = hash_cache[filename] = filehash
-
-
-@app.route('/')
+@bp.route('/')
 def llista_sessions():
     log('Loading existing sessions from redis')
     return render_template('llista_sessions.html')
 
 
-@app.route('/new_session/', methods=['GET', 'POST'])
+@bp.route('/new_session/', methods=['GET', 'POST'])
 def new():
     if request.method == 'POST':
         name = request.form['name']
@@ -247,11 +259,11 @@ def new():
         s = Session(data)
         log(f'New session created: {s.name} ({s.id})\n{json.dumps(s.get_full_data(), indent=4)}')
         notifica_available_sessions()
-        return redirect(url_for('session', session_id=s.id))
+        return redirect(url_for('app.session', session_id=s.id))
     return render_template('nova_sessio.html')
 
 
-@app.route('/session/<session_id>/')
+@bp.route('/session/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
     if s is None:
@@ -259,10 +271,10 @@ def session(session_id):
     return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1')
 
 
-@app.route('/delete_session/<session_id>/')
+@bp.route('/delete_session/<session_id>/')
 def delete_session(session_id):
     delete_session_by_id(session_id)
-    return redirect(url_for('llista_sessions'))
+    return redirect(url_for('app.llista_sessions'))
 
 
 @socketio.on('disconnect')
@@ -366,6 +378,8 @@ def on_update_master_sequencer_current_step(data):  # session_id, current_step
 
 
 if __name__ == '__main__':
+    app.register_blueprint(bp, url_prefix=f'/{app_prefix}/')
+
     # Clean existing users connected in stored sessions
     for session in get_stored_sessions():
         session.clear_connected_users(update_clients=False)
@@ -373,4 +387,5 @@ if __name__ == '__main__':
     # Start server
     log('Starting server')
     debug_mode = os.getenv('DEPLOY') == None
-    socketio.run(app, debug=debug_mode, host='0.0.0.0', port=5555, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
+    port = os.getenv('PORT', 5555)
+    socketio.run(app, debug=debug_mode, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
