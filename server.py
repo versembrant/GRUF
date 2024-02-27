@@ -14,6 +14,7 @@ from gevent import monkey
 monkey.patch_all()
 
 app_prefix = os.getenv('APP_PREFIX', '')
+port = int(os.getenv('PORT', 5555))
 
 r = redis.Redis(host='redis', port=16379, db=0)
 app = Flask(__name__, static_url_path='/static' if not app_prefix else f'/{app_prefix}/static', static_folder='static')
@@ -385,7 +386,6 @@ if __name__ == '__main__':
         session.clear_connected_users(update_clients=False)
     
     # Start server
-    log('Starting server')
+    log('Starting server listening in port ' + str(port))
     debug_mode = os.getenv('DEPLOY') == None
-    port = os.getenv('PORT', 5555)
     socketio.run(app, debug=debug_mode, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
