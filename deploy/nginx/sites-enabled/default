@@ -17,6 +17,17 @@ server {
 
     server_name cl2024011711001.dnssw.net;
 
+    # Test deployment
+    location /test/static/dist/ {
+        alias /home/versembrant/test/versembrant-bruixit/static/dist/;
+    }
+
+    location /test/ {
+        include uwsgi_params;
+        uwsgi_pass unix:/home/versembrant/test/versembrant-bruixit/versembrant_bruixit.sock;
+    }
+    
+    # Main deployment
     location /static/dist/ {
         alias /home/versembrant/versembrant-bruixit/static/dist/;
     }
@@ -26,6 +37,7 @@ server {
         uwsgi_pass unix:/home/versembrant/versembrant-bruixit/versembrant_bruixit.sock;
     }
 
+    # SSL configuration
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/cl2024011711001.dnssw.net/fullchain.pem; # managed by Certbot
@@ -44,6 +56,4 @@ server {
 
     server_name cl2024011711001.dnssw.net;
     return 404; # managed by Certbot
-
-
 }

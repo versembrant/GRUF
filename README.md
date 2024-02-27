@@ -59,6 +59,18 @@ OJU!: aquest repositori ja inclou les claus ssh necessàries per poder accedir a
 
 Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net
 
+
+## Instruccions de desplegament mode TEST en el servidor (swhosting)
+
+Per a poder fer proves en el servidor remot sense afectar el desplegament principal de l'aplicació, es pot fer servir el flag `--test` al córrer l'script de deploy. Això desplegarà l'aplicació a http://cl2024011711001.dnssw.net/test (en comptes de http://cl2024011711001.dnssw.net). Opcionalment també es pot especificar el branch que es vol desplegar amb el flag `--branch xxx`. Per exemple:
+
+```
+docker compose run --rm server fab deploy --test --branch proves_1234
+```
+
+Si no s'especifica cap branch, es desplegarà el branch `main`.
+
+
 ### SSL
 
 Per fer funcionar HTTPS fem servir certificats de letsencrypt. Aquí hi ha instruccions: https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
