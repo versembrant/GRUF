@@ -113,16 +113,16 @@ export class AudioGraph {
 
         // Crea uns efectes
 
-        this.chorus = new Tone.Chorus({wet: 1,}).connect(this.masterGainNode);
-        this.chorusChannel = new Tone.Channel({ volume: -6 }).connect(this.chorus);
+        this.chorus = new Tone.Chorus({wet: 1,}).connect(this.masterGainNode).start();
+        this.chorusChannel = new Tone.Channel({ volume: 0 }).connect(this.chorus);
         this.chorusChannel.receive("chorus");
         
         this.reverb = new Tone.Reverb(3).connect(this.masterGainNode);
-        this.reverbChannel = new Tone.Channel({ volume: -6 }).connect(this.reverb);
+        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
         this.reverbChannel.receive("reverb");
 
         this.delay = new Tone.Delay(0.1).connect(this.masterGainNode);
-        this.delayChannel = new Tone.Channel({ volume: -6 }).connect(this.delay);
+        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
         this.delayChannel.receive("delay");
 
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
@@ -144,12 +144,6 @@ export class AudioGraph {
             console.log("Audio context started")
             audioContextIsReady = true;
         }
-    }
-    
-    effectsStart (){
-        this.chorus.start();
-        this.reverb.start();
-        this.delay.start();
     }
 
     transportStart() {
