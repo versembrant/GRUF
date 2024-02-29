@@ -26,7 +26,7 @@ docker compose run --rm server yarn build
 docker compose up
 ```
 
-5) Open running application by poiting the browser at `http://localhost:5555/`
+5) Open running application by poiting the browser at `http://localhost:5555/bruixit/`
 
 
 ## Diagrames
@@ -57,12 +57,12 @@ docker compose run --rm server fab deploy
 
 OJU!: aquest repositori ja inclou les claus ssh necessàries per poder accedir al servidor remot, no el compartiu!
 
-Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net
+Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net/bruixit/
 
 
 ## Instruccions de desplegament mode TEST en el servidor (swhosting)
 
-Per a poder fer proves en el servidor remot sense afectar el desplegament principal de l'aplicació, es pot fer servir el flag `--test` al córrer l'script de deploy. Això desplegarà l'aplicació a http://cl2024011711001.dnssw.net/test (en comptes de http://cl2024011711001.dnssw.net). Opcionalment també es pot especificar el branch que es vol desplegar amb el flag `--branch xxx`. Per exemple:
+Per a poder fer proves en el servidor remot sense afectar el desplegament principal de l'aplicació, es pot fer servir el flag `--test` al córrer l'script de deploy. Això desplegarà l'aplicació a http://cl2024011711001.dnssw.net/bruixit-test/ (en comptes de http://cl2024011711001.dnssw.net/bruixit/). Opcionalment també es pot especificar el branch que es vol desplegar amb el flag `--branch xxx`. Per exemple:
 
 ```
 docker compose run --rm server fab deploy --test --branch proves_1234
