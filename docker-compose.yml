@@ -7,9 +7,11 @@ services:
         volumes:
             - .:/code
         ports:
-            - "0.0.0.0:5555:5555"
+            - "0.0.0.0:${PORT}:${PORT}"
         depends_on:
             - redis
+        env_file:
+            - .env
     
     redis:
         image: redis:alpine

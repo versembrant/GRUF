@@ -17,6 +17,7 @@ const onSessionDataLoaded = () => {
     const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
+    getAudioGraphInstance().setSwing(currentSession.rawData.swing);
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
     if (getAudioGraphInstance().graphIsBuilt()) {

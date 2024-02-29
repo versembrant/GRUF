@@ -46,6 +46,7 @@ const EnumParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 };
 
 const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
+    const estacio = getCurrentSession().getEstacio(nomEstacio);
     const numRows = parameterDescription.numRows;
     const numSteps = parameterDescription.numCols;
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
@@ -54,7 +55,8 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
         const stepsElements = []
         for (let j = 0; j < numSteps; j++) {
             const filledClass = indexOfArray(parameterValue, [i, j]) > -1 ? 'filled' : '';
-            const activeStep = currentStep == j ? 'active' : '';
+            console.log()
+            const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
             stepsElements.push(
             <div 
                 key={i + "_" + j} // To avoid React warning

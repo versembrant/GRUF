@@ -19,6 +19,7 @@ export const NovaSessio = () => {
         // Create session data object
         const sessionData = {}
         sessionData.bpm = 120;
+        sessionData.swing = 0;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'presetsEstacions': {}}
         sessionData.estacions = {}
@@ -52,7 +53,7 @@ export const NovaSessio = () => {
     return(
         <div>
             <h1>Nova sessió</h1>
-            <a href="/">Torna a la llista de sessions</a>
+            <a href={appPrefix + "/"}>Torna a la llista de sessions</a>
             <div>
                 Estacions triades:
                 <ul>

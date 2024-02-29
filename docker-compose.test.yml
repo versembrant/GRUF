@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
 
-    server:
+    server-test:
         build: .
         init: true
         command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_bruixit.sock
@@ -12,16 +12,17 @@ services:
         stop_signal: SIGINT
         user: 1000:1000
         depends_on:
-            - redis
+            - redis-test
         volumes:
             - .:/code
         environment:
             - DEPLOY=1
+            - TEST=1
             - FLASK_SECRET=hsau65aygasjhd5553ggjhff
         env_file:
             - .env
     
-    redis:
+    redis-test:
         image: redis:alpine
         command: redis-server --port 16379
         volumes:
