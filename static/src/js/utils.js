@@ -88,4 +88,8 @@ const real2Norm = (x, parameterDescription) => {
     }else{
         return (x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min);
     }
+
+// Util function to check if a beat is a swing beat
+export const necessitaSwing = (numeroBeat) => {
+    return ((numeroBeat - 2) % 4) == 0
 }

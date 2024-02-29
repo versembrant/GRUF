@@ -20,7 +20,9 @@ export const AudioTransportControls = () => {
     const handleSetBpm = (e) => {
         getAudioGraphInstance().updateParametreAudioGraph('bpm', e.target.value)
     }
-
+    const handleSetSwing = (e) => {
+        getAudioGraphInstance().updateParametreAudioGraph('swing', e.target.value)
+    }
     return (
         <div>
             <div>
@@ -38,6 +40,9 @@ export const AudioTransportControls = () => {
             </div>
             <div>
                 BPM: <input type="range" min="40" max="300" step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}
+            </div>
+            <div>
+                Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
             </div>
             <div>
                 <label>

@@ -9,6 +9,7 @@ const wsServerURL = ''  // Nothing for same domain where the page is loaded
 const socket = io(wsServerURL, {
     autoConnect: false,
     reconnection: true,
+    path: appPrefix + '/socket.io'
 });
 
 socket.on('connect', function() {
