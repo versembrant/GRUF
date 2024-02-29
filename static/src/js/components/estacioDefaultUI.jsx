@@ -4,23 +4,6 @@ import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArray } from "../utils";
 
-const exponent = 2;
-
-const norm2Real = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow(x, exponent)*(parameterDescription.max-parameterDescription.min)+parameterDescription.min;
-    }else{
-        return x * (parameterDescription.max-parameterDescription.min) + parameterDescription.min;
-    }
-}
-
-const real2Norm = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow((x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min), 1/exponent);
-    }else{
-        return (x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min);
-    }
-}
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
         <div>
