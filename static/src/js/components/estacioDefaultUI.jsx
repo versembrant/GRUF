@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArray } from "../utils";
+import { indexOfArray, real2Norm, norm2Real } from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
