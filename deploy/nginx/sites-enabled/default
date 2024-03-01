@@ -38,6 +38,11 @@ server {
         uwsgi_pass unix:/home/versembrant/sonicpi-renderer/versembrant-sonicpi-server.sock;
     }
 
+    # Redirect from / to /bruixit
+    location / {
+        rewrite (/.*)?$ /bruixit$1 permanent;
+    }
+
     # SSL configuration
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
     listen 443 ssl; # managed by Certbot
