@@ -381,11 +381,15 @@ def on_update_master_sequencer_current_step(data):  # session_id, current_step
 
 app.register_blueprint(bp, url_prefix=f'/{app_prefix}/')
 
-if __name__ == '__main__':
+def clean_existing_connected_users():
     # Clean existing users connected in stored sessions
     for session in get_stored_sessions():
         session.clear_connected_users(update_clients=False)
-    
+
+clean_existing_connected_users()
+
+
+if __name__ == '__main__':
     # Start server
     log('Starting server listening in port ' + str(port))
     debug_mode = os.getenv('DEPLOY') == None
