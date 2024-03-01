@@ -7,15 +7,15 @@ import { indexOfArray } from "../utils";
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
         <div>
-            <p>{parameterDescription.label}: {parameterValue}</p>
+            <p>{parameterDescription.label}: {parameterValue >= 5 ? parameterValue.toFixed(0) : parameterValue}</p>
             <input
                 type="range"
-                min={parameterDescription.min}
-                max={parameterDescription.max}
-                step={parameterDescription.step || 0.05}
-                value={parameterValue}
-                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.value)} />
-        </div>
+                min={0.0}
+                max={1.0}
+                step={0.01}
+                value= {real2Norm(parameterValue, parameterDescription)} 
+                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.target.value, parameterDescription))}/> 
+                </div>
     )
 };
 
