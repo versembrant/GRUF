@@ -12,7 +12,7 @@ export const getAudioGraphInstance = () => {
 export class AudioGraph {
     constructor() {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
-        this.estacionsMasterGainNodes = {};
+        this.estacionsMasterChannelNodes = {};
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
         const defaultsForPropertiesInStore = {
@@ -88,8 +88,8 @@ export class AudioGraph {
         return this.store.getState().mainSequencerCurrentStep
     }
 
-    getMasterGainNodeForEstacio(nomEstacio) {
-        return this.estacionsMasterGainNodes[nomEstacio]
+    getMasterChannelNodeForEstacio(nomEstacio) {
+        return this.estacionsMasterChannelNodes[nomEstacio]
     }
     
     buildAudioGraph() {
@@ -117,11 +117,14 @@ export class AudioGraph {
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
             estacio.buildEstacioAudioGraph(estacioMasterChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
-            this.estacionsMasterGainNodes[nomEstacio] = estacioMasterChannel;
+            this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
         })
         
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
+
+        // Carrega els volumns dels channels de cada estació ara que els objectes ha estan creats
+        getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
     }
     
     async startAudioContext() {
