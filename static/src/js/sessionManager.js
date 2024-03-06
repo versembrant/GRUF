@@ -168,7 +168,7 @@ export class EstacioBase {
         }
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         return {}
     }
 

@@ -114,10 +114,10 @@ export class AudioGraph {
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
-            const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
-            estacio.buildEstacioAudioGraph(estacioMasterGainNode);
+            const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            estacio.buildEstacioAudioGraph(estacioMasterChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
-            this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
+            this.estacionsMasterGainNodes[nomEstacio] = estacioMasterChannel;
         })
         
         // Marca el graph com a construït
