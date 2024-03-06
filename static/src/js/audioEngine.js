@@ -113,7 +113,7 @@ export class AudioGraph {
 
         // Crea uns efectes
 
-        this.chorus = new Tone.Chorus({wet: 1,}).connect(this.masterGainNode).start();
+        this.chorus = new Tone.Chorus({wet: 1,}).connect(this.masterGainNode);
         this.chorusChannel = new Tone.Channel({ volume: 0 }).connect(this.chorus);
         this.chorusChannel.receive("chorus");
         

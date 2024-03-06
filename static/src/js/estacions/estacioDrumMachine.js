@@ -17,7 +17,7 @@ export class EstacioDrumMachine extends EstacioBase {
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
-        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 25, initial: -60},
+        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: -25, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: -25, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: -25, initial: -60},
 
@@ -46,7 +46,9 @@ export class EstacioDrumMachine extends EstacioBase {
         const drumMachineChannel = new Tone.Channel().connect(estacioMasterGainNode);
         this.audioNodes = {
             sampler: new Tone.Sampler().connect(drumMachineChannel),
-            drumMachineChannel: drumMachineChannel,
+            effect: function (effect, amount){
+                return drumMachineChannel.send(effect, amount);
+            }
         }
     }
 
@@ -59,6 +61,9 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
             this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
+        this.audioNodes.effect('chorus', this.getParameterValue('chorusSend', preset));
+        this.audioNodes.effect('reverb', this.getParameterValue('reverbSend', preset));
+        this.audioNodes.effect('delay', this.getParameterValue('delaySend', preset));
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
@@ -67,15 +72,7 @@ export class EstacioDrumMachine extends EstacioBase {
         if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
             this.loadSoundInSampler(this.getParameterValue(nomParametre, preset))
         }
-        if (nomParametre === 'chorusSend'){
-            this.audioNodes.drumMachineChannel.send('chorus',this.getParameterValue(nomParametre, preset));
-        }
-        else if (nomParametre === 'reverbSend'){
-            this.audioNodes.drumMachineChannel.send('reverb',this.getParameterValue(nomParametre, preset));
-        }
-        else if(nomParametre === 'delaySend'){
-            this.audioNodes.drumMachineChannel.send('delay',this.getParameterValue(nomParametre, preset));
-        }
+        this.updateAudioGraphFromState(preset);
     }
 
     playSoundFromUrl(url, time) {
