@@ -37,10 +37,10 @@ export class EstacioDrumMachine extends EstacioBase {
         }
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph
         this.audioNodes = {
-            sampler: new Tone.Sampler().connect(estacioMasterGainNode),
+            sampler: new Tone.Sampler().connect(estacioMasterChannel),
         }
     }
 
