@@ -12,7 +12,7 @@ export const getAudioGraphInstance = () => {
 export class AudioGraph {
     constructor() {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
-        this.estacionsMasterGainNodes = {};
+        this.estacionsMasterChannelNodes = {};
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
         const defaultsForPropertiesInStore = {
@@ -88,8 +88,8 @@ export class AudioGraph {
         return this.store.getState().mainSequencerCurrentStep
     }
 
-    getMasterGainNodeForEstacio(nomEstacio) {
-        return this.estacionsMasterGainNodes[nomEstacio]
+    getMasterChannelNodeForEstacio(nomEstacio) {
+        return this.estacionsMasterChannelNodes[nomEstacio]
     }
     
     buildAudioGraph() {
@@ -114,14 +114,17 @@ export class AudioGraph {
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
-            const estacioMasterGainNode = new Tone.Gain(1.0).connect(this.masterGainNode);
-            estacio.buildEstacioAudioGraph(estacioMasterGainNode);
+            const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            estacio.buildEstacioAudioGraph(estacioMasterChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
-            this.estacionsMasterGainNodes[nomEstacio] = estacioMasterGainNode;
+            this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
         })
         
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
+
+        // Carrega els volumns dels channels de cada estació ara que els objectes ha estan creats
+        getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
     }
     
     async startAudioContext() {

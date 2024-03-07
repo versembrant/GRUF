@@ -17,9 +17,9 @@ export class EstacioSynth extends EstacioBase {
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterGainNode);
+        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
