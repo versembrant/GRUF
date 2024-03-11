@@ -60,6 +60,7 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
             this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
+        // Setegem el guany de la quantitat d'enviament amb el valor en dB del slider corresponent
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);

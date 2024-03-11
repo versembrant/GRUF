@@ -16,23 +16,22 @@ export class EstacioSynth extends EstacioBase {
         cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
-        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: -40, initial: -60},
-        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: -30, initial: -60},
-        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: -30, initial: -60},
+        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
+        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const synthChannel = new Tone.Channel({volume:-12}).connect(estacioMasterChannel);
-        const filtre = new Tone.Filter(500, "lowpass").connect(synthChannel);
+        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
             filtre: filtre,
-            effect: function (effect, amount){
-                return synthChannel.send(effect, amount);
-            }
+            sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
+            sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
+            sendDelayGainNode: estacioMasterChannel.send("delay", -100),
         };
     }
 
@@ -50,9 +49,9 @@ export class EstacioSynth extends EstacioBase {
             'volume': -12,  // Avoid clipping, specially when using sine
         });
         this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset),0.01);
-        this.audioNodes.effect('chorus', this.getParameterValue('chorusSend', preset));
-        this.audioNodes.effect('reverb', this.getParameterValue('reverbSend', preset));
-        this.audioNodes.effect('delay', this.getParameterValue('delaySend', preset));
+        this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
+        this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
+        this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
