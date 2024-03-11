@@ -8,6 +8,9 @@
 <body>
     {% block content %}
     {% endblock %}
+    <script type="text/javascript">
+        const appPrefix = "{{ app_prefix }}";
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='dist/index.js') }}"></script>
     {% block js %}
     {% endblock %}

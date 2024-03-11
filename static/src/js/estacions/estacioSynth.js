@@ -13,7 +13,7 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
-        cutoff: {type: 'float', label: 'Filtre', min: 100, max: 12000, initial: 12000},
+        cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: -40, initial: -60},
@@ -21,9 +21,9 @@ export class EstacioSynth extends EstacioBase {
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: -30, initial: -60},
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const synthChannel = new Tone.Channel({volume:-12}).connect(estacioMasterGainNode);
+        const synthChannel = new Tone.Channel({volume:-12}).connect(estacioMasterChannel);
         const filtre = new Tone.Filter(500, "lowpass").connect(synthChannel);
         const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
         synth.set({maxPolyphony: 16});

@@ -72,6 +72,24 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
     return root;
 }
 
+const exponent = 2;
+
+export const norm2Real = (x, parameterDescription) => {
+    if(parameterDescription.logarithmic){
+        return Math.pow(x, exponent)*(parameterDescription.max-parameterDescription.min)+parameterDescription.min;
+    }else{
+        return x * (parameterDescription.max-parameterDescription.min) + parameterDescription.min;
+    }
+}
+
+export const real2Norm = (x, parameterDescription) => {
+    if(parameterDescription.logarithmic){
+        return Math.pow((x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min), 1/exponent);
+    }else{
+        return (x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min);
+    }
+}
+
 // Util function to check if a beat is a swing beat
 export const necessitaSwing = (numeroBeat) => {
     return ((numeroBeat - 2) % 4) == 0
