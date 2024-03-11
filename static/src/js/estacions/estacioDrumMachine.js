@@ -41,14 +41,13 @@ export class EstacioDrumMachine extends EstacioBase {
         }
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph
-        const drumMachineChannel = new Tone.Channel().connect(estacioMasterGainNode);
         this.audioNodes = {
-            sampler: new Tone.Sampler().connect(drumMachineChannel),
-            sendReverbGainNode: drumMachineChannel.send("reverb", -100),
-            sendChorusGainNode: drumMachineChannel.send("chorus", -100),
-            sendDelayGainNode: drumMachineChannel.send("delay", -100),
+            sampler: new Tone.Sampler().connect(estacioMasterChannel),
+            sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
+            sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
+            sendDelayGainNode: estacioMasterChannel.send("delay", -100),
         }
     }
 

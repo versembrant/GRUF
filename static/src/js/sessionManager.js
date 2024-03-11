@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { sendMessageToServer } from "./serverComs";
 import { ensureValidValue } from "./utils";
@@ -168,7 +169,7 @@ export class EstacioBase {
         }
     }
 
-    buildEstacioAudioGraph(estacioMasterGainNode) {
+    buildEstacioAudioGraph(estacioMasterChannel) {
         return {}
     }
 
@@ -328,20 +329,21 @@ export class Session {
     }
 
     receiveUpdateLiveFromServer(updateData) {
-        const liveActualitat = Object.assign({}, this.getLive());
+        const liveActualitzat = Object.assign({}, this.getLive());
         if (updateData.accio === 'set_gains') {
             Object.keys(updateData.gains_estacions).forEach(nomEstacio => {
-                liveActualitat.gainsEstacions[nomEstacio] = updateData.gains_estacions[nomEstacio];
+                liveActualitzat.gainsEstacions[nomEstacio] = updateData.gains_estacions[nomEstacio];
                 // Update audio graph gain nodes
-                const gainNode = getAudioGraphInstance().getMasterGainNodeForEstacio(nomEstacio);
-                if (gainNode !== undefined){
-                    gainNode.gain.value = updateData.gains_estacions[nomEstacio];
+                const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+                if (channelNode !== undefined){
+                    const volume = Tone.gainToDb(updateData.gains_estacions[nomEstacio]);
+                    channelNode.volume.value = volume;
                 }
                 
             })
         } else if (updateData.accio === 'set_presets') {
             Object.keys(updateData.presets_estacions).forEach(nomEstacio => {
-                liveActualitat.presetsEstacions[nomEstacio] = updateData.presets_estacions[nomEstacio];
+                liveActualitzat.presetsEstacions[nomEstacio] = updateData.presets_estacions[nomEstacio];
                 // Set presets in estacions
                 const estacio = this.getEstacio(nomEstacio)
                 if (estacio.currentPreset != updateData.presets_estacions[nomEstacio]){
@@ -351,7 +353,7 @@ export class Session {
             })
         }
         // Update parametre in store
-        this.setParametreInStore('live', liveActualitat); 
+        this.setParametreInStore('live', liveActualitzat); 
     }
 
     // ARRANJAMENT mode stuff
