@@ -14,7 +14,11 @@ export class EstacioSynth extends EstacioBase {
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
-        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]}
+        //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
+        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
+        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
+        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -24,7 +28,10 @@ export class EstacioSynth extends EstacioBase {
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
-            filtre: filtre 
+            filtre: filtre,
+            sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
+            sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
+            sendDelayGainNode: estacioMasterChannel.send("delay", -100),
         };
     }
 
@@ -41,7 +48,10 @@ export class EstacioSynth extends EstacioBase {
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         });
-        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset), 0.01);
+        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset),0.01);
+        this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
+        this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
+        this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
