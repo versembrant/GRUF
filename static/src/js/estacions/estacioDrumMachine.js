@@ -17,6 +17,10 @@ export class EstacioDrumMachine extends EstacioBase {
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
+        chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
+        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
+
     }
     noteURLsNumbers = {}
 
@@ -41,6 +45,9 @@ export class EstacioDrumMachine extends EstacioBase {
         // Creem els nodes del graph
         this.audioNodes = {
             sampler: new Tone.Sampler().connect(estacioMasterChannel),
+            sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
+            sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
+            sendDelayGainNode: estacioMasterChannel.send("delay", -100),
         }
     }
 
@@ -53,14 +60,27 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
             this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
+        // Setegem el guany de la quantitat d'enviament amb el valor en dB del slider corresponent
+        this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
+        this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
+        this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
-        // Si el parametre que ha canviat és la URL d'un so, el carreguem al sampler
-        // Per els altres parmetres no cal actualitzar res en el graph perquè els steps ja es llegeixen directament del store
+        // Si el paràmetre que ha canviat és la URL d'un so, el carreguem al sampler
+        // Si el paràmetre que ha canviat són els sends, actualitzem el seu valor 
         if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
             this.loadSoundInSampler(this.getParameterValue(nomParametre, preset))
         }
+        if(nomParametre === 'chorusSend'){
+            this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
+            }
+        else if(nomParametre === 'reverbSend'){
+            this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
+            }
+        else if(nomParametre === 'delaySend'){
+            this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
+            }
     }
 
     playSoundFromUrl(url, time) {
