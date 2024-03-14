@@ -16,6 +16,7 @@ export class EstacioDrumMachine extends EstacioBase {
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
+        cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
     }
     noteURLsNumbers = {}
@@ -39,8 +40,10 @@ export class EstacioDrumMachine extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph
+        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
-            sampler: new Tone.Sampler().connect(estacioMasterChannel),
+            sampler: new Tone.Sampler().connect(filtre),
+            filtre: filtre
         }
     }
 
@@ -53,6 +56,7 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
             this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
+        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset), 0.01);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
@@ -60,6 +64,9 @@ export class EstacioDrumMachine extends EstacioBase {
         // Per els altres parmetres no cal actualitzar res en el graph perquè els steps ja es llegeixen directament del store
         if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
             this.loadSoundInSampler(this.getParameterValue(nomParametre, preset))
+        }
+        if (nomParametre === 'cutoff'){
+            this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset), 0.01);
         }
     }
 
