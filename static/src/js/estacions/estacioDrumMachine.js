@@ -47,7 +47,7 @@ export class EstacioDrumMachine extends EstacioBase {
         const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
             sampler: new Tone.Sampler().connect(filtre),
-            filtre: filtre
+            filtre: filtre,
             sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
             sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
             sendDelayGainNode: estacioMasterChannel.send("delay", -100),
