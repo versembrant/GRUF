@@ -16,6 +16,7 @@ export class EstacioDrumMachine extends EstacioBase {
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
+        cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
@@ -43,8 +44,10 @@ export class EstacioDrumMachine extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph
+        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
-            sampler: new Tone.Sampler().connect(estacioMasterChannel),
+            sampler: new Tone.Sampler().connect(filtre),
+            filtre: filtre
             sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
             sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
             sendDelayGainNode: estacioMasterChannel.send("delay", -100),
@@ -60,7 +63,9 @@ export class EstacioDrumMachine extends EstacioBase {
             this.loadSoundInSampler(this.getParameterValue('sound3URL', i));
             this.loadSoundInSampler(this.getParameterValue('sound4URL', i));
         }
-        // Setegem el guany de la quantitat d'enviament amb el valor en dB del slider corresponent
+        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset), 0.01);
+
+        // Setejem el guany de la quantitat d'enviament amb el valor en dB del slider corresponent
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
@@ -72,15 +77,18 @@ export class EstacioDrumMachine extends EstacioBase {
         if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
             this.loadSoundInSampler(this.getParameterValue(nomParametre, preset))
         }
-        if(nomParametre === 'chorusSend'){
+        if (nomParametre === 'cutoff'){
+            this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset), 0.01);
+        }
+        else if(nomParametre === 'chorusSend'){
             this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
-            }
+        }
         else if(nomParametre === 'reverbSend'){
             this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
-            }
+        }
         else if(nomParametre === 'delaySend'){
             this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
-            }
+        }
     }
 
     playSoundFromUrl(url, time) {
