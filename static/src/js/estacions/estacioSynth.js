@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
-import { indexOfArray } from '../utils';
+import { indexOfArrayMatchingObject } from '../utils';
 
 export class EstacioSynth extends EstacioBase {
 
@@ -65,7 +65,7 @@ export class EstacioSynth extends EstacioBase {
         const notes = this.getParameterValue('notes', this.currentPreset);
         const notesToPlay = [];
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
-            if (indexOfArray(notes, [i, currentStep]) > -1){
+            if (indexOfArrayMatchingObject(notes, {'i': i, 'j': currentStep}) > -1){
                 const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
                 const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
                 const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
