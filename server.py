@@ -96,7 +96,7 @@ class Session(object):
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
-            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'drum synth':
+            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'synth':
                 for nom, valors_presets in estacio['parametres'].items():
                     if nom == 'pattern' or nom == 'notes':
                         nous_valors_presets = []
@@ -110,8 +110,6 @@ class Session(object):
                             else:
                                 nous_valors_presets.append([])
                         if changed:
-                            print("FIXING OLD GRID DATA")
-                            sys.stdout.flush()
                             data['estacions'][estacio_nom]['parametres'][nom] = nous_valors_presets
                 
         # Return updated data if all ok
