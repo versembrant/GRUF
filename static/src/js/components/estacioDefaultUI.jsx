@@ -85,6 +85,11 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
+            <div>
+            <button onMouseDown={(evt)=>
+                getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
+            }>Clear</button>
+            </div>
         </div>
     )
 };
