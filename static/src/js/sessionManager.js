@@ -43,6 +43,12 @@ export const registerEstacioDisponible = (estacioClass) => {
     estacionsDisponibles[tipusEstacio] = estacioClass;
 }
 
+let saveSessionAfterLoad = false;
+
+export const shouldSaveSessionAfterLoad = () => {
+    return saveSessionAfterLoad;
+}
+
 export class EstacioBase {
 
     tipus = 'base'
@@ -77,6 +83,11 @@ export class EstacioBase {
             if (initialState !== undefined) {
                 if (initialState.parametres.hasOwnProperty(parameterName)) {
                     initialValues = initialState.parametres[parameterName];
+                } else {
+                    // If parameter was not present in the initial state and we added a default value, we should save the whole session
+                    // state when we finish loading it so the new default parameters will be saved in the server and the parameter is
+                    // properly synchronized with the server
+                    saveSessionAfterLoad = true;
                 }
             }
             reducers[parameterName] = (state = initialValues.map(value => ensureValidValue(value, parameterDescription)), action) => {
@@ -252,6 +263,28 @@ export class Session {
 
     getEstacio(nomEstacio) {
         return this.estacions[nomEstacio];
+    }
+
+    getSessionDataObject() {
+        // Collects all the data of the session and returns it as an object that should be suitable to be stored in a redis store
+        // TODO: some parameters here are set manually (bpm, swing) and this is quite bad because if we add new parameters managed by
+        // the audio engine which are not added here, this would not be included in the updated session data. We should find a way to
+        // specify which parameters should be added here so we don't have to keep updating this function every time we add a new parameter.
+        const data = {};
+        this.propertiesInStore.forEach(propertyName => {
+            data[propertyName] = this.store.getState()[propertyName];
+        })
+        data.estacions = {};
+        this.getNomsEstacions().forEach(nomEstacio => {
+            data.estacions[nomEstacio] = this.getEstacio(nomEstacio).getFullStateObject();
+        })
+        data.bpm = getAudioGraphInstance().getBpm();
+        data.swing = getAudioGraphInstance().getSwing();
+        return data
+    }
+
+    saveDataInServer() {
+        sendMessageToServer('save_session_data', {session_id: this.getID(), full_session_data: this.getSessionDataObject()});
     }
     
     updateParametreSessio(nomParametre, valor) {
