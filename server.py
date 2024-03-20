@@ -94,6 +94,24 @@ class Session(object):
         if 'arranjament' not in data:
             data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
 
+        # Transform old grid saved data to new object-based format
+        for estacio_nom, estacio in data['estacions'].items():
+            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'synth':
+                for nom, valors_presets in estacio['parametres'].items():
+                    if nom == 'pattern' or nom == 'notes':
+                        nous_valors_presets = []
+                        changed = False
+                        for valor in valors_presets:
+                            if valor != []:
+                                if type(valor[0]) != dict:
+                                    nou_valor = [{'i': e[0], 'j': e[1]} for e in valor]
+                                    nous_valors_presets.append(nou_valor)
+                                    changed = True
+                            else:
+                                nous_valors_presets.append([])
+                        if changed:
+                            data['estacions'][estacio_nom]['parametres'][nom] = nous_valors_presets
+                
         # Return updated data if all ok
         return data
         

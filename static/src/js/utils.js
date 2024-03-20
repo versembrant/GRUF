@@ -26,7 +26,7 @@ export const ensureValidValue = (value, parameterDescription) => {
     return value;
 }
 
-// IndexOf like function for arrays of arrays (useful for "grid" parameter type)
+// IndexOf like function for arrays of arrays
 /*
 E.g.:
 indexOfArray([[1,1], [2,3]], [1,1]) = 0
@@ -38,6 +38,31 @@ export const indexOfArray = (arrayOfArrays, targetArray) => {
         let isMatch = true;
         for (let j = 0; j < targetArray.length; j++) {
             if (arrayOfArrays[i][j] !== targetArray[j]) {
+                isMatch = false;
+                break;
+            }
+        }
+        if (isMatch) {
+            return i;
+        }
+    }
+    return -1;  
+}
+
+// IndexOf like function that returns the index of an element in an arrays of objects if such element exists that matches all 
+// the given properties of the target object. Not that the matched element can contain more properties that those provided.
+/*
+E.g.:
+indexOfArrayMatchingObject([{a: 'a', b: 'b'}, {a: 'c', b: 'd'}], {a: 'a', b: 'b'}) = 0
+indexOfArrayMatchingObject([{a: 'a', b: 'b'}, {a: 'c', b: 'd', c: 'c'}], {a: 'c', b: 'd'}) = 1
+indexOfArrayMatchingObject([{a: 'a', b: 'b'}, {a: 'c', b: 'd', c: 'c'}], {a: 'c', b: 't'}) = -1
+*/
+export const indexOfArrayMatchingObject = (arrayOfObjects, targetObjetProperties) => {
+    for (let i = 0; i < arrayOfObjects.length; i++) {
+        // Iterate over key and values of targetObjetProperties and see if they match that of arrayOfObjects[i]
+        let isMatch = true;
+        for (let key in targetObjetProperties) {
+            if (arrayOfObjects[i][key] !== targetObjetProperties[key]) {
                 isMatch = false;
                 break;
             }

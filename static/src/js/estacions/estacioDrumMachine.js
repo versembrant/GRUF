@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
-import { indexOfArray, clamp, necessitaSwing } from '../utils';
+import { indexOfArrayMatchingObject, clamp, necessitaSwing } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioDrumMachine extends EstacioBase {
@@ -102,10 +102,10 @@ export class EstacioDrumMachine extends EstacioBase {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % this.getParameterDescription('pattern').numCols;
         const pattern = this.getParameterValue('pattern', this.currentPreset);
-        const shouldPlaySound1 = indexOfArray(pattern, [0, currentStep]) > -1;
-        const shouldPlaySound2 = indexOfArray(pattern, [1, currentStep]) > -1;
-        const shouldPlaySound3 = indexOfArray(pattern, [2, currentStep]) > -1;
-        const shouldPlaySound4 = indexOfArray(pattern, [3, currentStep]) > -1;
+        const shouldPlaySound1 = indexOfArrayMatchingObject(pattern, {'i': 0, 'j': currentStep}) > -1;
+        const shouldPlaySound2 = indexOfArrayMatchingObject(pattern, {'i': 1, 'j': currentStep}) > -1;
+        const shouldPlaySound3 = indexOfArrayMatchingObject(pattern, {'i': 2, 'j': currentStep}) > -1;
+        const shouldPlaySound4 = indexOfArrayMatchingObject(pattern, {'i': 3, 'j': currentStep}) > -1;
         let modificadorTempsSwingGeneral = 0.0;
         let modificatorTempsSwing1 = 0.0;
         let modificatorTempsSwing2 = 0.0;
