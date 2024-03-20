@@ -1,4 +1,4 @@
-import { Session, getCurrentSession, setCurrentSession, updateCurrentSessionWithNewData } from "../sessionManager";
+import { Session, getCurrentSession, setCurrentSession, updateCurrentSessionWithNewData, shouldSaveSessionAfterLoad } from "../sessionManager";
 import { joinSessionInServer } from "../serverComs";
 import { renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -33,6 +33,14 @@ const onSessionDataLoaded = () => {
     console.log(getCurrentSession());
     console.log(getAudioGraphInstance());
 
+    // Save the session data to the server if needed
+    // This will only be if the loaded session did not have initial values for some of the parameters
+    // of the estacions. This can happen if we're loading an older session with a newer version of an
+    // estació that has more parameters.
+    if (shouldSaveSessionAfterLoad()){
+        getCurrentSession().saveDataInServer();
+    }
+    
     // Render UI
     reactRoot = renderReactComponentInElement(Sessio, 'root', {}, reactRoot)
 }

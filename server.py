@@ -221,7 +221,7 @@ class Session(object):
             self.data['estacions'][nom_estacio]['parametres'][nom_parametre][preset] = valor
             self.save_to_redis()
         except KeyError:
-            pass
+            log(f'Error updating parameter {nom_parametre} for station {nom_estacio} with preset {preset} in session {self.id}, station or parameter not found')
 
 
 def get_stored_sessions():
@@ -329,6 +329,15 @@ def on_request_session_data(data):  # session_id
     if s is None:
         raise Exception('Session not found')
     emit('set_session_data', s.get_full_data())
+
+
+@socketio.on('save_session_data')
+def on_save_session_data(data):  # session_id
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    log(f'Saving session data for session {data['session_id']}')
+    Session(data['full_session_data'])  # This will trigger saving the session to redis and overwriting exsiting one
 
 
 @socketio.on('leave_session')
