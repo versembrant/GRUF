@@ -132,4 +132,12 @@ export class EstacioDrumMachine extends EstacioBase {
             this.playSoundFromUrl(this.getParameterValue('sound4URL', this.currentPreset), time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing4, 0, 1))
         }
     }
+
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+        if (!getAudioGraphInstance().graphIsBuilt()){ return };
+        if (!noteOff){
+            const urls = Object.keys(this.noteURLsNumbers)
+            this.playSoundFromUrl(urls[midiNoteNumber % urls.length], Tone.now());
+        }
+    }
 }
