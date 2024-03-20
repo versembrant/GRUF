@@ -406,6 +406,14 @@ def on_update_master_sequencer_current_step(data):  # session_id, current_step
     emit('update_master_sequencer_current_step', data, to=s.room_name)
 
 
+@socketio.on('midi_event')
+def on_midi_event(data):  # session_id, nom_estacio, midi_event_data
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    emit('midi_event', data, to=s.room_name)
+
+
 app.register_blueprint(bp, url_prefix=f'/{app_prefix}/')
 
 def clean_existing_connected_users():

@@ -25,7 +25,7 @@ export class AudioGraph {
             audioEngineSyncedToRemote: true,
             playing: false,
             playingArranjement: false,
-            swing: 0
+            swing: 0,
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -222,6 +222,28 @@ export class AudioGraph {
             if (this.mainSequencerCurrentStep >= (getCurrentSession().getArranjament().numSteps * getCurrentSession().getArranjament().beatsPerStep) -1){
                 this.transportStop();
             }
+        }
+    }
+
+    sendMidiEvent(nomEstacio, data) {
+        if (!getCurrentSession().localMode) {
+            sendMessageToServer('midi_event', {session_id: getCurrentSession().getID(), nom_estacio: nomEstacio, midi_event_data: data});
+        } else {
+            // In local mode, simulate the message coming from the server and perform the actual action
+            getAudioGraphInstance().receiveMidiEventFromServer(nomEstacio, data)
+        }
+    }
+
+    receiveMidiEventFromServer(nomEstacio, data) {
+        console.log(nomEstacio, data);
+        if (nomEstacio !== undefined) {
+            // If a nomEstacio is provided, only send to the estacio with that name
+            getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
+        } else {
+            // Otherwise send to all estacions
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
+            });
         }
     }
 
