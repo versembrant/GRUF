@@ -4,6 +4,7 @@ import { AudioTransportControls } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { AudioMixerEstacions } from "../components/audioMixerEstacions";
 import { Arranjament } from "../components/arranjament";
+import { EntradaMidi } from "../components/entradaMidi";
 
 const Estacio = ({estacio}) => {
     return (
@@ -35,6 +36,7 @@ export const Sessio = () => {
                 </div>
             </div>
             <Arranjament/>
+            <EntradaMidi/>
         </div>
     )
 };
