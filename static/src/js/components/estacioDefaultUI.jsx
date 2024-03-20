@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArray, real2Norm, norm2Real } from "../utils";
+import { indexOfArrayMatchingObject, real2Norm, norm2Real } from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
@@ -54,8 +54,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
     for (let i = 0; i < numRows; i++) {
         const stepsElements = []
         for (let j = 0; j < numSteps; j++) {
-            const filledClass = indexOfArray(parameterValue, [i, j]) > -1 ? 'filled' : '';
-            console.log()
+            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'filled' : '';
             const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
             stepsElements.push(
             <div 
@@ -63,11 +62,11 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 className={'step ' + filledClass + ' ' + activeStep}
                 onMouseDown={(evt) => {
                     let updatedParameterValue = [...parameterValue]
-                    const index = indexOfArray(parameterValue, [i, j]);
+                    const index = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j});
                     if (index > -1){
                         updatedParameterValue.splice(index, 1);
                     } else {
-                        updatedParameterValue.push([i, j])
+                        updatedParameterValue.push({'i': i, 'j': j})
                     }
                     getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, updatedParameterValue)
                 }}>
@@ -79,7 +78,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
     
     return (
         <div>
-            <p>{parameterDescription.label}: {parameterValue.join('|')}</p>
+            <p>{parameterDescription.label}: {JSON.stringify(parameterValue)}</p>
             <div className="grid-default">
                 {stepsElementsPerRow.map(function(stepsElements, i){
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
