@@ -69,7 +69,7 @@ if (localMode){
     // on retrying until it succeeds.
     checkLoadedCorrectlyInterval = setInterval(() => {
         location.reload();
-    }, 2000)
+    }, 4000)
 
     // In remote mode, all session updates go through the server and come from the server
     joinSessionInServer(sessionID, (data) => {
