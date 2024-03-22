@@ -89,6 +89,45 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
             }>Clear</button>
             </div>
+            <div>
+                Patró:
+                <select>
+                    <option key={"patro0"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
+                    }>Cap</option>
+                    <option key={"patro1"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}])
+                    }>Hip Hop Classic 1</option>
+                    <option key={"patro2"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}])
+                    }>Hip Hop Classic 2</option>
+                    <option key={"patro3"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":15},{"i":2,"j":2},{"i":3,"j":4},{"i":0,"j":11},{"i":3,"j":11},{"i":1,"j":13},{"i":3,"j":13}])
+                    }>Reggae Roots</option>   
+                    <option key={"patro4"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":3,"j":4},{"i":1,"j":2},{"i":3,"j":2},{"i":2,"j":4},{"i":3,"j":6},{"i":0,"j":8},{"i":3,"j":8},{"i":3,"j":10},{"i":2,"j":12},{"i":3,"j":12},{"i":3,"j":14}])
+                    }>Dub Reggae</option>
+                    <option key={"patro5"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":4},{"i":3,"j":8},{"i":2,"j":12}])
+                    }>Soul Pop (Billie Jean)</option>
+                    <option key={"patro6"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":2},{"i":3,"j":8},{"i":1,"j":14},{"i":2,"j":15}])
+                    }>Funky Soul</option>
+                    <option key={"patro7"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":8},{"i":0,"j":0},{"i":3,"j":4},{"i":3,"j":12},{"i":0,"j":14}])
+                    }>Acid House</option>
+                    <option key={"patro8"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":1,"j":7},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":14},{"i":1,"j":15}])
+                    }>Trap 1</option>
+                    <option key={"patro9"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":15},{"i":1,"j":4},{"i":3,"j":4},{"i":1,"j":9},{"i":3,"j":15}])
+                    }>Trap 2</option>
+                    <option key={"patro10"} onMouseDown={(evt)=>
+                        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}])
+                    }>Urban Reggaeton</option>
+                </select>
+            </div>
+
         </div>
     )
 };
