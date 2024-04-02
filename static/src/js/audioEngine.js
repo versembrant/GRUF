@@ -225,15 +225,16 @@ export class AudioGraph {
         }
     }
 
-    sendMidiEvent(nomEstacio, data) {
+    sendMidiEvent(nomEstacio, data, forwardToServer = false) {
         // MIDI notes require the less latency the better, so we always directly invoke the method "receiveMidiEventFromServer" even if we're
         // not in local mode. However, unlike other parameters, we can nto accept repeated note that would be cause by we calling 
         // "receiveMidiEventFromServer" and then "receiveMidiEventFromServer" being called again by the server when the note event hits the
         // server and is sent to all clients (including the client who sent it). To avoid this problem, we ignore received note messages 
         // that originate from the same client (the same socket ID)
         getAudioGraphInstance().receiveMidiEventFromServer(nomEstacio, data);
-        if (!getCurrentSession().localMode) {
+        if (!getCurrentSession().localMode && forwardToServer) {
             data.origin_socket_id = getSocketID();
+            console.log("Sending MIDI event to server")
             sendMessageToServer('midi_event', {session_id: getCurrentSession().getID(), nom_estacio: nomEstacio, midi_event_data: data});
         }
     }

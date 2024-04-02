@@ -2,6 +2,7 @@
 import './serverComs'
 import './audioEngine'
 import './sessionManager'
+import './midi'
 
 // CSS
 import '../styles/index.scss'
