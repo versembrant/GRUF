@@ -1,7 +1,11 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
+import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
 
 export const EntradaMidi = () => {
+
+    let baseNote = 60;
+    document.baseNote = baseNote;
 
     const buildAudioGraphIfNotBuilt = async () => {  
         if (!getAudioGraphInstance().graphIsBuilt()) {
@@ -10,17 +14,38 @@ export const EntradaMidi = () => {
         }
     }
 
+    const getMidiNoteNoteNumber = buttonElement => {
+        if (buttonElement.dataset.midiNote !== undefined) {
+            return baseNote + parseInt(buttonElement.dataset.midiNote, 10);
+        } else {
+            return parseInt(buttonElement.dataset.midiPad, 10);
+        }
+    }
+
     const handleKeyDown = async (evt) => {
         await buildAudioGraphIfNotBuilt()
-        const noteNumber = parseInt(evt.target.dataset.midiNote, 10);
-        sendNoteOn(noteNumber, 127);
+        sendNoteOn(getMidiNoteNoteNumber(evt.target), 127);
     }
 
     const handleKeyUp = async (evt) => {  
         await buildAudioGraphIfNotBuilt()
-        const noteNumber = parseInt(evt.target.dataset.midiNote, 10);
-        sendNoteOff(noteNumber, 127);
+        sendNoteOff(getMidiNoteNoteNumber(evt.target), 127);
     }
+
+    const handleOctaveUp = (evt) => {
+        baseNote += 12;
+        document.baseNote = baseNote;
+    }
+
+    const handleOctaveDown = (evt) => {
+        baseNote -= 12;
+        document.baseNote = baseNote;
+    }
+
+    document.notesActivades = {};
+    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
+        document.notesActivades[nomEstacio] = new Set();
+    });
 
     const sendNoteOn = (noteNumber, noteVelocity) => {
         const messageData =  {
@@ -32,7 +57,8 @@ export const EntradaMidi = () => {
         if (nomEstacio == "all") {
             nomEstacio = undefined;
         }
-        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData);
+        document.notesActivades[nomEstacio].add(noteNumber);
+        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
     }
 
     const sendNoteOff = (noteNumber, noteVelocity) => {
@@ -45,7 +71,23 @@ export const EntradaMidi = () => {
         if (nomEstacio == "all") {
             nomEstacio = undefined;
         }
-        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData);
+        document.notesActivades[nomEstacio].delete(noteNumber);
+        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    }
+
+    const panic = () => {
+        // Sends a note off for all active notes in all devices
+        for (let nomEstacio in document.notesActivades) {
+            document.notesActivades[nomEstacio].forEach((noteNumber) => {
+                const messageData =  {
+                    noteNumber: noteNumber,
+                    velocity: 0,
+                    type: 'noteOff'
+                }
+                document.notesActivades[nomEstacio].delete(noteNumber);
+                getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+            });
+        }
     }
 
     if (document.inputKeyDownEventBinded === undefined){
@@ -70,31 +112,31 @@ export const EntradaMidi = () => {
 
                 // Notes
                 if (evt.key == "a") {
-                    sendNoteOn(60, 127);
+                    sendNoteOn(document.baseNote, 127);
                 } else if (evt.key == "w") {
-                    sendNoteOn(61, 127);
+                    sendNoteOn(document.baseNote + 1, 127);
                 } else if (evt.key == "s") {
-                    sendNoteOn(62, 127);
+                    sendNoteOn(document.baseNote + 2, 127);
                 } else if (evt.key == "e") {
-                    sendNoteOn(63, 127);
+                    sendNoteOn(document.baseNote + 3, 127);
                 } else if (evt.key == "d") {
-                    sendNoteOn(64, 127);
+                    sendNoteOn(document.baseNote + 4, 127);
                 } else if (evt.key == "f") {
-                    sendNoteOn(65, 127);
+                    sendNoteOn(document.baseNote + 5, 127);
                 } else if (evt.key == "t") {
-                    sendNoteOn(66, 127);
+                    sendNoteOn(document.baseNote + 6, 127);
                 } else if (evt.key == "g") {
-                    sendNoteOn(67, 127);
+                    sendNoteOn(document.baseNote + 7, 127);
                 } else if (evt.key == "y") {
-                    sendNoteOn(68, 127);
+                    sendNoteOn(document.baseNote + 8, 127);
                 } else if (evt.key == "h") {
-                    sendNoteOn(69, 127);
+                    sendNoteOn(document.baseNote + 9, 127);
                 } else if (evt.key == "u") {
-                    sendNoteOn(70, 127);
+                    sendNoteOn(document.baseNote + 10, 127);
                 } else if (evt.key == "j") {
-                    sendNoteOn(71, 127);
+                    sendNoteOn(document.baseNote + 11, 127);
                 } else if (evt.key == "k") {
-                    sendNoteOn(72, 127);
+                    sendNoteOn(document.baseNote + 12, 127);
                 } 
             }
         })
@@ -108,42 +150,42 @@ export const EntradaMidi = () => {
             } else {
                 // Drum pads
                 if (evt.key == "1") {
-                    sendNoteOff(0, 127);
+                    sendNoteOff(0, 0);
                 } else if (evt.key == "2") {
-                    sendNoteOff(1, 127);
+                    sendNoteOff(1, 0);
                 } else if (evt.key == "3") {
-                    sendNoteOff(2, 127);
+                    sendNoteOff(2, 0);
                 } else if (evt.key == "4") {
-                    sendNoteOff(3, 127);
+                    sendNoteOff(3, 0);
                 }
 
                 // Notes
                 if (evt.key == "a") {
-                    sendNoteOff(60, 127);
+                    sendNoteOff(document.baseNote, 0);
                 } else if (evt.key == "w") {
-                    sendNoteOff(61, 127);
+                    sendNoteOff(document.baseNote + 1, 0);
                 } else if (evt.key == "s") {
-                    sendNoteOff(62, 127);
+                    sendNoteOff(document.baseNote + 2, 0);
                 } else if (evt.key == "e") {
-                    sendNoteOff(63, 127);
+                    sendNoteOff(document.baseNote + 3, 0);
                 } else if (evt.key == "d") {
-                    sendNoteOff(64, 127);
+                    sendNoteOff(document.baseNote + 4, 0);
                 } else if (evt.key == "f") {
-                    sendNoteOff(65, 127);
+                    sendNoteOff(document.baseNote + 5, 0);
                 } else if (evt.key == "t") {
-                    sendNoteOff(66, 127);
+                    sendNoteOff(document.baseNote + 6, 0);
                 } else if (evt.key == "g") {
-                    sendNoteOff(67, 127);
+                    sendNoteOff(document.baseNote + 7, 0);
                 } else if (evt.key == "y") {
-                    sendNoteOff(68, 127);
+                    sendNoteOff(document.baseNote + 8, 0);
                 } else if (evt.key == "h") {
-                    sendNoteOff(69, 127);
+                    sendNoteOff(document.baseNote + 9, 0);
                 } else if (evt.key == "u") {
-                    sendNoteOff(70, 127);
+                    sendNoteOff(document.baseNote + 10, 0);
                 } else if (evt.key == "j") {
-                    sendNoteOff(71, 127);
+                    sendNoteOff(document.baseNote + 11, 0);
                 } else if (evt.key == "k") {
-                    sendNoteOff(72, 127);
+                    sendNoteOff(document.baseNote + 12, 0);
                 } 
             }
         })
@@ -153,29 +195,58 @@ export const EntradaMidi = () => {
         <div>
             <h2>Entrada MIDI</h2>
             <div>
-                Estació: 
-                <select id="entradaMidiNomEstacio">
-                    <option value="all">Totes</option>
+                Enviar a estació: 
+                <select 
+                    id="entradaMidiNomEstacio"
+                    defaultValue={getCurrentSession().getNomsEstacions()[0]}>
                     {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option key={nomEstacio} value={nomEstacio}>{nomEstacio}</option>)}
                 </select>
             </div>
             <div>
-                <button data-midi-note="0" onMouseDown={handleKeyDown}>Pad #1</button>
-                <button data-midi-note="1" onMouseDown={handleKeyDown}>Pad #2</button>
-                <button data-midi-note="2" onMouseDown={handleKeyDown}>Pad #3</button>
-                <button data-midi-note="3" onMouseDown={handleKeyDown}>Pad #4</button>
+                <label>Enviar al servidor: <input id="forwardToServer" type="checkbox" defaultChecked={false} /></label>
             </div>
             <div>
-                <button data-midi-note="60" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>C</button>
-                <button data-midi-note="62" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>D</button>
-                <button data-midi-note="64" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>E</button>
-                <button data-midi-note="65" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>F</button>
-                <button data-midi-note="67" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>G</button>
-                <button data-midi-note="69" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>A</button>
-                <button data-midi-note="71" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>B</button>
-                <button data-midi-note="72" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp}>C</button>
+                <button data-midi-pad="0" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #1</button>
+                <button data-midi-pad="1" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #2</button>
+                <button data-midi-pad="2" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #3</button>
+                <button data-midi-pad="3" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #4</button>
+            </div>
+            <div>
+                <button data-midi-note="0" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>C</button>
+                <button data-midi-note="2" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>D</button>
+                <button data-midi-note="4" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>E</button>
+                <button data-midi-note="5" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>F</button>
+                <button data-midi-note="7" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>G</button>
+                <button data-midi-note="9" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>A</button>
+                <button data-midi-note="11" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>B</button>
+                <button data-midi-note="12" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>C</button>
+                <button onClick={handleOctaveDown}>Octave down</button>
+                <button onClick={handleOctaveUp}>Octave up</button>
             </div>
             <div>Pots tocar els pads amb les tecles 1, 2, 3, 4. Pots tocar el "piano" amb les tecles a, w, s, e, d...</div>
+            {isWebMidiEnabled() && 
+                <div>
+                    <select
+                        onChange={async (evt) => {
+                            await buildAudioGraphIfNotBuilt();
+                            bindMidiInputOnMidiMessage(evt.target.value, (midiMessage) => {
+                                if (midiMessage.data[0] === 144) {
+                                    // Note on
+                                    sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
+                                } else if (midiMessage.data[0] === 128) {
+                                    // Note off
+                                    sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
+                                }
+                            });
+                        }}>
+                        <option value="cap">Cap</option>
+                        {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
+                    </select>
+                </div>
+            }
+            <div>
+                <button onClick={panic}>Panic</button>
+            </div>
         </div>
     )
 };
