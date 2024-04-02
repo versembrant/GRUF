@@ -79,9 +79,7 @@ export class EstacioSynth extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
-            // Trigger notw with a duration of 10 seconds. This will be the maximum duration if no "note off" arrives before.
-            // This is to avoid forever hanging notes if there are problems.
-            this.audioNodes.synth.triggerAttackRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], 10.0, Tone.now());
+            this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         } else {
             this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         }
