@@ -6,7 +6,7 @@ import hashlib
 from collections import defaultdict
 
 from flask import Flask, render_template, request, redirect, url_for, Blueprint
-from werkzeug.utils import safe_join
+from werkzeug.utils import safe_join, secure_filename
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
 
@@ -20,6 +20,7 @@ test = int(os.getenv('TEST', 0)) == 1
 r = redis.Redis(host='redis' if not test else 'redis-test', port=16379, db=0)
 app = Flask(__name__, static_url_path='/static' if not app_prefix else f'/{app_prefix}/static', static_folder='static')
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5, path='socket.io' if not app_prefix else f'{app_prefix}/socket.io')
 available_sessions_room_name = 'available_sessions'
 usernames_connected_per_session = defaultdict(list)
@@ -87,6 +88,8 @@ class Session(object):
         # Set default values for some properties
         if 'connected_users' not in data:
             data['connected_users'] = []
+        if 'recorded_files' not in data:
+            data['recorded_files'] = self.get_recorded_files_from_disk()
         if 'bpm' not in data:
             data['bpm'] = 120
         if 'swing' not in data:
@@ -142,12 +145,29 @@ class Session(object):
     @property
     def room_name(self):
         return self.id
+    
+    @property
+    def audio_files_path(self):
+        return os.path.join(app.config['UPLOAD_FOLDER'], self.id)
+    
+    @property
+    def audio_files_url(self):
+        return f'/{app_prefix}/static/uploads/{self.id}/'
+    
+    def get_recorded_files_from_disk(self):
+        recorded_files = []
+        for f in os.listdir(self.audio_files_path):
+            recorded_files.append(f)
+        return recorded_files
 
     def save_to_redis(self):
         r.set(self.cache_key, json.dumps(self.get_full_data()))
 
     def delete_from_redis(self):
         r.delete(self.cache_key)
+
+    def delete_audio_files(self):
+        os.system(f'rm -rf {self.audio_files_path}')
 
     def get_full_data(self):
         return self.data
@@ -173,13 +193,16 @@ class Session(object):
             self.update_parametre_sessio('connected_users', [])
             notifica_available_sessions()
 
-    def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio'):
+    def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio', no_context=False):
         # NOTE: en aquest cas tenim un 'emit_msg_name' parametre perquè els paràmetres relacionat amb àudio han de fer
         # servir un nom de missatge diferent perquè el client els pugui diferenciar i tractar-los de forma diferent (encara
         # que siguin paràmetres de la sessió).
         # Envia el nou paràmetre als clients connectats
         update_count_per_session[self.id] += 1
-        emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+        if no_context:
+            socketio.emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+        else:
+            emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
         
         # Guarda el canvi a la sessió al servidor
         self.data[nom_parametre] = valor  
@@ -248,6 +271,7 @@ def get_session_by_id(id):
 def delete_session_by_id(id):
     s_to_delete = get_session_by_id(id)
     if s_to_delete is not None:
+        s_to_delete.delete_audio_files()
         s_to_delete.delete_from_redis()
         
 
@@ -295,6 +319,51 @@ def session(session_id):
 def delete_session(session_id):
     delete_session_by_id(session_id)
     return redirect(url_for('app.llista_sessions'))
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'webm', 'wav', 'mp3', 'mp4', 'ogg'}
+
+
+@bp.route('/upload_file/<session_id>/', methods=['POST'])
+def upload_file(session_id):
+    s = get_session_by_id(session_id)
+    if s is None:
+        raise Exception('Session not found')
+    folder_path = s.audio_files_path
+    os.makedirs(folder_path, mode=0o777, exist_ok=True)
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return {'error': True, 'message': 'No file part'}
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            return {'error': True, 'message': 'Empty filename'}
+        if file and allowed_file(file.filename):
+            # Save file
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(folder_path, filename)
+            file.save(file_path)
+
+            # Convert to wav
+            wav_filename = filename.split('.')[0] + '.wav'
+            wav_file_path = os.path.join(folder_path, wav_filename)
+            os.system(f'ffmpeg -i {file_path} -c:a pcm_s16le -ar 44100 {wav_file_path}')
+            os.chmod(wav_file_path, 0o0777)
+            os.remove(file_path)
+
+            # Update all clients with list of recorded audio files
+            s.update_parametre_sessio('recorded_files', s.get_recorded_files_from_disk(), no_context=True)
+            
+            # Return URL
+            file_url = f'{s.audio_files_url}/{wav_filename}'
+            return {'error': False, 'url': file_url}
+        else:
+            return {'error': True, 'message': 'File not allowed'}
+    return {'error': True, 'message': 'No post request'}
 
 
 @socketio.on('disconnect')
