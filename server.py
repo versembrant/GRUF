@@ -359,7 +359,7 @@ def upload_file(session_id):
             s.update_parametre_sessio('recorded_files', s.get_recorded_files_from_disk(), no_context=True)
             
             # Return URL
-            file_url = f'{s.audio_files_url}/{wav_filename}'
+            file_url = f'{s.audio_files_url}{wav_filename}'
             return {'error': False, 'url': file_url}
         else:
             return {'error': True, 'message': 'File not allowed'}
