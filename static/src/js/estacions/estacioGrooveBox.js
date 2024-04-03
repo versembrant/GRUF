@@ -10,20 +10,20 @@ export class EstacioGrooveBox extends EstacioBase {
     parametersDescription = {
         sound1URL: {type: 'text', label: 'Clap', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // Clap
         swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0},
-        tone1: {type: 'float', label: 'Tone1', min: -12, max: 12, initial: 1},
-        volume1: {type: 'float', label: 'KickVolume', min: -60, max: 6, initial: 0},
+        tone1: {type: 'float', label: 'Tone1', min: 0.25, max: 6, initial: 1},
+        volume1: {type: 'float', label: 'ClapVolume', min: -60, max: 6, initial: 0},
         sound2URL: {type: 'text', label: 'HiHat', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, // Hat
         swing2: {type: 'float', label: 'Swing2', min: 0, max: 1, initial: 0},
-        tone2: {type: 'float', label: 'Tone2', min: -12, max: 12, initial: 1},
-        volume2: {type: 'float', label: 'SnareVolume', min: -60, max: 6, initial: 0},
+        tone2: {type: 'float', label: 'Tone2', min: 0.25, max: 6, initial: 1},
+        volume2: {type: 'float', label: 'HihatVolume', min: -60, max: 6, initial: 0},
         sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
-        tone3: {type: 'float', label: 'Tone3', min: -12, max: 12, initial: 1},
-        volume3: {type: 'float', label: 'HihatVolume', min: -60, max: 6, initial: 0},
+        tone3: {type: 'float', label: 'Tone3', min: 0.25, max: 6, initial: 1},
+        volume3: {type: 'float', label: 'SnareVolume', min: -60, max: 6, initial: 0},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
-        tone4: {type: 'float', label: 'Tone4', min: -12, max: 12, initial: 1},
-        volume4: {type: 'float', label: 'ClapVolume', min: -60, max: 6, initial: 0},
+        tone4: {type: 'float', label: 'Tone4', min: 0.25, max: 6, initial: 1},
+        volume4: {type: 'float', label: 'KickVolume', min: -60, max: 6, initial: 0},
         cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
@@ -43,7 +43,7 @@ export class EstacioGrooveBox extends EstacioBase {
         // Creem els nodes del graph
         const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
-            kick: new Tone.Player({}).connect(filtre),
+            kick: new Tone.Player({playbackRate:0.25}).connect(filtre),
             snare: new Tone.Player({playbackRate:1}).connect(filtre),
             hihat: new Tone.Player({playbackRate:1}).connect(filtre),
             clap: new Tone.Player({playbackRate:1}).connect(filtre),
