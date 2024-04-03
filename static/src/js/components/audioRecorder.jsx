@@ -103,7 +103,6 @@ export const AudioRecorder = () => {
     return (
         <div>
             <h2>MIC Recorder</h2>
-            <div>{ getCurrentSession().getRecordedFiles().length } recorded files</div>
             <div>
                 <button id="startRecording" onClick={handleRecButton} disabled={isRecButtonDisabled}>Record</button>
                 <button id="stopRecording" onClick={handleStopButton} disabled={isStopButtonDisabled}>Stop recording</button>
@@ -116,6 +115,14 @@ export const AudioRecorder = () => {
                 <button id="sendToServerButton" disabled={isSendButtonDisabled} onClick={handleSendToServerButton}>Send to server</button>
                 <span id="serverFileURL"></span>
             </div>
+            <div>{ getCurrentSession().getRecordedFiles().length } recorded files
+            <ul>
+                { getCurrentSession().getRecordedFiles().map((file, index) => {
+                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} targte="_blank">{"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a></li>
+                })}
+            </ul>
+            </div>
+            
         </div>
     )
 };
