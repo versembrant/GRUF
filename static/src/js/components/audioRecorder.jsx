@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { clamp } from '../utils';
-
+import { subscribeToStoreChanges } from "../utils";
 
 const recorder = new Tone.Recorder();
 const meter = new Tone.Meter();
@@ -15,6 +15,8 @@ let startedRecordingTime = undefined;
 let recording = undefined;
 
 export const AudioRecorder = () => {
+
+    subscribeToStoreChanges(getCurrentSession());
     
     const handleRecButton = async () => {  
         await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
@@ -101,6 +103,7 @@ export const AudioRecorder = () => {
     return (
         <div>
             <h2>MIC Recorder</h2>
+            <div>{ getCurrentSession().getRecordedFiles().length } recorded files</div>
             <div>
                 <button id="startRecording" onClick={handleRecButton} disabled={isRecButtonDisabled}>Record</button>
                 <button id="stopRecording" onClick={handleStopButton} disabled={isStopButtonDisabled}>Stop recording</button>
