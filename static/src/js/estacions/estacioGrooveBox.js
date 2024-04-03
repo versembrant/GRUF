@@ -11,15 +11,19 @@ export class EstacioGrooveBox extends EstacioBase {
         sound1URL: {type: 'text', label: 'Clap', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // Clap
         swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0},
         tone1: {type: 'float', label: 'Tone1', min: -12, max: 12, initial: 1},
+        volume1: {type: 'float', label: 'KickVolume', min: -60, max: 6, initial: 0},
         sound2URL: {type: 'text', label: 'HiHat', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, // Hat
         swing2: {type: 'float', label: 'Swing2', min: 0, max: 1, initial: 0},
-        tone2: {type: 'float', label: 'Tone1', min: -12, max: 12, initial: 1},
+        tone2: {type: 'float', label: 'Tone2', min: -12, max: 12, initial: 1},
+        volume2: {type: 'float', label: 'SnareVolume', min: -60, max: 6, initial: 0},
         sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
-        tone3: {type: 'float', label: 'Tone1', min: -12, max: 12, initial: 1},
+        tone3: {type: 'float', label: 'Tone3', min: -12, max: 12, initial: 1},
+        volume3: {type: 'float', label: 'HihatVolume', min: -60, max: 6, initial: 0},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
-        tone4: {type: 'float', label: 'Tone1', min: -12, max: 12, initial: 1},
+        tone4: {type: 'float', label: 'Tone4', min: -12, max: 12, initial: 1},
+        volume4: {type: 'float', label: 'ClapVolume', min: -60, max: 6, initial: 0},
         cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
@@ -27,19 +31,6 @@ export class EstacioGrooveBox extends EstacioBase {
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
 
     }
-
-   /*  grooveBoxSamples = new Tone.ToneAudioBuffers({
-        urls: {},    
-    }, ()=> console.log('loaded'));
-    
-    loadSoundinBuffer(sampleName, url) {
-        if (["kick", "snare", "hihat", "clap"].includes(sampleName)) {
-            if (!this.grooveBoxSamples.urls) {
-                this.grooveBoxSamples.urls = {};
-                this.grooveBoxSamples.urls[sampleName] = url;
-            }
-        }
-    } */
 
     loadSoundinPlayer (playerName, url){
         if (["kick", "snare", "hihat", "clap"].includes(playerName)) {
@@ -52,10 +43,10 @@ export class EstacioGrooveBox extends EstacioBase {
         // Creem els nodes del graph
         const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
-            kick: new Tone.Player().connect(filtre),
-            snare: new Tone.Player().connect(filtre),
-            hihat: new Tone.Player().connect(filtre),
-            clap: new Tone.Player().connect(filtre),
+            kick: new Tone.Player({}).connect(filtre),
+            snare: new Tone.Player({playbackRate:1}).connect(filtre),
+            hihat: new Tone.Player({playbackRate:1}).connect(filtre),
+            clap: new Tone.Player({playbackRate:1}).connect(filtre),
 
             //sampler: new Tone.Sampler().connect(filtre),
             filtre: filtre,
@@ -64,6 +55,15 @@ export class EstacioGrooveBox extends EstacioBase {
             sendDelayGainNode: estacioMasterChannel.send("delay", -100),
         }
     }
+
+    applyPlayerSettings(playerName, playbackRate, volume){
+        if (["kick", "snare", "hihat", "clap"].includes(playerName)) {
+            let player = this.audioNodes[playerName];
+            player.playbackRate = playbackRate;
+            player.volume.value = volume;
+        }
+    }
+     
 
     updateAudioGraphFromState(preset) {
         // Carreguem tots els sons de tots els presets (si n'hi ha de repetits es carregaran només un cop)
@@ -80,6 +80,14 @@ export class EstacioGrooveBox extends EstacioBase {
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
+        
+        // Setejem les propietats dels players funció de l'estat del paràmetre corresponent
+
+        this.applyPlayerSettings('kick',this.getParameterValue('tone1',preset), this.getParameterValue('volume1',preset));
+        this.applyPlayerSettings('snare',this.getParameterValue('tone2',preset), this.getParameterValue('volume2',preset));
+        this.applyPlayerSettings('hihat',this.getParameterValue('tone3',preset), this.getParameterValue('volume3',preset));
+        this.applyPlayerSettings('clap',this.getParameterValue('tone4',preset), this.getParameterValue('volume4',preset));
+
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
@@ -100,15 +108,20 @@ export class EstacioGrooveBox extends EstacioBase {
         else if(nomParametre === 'delaySend'){
             this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
         }
-
+        //Si el paràmetre que ha canviat són les propietats dels players
+        else if(nomParametre === 'tone1' || nomParametre === 'volume1'){
+            this.applyPlayerSettings('kick',this.getParameterValue('tone1',preset), this.getParameterValue('volume1',preset));
+        }
+        else if(nomParametre === 'tone2' || nomParametre === 'volume2'){
+            this.applyPlayerSettings('snare',this.getParameterValue('tone2',preset), this.getParameterValue('volume2',preset));
+        }
+        else if(nomParametre === 'tone3' || nomParametre === 'volume3'){
+            this.applyPlayerSettings('hihat',this.getParameterValue('tone3',preset), this.getParameterValue('volume3',preset));
+        }
+        else if(nomParametre === 'tone4' || nomParametre === 'volume4'){
+            this.applyPlayerSettings('clap',this.getParameterValue('tone4',preset), this.getParameterValue('volume4',preset));
+        }
     }
-
-    /*  playSoundFromBuffer(sampleName, time) {
-        const instrumentPlayer = this.audioNodes[sampleName];
-        instrumentPlayer.buffer = this.grooveBoxSamples.get(sampleName)
-        instrumentPlayer.start(time);
-        
-    } */
 
     playSoundFromPlayer (playerName, time){
         if (["kick", "snare", "hihat", "clap"].includes(playerName)) {
@@ -151,12 +164,12 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
 
-    /*onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
             const urls = Object.keys(this.noteURLsNumbers)
             this.playSoundFromUrl(urls[midiNoteNumber % urls.length], Tone.now());
         }
-    }*/
+    }
 
 }
