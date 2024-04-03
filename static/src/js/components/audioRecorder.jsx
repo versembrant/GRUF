@@ -55,21 +55,43 @@ export const AudioRecorder = () => {
     }
 
     const handleSendToServerButton = () => {
-
-
-        const anchor = document.createElement("a");
-        anchor.download = "recording.webm";
-        anchor.href = URL.createObjectURL(recording);
-        anchor.click();
-
-        // Send to server and when received, make the URL visible
-        const url = 'http://fake.url'
-        document.getElementById("serverFileURL").innerHTML = 'Sent to server!: <a href="' + url + '" target="_blank">' + url + '</a>';
-        setTimeout(() => {
-            document.getElementById("serverFileURL").innerHTML = "";
-            document.getElementById("recordingLength").innerText = "";
-            setSendButtonDisabled(true);
-        }, 5000);
+        const uploadFileUrl = appPrefix + '/upload_file/' + getCurrentSession().getID() + '/';
+        const extension = recorder.mimeType.split('/')[1].split(';')[0];
+        const filename = 'file_' + Date.now() + '.' + extension;
+        console.log('Uploading ' + filename)
+        var fd = new FormData();
+        fd.append('file', recording, filename);
+        fetch(uploadFileUrl, { 
+            method: "POST", 
+            body: fd,
+        }) 
+        .then(response => {
+            response.json().then(data => {
+                if (!data.error){
+                    document.getElementById("serverFileURL").innerHTML = 'Sent to server!: <a href="' + data.url + '" target="_blank">' + data.url + '</a>';
+                    setTimeout(() => {
+                        document.getElementById("serverFileURL").innerHTML = "";
+                        document.getElementById("recordingLength").innerText = "";
+                        setSendButtonDisabled(true);
+                    }, 5000);
+                } else {
+                    document.getElementById("serverFileURL").innerHTML = 'Error uploading file: ' + data.message;
+                    setTimeout(() => {
+                        document.getElementById("serverFileURL").innerHTML = "";
+                        document.getElementById("recordingLength").innerText = "";
+                        setSendButtonDisabled(true);
+                    }, 5000);
+                }    
+            });        
+        }) 
+        .catch(err => {
+            document.getElementById("serverFileURL").innerHTML = 'Error uploading file';
+            setTimeout(() => {
+                document.getElementById("serverFileURL").innerHTML = "";
+                document.getElementById("recordingLength").innerText = "";
+                setSendButtonDisabled(true);
+            }, 5000);
+        });  
     }
 
     const [isRecButtonDisabled, setRecButtonDisabled] = useState(false);
