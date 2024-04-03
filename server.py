@@ -6,7 +6,7 @@ import hashlib
 from collections import defaultdict
 
 from flask import Flask, render_template, request, redirect, url_for, Blueprint
-from werkzeug.utils import safe_join
+from werkzeug.utils import safe_join, secure_filename
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
 
@@ -20,6 +20,8 @@ test = int(os.getenv('TEST', 0)) == 1
 r = redis.Redis(host='redis' if not test else 'redis-test', port=16379, db=0)
 app = Flask(__name__, static_url_path='/static' if not app_prefix else f'/{app_prefix}/static', static_folder='static')
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET') or 'secret!'
+app.config['UPLOAD_FOLDER'] = 'uploads'
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 socketio = SocketIO(app, message_queue="redis://redis:16379/1", ping_timeout=5, ping_interval=5, path='socket.io' if not app_prefix else f'{app_prefix}/socket.io')
 available_sessions_room_name = 'available_sessions'
 usernames_connected_per_session = defaultdict(list)
@@ -295,6 +297,39 @@ def session(session_id):
 def delete_session(session_id):
     delete_session_by_id(session_id)
     return redirect(url_for('app.llista_sessions'))
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'webm', 'wav', 'mp3', 'mp4', 'ogg'}
+
+
+@bp.route('/upload_file/<session_id>/', methods=['POST'])
+def upload_file(session_id):
+    s = get_session_by_id(session_id)
+    if s is None:
+        raise Exception('Session not found')
+    folder_path = os.path.join(app.config['UPLOAD_FOLDER'], session_id)
+    os.makedirs(folder_path, exist_ok=True)
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return {'error': True, 'message': 'No file part'}
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            return {'error': True, 'message': 'Empty filename'}
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(folder_path, filename)
+            log('Saved file to:' + file_path)
+            file.save(file_path)
+            # TODO: return here the download URL, not the file path
+            return {'error': False, 'url': file_path}
+        else:
+            return {'error': True, 'message': 'File not allowed'}
+    return {'error': True, 'message': 'No post request'}
 
 
 @socketio.on('disconnect')
