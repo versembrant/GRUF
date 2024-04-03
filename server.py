@@ -89,7 +89,7 @@ class Session(object):
         if 'connected_users' not in data:
             data['connected_users'] = []
         if 'recorded_files' not in data:
-            data['recorded_files'] = self.get_recorded_files_from_disk()
+            data['recorded_files'] = []
         if 'bpm' not in data:
             data['bpm'] = 120
         if 'swing' not in data:
