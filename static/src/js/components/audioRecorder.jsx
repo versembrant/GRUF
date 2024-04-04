@@ -118,7 +118,7 @@ export const AudioRecorder = () => {
             <div>{ getCurrentSession().getRecordedFiles().length } recorded files
             <ul>
                 { getCurrentSession().getRecordedFiles().map((file, index) => {
-                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} targte="_blank">{"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a></li>
+                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/bruixit/")[0] + "/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a></li>
                 })}
             </ul>
             </div>
