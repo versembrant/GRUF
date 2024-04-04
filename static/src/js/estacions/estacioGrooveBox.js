@@ -34,7 +34,12 @@ export class EstacioGrooveBox extends EstacioBase {
 
     loadSoundinPlayer (playerName, url){
         if (["kick", "snare", "hihat", "clap"].includes(playerName)) {
-            this.audioNodes[playerName].load(url);
+            const player = this.audioNodes[playerName];
+            if (player.buffer && player.buffer.url === url){
+                console.log(`El Player ${playerName} ja té la URL ${url} cargada.`);
+                return;
+            }
+            player.load(url);
         }
     }
 
@@ -124,7 +129,7 @@ export class EstacioGrooveBox extends EstacioBase {
     }
 
     playSoundFromPlayer (playerName, time){
-        if (["kick", "snare", "hihat", "clap"].includes(playerName)) {
+        if (["kick", "snare", "hihat", "clap"].includes(playerName) && this.audioNodes[playerName].loaded ===true) {
             this.audioNodes[playerName].start(time);
         }
     }
