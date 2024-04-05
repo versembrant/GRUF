@@ -59,7 +59,7 @@ export const AudioRecorder = () => {
     const handleSendToServerButton = () => {
         const uploadFileUrl = appPrefix + '/upload_file/' + getCurrentSession().getID() + '/';
         const extension = recorder.mimeType.split('/')[1].split(';')[0];
-        const filename = 'file_' + new Date.toISOString().replaceAll(':', '-') + '.' + extension;
+        const filename = 'file_' + new Date().toISOString().replaceAll(':', '-') + '.' + extension;
         var fd = new FormData();
         fd.append('file', recording, filename);
         fetch(uploadFileUrl, { 
