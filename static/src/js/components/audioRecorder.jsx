@@ -59,8 +59,7 @@ export const AudioRecorder = () => {
     const handleSendToServerButton = () => {
         const uploadFileUrl = appPrefix + '/upload_file/' + getCurrentSession().getID() + '/';
         const extension = recorder.mimeType.split('/')[1].split(';')[0];
-        const filename = 'file_' + Date.now() + '.' + extension;
-        console.log('Uploading ' + filename)
+        const filename = 'file_' + new Date.toISOString().replaceAll(':', '-') + '.' + extension;
         var fd = new FormData();
         fd.append('file', recording, filename);
         fetch(uploadFileUrl, { 
@@ -76,6 +75,12 @@ export const AudioRecorder = () => {
                         document.getElementById("recordingLength").innerText = "";
                         setSendButtonDisabled(true);
                     }, 5000);
+
+                    if (getCurrentSession().localMode) {
+                        // In local mode, simulate receiving a parameter update with the updated list of avialable files
+                        getCurrentSession().receiveUpdateParametreSessioFromServer('recorded_files', data.recorded_files)
+                    }
+
                 } else {
                     document.getElementById("serverFileURL").innerHTML = 'Error uploading file: ' + data.message;
                     setTimeout(() => {
@@ -94,6 +99,25 @@ export const AudioRecorder = () => {
                 setSendButtonDisabled(true);
             }, 5000);
         });  
+    }
+
+    const handleRemoveFileButton = (evt) => {
+        filename = evt.target.dataset.filename;
+        const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
+        var fd = new FormData();
+        fd.append('filename', filename);
+        fetch(deleteFileUrl, { 
+            method: "POST", 
+            body: fd,
+        })
+        .then(response => {
+            response.json().then(data => {
+                if (!data.error){
+                    // In local mode, simulate receiving a parameter update with the updated list of avialable files
+                    getCurrentSession().receiveUpdateParametreSessioFromServer('recorded_files', data.recorded_files)
+                }
+            });
+        })
     }
 
     const [isRecButtonDisabled, setRecButtonDisabled] = useState(false);
@@ -118,7 +142,7 @@ export const AudioRecorder = () => {
             <div>{ getCurrentSession().getRecordedFiles().length } recorded files
             <ul>
                 { getCurrentSession().getRecordedFiles().map((file, index) => {
-                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/bruixit/")[0] + "/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a></li>
+                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/bruixit/")[0] + "/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a> <button data-filename={file} onClick={handleRemoveFileButton}>Delete</button></li>
                 })}
             </ul>
             </div>

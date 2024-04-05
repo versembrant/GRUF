@@ -356,14 +356,34 @@ def upload_file(session_id):
             os.remove(file_path)
 
             # Update all clients with list of recorded audio files
-            s.update_parametre_sessio('recorded_files', s.get_recorded_files_from_disk(), no_context=True)
+            recorded_files = s.get_recorded_files_from_disk()
+            s.update_parametre_sessio('recorded_files', recorded_files, no_context=True)
             
-            # Return URL
+            # Return URL and list of recorded files (useful in local mode to update the list of recorded files in the client)
             file_url = f'{s.audio_files_url}{wav_filename}'
-            return {'error': False, 'url': file_url}
+            return {'error': False, 'url': file_url, 'recorded_files': recorded_files}
         else:
             return {'error': True, 'message': 'File not allowed'}
     return {'error': True, 'message': 'No post request'}
+
+
+@bp.route('/delete_file/<session_id>/', methods=['POST'])
+def delete_file(session_id):
+    s = get_session_by_id(session_id)
+    if s is None:
+        raise Exception('Session not found')
+    folder_path = s.audio_files_path
+    if request.method == 'POST':
+        filename = request.form['filename']
+        filepath = os.path.join(folder_path, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            # Update all clients with list of recorded audio files
+            recorded_files = s.get_recorded_files_from_disk()
+            s.update_parametre_sessio('recorded_files', recorded_files, no_context=True)
+            return {'error': False, 'recorded_files': recorded_files}
+        return {'error': True, 'message': 'File does not exist'}
+    return {'error': True, 'message': 'No post rewuest'}
 
 
 @socketio.on('disconnect')
