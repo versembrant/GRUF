@@ -14,15 +14,15 @@ export class EstacioGrooveBox extends EstacioBase {
         volume1: {type: 'float', label: 'ClapVolume', min: -60, max: 6, initial: 0, logarithmic: true},
         sound2URL: {type: 'text', label: 'HiHat', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, // Hat
         swing2: {type: 'float', label: 'Swing2', min: 0, max: 1, initial: 0},
-        tone2: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
+        tone2: {type: 'enum', label: 'Tone2', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
         volume2: {type: 'float', label: 'HihatVolume', min: -60, max: 6, initial: 0, logarithmic: true},
         sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/693/693151_14904072-hq.mp3'}, // Snare
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0},
-        tone3: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
+        tone3: {type: 'enum', label: 'Tone3', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
         volume3: {type: 'float', label: 'SnareVolume', min: -60, max: 6, initial: 0, logarithmic: true},
         sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/274/274775_4965320-hq.mp3'}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0},
-        tone4: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
+        tone4: {type: 'enum', label: 'Tone4', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','1','2','3','4','5','6','7','8','9','10','11','12'], initial: '1'},
         volume4: {type: 'float', label: 'KickVolume', min: -60, max: 6, initial: 0, logarithmic: true},
         cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
@@ -48,10 +48,10 @@ export class EstacioGrooveBox extends EstacioBase {
         // Creem els nodes del graph
         const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         this.audioNodes = {
-            kick: new Tone.Player({playbackRate:0.25}).connect(filtre),
-            snare: new Tone.Player({playbackRate:1}).connect(filtre),
-            hihat: new Tone.Player({playbackRate:1}).connect(filtre),
-            clap: new Tone.Player({playbackRate:1}).connect(filtre),
+            kick: new Tone.Player().connect(filtre),
+            snare: new Tone.Player().connect(filtre),
+            hihat: new Tone.Player().connect(filtre),
+            clap: new Tone.Player().connect(filtre),
 
             //sampler: new Tone.Sampler().connect(filtre),
             filtre: filtre,
@@ -133,6 +133,11 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes[playerName].start(time);
         }
     }
+    stopSoundFromPlayer(playerName, time){
+        if (["kick", "snare", "hihat", "clap"].includes(playerName) && this.audioNodes[playerName].loaded ===true) {
+            this.audioNodes[playerName].stop(time);
+        }
+    }
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
@@ -169,11 +174,30 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    /* onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
-            const urls = Object.keys(this.noteURLsNumbers)
-            this.playSoundFromPlayer(urls[midiNoteNumber % urls.length], Tone.now());
+            const player = Object.keys(this.noteURLsNumbers)
+            this.playSoundFromPlayer(midiNoteNumber, Tone.now());
+        }
+    } */
+
+    onMidiNote (midiNoteNumber, midiVelocity, noteOff){
+        const playerMappings = {
+            60: 'kick',
+            62: 'snare',
+            64: 'hihat',
+            67: 'clap',
+        };
+        const playerName = playerMappings[midiNoteNumber];
+        console.log(playerName);
+        if (playerName){
+            if (!noteOff){
+                this.playSoundFromPlayer(playerName, Tone.now());
+            }
+            else {
+                this.stopSoundFromPlayer(playerName);
+            }
         }
     }
 
