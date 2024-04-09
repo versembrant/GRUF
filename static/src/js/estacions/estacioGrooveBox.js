@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
-import { EstacioBase } from "../sessionManager";
-import { indexOfArrayMatchingObject, clamp, necessitaSwing } from '../utils';
+import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
+import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioGrooveBox extends EstacioBase {
@@ -35,6 +35,10 @@ export class EstacioGrooveBox extends EstacioBase {
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
     }
+
+    getTempsBeat = () => {
+    return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+    };
 
     loadSoundinPlayer (playerName, url){
         if (["kick", "snare", "closed_hat", "open_hat"].includes(playerName)) {
@@ -83,7 +87,7 @@ export class EstacioGrooveBox extends EstacioBase {
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
        
         // Setejem les propietats dels players en funció de l'estat del paràmetre corresponent
-        const tempsBeat = 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+        const tempsBeat = this.getTempsBeat();
         this.applyPlayerSettings('open_hat', 
             Math.pow(2, (this.getParameterValue('tone1',preset)/12)), 
             this.getParameterValue('volume1',preset),
@@ -117,7 +121,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         }
         //Si el paràmetre que ha canviat són les propietats dels players
-        const tempsBeat = 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+        const tempsBeat = this.getTempsBeat();
         if(nomParametre === 'tone1' || nomParametre === 'volume1'||  nomParametre === 'atack1' || nomParametre === 'release1'){
             this.applyPlayerSettings('open_hat', 
                 Math.pow(2, (this.getParameterValue('tone1',preset)/12)), 
@@ -172,7 +176,7 @@ export class EstacioGrooveBox extends EstacioBase {
         let modificatorTempsSwing2 = 0.0;
         let modificatorTempsSwing3 = 0.0;
         let modificatorTempsSwing4 = 0.0;
-        const tempsBeat = 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+        const tempsBeat = this.getTempsBeat();
         if (necessitaSwing(currentStep)) {
             modificadorTempsSwingGeneral = tempsBeat * getAudioGraphInstance().getSwing();
             modificatorTempsSwing1 = tempsBeat * this.getParameterValue('swing1', this.currentPreset);
