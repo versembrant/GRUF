@@ -2,8 +2,8 @@ server {
     server_name cl2024011711001.dnssw.net;
 
     # Bruixit main deployment
-    location /bruixit/static/dist/ {
-        alias /home/versembrant/versembrant-bruixit/static/dist/;
+    location /bruixit/static/ {
+        alias /home/versembrant/versembrant-bruixit/static/;
     }
     location /bruixit/ {
         include uwsgi_params;
@@ -11,8 +11,8 @@ server {
     }
 
     # Bruixit test deployment
-    location /bruixit-test/static/dist/ {
-        alias /home/versembrant/test/versembrant-bruixit/static/dist/;
+    location /bruixit-test/static/ {
+        alias /home/versembrant/test/versembrant-bruixit/static/;
     }
     location /bruixit-test/ {
         include uwsgi_params;
