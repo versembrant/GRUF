@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { createElement, useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
@@ -41,6 +41,20 @@ const EnumParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.value)}>
                 {parameterDescription.options.map((option, i) => <option key={option} value={option}>{option}</option>)}
             </select>
+        </div>
+    )
+};
+
+const BoolParameterDefaultWidget = ({ parameterDescription, parameterValue, nomEstacio }) => {
+    return (
+        <div>
+            <label>
+                <input
+                    type="checkbox"
+                    checked={parameterValue}
+                    onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, evt.target.checked)} />
+                {parameterDescription.label}
+            </label>
         </div>
     )
 };
@@ -88,6 +102,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             <button onMouseDown={(evt)=>
                 getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
             }>Clear</button>
+            { parameterDescription.showRecButton && <label><input id={nomEstacio + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
             </div>
         </div>
     )
@@ -101,7 +116,8 @@ const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
         text: TextParameterDefaultWidget,
-        grid: GridParameterDefaultWidget
+        grid: GridParameterDefaultWidget,
+        bool: BoolParameterDefaultWidget
     }
     const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
     if (widgetUIClass === undefined) {

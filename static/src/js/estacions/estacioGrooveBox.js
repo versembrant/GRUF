@@ -36,11 +36,11 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -60, max: 6, initial: -60},
-        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[], showRecButton: true},
     }
 
     getTempsBeat = () => {
-    return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+        return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
     };
 
     loadSoundinPlayer (playerName, url){
@@ -53,8 +53,6 @@ export class EstacioGrooveBox extends EstacioBase {
             player.load(url);
         }
     }
-
-    
     buildEstacioAudioGraph(estacioMasterChannel) {
         const opHatChannel = new Tone.Channel().connect(estacioMasterChannel);
         const cHatChannel = new Tone.Channel().connect(estacioMasterChannel);
@@ -85,7 +83,6 @@ export class EstacioGrooveBox extends EstacioBase {
             player.fadeOut = fadeOut; 
         }
     }
-     
 
     updateAudioGraphFromState(preset) {
         // Carreguem tots els sons de tots els presets (si n'hi ha de repetits es carregaran només un cop)
@@ -229,13 +226,25 @@ export class EstacioGrooveBox extends EstacioBase {
     onMidiNote (midiNoteNumber, midiVelocity, noteOff){
         const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
 
-        if (playerName){
-            if (!noteOff){
-                this.playSoundFromPlayer(playerName, Tone.now());
+        if (!noteOff){
+            const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
+            // Si Rec està ON
+            if (recEnabled) {
+                const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % this.getParameterDescription('pattern').numCols;
+                const pattern = this.getParameterValue('pattern', this.currentPreset);
+                const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
+                if (index === -1) {
+                    // Si la nota no està en el patró, l'afegeix
+                    pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
+                };
             }
-            else {
-                this.stopSoundFromPlayer(playerName);
-            }
+            // Play
+            else  this.playSoundFromPlayer(playerName, Tone.now());
+        } 
+        else {
+            // Stop
+            this.stopSoundFromPlayer(playerName);
         }
+        
     }
 }
