@@ -119,3 +119,23 @@ export const real2Norm = (x, parameterDescription) => {
 export const necessitaSwing = (numeroBeat) => {
     return ((numeroBeat - 2) % 4) == 0
 }
+
+export const getNomPatroOCap = (parameterDescription, patroActual) => {
+    if(parameterDescription.patronsPredefinits){
+        let isMatch = true;
+        for (let key in patronsPredefinits){
+            if(patronsPredefinits[key] !== patroActual){
+                isMatch = false;
+                return patroActual = 'Cap';
+            };
+        }
+    }
+    if(isMatch){
+        return patroActual;
+    }
+}; 
+
+
+
+esMateixPatro(patro1, patro2)
+//que un serà el parameterValue (q ja em donarà el patró actual)
