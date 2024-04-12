@@ -8,7 +8,6 @@ export class EstacioGrooveBox extends EstacioBase {
     tipus = 'groove box'
     versio = '0.1'
     parametersDescription = {
-        rec: {type: 'text', label: 'REC', initial: 'true'},
         sound1URL: {type: 'text', label: 'OpHat', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // OpHat
         swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0},
         tone1: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
@@ -33,7 +32,7 @@ export class EstacioGrooveBox extends EstacioBase {
         volume4: {type: 'float', label: 'KickVolume', min: -60, max: 6, initial: 0, logarithmic: true},
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
-        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[]},
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[], showRecButton: true},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
     }
   
@@ -201,26 +200,25 @@ export class EstacioGrooveBox extends EstacioBase {
     onMidiNote (midiNoteNumber, midiVelocity, noteOff){
         const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
 
-        if (playerName){
-            if (!noteOff){
-                // Si Rec està ON
-                if ((this.getParameterValue('rec')) === true) {
-                    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % this.getParameterDescription('pattern').numCols;
-                    const pattern = this.getParameterValue('pattern', this.currentPreset);
-                    const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
-                    if (index === -1) {
-                        // Si la nota no està en el patró, l'afegeix
-                        pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
-                    };
-                }
-                // Play
-                else  this.playSoundFromPlayer(playerName, Tone.now());
-                console.log((this.getParameterValue('rec')));
-            } 
-            else {
-                // Stop
-                this.stopSoundFromPlayer(playerName);
+        if (!noteOff){
+            const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
+            // Si Rec està ON
+            if (recEnabled) {
+                const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % this.getParameterDescription('pattern').numCols;
+                const pattern = this.getParameterValue('pattern', this.currentPreset);
+                const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
+                if (index === -1) {
+                    // Si la nota no està en el patró, l'afegeix
+                    pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
+                };
             }
+            // Play
+            else  this.playSoundFromPlayer(playerName, Tone.now());
+        } 
+        else {
+            // Stop
+            this.stopSoundFromPlayer(playerName);
         }
+        
     }
 }

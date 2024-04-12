@@ -102,6 +102,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             <button onMouseDown={(evt)=>
                 getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
             }>Clear</button>
+            { parameterDescription.showRecButton && <label><input id={nomEstacio + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
             </div>
         </div>
     )
