@@ -4,3 +4,4 @@ static/dist
 __pycache__/
 versembrant_bruixit.sock
 redis-data
+uploads

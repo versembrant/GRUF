@@ -231,7 +231,7 @@ export class Session {
         })
 
         // Inicialitza un redux store amb les propietats de la sessió
-        this.propertiesInStore = ['id', 'name', 'connected_users', 'live', 'arranjament'];
+        this.propertiesInStore = ['id', 'name', 'connected_users', 'recorded_files', 'live', 'arranjament'];
         const reducers = {};
         this.propertiesInStore.forEach(propertyName => {
             reducers[propertyName] = (state = this.rawData[propertyName], action) => {
@@ -260,6 +260,10 @@ export class Session {
 
     getConnectedUsers() {
         return this.store.getState().connected_users
+    }
+
+    getRecordedFiles() {
+        return this.store.getState().recorded_files
     }
 
     getNomsEstacions() {
