@@ -103,7 +103,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 Patró:
                 <select value={getNomPatroOCap(parameterDescription, parameterValue)}
                 >              
-                <option key={"Hip Hop Classic 2"} value={'Hip Hop Classic 2'}>{'Hip Hop Classic 2'}</option>
+                <option key={'patro'} value={parameterDescription.patronsPredefinits}>{getNomPatroOCap(parameterDescription, parameterValue)}</option>
 
                 </select>
                 </div>

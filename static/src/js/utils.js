@@ -120,22 +120,26 @@ export const necessitaSwing = (numeroBeat) => {
     return ((numeroBeat - 2) % 4) == 0
 }
 
+const esMateixPatro = (patro1, patro2) => {
+    // TODO: tenir en compte l'ordre en què està escrit el patró
+    if (patro1.length != patro2.length) return false;
+    for (let posicio = 0; posicio < patro1.length; posicio++){
+        const i_patro1 = patro1[posicio].i;
+        const i_patro2 = patro2[posicio].i;
+        const j_patro1 = patro1[posicio].j;
+        const j_patro2 = patro2[posicio].j;
+        if (i_patro1 !== i_patro2 || j_patro1 !== j_patro2) return false;
+    }
+    return patro1[0].i === 0;
+}
+
 export const getNomPatroOCap = (parameterDescription, patroActual) => {
     if(parameterDescription.patronsPredefinits){
-        let isMatch = true;
-        for (let key in patronsPredefinits){
-            if(patronsPredefinits[key] !== patroActual){
-                isMatch = false;
-                return patroActual = 'Cap';
+        for (let key in parameterDescription.patronsPredefinits){
+            if (esMateixPatro(parameterDescription.patronsPredefinits[key].patro, patroActual)){
+                return parameterDescription.patronsPredefinits[key].nom;
             };
         }
     }
-    if(isMatch){
-        return patroActual;
-    }
-}; 
-
-
-
-esMateixPatro(patro1, patro2)
-//que un serà el parameterValue (q ja em donarà el patró actual)
+    return 'Cap'
+};
