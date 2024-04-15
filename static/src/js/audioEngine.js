@@ -26,6 +26,7 @@ export class AudioGraph {
             playing: false,
             playingArranjement: false,
             swing: 0,
+            modBars: 4,
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -286,6 +287,14 @@ export class AudioGraph {
         this.setParametreInStore('swing', swing);
     }
 
+    getModBars(){
+        return this.store.getState().modBars;
+    }
+
+    setModBars(modBars){
+        this.setParametreInStore('modBars', modBars);
+    }
+
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -311,7 +320,10 @@ export class AudioGraph {
             this.setMasterGain(valor);
         } else if (nomParametre === 'swing'){
             this.setSwing(valor);
+        } else if (nomParametre === 'modBars'){
+            this.setModBars(valor);
         }
+
         else {
             this.setParametreInStore(nomParametre, valor);
         }

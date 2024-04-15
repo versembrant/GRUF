@@ -23,6 +23,9 @@ export const AudioTransportControls = () => {
     const handleSetSwing = (e) => {
         getAudioGraphInstance().updateParametreAudioGraph('swing', e.target.value)
     }
+    const handleSetModBars = (e) => {
+        getAudioGraphInstance().updateParametreAudioGraph('modBars', e.target.value)
+    }
     return (
         <div>
             <div>
@@ -43,6 +46,9 @@ export const AudioTransportControls = () => {
             </div>
             <div>
                 Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
+            </div>
+            <div>
+                Bars: <input type="range" min="2" max="12" step="1" value={getAudioGraphInstance().getModBars()} onChange={(e) => handleSetModBars(e)}/> {getAudioGraphInstance().getModBars()}
             </div>
             <div>
                 <label>
