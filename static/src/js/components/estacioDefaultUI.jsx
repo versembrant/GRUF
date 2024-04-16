@@ -62,7 +62,7 @@ const BoolParameterDefaultWidget = ({ parameterDescription, parameterValue, nomE
 const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     const estacio = getCurrentSession().getEstacio(nomEstacio);
     const numRows = parameterDescription.numRows;
-    const numSteps = getAudioGraphInstance().getModBars()* parameterDescription.numCols;
+    const numSteps =  getAudioGraphInstance().getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
     for (let i = 0; i < numRows; i++) {

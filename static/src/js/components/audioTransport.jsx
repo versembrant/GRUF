@@ -1,6 +1,7 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
+import {useState} from "react";
 
 export const AudioTransportControls = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -13,7 +14,7 @@ export const AudioTransportControls = () => {
             }
             getAudioGraphInstance().transportStart();
         } else {
-            getAudioGraphInstance().transportStop()
+            getAudioGraphInstance().transportStop() 
         }
     }
 
@@ -23,9 +24,14 @@ export const AudioTransportControls = () => {
     const handleSetSwing = (e) => {
         getAudioGraphInstance().updateParametreAudioGraph('swing', e.target.value)
     }
-    const handleSetModBars = (e) => {
-        getAudioGraphInstance().updateParametreAudioGraph('modBars', e.target.value)
+    const [selectedCompas, setSelectedCompas] = useState("4/4"); 
+
+    const handleCompasChange = (e) => {
+        const newCompas = e.target.value;
+        setSelectedCompas(newCompas);
+        getAudioGraphInstance().updateParametreAudioGraph('compas', newCompas); 
     }
+
     return (
         <div>
             <div>
@@ -48,7 +54,12 @@ export const AudioTransportControls = () => {
                 Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
             </div>
             <div>
-                Bars: <input type="range" min="2" max="12" step="1" value={getAudioGraphInstance().getModBars()} onChange={(e) => handleSetModBars(e)}/> {getAudioGraphInstance().getModBars()}
+                Compàs:
+                <select value={selectedCompas} onChange={handleCompasChange}>
+                    <option value="2/4">2/4</option>
+                    <option value="3/4">3/4</option>
+                    <option value="4/4">4/4</option>
+                </select>
             </div>
             <div>
                 <label>

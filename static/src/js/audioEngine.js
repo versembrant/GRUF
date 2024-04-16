@@ -26,7 +26,7 @@ export class AudioGraph {
             playing: false,
             playingArranjement: false,
             swing: 0,
-            modBars: 4,
+            compas: '4/4',
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -287,13 +287,26 @@ export class AudioGraph {
         this.setParametreInStore('swing', swing);
     }
 
-    getModBars(){
-        return this.store.getState().modBars;
+    getCompas(){
+        return this.store.getState().compas;
     }
 
-    setModBars(modBars){
-        this.setParametreInStore('modBars', modBars);
+    setCompas(compas){
+        this.setParametreInStore('compas', compas);
     }
+
+    getNumSteps (){
+        const compas = this.getCompas();
+        if (compas === '2/4'){
+            return 8
+        } 
+        else if (compas === '3/4') {
+            return 12
+        }
+        else if (compas === '4/4') {
+            return 16
+        }
+    } 
 
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
@@ -320,8 +333,8 @@ export class AudioGraph {
             this.setMasterGain(valor);
         } else if (nomParametre === 'swing'){
             this.setSwing(valor);
-        } else if (nomParametre === 'modBars'){
-            this.setModBars(valor);
+        } else if (nomParametre === 'compas'){
+            this.setCompas(valor);
         }
 
         else {

@@ -96,8 +96,8 @@ class Session(object):
             data ['swing'] = 0
         if 'arranjament' not in data:
             data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
-        if 'modBars' not in data:
-            data ['modBars'] = 4
+        if 'compas' not in data:
+            data ['compas'] = '4/4'
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
