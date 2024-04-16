@@ -18,7 +18,7 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);
-    getAudioGraphInstance().setModBars(currentSession.rawData.modBars);
+    getAudioGraphInstance().setCompas(currentSession.rawData.compas);
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
     if (getAudioGraphInstance().graphIsBuilt()) {
