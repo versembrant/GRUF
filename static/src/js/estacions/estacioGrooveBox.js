@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
 import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
-import { getAudioGraphInstance } from '../audioEngine';
+import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioGrooveBox extends EstacioBase {
     
@@ -229,8 +229,9 @@ export class EstacioGrooveBox extends EstacioBase {
         if (!noteOff){
             const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
             // Si Rec està ON
-            if (recEnabled) {
-                const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps);
+            if (recEnabled) {   
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
                 const pattern = this.getParameterValue('pattern', this.currentPreset);
                 const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
                 if (index === -1) {
