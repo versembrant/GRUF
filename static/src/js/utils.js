@@ -130,11 +130,11 @@ const esMateixPatro = (patro1, patro2) => {
         const j_patro2 = patro2[posicio].j;
         if (i_patro1 !== i_patro2 || j_patro1 !== j_patro2) return false;
     }
-    return patro1[0].i === 0;
+    return true;
 }
 
 export const getNomPatroOCap = (parameterDescription, patroActual) => {
-    if(parameterDescription.patronsPredefinits){
+    if(parameterDescription.patronsPredefinits !==undefined){
         for (let key in parameterDescription.patronsPredefinits){
             if (esMateixPatro(parameterDescription.patronsPredefinits[key].patro, patroActual)){
                 return parameterDescription.patronsPredefinits[key].nom;
