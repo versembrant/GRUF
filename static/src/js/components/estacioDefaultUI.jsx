@@ -77,9 +77,9 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
     }
     const checkPatrons = (parameterDescription) => {
         if(parameterDescription.patronsPredefinits){
-            return hiHaPatrons=true;
+            return true;
         }else{
-            return hiHaPatrons=false;
+            return false;
         }
     }
     checkPatrons(parameterDescription);
@@ -97,7 +97,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             }>Clear</button>
             </div>
             
-            {hiHaPatrons &&
+            {checkPatrons(parameterDescription) &&
                  (
                     <div>
                 Patró:
