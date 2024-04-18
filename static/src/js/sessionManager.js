@@ -289,6 +289,7 @@ export class Session {
         })
         data.bpm = getAudioGraphInstance().getBpm();
         data.swing = getAudioGraphInstance().getSwing();
+        data.compas = getAudioGraphInstance().getCompas();
         return data
     }
 
