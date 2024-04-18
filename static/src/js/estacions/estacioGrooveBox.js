@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
 import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
-import { getAudioGraphInstance } from '../audioEngine';
+import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioGrooveBox extends EstacioBase {
     
@@ -36,7 +36,7 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -60, max: 6, initial: -60},
-        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[], showRecButton: true},
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true},
     }
 
     getTempsBeat = () => {
@@ -185,7 +185,7 @@ export class EstacioGrooveBox extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
-        const currentStep = currentMainSequencerStep % this.getParameterDescription('pattern').numCols;
+        const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps());
         const pattern = this.getParameterValue('pattern', this.currentPreset);
         const shouldPlaySound1 = indexOfArrayMatchingObject(pattern, {'i': 0, 'j': currentStep}) > -1;
         const shouldPlaySound2 = indexOfArrayMatchingObject(pattern, {'i': 1, 'j': currentStep}) > -1;
@@ -229,8 +229,9 @@ export class EstacioGrooveBox extends EstacioBase {
         if (!noteOff){
             const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
             // Si Rec està ON
-            if (recEnabled) {
-                const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % this.getParameterDescription('pattern').numCols;
+            if (recEnabled) {   
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
                 const pattern = this.getParameterValue('pattern', this.currentPreset);
                 const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
                 if (index === -1) {

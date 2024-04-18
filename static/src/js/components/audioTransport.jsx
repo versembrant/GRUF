@@ -13,7 +13,7 @@ export const AudioTransportControls = () => {
             }
             getAudioGraphInstance().transportStart();
         } else {
-            getAudioGraphInstance().transportStop()
+            getAudioGraphInstance().transportStop() 
         }
     }
 
@@ -23,6 +23,10 @@ export const AudioTransportControls = () => {
     const handleSetSwing = (e) => {
         getAudioGraphInstance().updateParametreAudioGraph('swing', e.target.value)
     }
+    const handleCompasChange = (e) => {
+        getAudioGraphInstance().updateParametreAudioGraph('compas', e.target.value); 
+    }
+
     return (
         <div>
             <div>
@@ -43,6 +47,14 @@ export const AudioTransportControls = () => {
             </div>
             <div>
                 Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
+            </div>
+            <div>
+                Compàs:
+                <select value={getAudioGraphInstance().getCompas()} onChange={handleCompasChange}>
+                    <option value="2/4">2/4</option>
+                    <option value="3/4">3/4</option>
+                    <option value="4/4">4/4</option>
+                </select>
             </div>
             <div>
                 <label>
