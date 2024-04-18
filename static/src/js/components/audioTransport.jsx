@@ -1,7 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
-import {useState} from "react";
 
 export const AudioTransportControls = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -24,12 +23,8 @@ export const AudioTransportControls = () => {
     const handleSetSwing = (e) => {
         getAudioGraphInstance().updateParametreAudioGraph('swing', e.target.value)
     }
-    const [selectedCompas, setSelectedCompas] = useState("4/4"); 
-
     const handleCompasChange = (e) => {
-        const newCompas = e.target.value;
-        setSelectedCompas(newCompas);
-        getAudioGraphInstance().updateParametreAudioGraph('compas', newCompas); 
+        getAudioGraphInstance().updateParametreAudioGraph('compas', e.target.value); 
     }
 
     return (
@@ -55,7 +50,7 @@ export const AudioTransportControls = () => {
             </div>
             <div>
                 Compàs:
-                <select value={selectedCompas} onChange={handleCompasChange}>
+                <select value={getAudioGraphInstance().getCompas()} onChange={handleCompasChange}>
                     <option value="2/4">2/4</option>
                     <option value="3/4">3/4</option>
                     <option value="4/4">4/4</option>
