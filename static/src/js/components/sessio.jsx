@@ -6,6 +6,7 @@ import { AudioMixerEstacions } from "../components/audioMixerEstacions";
 import { Arranjament } from "../components/arranjament";
 import { EntradaMidi } from "../components/entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
+import { AudioEffectsControlPanel} from  "../components/fxControlPanel"
 
 const Estacio = ({estacio}) => {
     return (
@@ -39,6 +40,7 @@ export const Sessio = () => {
             <Arranjament/>
             <EntradaMidi/>
             <AudioRecorder/>
+            <AudioEffectsControlPanel/>
         </div>
     )
 };
