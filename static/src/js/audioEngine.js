@@ -26,6 +26,8 @@ export class AudioGraph {
             playing: false,
             playingArranjement: false,
             swing: 0,
+            reverbWet:0.5,
+            reverbDecay: 5,
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -113,13 +115,18 @@ export class AudioGraph {
 
         // Crea uns efectes
 
+         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
+         this.reverb.wet.value = this.store.getState().reverbWet;
+         this.reverbChannel = new Tone.Channel().connect(this.reverb);
+         this.reverbChannel.receive("reverb"); 
+ 
         this.chorus = new Tone.Chorus({wet: 1, frequency: 4, depth: 0.5, delayTime: 2.5}).connect(this.masterGainNode).start();  // Aquest efecte necessita start() perquè sino el LFO intern no funciona
         this.chorusChannel = new Tone.Channel({ volume: 0 }).connect(this.chorus);
         this.chorusChannel.receive("chorus");
         
-        this.reverb = new Tone.Reverb({wet: 1, decay: 5}).connect(this.masterGainNode);
+        /* this.reverb = new Tone.Reverb({wet: 1, decay: 5}).connect(this.masterGainNode);
         this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-        this.reverbChannel.receive("reverb");
+        this.reverbChannel.receive("reverb"); */
 
         this.delay = new Tone.FeedbackDelay({wet: 1, delayTime: 60.0/this.getBpm(), feedback: 0.1}).connect(this.masterGainNode);
         this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
@@ -264,6 +271,15 @@ export class AudioGraph {
         if (this.graphIsBuilt()){
             this.masterGainNode.gain.value = gain;
         }
+    }
+
+    setReverbWet(wetValue) {
+        this.setParametreInStore('reverbWet', wetValue);
+        this.reverb.wet.value = wetValue; 
+    }
+
+    getReverbWet (){
+        return this.store.getState().reverbWet
     }
     
     getBpm() {
