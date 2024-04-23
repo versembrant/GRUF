@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, getNomPatroOCap} from "../utils";
+import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
@@ -75,14 +75,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
         }
         stepsElementsPerRow.push(stepsElements)
     }
-    const checkPatrons = (parameterDescription) => {
-        if(parameterDescription.patronsPredefinits){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    checkPatrons(parameterDescription);
+    
     return (
         <div>
             <p>{parameterDescription.label}: {JSON.stringify(parameterValue)}</p>
@@ -97,21 +90,21 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             }>Clear</button>
             </div>
             
-            {checkPatrons(parameterDescription) &&
-                 (
-                    <div>
+            {hasPatronsPredefinits(parameterDescription) &&
+                (
+                <div>
                 Patró:
-                <select value={getNomPatroOCap(parameterDescription, parameterValue)}
+                <select 
+                    defaultValue={getNomPatroOCap(parameterDescription, parameterValue)}
+                    onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))}
                 >              
-                <option key={'patro'} value={parameterDescription.patronsPredefinits}>{getNomPatroOCap(parameterDescription, parameterValue)}</option>
-
+                    <option key="cap" value="Cap">Cap</option>
+                    {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
                 </select>
                 </div>
                 )
 
             }
-            
-
         </div>
     )
 };
