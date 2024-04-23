@@ -133,13 +133,37 @@ const esMateixPatro = (patro1, patro2) => {
     return true;
 }
 
+export const hasPatronsPredefinits = (parameterDescription) => {
+    // Retorna true si la descripció del paràmetre conté patrons predefintis
+    if (parameterDescription.patronsPredefinits !== undefined) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export const getNomPatroOCap = (parameterDescription, patroActual) => {
-    if(parameterDescription.patronsPredefinits !==undefined){
-        for (let key in parameterDescription.patronsPredefinits){
-            if (esMateixPatro(parameterDescription.patronsPredefinits[key].patro, patroActual)){
-                return parameterDescription.patronsPredefinits[key].nom;
+    // Donat un patró, comprova si es correspon amb algun dels patrons predefinits i
+    // retorna el nom del patró si és el cas. Si no es correspon amb cap patró, retorna "Cap"
+    if (hasPatronsPredefinits(parameterDescription)) {
+        for (let i in parameterDescription.patronsPredefinits){
+            if (esMateixPatro(parameterDescription.patronsPredefinits[i].patro, patroActual)){
+                return parameterDescription.patronsPredefinits[i].nom;
             };
         }
     }
     return 'Cap'
 };
+
+export const getPatroPredefinitAmbNom = (parameterDescription, nomPatro) => {
+    // Donat el nom d'un patró, retorna el patró corresponent si hi és dins la llista
+    // de patrons predefinits, sino retorna un patro buit.
+    if (hasPatronsPredefinits(parameterDescription)) {
+        for (let i in parameterDescription.patronsPredefinits){
+            if (parameterDescription.patronsPredefinits[i].nom === nomPatro) {
+                return parameterDescription.patronsPredefinits[i].patro;
+            }
+        }
+    }
+    return []
+}
