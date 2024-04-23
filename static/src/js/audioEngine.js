@@ -114,23 +114,31 @@ export class AudioGraph {
         }, "16n").start(0);
 
         // Crea uns efectes
-
-         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
-         this.reverb.wet.value = this.store.getState().reverbWet;
-         this.reverbChannel = new Tone.Channel().connect(this.reverb);
-         this.reverbChannel.receive("reverb"); 
  
-        this.chorus = new Tone.Chorus({wet: 1, frequency: 4, depth: 0.5, delayTime: 2.5}).connect(this.masterGainNode).start();  // Aquest efecte necessita start() perquè sino el LFO intern no funciona
+        /* this.chorus = new Tone.Chorus({wet: 1, frequency: 4, depth: 0.5, delayTime: 2.5}).connect(this.masterGainNode).start();  // Aquest efecte necessita start() perquè sino el LFO intern no funciona
         this.chorusChannel = new Tone.Channel({ volume: 0 }).connect(this.chorus);
         this.chorusChannel.receive("chorus");
+         */
         
-        /* this.reverb = new Tone.Reverb({wet: 1, decay: 5}).connect(this.masterGainNode);
+        this.reverb = new Tone.Reverb({wet: 1, decay: 5}).connect(this.masterGainNode);
         this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-        this.reverbChannel.receive("reverb"); */
+        this.reverbChannel.receive("reverb");
 
         this.delay = new Tone.FeedbackDelay({wet: 1, delayTime: 60.0/this.getBpm(), feedback: 0.1}).connect(this.masterGainNode);
         this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
         this.delayChannel.receive("delay");
+
+        this.drive = new Tone.Distortion(1).connect(this.masterGainNode);
+        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
+        this.driveChannel.receive("drive");
+
+        this.eq3 = new Tone.EQ3({
+            low: 12,
+            high: 12,
+            mid: 12,
+        }).connect(this.masterGainNode);
+        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
+        this.eq3Channel.receive("eq3");
 
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {

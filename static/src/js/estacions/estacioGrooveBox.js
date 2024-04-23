@@ -36,6 +36,7 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -60, max: 6, initial: -60},
+        masterEffectsGain: {type: 'float', label: 'Effects send', min: -60, max: 6, initial: -60},
         pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[], showRecButton: true},
     }
 
@@ -54,24 +55,38 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
     buildEstacioAudioGraph(estacioMasterChannel) {
-        const opHatChannel = new Tone.Channel().connect(estacioMasterChannel);
-        const cHatChannel = new Tone.Channel().connect(estacioMasterChannel);
-        const snareChannel = new Tone.Channel().connect(estacioMasterChannel);
-        const kickChannel = new Tone.Channel().connect(estacioMasterChannel);
+
+        const grooveBoxMasterChannel = estacioMasterChannel;
+        const channels = {
+            kick: new Tone.Channel(),
+            snare: new Tone.Channel(),
+            closed_hat: new Tone.Channel(),
+            open_hat: new Tone.Channel()
+        };
+
+        Object.values(channels).forEach(channel => channel.connect(grooveBoxMasterChannel));
 
         // Creem els nodes del graph
         this.audioNodes = {
-            kick: new Tone.Player().connect(kickChannel),
-            snare: new Tone.Player().connect(snareChannel),
-            closed_hat: new Tone.Player().connect(cHatChannel),
-            open_hat: new Tone.Player().connect(opHatChannel),
+            kick: new Tone.Player().connect(channels.kick),
+            snare: new Tone.Player().connect(channels.snare),
+            closed_hat: new Tone.Player().connect(channels.closed_hat),
+            open_hat: new Tone.Player().connect(channels.open_hat),
 
-            sendReverbGainNode1: opHatChannel.send("reverb", -100),
-            sendReverbGainNode2: cHatChannel.send("reverb", -100),
-            sendReverbGainNode3: snareChannel.send("reverb", -100),
-            sendReverbGainNode4: kickChannel.send("reverb", -100),
+            sendReverbGainNode1: channels.open_hat.send("reverb", -100),
+            sendReverbGainNode2: channels.closed_hat.send("reverb", -100),
+            sendReverbGainNode3: channels.snare.send("reverb", -100),
+            sendReverbGainNode4: channels.kick.send("reverb", -100),
+        
 
+            //Creem l'objecte masterEffectsSends per controlar tots els efectes alhora. 
+            masterEffectsSends:{},
         }
+        // Assignem els efectes a l'objecte buid i creem un send per cada efecte. 
+        const effects = ['reverb', 'delay', 'drive', 'eq3'];
+        effects.forEach(effect => {
+        this.audioNodes.masterEffectsSends[effect] = grooveBoxMasterChannel.send(effect, -100);  // Initial gain set to 0
+        });
     }
 
     applyPlayerSettings(playerName, playbackRate, volume, fadeIn, fadeOut){
@@ -83,6 +98,12 @@ export class EstacioGrooveBox extends EstacioBase {
             player.fadeOut = fadeOut; 
         }
     }
+
+   setMasterEffectsGain(audioNodes, gainValue) {
+        Object.keys(audioNodes.masterEffectsSends).forEach(effect => {
+            audioNodes.masterEffectsSends[effect].gain.value = gainValue;
+        });
+    } 
 
     updateAudioGraphFromState(preset) {
         // Carreguem tots els sons de tots els presets (si n'hi ha de repetits es carregaran només un cop)
@@ -98,6 +119,11 @@ export class EstacioGrooveBox extends EstacioBase {
         this.audioNodes.sendReverbGainNode2.gain.value = this.getParameterValue('reverbSend2',preset);
         this.audioNodes.sendReverbGainNode3.gain.value = this.getParameterValue('reverbSend3',preset);
         this.audioNodes.sendReverbGainNode4.gain.value = this.getParameterValue('reverbSend4',preset);
+
+        const  masterEffectsGain = this.getParameterValue('masterEffectsGain', preset);
+        this.setMasterEffectsGain(this.audioNodes, masterEffectsGain); 
+
+
         // Setejem les propietats dels players en funció de l'estat del paràmetre corresponent
         const tempsBeat = this.getTempsBeat();
         this.applyPlayerSettings('open_hat', 
@@ -140,6 +166,10 @@ export class EstacioGrooveBox extends EstacioBase {
         else if (nomParametre === 'reverbSend4'){
             this.audioNodes.sendReverbGainNode4.gain.value = this.getParameterValue('reverbSend4',preset);
         }
+        else if (nomParametre === 'masterEffectsGain'){
+            const  masterEffectsGain = this.getParameterValue('masterEffectsGain', preset);
+            this.setMasterEffectsGain(this.audioNodes, masterEffectsGain);        
+        }  
         //Si el paràmetre que ha canviat són les propietats dels players
         const tempsBeat = this.getTempsBeat();
         if(nomParametre === 'tone1' || nomParametre === 'volume1'||  nomParametre === 'atack1' || nomParametre === 'release1'){
