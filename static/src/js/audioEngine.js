@@ -26,8 +26,18 @@ export class AudioGraph {
             playing: false,
             playingArranjement: false,
             swing: 0,
-            reverbWet:0.5,
-            reverbDecay: 5,
+            effectParameters: {
+                reverbWet:0,
+                reverbDecay: 1,
+                delayWet: 0,
+                delayTime: 1,
+                delayFeedback:0,
+                drive: 1,
+                eq3HighGain: 0,
+                eq3MidGain: 0,
+                eq3LowGain: 0,
+            }
+            
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -93,6 +103,53 @@ export class AudioGraph {
     getMasterChannelNodeForEstacio(nomEstacio) {
         return this.estacionsMasterChannelNodes[nomEstacio]
     }
+
+    //Creem uns efectes
+    initEffects(){
+        this.reverb = new Tone.Reverb().connect(this.masterGainNode);
+        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
+        this.reverbChannel.receive("reverb");
+
+        this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
+        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
+        this.delayChannel.receive("delay");
+
+        this.drive = new Tone.Distortion().connect(this.masterGainNode);
+        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
+        this.driveChannel.receive("drive");
+
+        this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
+        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
+        this.eq3Channel.receive("eq3");
+
+        const effectParams = this.store.getState().effectParameters;
+        this.applyEffectParameters(effectParams);
+    }
+
+    applyEffectParameters(effectParams) {
+        this.reverb.wet.value = effectParams.reverbWet;
+        this.reverb.decay = effectParams.reverbDecay;
+        this.delay.wet.value = effectParams.delayWet;
+        this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
+        this.delay.feedback.value = effectParams.delayFeedback;
+        this.drive.distortion = effectParams.drive;
+        this.eq3.set({
+            low: effectParams.eq3LowGain,
+            mid: effectParams.eq3MidGain,
+            high: effectParams.eq3HighGain
+        });
+    }
+
+    setEffectParameter(effectKey, value) {
+        let newEffectParameters = {...this.store.getState().effectParameters, [effectKey]: value};
+        this.setParametreInStore('effectParameters', newEffectParameters);
+
+        this.applyEffectParameters({[effectKey]: value});
+    }
+
+    getEffectParameter(effectKey) {
+        return this.store.getState().effectParameters[effectKey];
+    }
     
     buildAudioGraph() {
         console.log("Building audio graph")
@@ -113,32 +170,8 @@ export class AudioGraph {
             }
         }, "16n").start(0);
 
-        // Crea uns efectes
- 
-        /* this.chorus = new Tone.Chorus({wet: 1, frequency: 4, depth: 0.5, delayTime: 2.5}).connect(this.masterGainNode).start();  // Aquest efecte necessita start() perquè sino el LFO intern no funciona
-        this.chorusChannel = new Tone.Channel({ volume: 0 }).connect(this.chorus);
-        this.chorusChannel.receive("chorus");
-         */
-        
-        this.reverb = new Tone.Reverb({wet: 1, decay: 5}).connect(this.masterGainNode);
-        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-        this.reverbChannel.receive("reverb");
-
-        this.delay = new Tone.FeedbackDelay({wet: 1, delayTime: 60.0/this.getBpm(), feedback: 0.1}).connect(this.masterGainNode);
-        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
-        this.delayChannel.receive("delay");
-
-        this.drive = new Tone.Distortion(1).connect(this.masterGainNode);
-        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
-        this.driveChannel.receive("drive");
-
-        this.eq3 = new Tone.EQ3({
-            low: 12,
-            high: 12,
-            mid: 12,
-        }).connect(this.masterGainNode);
-        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
-        this.eq3Channel.receive("eq3");
+        // Inicialitzem els efectes
+        this.initEffects();
 
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
