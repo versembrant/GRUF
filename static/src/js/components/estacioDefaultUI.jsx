@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real } from "../utils";
+import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
@@ -104,6 +104,22 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
             }>Clear</button>
             { parameterDescription.showRecButton && <label><input id={nomEstacio + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
             </div>
+            
+            {hasPatronsPredefinits(parameterDescription) &&
+                (
+                <div>
+                Patró:
+                <select 
+                    defaultValue={getNomPatroOCap(parameterDescription, parameterValue)}
+                    onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))}
+                >              
+                    <option key="cap" value="Cap">Cap</option>
+                    {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
+                </select>
+                </div>
+                )
+
+            }
         </div>
     )
 };
