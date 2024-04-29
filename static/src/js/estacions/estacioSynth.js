@@ -2,6 +2,7 @@ import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
+import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
 export class EstacioSynth extends EstacioBase {
 
@@ -21,6 +22,7 @@ export class EstacioSynth extends EstacioBase {
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
+        detune: {type: 'float', label: 'Detune', min: 0.0, max: 200.0, initial: 0.0}
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -52,7 +54,8 @@ export class EstacioSynth extends EstacioBase {
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         
-            'portamento': this.getParameterValue('portamento', preset),   
+            'portamento': this.getParameterValue('portamento', preset),
+            'detune': this.getParameterValue('detune', preset), 
         });
         this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
         this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
