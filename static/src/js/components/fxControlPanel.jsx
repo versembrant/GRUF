@@ -5,8 +5,8 @@ import { getAudioGraphInstance } from "../audioEngine";
 export const AudioEffectsControlPanel = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
 
-    const handleEffectParameterChange = (effectKey, value) => {
-        getAudioGraphInstance().setEffectParameter(effectKey, parseFloat(value));
+    const handleEffectParameterChange = (value) => {
+        getAudioGraphInstance().updateParametreAudioGraph('effectParameters', parseFloat(value));
     };
 
     return (

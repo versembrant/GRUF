@@ -106,24 +106,26 @@ export class AudioGraph {
 
     //Creem uns efectes
     initEffects(){
-        this.reverb = new Tone.Reverb().connect(this.masterGainNode);
-        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-        this.reverbChannel.receive("reverb");
-
-        this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
-        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
-        this.delayChannel.receive("delay");
-
-        this.drive = new Tone.Distortion().connect(this.masterGainNode);
-        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
-        this.driveChannel.receive("drive");
-
-        this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
-        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
-        this.eq3Channel.receive("eq3");
-
-        const effectParams = this.store.getState().effectParameters;
-        this.applyEffectParameters(effectParams);
+        if (!this.graphIsBuilt()){
+            this.reverb = new Tone.Reverb().connect(this.masterGainNode);
+            this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
+            this.reverbChannel.receive("reverb");
+    
+            this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
+            this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
+            this.delayChannel.receive("delay");
+    
+            this.drive = new Tone.Distortion().connect(this.masterGainNode);
+            this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
+            this.driveChannel.receive("drive");
+    
+            this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
+            this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
+            this.eq3Channel.receive("eq3");
+    
+            const effectParams = this.store.getState().effectParameters;
+            this.applyEffectParameters(effectParams);
+        } 
     }
 
     applyEffectParameters(effectParams) {
@@ -143,8 +145,7 @@ export class AudioGraph {
     setEffectParameter(effectKey, value) {
         let newEffectParameters = {...this.store.getState().effectParameters, [effectKey]: value};
         this.setParametreInStore('effectParameters', newEffectParameters);
-
-        this.applyEffectParameters({[effectKey]: value});
+        this.applyEffectParameters(newEffectParameters);
     }
 
     getEffectParameter(effectKey) {
@@ -313,15 +314,6 @@ export class AudioGraph {
             this.masterGainNode.gain.value = gain;
         }
     }
-
-    setReverbWet(wetValue) {
-        this.setParametreInStore('reverbWet', wetValue);
-        this.reverb.wet.value = wetValue; 
-    }
-
-    getReverbWet (){
-        return this.store.getState().reverbWet
-    }
     
     getBpm() {
         return this.store.getState().bpm;
@@ -368,7 +360,10 @@ export class AudioGraph {
             this.setMasterGain(valor);
         } else if (nomParametre === 'swing'){
             this.setSwing(valor);
+        } else if (nomParametre === 'effectParameters'){
+            this.setEffectParameter(valor);
         }
+        
         else {
             this.setParametreInStore(nomParametre, valor);
         }
