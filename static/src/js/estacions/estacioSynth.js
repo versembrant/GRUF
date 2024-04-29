@@ -20,6 +20,7 @@ export class EstacioSynth extends EstacioBase {
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
+        portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -50,6 +51,8 @@ export class EstacioSynth extends EstacioBase {
                 type: this.getParameterValue('waveform', preset),
             },
             'volume': -12,  // Avoid clipping, specially when using sine
+        
+            'portamento': this.getParameterValue('portamento', preset),   
         });
         this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
         this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
