@@ -28,11 +28,11 @@ export class AudioGraph {
             swing: 0,
             effectParameters: {
                 reverbWet:0,
-                reverbDecay: 1,
+                reverbDecay: 0.1,
                 delayWet: 0,
                 delayTime: 1,
                 delayFeedback:0,
-                drive: 1,
+                drive: 0,
                 eq3HighGain: 0,
                 eq3MidGain: 0,
                 eq3LowGain: 0,
