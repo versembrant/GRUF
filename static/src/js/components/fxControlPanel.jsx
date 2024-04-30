@@ -5,123 +5,62 @@ import { getAudioGraphInstance } from "../audioEngine";
 export const AudioEffectsControlPanel = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
 
-    const handleEffectParameterChange = (value) => {
-        getAudioGraphInstance().updateParametreAudioGraph('effectParameters', parseFloat(value));
+    const handleEffectParameterChange = (parameterName, value) => {
+        let floatValue;
+        if (parameterName === 'delayTime') {
+            //Per delayTime, fem servir intergers
+            floatValue = parseInt(value, 10);
+        } else {
+            floatValue = parseFloat(value);
+        }
+        // Actualitzem els paràmetres cridant a la funció setEffectParameter
+        getAudioGraphInstance().setEffectParameter(parameterName, floatValue);
     };
 
     return (
         <div>
             <h3>Audio Effects Control</h3>
-            <div>
-                Reverb Wet:
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={getAudioGraphInstance().getEffectParameter('reverbWet')}
-                    onChange={(e) => handleEffectParameterChange('reverbWet', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('reverbWet').toFixed(2)}
-            </div>
-            <div>
-                Reverb Decay:
-                <input
-                    type="range"
-                    min="0.5"
-                    max="10"
-                    step="0.1"
-                    value={getAudioGraphInstance().getEffectParameter('reverbDecay')}
-                    onChange={(e) => handleEffectParameterChange('reverbDecay', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('reverbDecay').toFixed(2)}
-            </div>
-            <div>
-                Delay Wet:
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={getAudioGraphInstance().getEffectParameter('delayWet')}
-                    onChange={(e) => handleEffectParameterChange('delayWet', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('delayWet').toFixed(2)}
-            </div>
-            <div>
-                Delay Time:
-                <select
-                    value={getAudioGraphInstance().getEffectParameter('delayTime')}
-                    onChange={(e) => handleEffectParameterChange('delayTime', e.target.value)}
-                >
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                    <option value="8">8</option>
-                </select>
-            </div>
-            <div>
-                Delay Feedback:
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={getAudioGraphInstance().getEffectParameter('delayFeedback')}
-                    onChange={(e) => handleEffectParameterChange('delayFeedback', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('delayFeedback').toFixed(2)}
-            </div>
-            <div>
-                Drive:
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={getAudioGraphInstance().getEffectParameter('drive')}
-                    onChange={(e) => handleEffectParameterChange('drive', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('drive').toFixed(2)}
-            </div>
-            <div>
-                EQ High Gain:
-                <input
-                    type="range"
-                    min="-12"
-                    max="12"
-                    step="0.1"
-                    value={getAudioGraphInstance().getEffectParameter('eq3HighGain')}
-                    onChange={(e) => handleEffectParameterChange('eq3HighGain', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('eq3HighGain').toFixed(2)}
-            </div>
-            <div>
-                EQ Mid Gain:
-                <input
-                    type="range"
-                    min="-12"
-                    max="12"
-                    step="0.1"
-                    value={getAudioGraphInstance().getEffectParameter('eq3MidGain')}
-                    onChange={(e) => handleEffectParameterChange('eq3MidGain', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('eq3MidGain').toFixed(2)}
-            </div>
-            <div>
-                EQ Low Gain:
-                <input
-                    type="range"
-                    min="-12"
-                    max="12"
-                    step="0.1"
-                    value={getAudioGraphInstance().getEffectParameter('eq3LowGain')}
-                    onChange={(e) => handleEffectParameterChange('eq3LowGain', e.target.value)}
-                />
-                {getAudioGraphInstance().getEffectParameter('eq3LowGain').toFixed(2)}
-            </div>
+                {/* Diccionari que passa per cada efecte de l'store */}
+
+            {Object.entries(getAudioGraphInstance().store.getState().effectParameters).map(([param, value]) => {
+                let inputElement;
+                if (param === 'delayTime') {
+                    inputElement = (
+                        <select
+                            value={value}
+                            onChange={(e) => handleEffectParameterChange(param, e.target.value)}
+                        >
+                            <option value="1">1/4</option>
+                            <option value="2">1/8</option>
+                            <option value="4">1/16</option>
+                            <option value="3">1/8T</option>
+                            <option value="6">1/16T</option>
+                        </select>
+                    );
+                } else {
+                    // Ajustem aquí els paràmetres tipus range. 
+                    const isEqParameter = param.includes('eq3');
+                    const isReverbDecay = param === 'reverbDecay';
+                    inputElement = (
+                        <input
+                            type="range"
+                            min={isEqParameter ? "-12" : isReverbDecay ? "0.1" : "0"}
+                            max={isEqParameter ? "12" : isReverbDecay ? "10" : "1"}
+                            step={isEqParameter || isReverbDecay ? "0.01" : "0.01"}
+                            value={value}
+                            onChange={(e) => handleEffectParameterChange(param, e.target.value)}
+                        />
+                    );
+                }
+                return (
+                    //Retorna el nom i el input element de cada paràmetre de manera automàtica
+                    <div key={param}>
+                        {param.replace(/([A-Z])/g, ' $1').trim()}:
+                        {inputElement}
+                        {typeof value === 'number' ? value.toFixed(2) : value}
+                    </div>
+                );
+            })}
         </div>
     );
 };
