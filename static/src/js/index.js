@@ -18,3 +18,6 @@ registerEstacioDisponible(EstacioSynth);
 
 import {EstacioGrooveBox} from './estacions/estacioGrooveBox'
 registerEstacioDisponible(EstacioGrooveBox);
+
+import {EstacioBaix} from './estacions/estacioBaix'
+registerEstacioDisponible(EstacioBaix);
