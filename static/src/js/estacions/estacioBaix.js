@@ -8,7 +8,7 @@ export class EstacioBaix extends EstacioBase {
     tipus = 'bassSynth'
     versio = '0.1'
     parametersDescription = {
-        noteBase: {type: 'float', label:'Nota base', min: 0, max: 127, step: 1, initial: 64},
+        noteBase: {type: 'float', label:'Nota base', min: 1, max: 25, step: 1, initial: 16},
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
@@ -55,6 +55,8 @@ export class EstacioBaix extends EstacioBase {
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
+        
+
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
@@ -63,12 +65,14 @@ export class EstacioBaix extends EstacioBase {
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
-        // Check if sounds should be played in the current step and do it
+        // Retrieve notes and apply monophonic constraints
+        let originalNotes = this.getParameterValue('notes', this.currentPreset);
+        let monophonicNotes = this.enforceMonophonicSequence(originalNotes);
+    
         const currentStep = currentMainSequencerStep % this.getParameterDescription('notes').numCols;
-        const notes = this.getParameterValue('notes', this.currentPreset);
         const notesToPlay = [];
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
-            if (indexOfArrayMatchingObject(notes, {'i': i, 'j': currentStep}) > -1){
+            if (indexOfArrayMatchingObject(monophonicNotes, {'i': i, 'j': currentStep}) > -1){
                 const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
                 const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
                 const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
@@ -77,13 +81,34 @@ export class EstacioBaix extends EstacioBase {
         }
         this.audioNodes.synth.triggerAttackRelease(notesToPlay, "16n", time);
     }
+    enforceMonophonicSequence(notes) {
+        console.log("Original notes:", notes);  
+        const latestNoteMap = new Map();
+    
+        // Itera sobre les notes de l'array per trobar i guardar la més recent a cada passa. 
+        for (let note of notes) {
+            latestNoteMap.set(note.j, note);
+        }
+    
+        // Torna el diccionari a un array. 
+        const newNotes = Array.from(latestNoteMap.values());
+    
+        // Ordena en l'ordre que toca. 
+        newNotes.sort((a, b) => a.j - b.j);
+        console.log("Processed notes:", newNotes);  
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    
+        return newNotes;
+    }
+
+    
+
+    /* onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
             this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         } else {
             this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         }
-    }
+    } */
 }
