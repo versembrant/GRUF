@@ -362,6 +362,7 @@ export class AudioGraph {
             this.setSwing(valor);
         } else if (nomParametre === 'effectParameters'){
             this.setEffectParameter(valor);
+            this.applyEffectParameters(valor);
         }
         
         else {
