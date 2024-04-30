@@ -19,7 +19,7 @@ export const AudioEffectsControlPanel = () => {
 
     return (
         <div>
-            <h3>Audio Effects Control</h3>
+            <h3>Estació de control d'efectes</h3>
                 {/* Diccionari que passa per cada efecte de l'store */}
 
             {Object.entries(getAudioGraphInstance().store.getState().effectParameters).map(([param, value]) => {
