@@ -7,8 +7,9 @@ export class EstacioBaix extends EstacioBase {
 
     tipus = 'bassSynth'
     versio = '0.1'
+    currentlyPlayingNote = null;
     parametersDescription = {
-        noteBase: {type: 'float', label:'Nota base', min: 1, max: 25, step: 1, initial: 16},
+        noteBase: {type: 'float', label:'Nota base', min: 36, max: 48, step: 12, initial: 36},
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
@@ -16,17 +17,19 @@ export class EstacioBaix extends EstacioBase {
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         lpf: {type: 'float', label: 'LPF', min: 500, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 6000, initial: 20, logarithmic: true},
-        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
+        notes: {type: 'grid', label:'Notes', numRows: 8, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
+        portamento:{type: 'float', label: 'Glide', min: 0, max: 0.5, initial: 0},
+        detune:{type: 'float', label: 'Detune', min: 0, max: 100, initial: 0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
         const lpf = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         const hpf = new Tone.Filter(6000, "highpass").connect(estacioMasterChannel);
-        const synth = new Tone.MonoSynth(Tone.MonoSynth).connect(lpf).connect(hpf);
+        const synth = new Tone.MonoSynth().connect(lpf).connect(hpf);
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
@@ -49,6 +52,9 @@ export class EstacioBaix extends EstacioBase {
                 type: this.getParameterValue('waveform', preset),
             },
             'volume': -12,  // Avoid clipping, specially when using sine
+            portamento: this.getParameterValue('portamento', preset),
+            detune: this.getParameterValue('detune', preset),
+
         });
         this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
         this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
@@ -65,50 +71,46 @@ export class EstacioBaix extends EstacioBase {
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
-        // Retrieve notes and apply monophonic constraints
-        let originalNotes = this.getParameterValue('notes', this.currentPreset);
-        let monophonicNotes = this.enforceMonophonicSequence(originalNotes);
+        const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps());
+        const notes = this.getParameterValue('notes', this.currentPreset);
     
-        const currentStep = currentMainSequencerStep % this.getParameterDescription('notes').numCols;
-        const notesToPlay = [];
+        // Inicialitzem una variable que ens indiqui quina nota té més prioritat per sonar
+        let noteToPlay = null;
+    
+        // Iterem sobre totes les notes per trobar la que es correspon al currentStep
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
-            if (indexOfArrayMatchingObject(monophonicNotes, {'i': i, 'j': currentStep}) > -1){
-                const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
-                const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
-                const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
-                notesToPlay.push(Tone.Frequency(midiNoteNumber, "midi").toNote());
+            const noteIndex = indexOfArrayMatchingObject(notes, {'i': i, 'j': currentStep});
+            if (noteIndex > -1) {
+                const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;
+                const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];
+                const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];
+                noteToPlay = Tone.Frequency(midiNoteNumber, "midi").toFrequency();
+                // Quan trobem la nota, trenquem el loop amb el primer match
+                break;
             }
         }
-        this.audioNodes.synth.triggerAttackRelease(notesToPlay, "16n", time);
-    }
-    enforceMonophonicSequence(notes) {
-        console.log("Original notes:", notes);  
-        const latestNoteMap = new Map();
     
-        // Itera sobre les notes de l'array per trobar i guardar la més recent a cada passa. 
-        for (let note of notes) {
-            latestNoteMap.set(note.j, note);
+        if (noteToPlay) {
+            // Ens assegurem que cap altra nota estigui sonant. 
+            if (this.currentlyPlayingNote) {
+                this.audioNodes.synth.triggerRelease(this.currentlyPlayingNote, time);
+            }
+            this.audioNodes.synth.triggerAttackRelease(noteToPlay, "16n", time);
+            this.currentlyPlayingNote = noteToPlay;  
+        } else {
+            if (this.currentlyPlayingNote) {
+                this.audioNodes.synth.triggerRelease(this.currentlyPlayingNote, time);
+                this.currentlyPlayingNote = null;
+            }
         }
-    
-        // Torna el diccionari a un array. 
-        const newNotes = Array.from(latestNoteMap.values());
-    
-        // Ordena en l'ordre que toca. 
-        newNotes.sort((a, b) => a.j - b.j);
-        console.log("Processed notes:", newNotes);  
-
-    
-        return newNotes;
     }
-
     
-
-    /* onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
-            this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+            this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toFrequency()], Tone.now());
         } else {
-            this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+            this.audioNodes.synth.triggerRelease(Tone.now());
         }
-    } */
+    } 
 }
