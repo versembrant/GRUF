@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
+import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, hasEscales, getNomEscalaOCap, getEscalaAmbNom} from "../utils";
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
@@ -115,6 +115,21 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
                 >              
                     <option key="cap" value="Cap">Cap</option>
                     {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
+                </select>
+                </div>
+                )
+
+            }
+            {hasEscales(parameterDescription) &&
+                (
+                <div>
+                Escala:
+                <select 
+                    defaultValue={getNomEscalaOCap(parameterDescription, parameterValue)}
+                    onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getEscalaAmbNom(parameterDescription, evt.target.value))}
+                >              
+                    <option key="cap" value="Cap">Cap</option>
+                    {parameterDescription.escales.map(escala => <option key={escala.nom} value={escala.nom}>{escala.nom}</option>)}
                 </select>
                 </div>
                 )

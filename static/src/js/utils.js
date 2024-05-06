@@ -167,3 +167,50 @@ export const getPatroPredefinitAmbNom = (parameterDescription, nomPatro) => {
     }
     return []
 }
+const esMateixaEscala = (escala1, escala2) => {
+    // TODO: tenir en compte l'ordre en què està escrit l'escala
+    if (escala1.length != escala2.length) return false;
+    for (let posicio = 0; posicio < escala1.length; posicio++){
+        const i_escala1 = escala1[posicio].i;
+        const i_escala2 = escala2[posicio].i;
+        const j_escala1 = escala1[posicio].j;
+        const j_escala2 = escala2[posicio].j;
+        if (i_escala1 !== i_escala2 || j_escala1 !== j_escala2) return false;
+    }
+    return true;
+}
+
+export const hasEscales = (parameterDescription) => {
+    // Retorna true si la descripció del paràmetre conté escales
+    if (parameterDescription.escales !== undefined) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export const getNomEscalaOCap = (parameterDescription, escalaActual) => {
+    // Donat una escala, comprova si es correspon amb alguna de les escales predefinides i
+    // retorna el nom de l'escala si és el cas. Si no es correspon amb cap escala, retorna "Cap"
+    if (hasEscales(parameterDescription)) {
+        for (let i in parameterDescription.escales){
+            if (esMateixaEscala(parameterDescription.escales[i].escala, escalaActual)){
+                return parameterDescription.escales[i].nom;
+            };
+        }
+    }
+    return 'Cap'
+};
+
+export const getEscalaAmbNom = (parameterDescription, nomEscala) => {
+    // Donat el nom d'una escala, retorna l'escala corresponent si hi és dins la llista
+    // d'escales predefinides, si no retorna una escala buida. 
+    if (hasEscales(parameterDescription)) {
+        for (let i in parameterDescription.escales){
+            if (parameterDescription.escales[i].nom === nomEscala) {
+                return parameterDescription.escales[i].escala;
+            }
+        }
+    }
+    return []
+}

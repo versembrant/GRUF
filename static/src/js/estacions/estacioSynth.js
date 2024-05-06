@@ -16,7 +16,10 @@ export class EstacioSynth extends EstacioBase {
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         lpf: {type: 'float', label: 'LPF', min: 500, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 6000, initial: 20, logarithmic: true},
-        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
+        notes: {type: 'grid', label:'Notes', numRows: 13, numCols: 16, initial:[], escales: [
+            {'nom': 'Major', 'escala': [{"i":12,"j":0},{"i":10,"j":1},{"i":8,"j":2},{"i":7,"j":3},{"i":5,"j":4},{"i":3,"j":5},{"i":1,"j":6},{"i":0,"j":7},{"i":12,"j":8},{"i":10,"j":9},{"i":8,"j":10},{"i":7,"j":11},{"i":5,"j":12},{"i":3,"j":13},{"i":1,"j":14},{"i":0,"j":15}]},
+            {'nom': 'Menor', 'escala': [{"i":12,"j":0},{"i":10,"j":1},{"i":7,"j":3},{"i":5,"j":4},{"i":0,"j":7},{"i":12,"j":8},{"i":10,"j":9},{"i":7,"j":11},{"i":5,"j":12},{"i":0,"j":15},{"i":9,"j":2},{"i":2,"j":6},{"i":4,"j":5},{"i":9,"j":10},{"i":4,"j":13},{"i":2,"j":14}]},
+        ]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
@@ -71,7 +74,7 @@ export class EstacioSynth extends EstacioBase {
         for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
             if (indexOfArrayMatchingObject(notes, {'i': i, 'j': currentStep}) > -1){
                 const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
-                const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
+                const noteOffsetMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];  // Mapa de offsets de notes 
                 const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
                 notesToPlay.push(Tone.Frequency(midiNoteNumber, "midi").toNote());
             }
