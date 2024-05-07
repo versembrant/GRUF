@@ -121,13 +121,10 @@ export class AudioGraph {
         this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
         this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
         this.eq3Channel.receive("eq3");
-
-        const effectParams = this.store.getState().effectParameters;
-        this.applyEffectParameters(effectParams);
     }
 
     applyEffectParameters(effectParams) {
-        if (this.graphIsBuilt){
+        if (this.graphIsBuilt()){
             this.reverb.wet.value = effectParams.reverbWet;
             this.reverb.decay = effectParams.reverbDecay;
             this.delay.wet.value = effectParams.delayWet;
@@ -142,14 +139,13 @@ export class AudioGraph {
         }
     }
 
-    setEffectParameter(effectKey, value) {
-        let newEffectParameters = {...this.store.getState().effectParameters, [effectKey]: value};
+    setEffectParameters(newEffectParameters) {
         this.setParametreInStore('effectParameters', newEffectParameters);
         this.applyEffectParameters(newEffectParameters);
     }
 
-    getEffectParameter(effectKey) {
-        return this.store.getState().effectParameters[effectKey];
+    getEffectParameters() {
+        return this.store.getState().effectParameters;
     }
     
     buildAudioGraph() {
@@ -188,6 +184,9 @@ export class AudioGraph {
 
         // Carrega els volumns dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+
+        // Carrega els paràmetres dels efectes
+        this.applyEffectParameters(this.getEffectParameters());
     }
     
     async startAudioContext() {
@@ -361,11 +360,9 @@ export class AudioGraph {
             this.setMasterGain(valor);
         } else if (nomParametre === 'swing'){
             this.setSwing(valor);
-        } else  if(effectKey === 'reverbWet'|| effectKey === 'reverbDecay'|| effectKey ==='delayWet'|| effectKey ==='delayTime'|| effectKey ==='delayFeedBack'|| effectKey ==='drive' || effectKey ==='eq3HighGain'|| effectKey === 'eq3MidGain'|| effectKey ==='eq3LowGain'){
-            this.setEffectParameter(effectKey, valor);
-        }
-        
-        else {
+        } else if (nomParametre === 'effectParameters'){
+            this.setEffectParameters(valor);
+        } else {
             this.setParametreInStore(nomParametre, valor);
         }
     } 
