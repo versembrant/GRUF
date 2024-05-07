@@ -5,18 +5,17 @@ import { getAudioGraphInstance } from "../audioEngine";
 export const AudioEffectsControlPanel = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
 
-    const handleEffectParameterChange = (parameterName, value) => {
-        let newEffectParameters = parameterName === 'delayTime' ? parseInt(value, 10) : parseFloat(value);
-        getAudioGraphInstance().updateParametreAudioGraph(parameterName, newEffectParameters);
+    const handleEffectParameterChange = (effectKey, value) => {
+        const parsedValue = effectKey === 'delayTime' ? parseInt(value, 10) : parseFloat(value);
+        let newEffectParameters = {...getAudioGraphInstance().getEffectParameters() , [effectKey]: parsedValue};
+        getAudioGraphInstance().updateParametreAudioGraph('effectParameters', newEffectParameters);
     };
-
-    const effectParameters = getAudioGraphInstance().store.getState().effectParameters;
 
     return (
         <div>
             <h3>Estació de control d'efectes</h3>
             {/* Diccionari que passa per cada efecte de l'store */}
-            {Object.entries(effectParameters).map(([param, value]) => {
+            {Object.entries(getAudioGraphInstance().getEffectParameters()).map(([param, value]) => {
                 const isEqParameter = param.includes('eq3');
                 const isReverbDecay = param === 'reverbDecay';
                 let inputElement = param === 'delayTime' ? (
