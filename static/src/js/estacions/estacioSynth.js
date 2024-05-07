@@ -29,7 +29,7 @@ export class EstacioSynth extends EstacioBase {
         // Creem els nodes del graph i els guardem
         const lpf = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
         const hpf = new Tone.Filter(6000, "highpass").connect(estacioMasterChannel);
-        const synth = new Tone.PolySynth(Tone.Synth).connect(lpf).connect(hpf);
+        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf).connect(hpf);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
@@ -56,6 +56,7 @@ export class EstacioSynth extends EstacioBase {
         
             'portamento': this.getParameterValue('portamento', preset),
             'detune': this.getParameterValue('detune', preset), 
+            'harmonicity': 1,
         });
         this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
         this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
