@@ -6,52 +6,42 @@ export const AudioEffectsControlPanel = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
 
     const handleEffectParameterChange = (parameterName, value) => {
-        let floatValue;
-        if (parameterName === 'delayTime') {
-            //Per delayTime, fem servir intergers
-            floatValue = parseInt(value, 10);
-        } else {
-            floatValue = parseFloat(value);
-        }
-        // Actualitzem els paràmetres cridant a la funció setEffectParameter
-        getAudioGraphInstance().setEffectParameter(parameterName, floatValue);
+        let newEffectParameters = parameterName === 'delayTime' ? parseInt(value, 10) : parseFloat(value);
+        getAudioGraphInstance().updateParametreAudioGraph(parameterName, newEffectParameters);
     };
+
+    const effectParameters = getAudioGraphInstance().store.getState().effectParameters;
 
     return (
         <div>
             <h3>Estació de control d'efectes</h3>
-                {/* Diccionari que passa per cada efecte de l'store */}
+            {/* Diccionari que passa per cada efecte de l'store */}
+            {Object.entries(effectParameters).map(([param, value]) => {
+                const isEqParameter = param.includes('eq3');
+                const isReverbDecay = param === 'reverbDecay';
+                let inputElement = param === 'delayTime' ? (
+                    <select
+                        value={value}
+                        onChange={(e) => handleEffectParameterChange(param, e.target.value)}
+                    >
+                        <option value="1">1/4</option>
+                        <option value="2">1/8</option>
+                        <option value="4">1/16</option>
+                        <option value="3">1/8T</option>
+                        <option value="6">1/16T</option>
+                    </select>
+                ) : (
+                    <input
+                        // Ajustem aquí els paràmetres tipus range.
+                        type="range"
+                        min={isEqParameter ? "-12" : isReverbDecay ? "0.1" : "0"}
+                        max={isEqParameter ? "12" : isReverbDecay ? "10" : "1"}
+                        step={isEqParameter || isReverbDecay ? "0.01" : "0.01"}
+                        value={value}
+                        onChange={(e) => handleEffectParameterChange(param, e.target.value)}
+                    />
+                );
 
-            {Object.entries(getAudioGraphInstance().store.getState().effectParameters).map(([param, value]) => {
-                let inputElement;
-                if (param === 'delayTime') {
-                    inputElement = (
-                        <select
-                            value={value}
-                            onChange={(e) => handleEffectParameterChange(param, e.target.value)}
-                        >
-                            <option value="1">1/4</option>
-                            <option value="2">1/8</option>
-                            <option value="4">1/16</option>
-                            <option value="3">1/8T</option>
-                            <option value="6">1/16T</option>
-                        </select>
-                    );
-                } else {
-                    // Ajustem aquí els paràmetres tipus range. 
-                    const isEqParameter = param.includes('eq3');
-                    const isReverbDecay = param === 'reverbDecay';
-                    inputElement = (
-                        <input
-                            type="range"
-                            min={isEqParameter ? "-12" : isReverbDecay ? "0.1" : "0"}
-                            max={isEqParameter ? "12" : isReverbDecay ? "10" : "1"}
-                            step={isEqParameter || isReverbDecay ? "0.01" : "0.01"}
-                            value={value}
-                            onChange={(e) => handleEffectParameterChange(param, e.target.value)}
-                        />
-                    );
-                }
                 return (
                     //Retorna el nom i el input element de cada paràmetre de manera automàtica
                     <div key={param}>

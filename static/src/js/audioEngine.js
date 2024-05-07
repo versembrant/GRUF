@@ -106,40 +106,40 @@ export class AudioGraph {
 
     //Creem uns efectes
     initEffects(){
-        if (!this.graphIsBuilt()){
-            this.reverb = new Tone.Reverb().connect(this.masterGainNode);
-            this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-            this.reverbChannel.receive("reverb");
-    
-            this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
-            this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
-            this.delayChannel.receive("delay");
-    
-            this.drive = new Tone.Distortion().connect(this.masterGainNode);
-            this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
-            this.driveChannel.receive("drive");
-    
-            this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
-            this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
-            this.eq3Channel.receive("eq3");
-    
-            const effectParams = this.store.getState().effectParameters;
-            this.applyEffectParameters(effectParams);
-        } 
+        this.reverb = new Tone.Reverb().connect(this.masterGainNode);
+        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
+        this.reverbChannel.receive("reverb");
+
+        this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
+        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
+        this.delayChannel.receive("delay");
+
+        this.drive = new Tone.Distortion().connect(this.masterGainNode);
+        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
+        this.driveChannel.receive("drive");
+
+        this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
+        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
+        this.eq3Channel.receive("eq3");
+
+        const effectParams = this.store.getState().effectParameters;
+        this.applyEffectParameters(effectParams);
     }
 
     applyEffectParameters(effectParams) {
-        this.reverb.wet.value = effectParams.reverbWet;
-        this.reverb.decay = effectParams.reverbDecay;
-        this.delay.wet.value = effectParams.delayWet;
-        this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
-        this.delay.feedback.value = effectParams.delayFeedback;
-        this.drive.distortion = effectParams.drive;
-        this.eq3.set({
-            low: effectParams.eq3LowGain,
-            mid: effectParams.eq3MidGain,
-            high: effectParams.eq3HighGain
-        });
+        if (this.graphIsBuilt){
+            this.reverb.wet.value = effectParams.reverbWet;
+            this.reverb.decay = effectParams.reverbDecay;
+            this.delay.wet.value = effectParams.delayWet;
+            this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
+            this.delay.feedback.value = effectParams.delayFeedback;
+            this.drive.distortion = effectParams.drive;
+            this.eq3.set({
+                low: effectParams.eq3LowGain,
+                mid: effectParams.eq3MidGain,
+                high: effectParams.eq3HighGain
+            });
+        }
     }
 
     setEffectParameter(effectKey, value) {
@@ -354,15 +354,15 @@ export class AudioGraph {
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
         // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but 
         // are actually not likely to be set from the remote server)
+        const effectKey = nomParametre.split('.')[1];
         if (nomParametre === 'bpm') {
             this.setBpm(valor);
         } else if (nomParametre === 'masterGain') {
             this.setMasterGain(valor);
         } else if (nomParametre === 'swing'){
             this.setSwing(valor);
-        } else if (nomParametre === 'effectParameters'){
-            this.setEffectParameter(valor);
-            this.applyEffectParameters(valor);
+        } else  if(effectKey === 'reverbWet'|| effectKey === 'reverbDecay'|| effectKey ==='delayWet'|| effectKey ==='delayTime'|| effectKey ==='delayFeedBack'|| effectKey ==='drive' || effectKey ==='eq3HighGain'|| effectKey === 'eq3MidGain'|| effectKey ==='eq3LowGain'){
+            this.setEffectParameter(effectKey, valor);
         }
         
         else {
