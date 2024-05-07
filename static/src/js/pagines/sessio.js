@@ -18,6 +18,9 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);
+    /* Object.keys(currentSession.rawData.effectParameters).forEach(([param, value]) => {
+        getAudioGraphInstance().setEffectParameter(param, value);
+    }); */
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
     if (getAudioGraphInstance().graphIsBuilt()) {
