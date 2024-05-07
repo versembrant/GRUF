@@ -104,11 +104,17 @@ export class EstacioBaix extends EstacioBase {
             }
         }
     }
+    convertToBassOctave(midiNoteNumber){
+        const noteInOctave = midiNoteNumber % 12;
+        const newMidiNoteNumber = 36 + noteInOctave;
+        return newMidiNoteNumber;    
+    }
     
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
         if (!noteOff){
-            this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toFrequency()], Tone.now());
+            let bassOctaveMidiNote = this.convertToBassOctave(midiNoteNumber);
+            this.audioNodes.synth.triggerAttack([Tone.Frequency(bassOctaveMidiNote, "midi").toFrequency()], Tone.now());
         } else {
             this.audioNodes.synth.triggerRelease(Tone.now());
         }
