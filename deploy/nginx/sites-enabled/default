@@ -20,22 +20,22 @@ server {
     }
 
     # Sonicpi main deployment
-    location /sonicpi/static/dist/ {
-        alias /home/versembrant/sonicpi-renderer/static/dist/;
+    location /sonicpi/static/ {
+        alias /home/versembrant/sonicpi-renderer/app/static/;
     }
-    location /sonicpi/worker/1/ {
-        proxy_pass              http://127.0.0.1:5201/sonicpi/worker/1/;
+    location /sonicpi/worker1/streamer/ {
+        proxy_pass              http://127.0.0.1:52010/;
         proxy_http_version      1.1;
         proxy_set_header        Connection "";      
     }
-    location /sonicpi/worker/2/ {
-        proxy_pass              http://127.0.0.1:5202/sonicpi/worker/2/;
+    location /sonicpi/worker1/controller/ {
+        proxy_pass              http://127.0.0.1:52011/;
         proxy_http_version      1.1;
         proxy_set_header        Connection "";      
     }
     location /sonicpi/ {
         include uwsgi_params;
-        uwsgi_pass unix:/home/versembrant/sonicpi-renderer/versembrant-sonicpi-server.sock;
+        uwsgi_pass unix:/home/versembrant/sonicpi-renderer/app/versembrant-sonicpi-server.sock;
     }
 
     # Redirect from / to /bruixit
