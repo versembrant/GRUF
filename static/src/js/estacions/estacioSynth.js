@@ -22,7 +22,8 @@ export class EstacioSynth extends EstacioBase {
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
-        detune: {type: 'float', label: 'Detune', min: 0.0, max: 200.0, initial: 0.0}
+        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.9, max: 1.1, initial: 1.0}
+
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -43,20 +44,33 @@ export class EstacioSynth extends EstacioBase {
 
     updateAudioGraphFromState(preset) {
         this.audioNodes.synth.set({
-            'envelope': {
-                attack:  this.getParameterValue('attack', preset),
-                decay: this.getParameterValue('decay', preset),
-                sustain: this.getParameterValue('sustain', preset),
-                release: this.getParameterValue('release', preset),
-            },
-            'oscillator': {
-                type: this.getParameterValue('waveform', preset),
-            },
             'volume': -12,  // Avoid clipping, specially when using sine
-        
-            'portamento': this.getParameterValue('portamento', preset),
-            'detune': this.getParameterValue('detune', preset), 
-            'harmonicity': 1,
+            
+            voice0: {
+                'portamento': this.getParameterValue('portamento', preset),
+                'envelope': {
+                    attack:  this.getParameterValue('attack', preset),
+                    decay: this.getParameterValue('decay', preset),
+                    sustain: this.getParameterValue('sustain', preset),
+                    release: this.getParameterValue('release', preset),
+                },
+                'oscillator': {
+                    type: this.getParameterValue('waveform', preset),
+                },
+            },
+            voice1: {
+                'portamento': this.getParameterValue('portamento', preset),
+                'envelope': {
+                    attack:  this.getParameterValue('attack', preset),
+                    decay: this.getParameterValue('decay', preset),
+                    sustain: this.getParameterValue('sustain', preset),
+                    release: this.getParameterValue('release', preset),
+                },
+                'oscillator': {
+                    type: this.getParameterValue('waveform', preset),
+                },
+            },   
+            'harmonicity': this.getParameterValue('harmonicity', preset),
         });
         this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
         this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
