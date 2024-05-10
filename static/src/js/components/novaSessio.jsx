@@ -22,7 +22,7 @@ export const NovaSessio = () => {
         sessionData.swing = 0;
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
-        sessionData.live = {'gainsEstacions': {}, 'presetsEstacions': {}}
+        sessionData.live = {'gainsEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
