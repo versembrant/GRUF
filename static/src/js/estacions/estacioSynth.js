@@ -14,8 +14,8 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
-        cutoff: {type: 'float', label: 'Filtre', min: 500, max: 15000, initial: 15000, logarithmic: true},
-        //shelf: {type: 'float', label: 'Shelf', min: -2, max: 2, initial: 0},
+        lpf: {type: 'float', label: 'LPF', min: 500, max: 15000, initial: 15000, logarithmic: true},
+        hpf: {type: 'float', label: 'HPF', min: 20, max: 6000, initial: 20, logarithmic: true},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
@@ -24,12 +24,14 @@ export class EstacioSynth extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const filtre = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
-        const synth = new Tone.PolySynth(Tone.Synth).connect(filtre);
+        const lpf = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
+        const hpf = new Tone.Filter(6000, "highpass").connect(estacioMasterChannel);
+        const synth = new Tone.PolySynth(Tone.Synth).connect(lpf).connect(hpf);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
-            filtre: filtre,
+            lpf: lpf,
+            hpf: hpf,
             sendReverbGainNode: estacioMasterChannel.send("reverb", -100),
             sendChorusGainNode: estacioMasterChannel.send("chorus", -100),
             sendDelayGainNode: estacioMasterChannel.send("delay", -100),
@@ -49,7 +51,8 @@ export class EstacioSynth extends EstacioBase {
             },
             'volume': -12,  // Avoid clipping, specially when using sine
         });
-        this.audioNodes.filtre.frequency.rampTo(this.getParameterValue('cutoff', preset),0.01);
+        this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
+        this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);

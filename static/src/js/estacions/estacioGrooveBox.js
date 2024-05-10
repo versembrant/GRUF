@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
 import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
-import { getAudioGraphInstance } from '../audioEngine';
+import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioGrooveBox extends EstacioBase {
     
@@ -37,7 +37,18 @@ export class EstacioGrooveBox extends EstacioBase {
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -60, max: 6, initial: -60},
         masterEffectsGain: {type: 'float', label: 'Effects send', min: -60, max: 6, initial: -60},
-        pattern: {type: 'grid', label:'Pattern', numRows: 4, numCols: 16, initial:[], showRecButton: true},
+        pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[
+            {'nom': 'Hip Hop Classic 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}]}, 
+            {'nom': 'Hip Hop classic 2' , 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}]},
+            {'nom': 'Reggae Roots', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":15},{"i":2,"j":2},{"i":3,"j":4},{"i":0,"j":11},{"i":3,"j":11},{"i":1,"j":13},{"i":3,"j":13}]},
+            {'nom': 'Dub Reggae', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":3,"j":4},{"i":1,"j":2},{"i":3,"j":2},{"i":2,"j":4},{"i":3,"j":6},{"i":0,"j":8},{"i":3,"j":8},{"i":3,"j":10},{"i":2,"j":12},{"i":3,"j":12},{"i":3,"j":14}]},
+            {'nom': 'Soul Pop (Billie Jean)', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":4},{"i":3,"j":8},{"i":2,"j":12}]},
+            {'nom': 'Funky Soul', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":2},{"i":3,"j":8},{"i":1,"j":14},{"i":2,"j":15}]},
+            {'nom': 'Acid House', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":8},{"i":0,"j":0},{"i":3,"j":4},{"i":3,"j":12},{"i":0,"j":14}]},
+            {'nom': 'Trap 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":1,"j":7},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":14},{"i":1,"j":15}]},
+            {'nom': 'Trap 2', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":15},{"i":1,"j":4},{"i":3,"j":4},{"i":1,"j":9},{"i":3,"j":15}]},
+            {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
+        ]},
     }
 
     getTempsBeat = () => {
@@ -215,7 +226,7 @@ export class EstacioGrooveBox extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
-        const currentStep = currentMainSequencerStep % this.getParameterDescription('pattern').numCols;
+        const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps());
         const pattern = this.getParameterValue('pattern', this.currentPreset);
         const shouldPlaySound1 = indexOfArrayMatchingObject(pattern, {'i': 0, 'j': currentStep}) > -1;
         const shouldPlaySound2 = indexOfArrayMatchingObject(pattern, {'i': 1, 'j': currentStep}) > -1;
@@ -259,8 +270,9 @@ export class EstacioGrooveBox extends EstacioBase {
         if (!noteOff){
             const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
             // Si Rec està ON
-            if (recEnabled) {
-                const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % this.getParameterDescription('pattern').numCols;
+            if (recEnabled) {   
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
                 const pattern = this.getParameterValue('pattern', this.currentPreset);
                 const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
                 if (index === -1) {

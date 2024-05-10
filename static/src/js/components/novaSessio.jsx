@@ -20,6 +20,7 @@ export const NovaSessio = () => {
         const sessionData = {}
         sessionData.bpm = 120;
         sessionData.swing = 0;
+        sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
