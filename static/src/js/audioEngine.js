@@ -386,7 +386,7 @@ export class AudioGraph {
         } else if (nomParametre === 'compas'){
             this.setCompas(valor);
         }
-        else 
+        else {
             this.setParametreInStore(nomParametre, valor);
         }
     } 
@@ -397,7 +397,6 @@ export class AudioGraph {
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
-    
 }
 
 const audioGraph = new AudioGraph();
