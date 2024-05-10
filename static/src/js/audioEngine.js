@@ -26,6 +26,7 @@ export class AudioGraph {
             playing: false,
             playingArranjement: false,
             swing: 0,
+            compas: '4/4',
             effectParameters: {
                 reverbWet:0,
                 reverbDecay: 0.1,
@@ -37,7 +38,6 @@ export class AudioGraph {
                 eq3MidGain: 0,
                 eq3LowGain: 0,
             }
-            
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -334,6 +334,27 @@ export class AudioGraph {
         this.setParametreInStore('swing', swing);
     }
 
+    getCompas(){
+        return this.store.getState().compas;
+    }
+
+    setCompas(compas){
+        this.setParametreInStore('compas', compas);
+    }
+
+    getNumSteps (){
+        const compas = this.getCompas();
+        if (compas === '2/4'){
+            return 8
+        } 
+        else if (compas === '3/4') {
+            return 12
+        }
+        else if (compas === '4/4') {
+            return 16
+        }
+    } 
+
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -362,7 +383,10 @@ export class AudioGraph {
             this.setSwing(valor);
         } else if (nomParametre === 'effectParameters'){
             this.setEffectParameters(valor);
-        } else {
+        } else if (nomParametre === 'compas'){
+            this.setCompas(valor);
+        }
+        else 
             this.setParametreInStore(nomParametre, valor);
         }
     } 
