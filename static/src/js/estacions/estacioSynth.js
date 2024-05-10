@@ -22,7 +22,7 @@ export class EstacioSynth extends EstacioBase {
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
-        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.9, max: 1.1, initial: 1.0}
+        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0}
 
     }
 
