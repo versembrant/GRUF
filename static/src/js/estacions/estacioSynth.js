@@ -31,7 +31,7 @@ export class EstacioSynth extends EstacioBase {
         const hpf = new Tone.Filter(6000, "highpass", -24).connect(estacioMasterChannel);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
         const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        synth.set({maxPolyphony: 16});
+        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
@@ -42,10 +42,27 @@ export class EstacioSynth extends EstacioBase {
         };
     }
 
+    setParameters(parametersDict) {
+        for (const [name, value] of Object.entries(parametersDict)) {
+            if (name == "lpf") {
+                this.audioNodes.lpf.frequency.rampTo(value, 0.01);
+            } else if (name == "hpf") {
+                this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+            } else if (name == "portamento") {
+                this.audioNodes.synth.set({
+                    voice0: {'portamento': value },
+                    voice1: {'portamento': value },
+                });
+            } else if (name == "harmonicity") {
+                this.audioNodes.synth.set({
+                    'harmonicity': value,
+                });
+            } // TODO: continuar amb tots els paràmetres un a un....
+        }
+    }
+
     updateAudioGraphFromState(preset) {
-        this.audioNodes.synth.set({
-            'volume': -12,  // Avoid clipping, specially when using sine
-            
+        this.audioNodes.synth.set({            
             voice0: {
                 'portamento': this.getParameterValue('portamento', preset),
                 'envelope': {
@@ -77,11 +94,24 @@ export class EstacioSynth extends EstacioBase {
         this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
         this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
         this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
+
+        // TODO: quan setParameters funcioni, aquesta funció la podem eliminar i canviar per això:
+        // (no he provat si funciona o no, suposo que si pero potser hi ha algun error sintàctic)
+        /*
+        const parametersDict = {}
+        this.parametersDescription.keys().forEach(nomParametre => {
+            parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
+        })
+        this.setParameters(parametersDict)
+        */
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
         // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
         this.updateAudioGraphFromState(preset);
+
+        // TODO: quan setParameters funcioni, en aquesta funció en comptes de updateAudioGraphFromState, cridarem:
+        // this.setParameters({nomParametre, this.getParameterValue(nomParametre, preset)})
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
