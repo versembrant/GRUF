@@ -15,8 +15,8 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
-        lpf: {type: 'float', label: 'LPF', min: 500, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', min: 20, max: 6000, initial: 20, logarithmic: true},
+        lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
+        hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
@@ -28,9 +28,9 @@ export class EstacioSynth extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const lpf = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
-        const hpf = new Tone.Filter(6000, "highpass").connect(estacioMasterChannel);
-        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf).connect(hpf);
+        const hpf = new Tone.Filter(6000, "highpass", -24).connect(estacioMasterChannel);
+        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
+        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
         synth.set({maxPolyphony: 16});
         this.audioNodes = {
             synth: synth,
