@@ -57,7 +57,38 @@ export class EstacioSynth extends EstacioBase {
                 this.audioNodes.synth.set({
                     'harmonicity': value,
                 });
-            } // TODO: continuar amb tots els paràmetres un a un....
+            } else if (name == "envelope"){
+                this.audioNodes.synth.set({
+                    voice0: {'envelope': {
+                        attack: value,
+                        decay: value,
+                        sustain: value,
+                        release: value,
+                    }},
+                    voice1: {'envelope': {
+                        attack: value,
+                        decay: value,
+                        sustain: value,
+                        release: value,
+                    }},
+                })
+            } else if (name == "oscillator"){
+                this.audioNodes.synth.set({
+                    voice0: {'oscillator': {
+                        type: value,
+                    }},
+                    voice1: {'oscillator': {
+                        type: value,
+                    }},
+                })
+            } else if (name == "reverbSend"){
+                this.audioNodes.sendReverbGainNode.gain.value = value;
+            } else if (name == "chorusSend"){
+                this.audioNodes.sendChorusGainNode.gain.value = value;
+            } else if (name == "delaySend"){
+                this.audioNodes.sendDelayGainNode.gain.value = value;
+            }
+            // TODO: continuar amb tots els paràmetres un a un....
         }
     }
 
