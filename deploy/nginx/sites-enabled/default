@@ -33,6 +33,16 @@ server {
         proxy_http_version      1.1;
         proxy_set_header        Connection "";      
     }
+    location /sonicpi/worker2/streamer/ {
+        proxy_pass              http://127.0.0.1:52020/;
+        proxy_http_version      1.1;
+        proxy_set_header        Connection "";      
+    }
+    location /sonicpi/worker2/controller/ {
+        proxy_pass              http://127.0.0.1:52021/;
+        proxy_http_version      1.1;
+        proxy_set_header        Connection "";      
+    }
     location /sonicpi/ {
         include uwsgi_params;
         uwsgi_pass unix:/home/versembrant/sonicpi-renderer/app/versembrant-sonicpi-server.sock;
