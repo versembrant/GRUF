@@ -140,7 +140,7 @@ export class EstacioSynth extends EstacioBase {
         //this.updateAudioGraphFromState(preset);
 
         // TODO: quan setParameters funcioni, en aquesta funció en comptes de updateAudioGraphFromState, cridarem:
-         this.setParameters(nomParametre, this.getParameterValue(nomParametre, preset))
+         this.setParameters({nomParametre: this.getParameterValue(nomParametre, preset)})
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
