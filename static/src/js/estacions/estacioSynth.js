@@ -57,29 +57,19 @@ export class EstacioSynth extends EstacioBase {
                 this.audioNodes.synth.set({
                     'harmonicity': value,
                 });
-            } else if (name == "envelope"){
+            } else if ((name == "attack")
+                    || (name == "decay")
+                    || (name == "sustain")
+                    || (name == "release")
+            ){
                 this.audioNodes.synth.set({
-                    voice0: {'envelope': {
-                        attack: value,
-                        decay: value,
-                        sustain: value,
-                        release: value,
-                    }},
-                    voice1: {'envelope': {
-                        attack: value,
-                        decay: value,
-                        sustain: value,
-                        release: value,
-                    }},
+                    voice0: {'envelope': {[name]: value}},
+                    voice1: {'envelope': {[name]: value}},
                 })
-            } else if (name == "oscillator"){
+            } else if (name == "waveform"){
                 this.audioNodes.synth.set({
-                    voice0: {'oscillator': {
-                        type: value,
-                    }},
-                    voice1: {'oscillator': {
-                        type: value,
-                    }},
+                    voice0: {'oscillator': { type: value }},
+                    voice1: {'oscillator': { type: value }},
                 })
             } else if (name == "reverbSend"){
                 this.audioNodes.sendReverbGainNode.gain.value = value;
@@ -92,42 +82,6 @@ export class EstacioSynth extends EstacioBase {
     }
 
     updateAudioGraphFromState(preset) {
-        // this.audioNodes.synth.set({            
-        //     voice0: {
-        //         'portamento': this.getParameterValue('portamento', preset),
-        //         'envelope': {
-        //             attack:  this.getParameterValue('attack', preset),
-        //             decay: this.getParameterValue('decay', preset),
-        //             sustain: this.getParameterValue('sustain', preset),
-        //             release: this.getParameterValue('release', preset),
-        //         },
-        //         'oscillator': {
-        //             type: this.getParameterValue('waveform', preset),
-        //         },
-        //     },
-        //     voice1: {
-        //         'portamento': this.getParameterValue('portamento', preset),
-        //         'envelope': {
-        //             attack:  this.getParameterValue('attack', preset),
-        //             decay: this.getParameterValue('decay', preset),
-        //             sustain: this.getParameterValue('sustain', preset),
-        //             release: this.getParameterValue('release', preset),
-        //         },
-        //         'oscillator': {
-        //             type: this.getParameterValue('waveform', preset),
-        //         },
-        //     },   
-        //     'harmonicity': this.getParameterValue('harmonicity', preset),
-        // });
-        // this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
-        // this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
-        // this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
-        // this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
-        // this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
-
-        // TODO: quan setParameters funcioni, aquesta funció la podem eliminar i canviar per això:
-        // (no he provat si funciona o no, suposo que si pero potser hi ha algun error sintàctic)
-        
         const parametersDict = {}
         Object.keys(this.parametersDescription).forEach(nomParametre => {
             parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
@@ -136,11 +90,7 @@ export class EstacioSynth extends EstacioBase {
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
-        // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
-        //this.updateAudioGraphFromState(preset);
-
-        // TODO: quan setParameters funcioni, en aquesta funció en comptes de updateAudioGraphFromState, cridarem:
-         this.setParameters({nomParametre: this.getParameterValue(nomParametre, preset)})
+        this.setParameters({[nomParametre]: this.getParameterValue(nomParametre, preset)})
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
