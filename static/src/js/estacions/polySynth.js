@@ -4,7 +4,7 @@ import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
-export class EstacioSynth extends EstacioBase {
+export class PolySynth extends EstacioBase {
 
     tipus = 'synth'
     versio = '0.1'
