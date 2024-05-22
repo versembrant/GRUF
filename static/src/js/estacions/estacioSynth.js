@@ -2,6 +2,7 @@ import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
+import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
 export class EstacioSynth extends EstacioBase {
 
@@ -14,20 +15,23 @@ export class EstacioSynth extends EstacioBase {
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
-        lpf: {type: 'float', label: 'LPF', min: 500, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', min: 20, max: 6000, initial: 20, logarithmic: true},
+        lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
+        hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
+        portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
+        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0}
+
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const lpf = new Tone.Filter(500, "lowpass").connect(estacioMasterChannel);
-        const hpf = new Tone.Filter(6000, "highpass").connect(estacioMasterChannel);
-        const synth = new Tone.PolySynth(Tone.Synth).connect(lpf).connect(hpf);
-        synth.set({maxPolyphony: 16});
+        const hpf = new Tone.Filter(6000, "highpass", -24).connect(estacioMasterChannel);
+        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
+        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
+        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
@@ -38,29 +42,55 @@ export class EstacioSynth extends EstacioBase {
         };
     }
 
+    setParameters(parametersDict) {
+        for (const [name, value] of Object.entries(parametersDict)) {
+            if (name == "lpf") {
+                this.audioNodes.lpf.frequency.rampTo(value, 0.01);
+            } else if (name == "hpf") {
+                this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+            } else if (name == "portamento") {
+                this.audioNodes.synth.set({
+                    voice0: {'portamento': value },
+                    voice1: {'portamento': value },
+                });
+            } else if (name == "harmonicity") {
+                this.audioNodes.synth.set({
+                    'harmonicity': value,
+                });
+            } else if ((name == "attack")
+                    || (name == "decay")
+                    || (name == "sustain")
+                    || (name == "release")
+            ){
+                this.audioNodes.synth.set({
+                    voice0: {'envelope': {[name]: value}},
+                    voice1: {'envelope': {[name]: value}},
+                })
+            } else if (name == "waveform"){
+                this.audioNodes.synth.set({
+                    voice0: {'oscillator': { type: value }},
+                    voice1: {'oscillator': { type: value }},
+                })
+            } else if (name == "reverbSend"){
+                this.audioNodes.sendReverbGainNode.gain.value = value;
+            } else if (name == "chorusSend"){
+                this.audioNodes.sendChorusGainNode.gain.value = value;
+            } else if (name == "delaySend"){
+                this.audioNodes.sendDelayGainNode.gain.value = value;
+            }
+        }
+    }
+
     updateAudioGraphFromState(preset) {
-        this.audioNodes.synth.set({
-            'envelope': {
-                attack:  this.getParameterValue('attack', preset),
-                decay: this.getParameterValue('decay', preset),
-                sustain: this.getParameterValue('sustain', preset),
-                release: this.getParameterValue('release', preset),
-            },
-            'oscillator': {
-                type: this.getParameterValue('waveform', preset),
-            },
-            'volume': -12,  // Avoid clipping, specially when using sine
-        });
-        this.audioNodes.lpf.frequency.rampTo(this.getParameterValue('lpf', preset),0.01);
-        this.audioNodes.hpf.frequency.rampTo(this.getParameterValue('hpf', preset),0.01);
-        this.audioNodes.sendReverbGainNode.gain.value = this.getParameterValue('reverbSend',preset);
-        this.audioNodes.sendChorusGainNode.gain.value = this.getParameterValue('chorusSend',preset);
-        this.audioNodes.sendDelayGainNode.gain.value = this.getParameterValue('delaySend',preset);
+        const parametersDict = {}
+        Object.keys(this.parametersDescription).forEach(nomParametre => {
+            parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
+        })
+        this.setParameters(parametersDict) 
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
-        // Com que hi ha molt poc a actualizar, sempre actualitzem tots els parametres sense comprovar quin ha canviat (sense optimitzar)
-        this.updateAudioGraphFromState(preset);
+        this.setParameters({[nomParametre]: this.getParameterValue(nomParametre, preset)})
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
