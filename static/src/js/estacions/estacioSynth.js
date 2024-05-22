@@ -9,7 +9,6 @@ export class EstacioSynth extends EstacioBase {
     tipus = 'synth'
     versio = '0.1'
     parametersDescription = {
-        noteBase: {type: 'float', label:'Nota base', min: 0, max: 127, step: 1, initial: 64},
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
@@ -17,13 +16,12 @@ export class EstacioSynth extends EstacioBase {
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
-        notes: {type: 'grid', label:'Notes', numRows: 8, numCols: 16, initial:[]},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[]},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0}
-
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -94,27 +92,60 @@ export class EstacioSynth extends EstacioBase {
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
-        // Check if sounds should be played in the current step and do it
-        const currentStep = currentMainSequencerStep % this.getParameterDescription('notes').numCols;
+        // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
+        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
         const notes = this.getParameterValue('notes', this.currentPreset);
-        const notesToPlay = [];
-        for (let i = 0; i < this.getParameterDescription('notes').numRows; i++) {
-            if (indexOfArrayMatchingObject(notes, {'i': i, 'j': currentStep}) > -1){
-                const noteOffset = this.getParameterDescription('notes').numRows - 1 - i;  // 0 = nota més greu, numRows = nota més aguda
-                const noteOffsetMap = [0, 2, 4, 5, 7, 9, 11, 12];  // Mapa de offsets de notes (per fer intervals musicals)
-                const midiNoteNumber = this.getParameterValue('noteBase', this.currentPreset) + noteOffsetMap[noteOffset];  // Midi numbers
-                notesToPlay.push(Tone.Frequency(midiNoteNumber, "midi").toNote());
+        for (let i = 0; i < notes.length; i++) {
+            const minBeat = currentStep;
+            const maxBeat = currentStep + 1;
+            const note = notes[i];
+            // note will be an object with properties
+            // b = beat (or step in which the note has to be played)
+            // n = midi note number
+            // d = duration of the note in beats (or steps)
+            if ((note.b >= minBeat) && (note.b < maxBeat)) {
+                this.audioNodes.synth.triggerAttackRelease([Tone.Frequency(note.n, "midi").toNote()], note.d * Tone.Time("16n").toSeconds(), time);
             }
         }
-        this.audioNodes.synth.triggerAttackRelease(notesToPlay, "16n", time);
     }
+
+    onTransportStop() {
+        // Stop all notes that are still playing
+        this.audioNodes.synth.releaseAll()
+    }
+
+    lastNoteOnBeats = {}
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
+
+        const recEnabled = document.getElementById(this.nom + '_notes_REC').checked;
         if (!noteOff){
             this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+            if (recEnabled){
+                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
+                // the note on time to save it
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                this.lastNoteOnBeats[midiNoteNumber] = currentStep;
+            }
         } else {
             this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+            if (recEnabled){
+                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
+                const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
+                if (lastNoteOnTimeForNote !== undefined){
+                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                    const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                    if (lastNoteOnTimeForNote < currentStep){
+                        // Only save the note if note off time is bigger than note on time
+                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
+                        this.updateParametreEstacio('notes', notes); // save change in server!
+                    }
+                    this.lastNoteOnBeats[midiNoteNumber] = undefined;
+                }
+            }
         }
     }
 }
