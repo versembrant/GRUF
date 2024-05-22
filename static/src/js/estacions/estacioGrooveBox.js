@@ -278,6 +278,7 @@ export class EstacioGrooveBox extends EstacioBase {
                 if (index === -1) {
                     // Si la nota no està en el patró, l'afegeix
                     pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
+                    this.updateParametreEstacio('pattern', pattern); // save change in server!
                 };
             }
             // Play
