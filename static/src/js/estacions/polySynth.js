@@ -6,7 +6,7 @@ import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
 export class PolySynth extends EstacioBase {
 
-    tipus = 'synth'
+    tipus = 'polySynth'
     versio = '0.1'
     parametersDescription = {
         noteBase: {type: 'float', label:'Nota base', min: 0, max: 127, step: 1, initial: 64},
