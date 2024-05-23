@@ -78,7 +78,11 @@ export class EstacioSynth extends EstacioBase {
             drive: new Tone.Distortion({
                 distortion: 0,
             }),
-            eq3: new Tone.EQ3(),
+            eq3: new Tone.EQ3({
+                low: 0,
+                mid: 0,
+                high: 0,
+            }),
         }
         const effectsChannels = {
             reverbChannel: new Tone.Channel(),
@@ -139,6 +143,10 @@ export class EstacioSynth extends EstacioBase {
         this.updateEffectParameter('delay','wet','delayTime', preset);
         this.updateEffectParameter('delay','feedback','delayFeedback', preset);
         this.updateEffectParameter('drive','distortion','drive', preset);
+        this.updateEffectParameter('eq3','low','low', preset);
+        this.updateEffectParameter('eq3','mid','mid', preset);
+        this.updateEffectParameter('eq3','high','high', preset);
+
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
