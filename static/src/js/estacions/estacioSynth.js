@@ -140,13 +140,12 @@ export class EstacioSynth extends EstacioBase {
         this.updateEffectParameter('reverb','wet','reverbWet', preset);
         this.updateEffectParameter('reverb','decay','reverbDecay', preset);
         this.updateEffectParameter('delay','wet','delayWet', preset);
-        this.updateEffectParameter('delay','wet','delayTime', preset);
+        this.updateEffectParameter('delay','delayTime','delayTime', preset);
         this.updateEffectParameter('delay','feedback','delayFeedback', preset);
         this.updateEffectParameter('drive','distortion','drive', preset);
         this.updateEffectParameter('eq3','low','low', preset);
         this.updateEffectParameter('eq3','mid','mid', preset);
         this.updateEffectParameter('eq3','high','high', preset);
-
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
