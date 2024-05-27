@@ -21,10 +21,6 @@ export class PolySynth extends EstacioBase {
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
-        reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
-        delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
-        driveSend:{type: 'float', label: 'Drive Send', min: -60, max: 6, initial: -60},
-        eq3Send: {type: 'float', label: 'EQ3 Send', min: -60, max: 6, initial: -60},
         reverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 1.0},
         reverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
         delayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 1.0},
@@ -52,12 +48,8 @@ export class PolySynth extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const dryGainNode = new Tone.Channel().connect(estacioMasterChannel);
-        const hpf = new Tone.Filter(6000, "highpass", -24).connect(dryGainNode);
-        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
-        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
-
+        const hpf = new Tone.Filter(6000, "highpass", -24);
+        const lpf = new Tone.Filter(500, "lowpass", -24);
         const effects = {
             reverb: new Tone.Reverb({
                 decay: 0.5,
@@ -77,38 +69,17 @@ export class PolySynth extends EstacioBase {
                 high: 0,
             }),
         }
-        const effectsChannels = {
-            reverbChannel: new Tone.Channel(),
-            delayChannel: new Tone.Channel(),
-            driveChannel: new Tone.Channel(),
-            eq3Channel: new Tone.Channel(),
-        }
-
-        //Connectem els efectes a la sortida d'àudio
-        Object.values(effects).forEach(effect => {
-            effect.connect(estacioMasterChannel);
-        }); 
-
-        //Connectem els canals d'efectes al seu respectiu efecte
-        Object.keys(effectsChannels).forEach((key, index) => {
-            const effectKey = Object.keys(effects)[index];
-            effectsChannels[key].connect(effects[effectKey]);
-        });
-
-        Object.keys(effectsChannels).forEach(key => {
-            const busName = key.replace('Channel', 'Synth'); // exemple: reverbChannel -> reverbSynth
-            effectsChannels[key].receive(busName);
-        });
-
+        const chainEffects = () => {
+            return [effects.drive, effects.delay, effects.reverb, effects.eq3];
+        };
+        const synth = new Tone.PolySynth(Tone.DuoSynth).chain(lpf, hpf, ...chainEffects(), estacioMasterChannel);
+        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
+        
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
             hpf: hpf,
             effects: effects,
-            sendReverbGainNode: dryGainNode.send("reverbSynth", -100),
-            sendDelayGainNode: dryGainNode.send("delaySynth", -100),
-            sendDriveGainNode: dryGainNode.send("driveSynth", -100),
-            sendEq3GainNode: dryGainNode.send('eq3Synth', -100),
         };
     }
 
@@ -142,14 +113,6 @@ export class PolySynth extends EstacioBase {
                     voice0: {'oscillator': { type: value }},
                     voice1: {'oscillator': { type: value }},
                 })
-            } else if (name == "reverbSend"){
-                this.audioNodes.sendReverbGainNode.gain.value = value;
-            } else if (name == "delaySend"){
-                this.audioNodes.sendDelayGainNode.gain.value = value;
-            } else if (name == "driveSend"){
-                this.audioNodes.sendDriveGainNode.gain.value = value;
-            } else if (name == "eq3Send"){
-                this.audioNodes.sendEq3GainNode.gain.value = value;
             } else if (name == "reverbWet"){
                 this.updateEffectParameter('reverb','wet', value);
             } else if (name == "reverbDecay"){
