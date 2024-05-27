@@ -3,6 +3,7 @@ import './serverComs'
 import './audioEngine'
 import './sessionManager'
 import './midi'
+import './3rd_party/webaudio-pianoroll'
 
 // CSS
 import '../styles/index.scss'
