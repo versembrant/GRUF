@@ -14,8 +14,8 @@ import {registerEstacioDisponible} from './sessionManager'
 import {EstacioDrumMachine} from './estacions/estacioDrumMachine'
 registerEstacioDisponible(EstacioDrumMachine);
 
-import {EstacioSynth} from './estacions/estacioSynth'
-registerEstacioDisponible(EstacioSynth);
+import {PolySynth} from './estacions/polySynth'
+registerEstacioDisponible(PolySynth);
 
 import {EstacioGrooveBox} from './estacions/estacioGrooveBox'
 registerEstacioDisponible(EstacioGrooveBox);

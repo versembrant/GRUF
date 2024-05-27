@@ -4,9 +4,9 @@ import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
-export class EstacioSynth extends EstacioBase {
+export class PolySynth extends EstacioBase {
 
-    tipus = 'synth'
+    tipus = 'poly_synth'
     versio = '0.1'
     parametersDescription = {
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
@@ -20,7 +20,6 @@ export class EstacioSynth extends EstacioBase {
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
-        portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0}
     }
 
@@ -46,11 +45,6 @@ export class EstacioSynth extends EstacioBase {
                 this.audioNodes.lpf.frequency.rampTo(value, 0.01);
             } else if (name == "hpf") {
                 this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-            } else if (name == "portamento") {
-                this.audioNodes.synth.set({
-                    voice0: {'portamento': value },
-                    voice1: {'portamento': value },
-                });
             } else if (name == "harmonicity") {
                 this.audioNodes.synth.set({
                     'harmonicity': value,
