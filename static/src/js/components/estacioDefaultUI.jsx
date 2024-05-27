@@ -186,7 +186,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
     return (
         <div>
             <p>{parameterDescription.label}: {JSON.stringify(parameterValue)}</p>
-            <div>
+            <div style={{overflow:"scroll"}}>
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
                     width="400"
