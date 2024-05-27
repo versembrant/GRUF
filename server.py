@@ -101,7 +101,7 @@ class Session(object):
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
-            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'synth':
+            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'polySynth':
                 for nom, valors_presets in estacio['parametres'].items():
                     if nom == 'pattern' or nom == 'notes':
                         nous_valors_presets = []
@@ -240,7 +240,7 @@ class Session(object):
         # Envia el nou paràmetre als clients connectats
         update_count_per_session[self.id] += 1
         emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor, 'preset': preset}, to=self.room_name)
-
+        
         # Guarda el canvi a la sessió al servidor
         try:
             self.data['estacions'][nom_estacio]['parametres'][nom_parametre][preset] = valor
