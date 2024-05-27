@@ -45,7 +45,6 @@ export class PolySynth extends EstacioBase {
             return 60/ (6*(getAudioGraphInstance().getBpm()));
     }
 
-
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
         const hpf = new Tone.Filter(6000, "highpass", -24);
@@ -63,6 +62,9 @@ export class PolySynth extends EstacioBase {
             drive: new Tone.Distortion({
                 distortion: 0,
             }),
+            driveMakeupGain: new Tone.Gain({
+                gain: 1.0,
+            }),
             eq3: new Tone.EQ3({
                 low: 0,
                 mid: 0,
@@ -70,7 +72,7 @@ export class PolySynth extends EstacioBase {
             }),
         }
         const chainEffects = () => {
-            return [effects.drive, effects.delay, effects.reverb, effects.eq3];
+            return [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
         };
         const synth = new Tone.PolySynth(Tone.DuoSynth).chain(lpf, hpf, ...chainEffects(), estacioMasterChannel);
         synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
@@ -124,7 +126,10 @@ export class PolySynth extends EstacioBase {
             } else if (name == "delayFeedback"){
                 this.updateEffectParameter('delay','feedback', value);
             } else if (name == "drive"){
+                this.updateEffectParameter('drive','wet', 1.0);
                 this.updateEffectParameter('drive','distortion', value);
+                const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
+                this.updateEffectParameter('driveMakeupGain','gain', makeupGain);
             } else if (name == "low"){
                 this.updateEffectParameter('eq3','low', value);
             } else if (name == "mid"){
