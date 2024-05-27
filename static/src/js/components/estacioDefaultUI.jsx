@@ -1,8 +1,9 @@
-import { createElement, useState } from "react";
+import { createElement, useState, useEffect } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
+import isequal from 'lodash.isequal'
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     return (
@@ -124,6 +125,88 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
     )
 };
 
+const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
+    const estacio = getCurrentSession().getEstacio(nomEstacio);
+    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
+    const uniqueId = estacio.nom + "_" + parameterDescription.nom
+    let lastEditedData = "";
+    
+    useEffect(() => {
+        const jsElement = document.getElementById(uniqueId + "_id")
+        if (jsElement.dataset.alreadyBinded === undefined){
+            jsElement.addEventListener("pianoRollEdited", evt => {
+                const stringifiedData = JSON.stringify(evt.detail)
+                if (!isequal(stringifiedData, lastEditedData)) {
+                    handleSequenceEdited(evt.detail)
+                    lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
+                }
+            });
+            jsElement.dataset.alreadyBinded = true;
+        }
+        if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
+            jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
+            jsElement.redraw()
+        }
+        if (currentStep >= 0) {
+            jsElement.locate(currentStep);
+        } else {
+            jsElement.locate(-10);  // make it dissapear
+        }
+    })
+
+    const appSequenceToWidgetSequence = (sequence) => {
+        return sequence.map(value => {return {
+            't': value.b,  // time in beats
+            'n': value.n,  // midi note number
+            'g': value.d,  // note duration in beats
+            'f': value.s,  // note is selected
+            'on': value.on,  // original note
+            'ot': value.ob,  // original time
+            'og': value.od,  // original duration
+        }})
+    }
+
+    const widgetSequenceToAppSequence = (wSequence) => {
+        return wSequence.map(value => {return {
+            'b': value.t,  // beat position
+            'n': value.n,  // midi note number
+            'd': value.g,  // note duration in beats
+            's': value.f,  // note is selected
+            'on': value.on,  // original note
+            'ob': value.ot,  // original time
+            'od': value.og,  // original duration
+        }})
+    }
+
+    const handleSequenceEdited = (widgetSequence) => {
+        getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
+    }
+
+    return (
+        <div>
+            <p>{parameterDescription.label}: {JSON.stringify(parameterValue)}</p>
+            <div style={{overflow:"scroll"}}>
+                <webaudio-pianoroll
+                    id={uniqueId + "_id"}
+                    width="400"
+                    xrange={numSteps}
+                    yrange={24}
+                    xruler={0}
+                    markstart={-10}  // make it dissapear
+                    markend={-10}  // make it dissapear
+                    yscroll={1}
+                ></webaudio-pianoroll>
+            </div>
+            <button onMouseDown={(evt)=>
+                getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, [])
+            }>Clear</button>
+            { parameterDescription.showRecButton && <label><input id={nomEstacio + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+        </div>
+    )
+};
+
+
 // Util function to create UI widgets for the default UIs
 const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     const parameterDescription = estacio.getParameterDescription(nomParametre);
@@ -133,7 +216,8 @@ const creaUIWidgetPerParametre = (estacio, nomParametre) => {
         enum: EnumParameterDefaultWidget,
         text: TextParameterDefaultWidget,
         grid: GridParameterDefaultWidget,
-        bool: BoolParameterDefaultWidget
+        bool: BoolParameterDefaultWidget,
+        piano_roll: PianoRollParameterDefaultWidget
     }
     const widgetUIClass = widgetUIClassParameterType[parameterDescription.type]
     if (widgetUIClass === undefined) {
