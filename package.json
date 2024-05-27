@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.4",
     "@parcel/transformer-sass": "2.11.0",
+    "@tonejs/piano": "^0.2.1",
     "buffer": "^5.5.0||^6.0.0",
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
@@ -25,6 +26,10 @@
     "react-dom": "^18.2.0",
     "redux": "^5.0.1",
     "socket.io-client": "^4.7.3",
-    "tone": "^14.7.77"
+    "tone": "^14.7.77",
+    "webmidi": "^3.1.9"
+  },
+  "devDependencies": {
+    "events": "^3.1.0"
   }
 }
