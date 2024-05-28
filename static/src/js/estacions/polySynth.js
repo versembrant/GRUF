@@ -28,7 +28,21 @@ export class PolySynth extends EstacioBase {
         const hpf = new Tone.Filter(6000, "highpass", -24).connect(estacioMasterChannel);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
         const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
+        synth.set({
+            maxPolyphony: 8, 
+            vibratoAmount: 0.0,
+            voice0: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
+            voice1: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
+            volume: -12
+        });  // Avoid clipping, specially when using sine
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
