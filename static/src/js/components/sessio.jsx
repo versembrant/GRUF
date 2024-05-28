@@ -17,7 +17,7 @@ const Estacio = ({estacio}) => {
 };
 
 export const Sessio = () => {
-    const [estacioSelected, setEstacioSelected] = useState("all");  // Local state for component Sessio
+    const [estacioSelected, setEstacioSelected] = useState(getCurrentSession().getNomsEstacions()[0]);  // Local state for component Sessio
     return(
         <div>
             <h1>Sessió "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h1>
@@ -30,8 +30,8 @@ export const Sessio = () => {
                 <select
                     value={estacioSelected}
                     onChange={(evt) => setEstacioSelected(evt.target.value)}>
-                    <option key={"all"} value="all">Totes</option>
                     {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option key={nomEstacio} value={nomEstacio}>{nomEstacio}</option>)}
+                    <option key={"all"} value="all">Totes</option>
                 </select>
                 <div className="estacions">
                     {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === "all") || (estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
