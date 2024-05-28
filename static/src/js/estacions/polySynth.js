@@ -33,19 +33,6 @@ export class PolySynth extends EstacioBase {
         high:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
     }
 
-    getDelayTimeValue(delayTime){
-        if      (delayTime === '1/4') 
-            return 60/ (1*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/8') 
-            return 60/ (2*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/16') 
-            return 60/ (4*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/8T') 
-            return 60/ (3*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/16T') 
-            return 60/ (6*(getAudioGraphInstance().getBpm()));
-    }
-
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
         const hpf = new Tone.Filter(6000, "highpass", -24);

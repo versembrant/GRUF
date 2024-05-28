@@ -158,6 +158,19 @@ export class EstacioBase {
         }
     }
 
+    getDelayTimeValue(delayTime){
+        if      (delayTime === '1/4') 
+            return 60/ (1*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/8') 
+            return 60/ (2*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/16') 
+            return 60/ (4*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/8T') 
+            return 60/ (3*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/16T') 
+            return 60/ (6*(getAudioGraphInstance().getBpm()));
+    }
+    
     // UI stuff
 
     getUserInterfaceComponent() {
