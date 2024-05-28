@@ -21,6 +21,7 @@ export class PolySynth extends EstacioBase {
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
+        eqOnOff: {type : 'bool', label: 'EQ On/Off', initial: 'unchecked'},
         reverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
         reverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
         delayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
@@ -131,11 +132,11 @@ export class PolySynth extends EstacioBase {
                 const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
                 this.updateEffectParameter('driveMakeupGain','gain', makeupGain);
             } else if (name == "low"){
-                this.updateEffectParameter('eq3','low', value);
+                this.updateEffectParameter('eq3', 'low', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
             } else if (name == "mid"){
-                this.updateEffectParameter('eq3','mid', value);
+                this.updateEffectParameter('eq3', 'mid', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
             } else if (name == "high"){
-                this.updateEffectParameter('eq3','high', value);
+                this.updateEffectParameter('eq3', 'high', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
             }
         }
     }
