@@ -170,6 +170,36 @@ export class EstacioBase {
         else if (delayTime === '1/16T') 
             return 60/ (6*(getAudioGraphInstance().getBpm()));
     }
+
+    addEffectChainNodes (audioInput, audioOutput){
+        const effects = {
+            reverb: new Tone.Reverb({
+                decay: 0.5,
+                wet: 0,
+            }),
+            delay: new Tone.FeedbackDelay({
+                wet: 1,
+                feedback: 0.5,
+                delayTime: this.getDelayTimeValue('1/4'),
+            }),
+            drive: new Tone.Distortion({
+                distortion: 0,
+            }),
+            driveMakeupGain: new Tone.Gain({
+                gain: 1.0,
+            }),
+            eq3: new Tone.EQ3({
+                low: 0,
+                mid: 0,
+                high: 0,
+            }),
+        }
+        const chainEffects = () => {
+            return [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
+        };
+        
+        audioInput.chain( ...chainEffects(), audioOutput);
+    }
     
     // UI stuff
 

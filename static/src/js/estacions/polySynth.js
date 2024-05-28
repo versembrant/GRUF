@@ -36,7 +36,12 @@ export class PolySynth extends EstacioBase {
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
         const hpf = new Tone.Filter(6000, "highpass", -24);
-        const lpf = new Tone.Filter(500, "lowpass", -24);
+        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
+        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
+        
+        this.addEffectChainNodes(hpf, estacioMasterChannel);
+        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
+        
         const effects = {
             reverb: new Tone.Reverb({
                 decay: 0.5,
@@ -59,12 +64,6 @@ export class PolySynth extends EstacioBase {
                 high: 0,
             }),
         }
-        const chainEffects = () => {
-            return [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
-        };
-        const synth = new Tone.PolySynth(Tone.DuoSynth).chain(lpf, hpf, ...chainEffects(), estacioMasterChannel);
-        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
-        
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
