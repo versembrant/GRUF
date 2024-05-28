@@ -1,8 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
-import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
-import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 import { Piano } from '@tonejs/piano'
 
 export class EstacioPiano extends EstacioBase {
@@ -10,7 +8,7 @@ export class EstacioPiano extends EstacioBase {
     tipus = 'piano'
     versio = '0.1'
     parametersDescription = {
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[]},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
