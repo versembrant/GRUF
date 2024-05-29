@@ -1,8 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
-import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
-import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
 export class PolySynth extends EstacioBase {
 
@@ -10,7 +8,7 @@ export class PolySynth extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[]},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         // Synth params
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
@@ -38,14 +36,27 @@ export class PolySynth extends EstacioBase {
         const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
         const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
             hpf: hpf,
         };
         this.addEffectChainNodes(hpf, estacioMasterChannel);
-        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
+        synth.set({
+            maxPolyphony: 8, 
+            vibratoAmount: 0.0,
+            voice0: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
+            voice1: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
+            volume: -12 // Avoid clipping, specially when using sine
+        });  
     }
 
     setParameters(parametersDict, preset) {

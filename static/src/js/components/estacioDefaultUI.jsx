@@ -189,7 +189,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
             <div style={{overflow:"scroll"}}>
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
-                    width="400"
+                    width="600"
                     xrange={numSteps}
                     yrange={24}
                     xruler={0}

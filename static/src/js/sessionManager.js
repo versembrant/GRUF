@@ -124,8 +124,16 @@ export class EstacioBase {
         return this.parametersDescription[parameterName]
     }
 
+    parameterFollowsPreset(parameterName) {
+        return this.getParameterDescription(parameterName).followsPreset === true;
+    }
+
     getParameterValue(parameterName, preset) {
-        return this.store.getState()[parameterName][preset];
+        if (this.parameterFollowsPreset(parameterName)) {
+            return this.store.getState()[parameterName][preset];
+        } else {
+            return this.store.getState()[parameterName][0];  // For parameters that don't follow presets, we always return the value of the first preset
+        }
     }
 
     getCurrentLivePreset() {
@@ -133,18 +141,19 @@ export class EstacioBase {
     }
 
     updateParametreEstacio(nomParametre, valor) {
+        const preset = this.parameterFollowsPreset(nomParametre) ? this.getCurrentLivePreset() : 0;  // For parameters that don't follow presets, allways update preset 0
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
             // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
             // locally before sending it to the sever and in this way the user experience is better as
             // parameter changes are more responsive
             if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
-                this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, this.getCurrentLivePreset())
+                this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset)
             }
-            sendMessageToServer('update_parametre_estacio', {session_id: getCurrentSession().getID(), nom_estacio: this.nom, nom_parametre: nomParametre, valor: valor, preset: this.getCurrentLivePreset()});
+            sendMessageToServer('update_parametre_estacio', {session_id: getCurrentSession().getID(), nom_estacio: this.nom, nom_parametre: nomParametre, valor: valor, preset: preset});
         } else {
             // In local mode, simulate the message coming from the server and perform the actual action
-            this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, this.getCurrentLivePreset())
+            this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset)
         }
     }
     
