@@ -238,7 +238,7 @@ export class EstacioBase {
                 wet: 0,
             }),
             delay: new Tone.FeedbackDelay({
-                wet: 1,
+                wet: 0,
                 feedback: 0.5,
                 delayTime: this.getDelayTimeValue('1/4'),
             }),
