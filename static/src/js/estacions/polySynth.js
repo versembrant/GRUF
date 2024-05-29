@@ -92,18 +92,6 @@ export class PolySynth extends EstacioBase {
         }  
     }
 
-    updateAudioGraphFromState(preset) {
-        const parametersDict = {}
-        Object.keys(this.parametersDescription).forEach(nomParametre => {
-            parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
-        })
-        this.setParametersInAudioGraph(parametersDict, preset) 
-    }
-
-    updateAudioGraphParameter(nomParametre, preset) {
-        this.setParametersInAudioGraph({[nomParametre]: this.getParameterValue(nomParametre, preset)}, preset)
-    }
-
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
