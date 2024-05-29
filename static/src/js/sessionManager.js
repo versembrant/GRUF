@@ -290,10 +290,16 @@ export class EstacioBase {
 
     updateAudioGraphFromState(preset) {
         // Called when we want to update the whole audio graph from the state (for example, to force syncing with the state)
+        const parametersDict = {}
+        Object.keys(this.parametersDescription).forEach(nomParametre => {
+            parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
+        })
+        this.setParametersInAudioGraph(parametersDict, preset) 
     }
-    
+
     updateAudioGraphParameter(nomParametre, preset) {
         // Called when a parameter of an station's audio graph is updated
+        this.setParametersInAudioGraph({[nomParametre]: this.getParameterValue(nomParametre, preset)}, preset)
     }
 
     onTransportStart() {
