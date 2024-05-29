@@ -170,6 +170,38 @@ export class EstacioBase {
         else if (delayTime === '1/16T') 
             return 60/ (6*(getAudioGraphInstance().getBpm()));
     }
+    updateEffectParameter(effectName, effectKey, paramValue){
+        if (this.audioNodes.effects[effectName]){
+            this.audioNodes.effects[effectName].set({[effectKey]: paramValue});
+        }
+    }
+
+    setFxParameters(parametersDict) {
+        for (const [name, value] of Object.entries(parametersDict)) {
+            if (name == "fxReverbWet"){
+                this.updateEffectParameter('reverb','wet', value);
+            } else if (name == "fxReverbDecay"){
+                this.updateEffectParameter('reverb','decay', value);
+            } else if (name == "fxDelayWet"){
+                this.updateEffectParameter('delay','wet', value);
+            } else if (name == "fxDelayTime"){
+                this.updateEffectParameter('delay','delayTime', this.getDelayTimeValue(value));
+            } else if (name == "fxDelayFeedback"){
+                this.updateEffectParameter('delay','feedback', value);
+            } else if (name == "fxDrive"){
+                this.updateEffectParameter('drive','wet', 1.0);
+                this.updateEffectParameter('drive','distortion', value);
+                const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
+                this.updateEffectParameter('driveMakeupGain','gain', makeupGain);
+            } else if (name == "fxLow"){
+                this.updateEffectParameter('eq3', 'low', value);
+            } else if (name == "fxMid"){
+                this.updateEffectParameter('eq3', 'mid', value);
+            } else if (name == "fxHigh"){
+                this.updateEffectParameter('eq3', 'high', value);
+            }
+        }
+    }
 
     addEffectChainNodes (audioInput, audioOutput){
         const effects = {
@@ -194,6 +226,8 @@ export class EstacioBase {
                 high: 0,
             }),
         }
+        this.audioNodes.effects = effects;
+
         const chainEffects = () => {
             return [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
         };
