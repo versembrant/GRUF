@@ -11,22 +11,27 @@ export class EstacioPiano extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[]},
+        timbre: {type: 'float', label: 'Timbre', min: 1200, max: 12000, initial: 12000, logarithmic: true},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const piano = new Piano({velocities: 2}).connect(estacioMasterChannel);
+        const timbre = new Tone.Filter(500, 'lowpass', -24).connect(estacioMasterChannel);
+        const piano = new Piano({velocities: 2}).connect(timbre);
         piano.load().then(() => { console.log('Mostres del piano carregades!') })
 
         this.audioNodes = {
             piano: piano,
+            timbre: timbre,
         };
     }
 
     updateAudioGraphFromState(preset) {
+        this.audioNodes.timbre.frequency.rampTo(this.getParameterValue('timbre', preset), 0.01);
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
+        this.updateAudioGraphFromState(preset);
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
