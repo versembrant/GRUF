@@ -21,16 +21,16 @@ export class PolySynth extends EstacioBase {
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
-        eqOnOff: {type : 'bool', label: 'EQ On/Off', initial: 'unchecked'},
-        reverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
-        reverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        delayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
-        delayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        delayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
-        drive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        low:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
-        mid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        high:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+        fxEqOnOff: {type : 'enum', label: 'EQ On/Off', options: ['On', 'Off'], initial: 'Off'},
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
+        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
+        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
+        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -39,91 +39,57 @@ export class PolySynth extends EstacioBase {
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
         const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
         
-        this.addEffectChainNodes(hpf, estacioMasterChannel);
-        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
-        
-        const effects = {
-            reverb: new Tone.Reverb({
-                decay: 0.5,
-                wet: 0,
-            }),
-            delay: new Tone.FeedbackDelay({
-                wet: 1,
-                feedback: 0.5,
-                delayTime: this.getDelayTimeValue('1/4'),
-            }),
-            drive: new Tone.Distortion({
-                distortion: 0,
-            }),
-            driveMakeupGain: new Tone.Gain({
-                gain: 1.0,
-            }),
-            eq3: new Tone.EQ3({
-                low: 0,
-                mid: 0,
-                high: 0,
-            }),
-        }
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
             hpf: hpf,
-            effects: effects,
         };
+        this.addEffectChainNodes(hpf, estacioMasterChannel);
+        synth.set({maxPolyphony: 8, volume: -12});  // Avoid clipping, specially when using sine
     }
 
-    updateEffectParameter(effectName, effectKey, paramValue){
-        if (this.audioNodes.effects[effectName]){
-            this.audioNodes.effects[effectName].set({[effectKey]: paramValue});
-        }
-    }
-
-    setParameters(parametersDict) {
+    setParameters(parametersDict, preset) {
+        const fxParameters = {};
         for (const [name, value] of Object.entries(parametersDict)) {
-            if (name == "lpf") {
-                this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-            } else if (name == "hpf") {
-                this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-            } else if (name == "harmonicity") {
-                this.audioNodes.synth.set({
-                    'harmonicity': value,
-                });
-            } else if ((name == "attack")
-                    || (name == "decay")
-                    || (name == "sustain")
-                    || (name == "release")
-            ){
-                this.audioNodes.synth.set({
-                    voice0: {'envelope': {[name]: value}},
-                    voice1: {'envelope': {[name]: value}},
-                })
-            } else if (name == "waveform"){
-                this.audioNodes.synth.set({
-                    voice0: {'oscillator': { type: value }},
-                    voice1: {'oscillator': { type: value }},
-                })
-            } else if (name == "reverbWet"){
-                this.updateEffectParameter('reverb','wet', value);
-            } else if (name == "reverbDecay"){
-                this.updateEffectParameter('reverb','decay', value);
-            } else if (name == "delayWet"){
-                this.updateEffectParameter('delay','wet', value);
-            } else if (name == "delayTime"){
-                this.updateEffectParameter('delay','delayTime', this.getDelayTimeValue(value));
-            } else if (name == "delayFeedback"){
-                this.updateEffectParameter('delay','feedback', value);
-            } else if (name == "drive"){
-                this.updateEffectParameter('drive','wet', 1.0);
-                this.updateEffectParameter('drive','distortion', value);
-                const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
-                this.updateEffectParameter('driveMakeupGain','gain', makeupGain);
-            } else if (name == "low"){
-                this.updateEffectParameter('eq3', 'low', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
-            } else if (name == "mid"){
-                this.updateEffectParameter('eq3', 'mid', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
-            } else if (name == "high"){
-                this.updateEffectParameter('eq3', 'high', this.getParameterValue('eqOnOff', parametersDict) === 'unchecked' ? 0 : value);
+            if (name.startsWith('fx')){
+                fxParameters[name] = value;
             }
+            else {
+                if (name == "lpf") {
+                    this.audioNodes.lpf.frequency.rampTo(value, 0.01);
+                } else if (name == "hpf") {
+                    this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+                } else if (name == "harmonicity") {
+                    this.audioNodes.synth.set({
+                        'harmonicity': value,
+                    });
+                } else if ((name == "attack")
+                        || (name == "decay")
+                        || (name == "sustain")
+                        || (name == "release")
+                ){
+                    this.audioNodes.synth.set({
+                        voice0: {'envelope': {[name]: value}},
+                        voice1: {'envelope': {[name]: value}},
+                    })
+                } else if (name == "waveform"){
+                    this.audioNodes.synth.set({
+                        voice0: {'oscillator': { type: value }},
+                        voice1: {'oscillator': { type: value }},
+                    })
+                } else if (name == "fxLow"){
+                    this.updateEffectParameter('eq3', 'low', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
+                } else if (name == "fxMid"){
+                    this.updateEffectParameter('eq3', 'mid', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
+                } else if (name == "fxHigh"){
+                    this.updateEffectParameter('eq3', 'high', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
+                }
+
+            }
+            
+        }
+        if (Object.keys(fxParameters).length > 0) {
+            this.setFxParameters(fxParameters);
         }
     }
 
@@ -132,11 +98,11 @@ export class PolySynth extends EstacioBase {
         Object.keys(this.parametersDescription).forEach(nomParametre => {
             parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
         })
-        this.setParameters(parametersDict) 
+        this.setParameters(parametersDict, preset) 
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
-        this.setParameters({[nomParametre]: this.getParameterValue(nomParametre, preset)})
+        this.setParameters({[nomParametre]: this.getParameterValue(nomParametre, preset)}, preset)
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
