@@ -1,12 +1,13 @@
 .estacions {
     display: flex;
+    flex-direction: column;
 }
 
 .estacio {
+    margin: 10px 0px;
     padding: 10px;
-    margin: 10px;
     border: 1px solid black;
-    width: 400px;
+    width: 100%;
     overflow: hidden;
 
     .preset-buttons {
