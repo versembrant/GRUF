@@ -1,8 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
-import { indexOfArrayMatchingObject } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
-import { theWindow } from 'tone/build/esm/core/context/AudioContext';
 
 export class PolySynth extends EstacioBase {
 
@@ -16,7 +14,7 @@ export class PolySynth extends EstacioBase {
         waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[]},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         chorusSend:{type: 'float', label: 'Chorus Send', min: -60, max: 6, initial: -60},
         reverbSend:{type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
         delaySend:{type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
