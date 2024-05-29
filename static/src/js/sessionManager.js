@@ -179,40 +179,59 @@ export class EstacioBase {
         else if (delayTime === '1/16T') 
             return 60/ (6*(getAudioGraphInstance().getBpm()));
     }
-    updateEffectParameter(effectName, effectKey, paramValue){
-        if (this.audioNodes.effects[effectName]){
-            this.audioNodes.effects[effectName].set({[effectKey]: paramValue});
+
+    setParametersInAudioGraph(parametersDict, preset) {
+        for (const [name, value] of Object.entries(parametersDict)) {
+            if (name.startsWith('fx')){
+                this.setFxParameterInAudioGraph(name, value, preset);
+            } else {
+                this.setParameterInAudioGraph(name, value, preset);
+            }
         }
     }
 
-    setFxParameters(parametersDict) {
-        for (const [name, value] of Object.entries(parametersDict)) {
-            if (name == "fxReverbWet"){
-                this.updateEffectParameter('reverb','wet', value);
-            } else if (name == "fxReverbDecay"){
-                this.updateEffectParameter('reverb','decay', value);
-            } else if (name == "fxDelayWet"){
-                this.updateEffectParameter('delay','wet', value);
-            } else if (name == "fxDelayTime"){
-                this.updateEffectParameter('delay','delayTime', this.getDelayTimeValue(value));
-            } else if (name == "fxDelayFeedback"){
-                this.updateEffectParameter('delay','feedback', value);
-            } else if (name == "fxDrive"){
-                this.updateEffectParameter('drive','wet', 1.0);
-                this.updateEffectParameter('drive','distortion', value);
-                const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
-                this.updateEffectParameter('driveMakeupGain','gain', makeupGain);
-            } else if (name == "fxLow"){
-                this.updateEffectParameter('eq3', 'low', value);
-            } else if (name == "fxMid"){
-                this.updateEffectParameter('eq3', 'mid', value);
-            } else if (name == "fxHigh"){
-                this.updateEffectParameter('eq3', 'high', value);
+    setParameterInAudioGraph(name, value, preset) {
+        // Called when a parameter gets updated and needs to update it's corresponding audio graph node
+        // This needs to be implemented in each station
+    }
+
+    setFxParameterInAudioGraph(name, value, preset) {
+        if (name == "fxReverbWet"){
+            this.audioNodes.effects['reverb'].set({'wet': value});
+        } else if (name == "fxReverbDecay"){
+            this.audioNodes.effects['reverb'].set({'decay': value});
+        } else if (name == "fxDelayWet"){
+            this.audioNodes.effects['delay'].set({'wet': value});
+        } else if (name == "fxDelayTime"){
+            this.audioNodes.effects['delay'].set({'delayTime': this.getDelayTimeValue(value)});
+        } else if (name == "fxDelayFeedback"){
+            this.audioNodes.effects['delay'].set({'feedback': value});
+        } else if (name == "fxDrive"){
+            this.audioNodes.effects['drive'].set({'wet': 1.0});
+            this.audioNodes.effects['drive'].set({'distortion': value});
+            const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
+            this.audioNodes.effects['driveMakeupGain'].set({'gain': makeupGain});
+        } else if (name == "fxLow"){
+            this.audioNodes.effects['eq3'].set({'low': this.getParameterValue("fxEqOnOff", preset) ? value: 0});
+        } else if (name == "fxMid"){
+            this.audioNodes.effects['eq3'].set({'mid': this.getParameterValue("fxEqOnOff", preset) ? value: 0});
+        } else if (name == "fxHigh"){
+            this.audioNodes.effects['eq3'].set({'high': this.getParameterValue("fxEqOnOff", preset) ? value: 0});
+        } else if (name == "fxEqOnOff"){
+            if (value) {
+                this.audioNodes.effects['eq3'].set({'low': this.getParameterValue("fxLow", preset)});
+                this.audioNodes.effects['eq3'].set({'mid': this.getParameterValue("fxMid", preset)});
+                this.audioNodes.effects['eq3'].set({'high': this.getParameterValue("fxHigh", preset)});
+            } else {
+                this.audioNodes.effects['eq3'].set({'low': 0});
+                this.audioNodes.effects['eq3'].set({'mid': 0});
+                this.audioNodes.effects['eq3'].set({'high': 0});
             }
         }
     }
 
     addEffectChainNodes (audioInput, audioOutput){
+        // Create nodes for the effect chain
         const effects = {
             reverb: new Tone.Reverb({
                 decay: 0.5,
@@ -235,13 +254,12 @@ export class EstacioBase {
                 high: 0,
             }),
         }
+
+        // Add the nodes to the station's audioNodes dictionary
         this.audioNodes.effects = effects;
 
-        const chainEffects = () => {
-            return [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
-        };
-        
-        audioInput.chain( ...chainEffects(), audioOutput);
+        // Connect the nodes in the effect chain
+        audioInput.chain( ...[effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3], audioOutput);
     }
     
     // UI stuff
@@ -266,7 +284,7 @@ export class EstacioBase {
         }
     }
 
-    buildEstacioAudioGraph(estacioMasterChannel) {
+    buildEstacioAudioGraph(outputNode) {
         return {}
     }
 

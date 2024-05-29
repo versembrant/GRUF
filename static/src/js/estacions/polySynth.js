@@ -14,34 +14,30 @@ export class PolySynth extends EstacioBase {
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
-        waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sine'},
+        waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sawtooth'},
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
-        fxEqOnOff: {type : 'enum', label: 'EQ On/Off', options: ['On', 'Off'], initial: 'Off'},
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0}
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
-        // Creem els nodes del graph i els guardem
+        // Creem els nodes del graph i els connectem entre ells
         const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
         const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        this.audioNodes = {
-            synth: synth,
-            lpf: lpf,
-            hpf: hpf,
-        };
-        this.addEffectChainNodes(hpf, estacioMasterChannel);
+        
+        // Settejem alguns paràmetres inicials que no canviaran
         synth.set({
             maxPolyphony: 8, 
             vibratoAmount: 0.0,
@@ -56,52 +52,44 @@ export class PolySynth extends EstacioBase {
                 releaseCurve: "exponential"
             },
             volume: -12 // Avoid clipping, specially when using sine
-        });  
+        });
+
+    
+        // Adegeix els nodes al diccionari de nodes de l'estació
+        this.audioNodes = {
+            synth: synth,
+            lpf: lpf,
+            hpf: hpf,
+        };
+
+        // Crea els nodes d'efectes (això també els afegirà al diccionari de nodes de l'estació)
+        this.addEffectChainNodes(hpf, estacioMasterChannel);
     }
 
-    setParameters(parametersDict, preset) {
-        const fxParameters = {};
-        for (const [name, value] of Object.entries(parametersDict)) {
-            if (name.startsWith('fx')){
-                fxParameters[name] = value;
-            }
-            else {
-                if (name == "lpf") {
-                    this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-                } else if (name == "hpf") {
-                    this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-                } else if (name == "harmonicity") {
-                    this.audioNodes.synth.set({
-                        'harmonicity': value,
-                    });
-                } else if ((name == "attack")
-                        || (name == "decay")
-                        || (name == "sustain")
-                        || (name == "release")
-                ){
-                    this.audioNodes.synth.set({
-                        voice0: {'envelope': {[name]: value}},
-                        voice1: {'envelope': {[name]: value}},
-                    })
-                } else if (name == "waveform"){
-                    this.audioNodes.synth.set({
-                        voice0: {'oscillator': { type: value }},
-                        voice1: {'oscillator': { type: value }},
-                    })
-                } else if (name == "fxLow"){
-                    this.updateEffectParameter('eq3', 'low', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
-                } else if (name == "fxMid"){
-                    this.updateEffectParameter('eq3', 'mid', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
-                } else if (name == "fxHigh"){
-                    this.updateEffectParameter('eq3', 'high', this.getParameterValue('eqOnOff', preset) === 'Off' ? 0 : value);
-                }
-
-            }
-            
-        }
-        if (Object.keys(fxParameters).length > 0) {
-            this.setFxParameters(fxParameters);
-        }
+    setParameterInAudioGraph(name, value, preset) {
+        if (name == "lpf") {
+            this.audioNodes.lpf.frequency.rampTo(value, 0.01);
+        } else if (name == "hpf") {
+            this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+        } else if (name == "harmonicity") {
+            this.audioNodes.synth.set({
+                'harmonicity': value,
+            });
+        } else if ((name == "attack")
+                || (name == "decay")
+                || (name == "sustain")
+                || (name == "release")
+        ){
+            this.audioNodes.synth.set({
+                voice0: {'envelope': {[name]: value}},
+                voice1: {'envelope': {[name]: value}},
+            })
+        } else if (name == "waveform"){
+            this.audioNodes.synth.set({
+                voice0: {'oscillator': { type: value }},
+                voice1: {'oscillator': { type: value }},
+            })
+        }  
     }
 
     updateAudioGraphFromState(preset) {
@@ -109,11 +97,11 @@ export class PolySynth extends EstacioBase {
         Object.keys(this.parametersDescription).forEach(nomParametre => {
             parametersDict[nomParametre] = this.getParameterValue(nomParametre, preset);
         })
-        this.setParameters(parametersDict, preset) 
+        this.setParametersInAudioGraph(parametersDict, preset) 
     }
 
     updateAudioGraphParameter(nomParametre, preset) {
-        this.setParameters({[nomParametre]: this.getParameterValue(nomParametre, preset)}, preset)
+        this.setParametersInAudioGraph({[nomParametre]: this.getParameterValue(nomParametre, preset)}, preset)
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
