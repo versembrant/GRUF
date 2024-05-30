@@ -10,11 +10,22 @@ export class EstacioPiano extends EstacioBase {
     parametersDescription = {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         timbre: {type: 'float', label: 'Timbre', min: 1200, max: 12000, initial: 12000, logarithmic: true},
+        // FX
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
+        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
+        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
+        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const timbre = new Tone.Filter(500, 'lowpass', -24).connect(estacioMasterChannel);
+        const timbre = new Tone.Filter(500, 'lowpass', -24);
         const piano = new Piano({velocities: 2}).connect(timbre);
         piano.load().then(() => { console.log('Mostres del piano carregades!') })
 
@@ -22,14 +33,15 @@ export class EstacioPiano extends EstacioBase {
             piano: piano,
             timbre: timbre,
         };
+
+        // Crea els nodes d'efectes (això també els afegirà al diccionari de nodes de l'estació)
+        this.addEffectChainNodes(timbre, estacioMasterChannel);
     }
 
-    updateAudioGraphFromState(preset) {
-        this.audioNodes.timbre.frequency.rampTo(this.getParameterValue('timbre', preset), 0.01);
-    }
-
-    updateAudioGraphParameter(nomParametre, preset) {
-        this.updateAudioGraphFromState(preset);
+    setParameterInAudioGraph(name, value, preset) {
+        if (name == "timbre") {
+            this.audioNodes.timbre.frequency.rampTo(value, 0.01);
+        }
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
