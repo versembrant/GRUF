@@ -18,6 +18,7 @@ export class MonoSynth extends EstacioBase {
         lpf: {type: 'float', label: 'LPF', min: 300, max: 12000, initial: 12000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 200, max: 3000, initial: 200, logarithmic: true},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
+        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
@@ -35,14 +36,21 @@ export class MonoSynth extends EstacioBase {
         // Creem els nodes del graph i els connectem entre ells
         const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
-        const synth = new Tone.MonoSynth().connect(lpf);
+        const synth = new Tone.DuoSynth().connect(lpf);
         
         // Settejem alguns paràmetres inicials que no canviaran
         synth.set({
             vibratoAmount: 0.0,
-            attackCurve: "exponential",
-            decayCurve: "exponential",
-            releaseCurve: "exponential",
+            voice0: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
+            voice1: {
+                attackCurve: "exponential",
+                decayCurve: "exponential",
+                releaseCurve: "exponential"
+            },
             volume: -12 // Avoid clipping, specially when using sine
         });
 
@@ -62,17 +70,23 @@ export class MonoSynth extends EstacioBase {
             this.audioNodes.lpf.frequency.rampTo(value, 0.01);
         } else if (name == "hpf") {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+        } else if (name == "harmonicity") {
+            this.audioNodes.synth.set({
+                'harmonicity': value,
+            });
         } else if ((name == "attack")
                 || (name == "decay")
                 || (name == "sustain")
                 || (name == "release")
         ){
             this.audioNodes.synth.set({
-                'envelope': {[name]: value},
+                voice0: {'envelope': {[name]: value}},
+                voice1: {'envelope': {[name]: value}},
             })
         } else if (name == "waveform"){
             this.audioNodes.synth.set({
-                'oscillator': { type: value },
+                voice0: {'oscillator': { type: value }},
+                voice1: {'oscillator': { type: value }},
             })
         } else if (name == "portamento"){
             this.audioNodes.synth.set({
