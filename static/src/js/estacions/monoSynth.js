@@ -20,9 +20,9 @@ export class MonoSynth extends EstacioBase {
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
         harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
         // FX
-        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
