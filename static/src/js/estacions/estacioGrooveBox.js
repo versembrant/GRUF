@@ -104,16 +104,6 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
 
-    updateAudioGraphFromState(preset){
-        for (let i=0; i<this.numPresets; i++) {
-            this.loadSoundinPlayer('open_hat', this.getParameterValue('sound1URL', i));
-            this.loadSoundinPlayer('closed_hat',this.getParameterValue('sound2URL', i));
-            this.loadSoundinPlayer('snare',this.getParameterValue('sound3URL', i));
-            this.loadSoundinPlayer('kick',this.getParameterValue('sound4URL', i));
-        }
-        super.updateAudioGraphFromState(preset);
-    }
-
     setParameterInAudioGraph(name, value, preset) {
         if (name == 'tone4') {
             this.audioNodes.kick.set({
@@ -187,6 +177,14 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.sendReverbGainNode3.gain.value = value > -30 ? value: -100
         } else if (name === 'reverbSend4'){
             this.audioNodes.sendReverbGainNode4.gain.value = value > -30 ? value: -100
+        } else if (name === 'sound1URL'){
+            this.loadSoundinPlayer('open_hat', value);
+        } else if (name === 'sound2URL'){
+            this.loadSoundinPlayer('closed_hat', value);
+        } else if (name === 'sound3URL'){
+            this.loadSoundinPlayer('snare', value);
+        } else if (name === 'sound4URL'){
+            this.loadSoundinPlayer('kick', value);
         }
     }
 
