@@ -21,7 +21,7 @@ server {
 
     # Sonicpi main deployment
     location /sonicpi/static/ {
-        alias /home/versembrant/sonicpi-renderer/app/static/;
+        alias /home/versembrant/sonicpi-renderer/django_app/static/;
     }
     location /sonicpi/worker1/streamer/ {
         proxy_pass              http://127.0.0.1:52010/;
@@ -45,7 +45,7 @@ server {
     }
     location /sonicpi/ {
         include uwsgi_params;
-        uwsgi_pass unix:/home/versembrant/sonicpi-renderer/app/versembrant-sonicpi-server.sock;
+        uwsgi_pass unix:/home/versembrant/sonicpi-renderer/django_app/versembrant-sonicpi-server.sock;
     }
 
     # Redirect from / to /bruixit
