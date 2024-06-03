@@ -48,7 +48,6 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -60, max: 6, initial: -60},
-        masterEffectsGain: {type: 'float', label: 'Effects send', min: -60, max: 6, initial: -60}
     }
 
     getTempsBeat = () => {
@@ -67,7 +66,6 @@ export class EstacioGrooveBox extends EstacioBase {
     }
     buildEstacioAudioGraph(estacioMasterChannel) {
 
-        const grooveBoxMasterChannel = estacioMasterChannel;
         const channels = {
             kick: new Tone.Channel(),
             snare: new Tone.Channel(),
@@ -75,151 +73,133 @@ export class EstacioGrooveBox extends EstacioBase {
             open_hat: new Tone.Channel()
         };
 
-        Object.values(channels).forEach(channel => channel.connect(grooveBoxMasterChannel));
+        const grooveBoxReverb = new Tone.Reverb({
+            wet: 1,
+            decay: 5,
+        }).connect(estacioMasterChannel);
+        const grooveBoxReverbChannel = new Tone.Channel({
+            volume: 0,
+        }).connect(grooveBoxReverb);
+        grooveBoxReverbChannel.receive('grooveBoxReverb');
+
+        const player1 = new Tone.Player().connect(channels.kick);
+        const player2 = new Tone.Player().connect(channels.snare);
+        const player3 = new Tone.Player().connect(channels.closed_hat);
+        const player4 = new Tone.Player().connect(channels.open_hat);
+        
+        Object.values(channels).forEach(channel => channel.connect(estacioMasterChannel));
 
         // Creem els nodes del graph
         this.audioNodes = {
-            kick: new Tone.Player().connect(channels.kick),
-            snare: new Tone.Player().connect(channels.snare),
-            closed_hat: new Tone.Player().connect(channels.closed_hat),
-            open_hat: new Tone.Player().connect(channels.open_hat),
+            
+            kick: player1,
+            snare: player2,
+            closed_hat: player3,
+            open_hat: player4,
 
-            sendReverbGainNode1: channels.open_hat.send("reverb", -100),
-            sendReverbGainNode2: channels.closed_hat.send("reverb", -100),
-            sendReverbGainNode3: channels.snare.send("reverb", -100),
-            sendReverbGainNode4: channels.kick.send("reverb", -100),
+            sendReverbGainNode1: channels.open_hat.send("grooveBoxReverb", -100),
+            sendReverbGainNode2: channels.closed_hat.send("grooveBoxReverb", -100),
+            sendReverbGainNode3: channels.snare.send("grooveBoxReverb", -100),
+            sendReverbGainNode4: channels.kick.send("grooveBoxReverb", -100),
         
-
-            //Creem l'objecte masterEffectsSends per controlar tots els efectes alhora. 
-            masterEffectsSends:{},
-        }
-        // Assignem els efectes a l'objecte buid i creem un send per cada efecte. 
-        const effects = ['reverb', 'delay', 'drive', 'eq3'];
-        effects.forEach(effect => {
-        this.audioNodes.masterEffectsSends[effect] = grooveBoxMasterChannel.send(effect, -100);  // Initial gain set to 0
-        });
-    }
-
-    applyPlayerSettings(playerName, playbackRate, volume, fadeIn, fadeOut){
-        if (["open_hat", "closed_hat", "snare","kick"].includes(playerName)) {
-            let player = this.audioNodes[playerName];
-            player.playbackRate = playbackRate;
-            player.volume.value = volume;
-            player.fadeIn = fadeIn;
-            player.fadeOut = fadeOut; 
         }
     }
 
-   setMasterEffectsGain(audioNodes, gainValue) {
-        Object.keys(audioNodes.masterEffectsSends).forEach(effect => {
-            audioNodes.masterEffectsSends[effect].gain.value = gainValue;
-        });
-    } 
-
-    updateAudioGraphFromState(preset) {
-        // Carreguem tots els sons de tots els presets (si n'hi ha de repetits es carregaran només un cop)
-        // Ignorem l'argument "preset" perquè volem carregar tots els sons de tots els presets
+    updateAudioGraphFromState(preset){
         for (let i=0; i<this.numPresets; i++) {
             this.loadSoundinPlayer('open_hat', this.getParameterValue('sound1URL', i));
             this.loadSoundinPlayer('closed_hat',this.getParameterValue('sound2URL', i));
             this.loadSoundinPlayer('snare',this.getParameterValue('sound3URL', i));
             this.loadSoundinPlayer('kick',this.getParameterValue('sound4URL', i));
         }
-        // Setejem el guany de la quantitat d'enviament amb el valor en dB del slider corresponent
-        this.audioNodes.sendReverbGainNode1.gain.value = this.getParameterValue('reverbSend1',preset);
-        this.audioNodes.sendReverbGainNode2.gain.value = this.getParameterValue('reverbSend2',preset);
-        this.audioNodes.sendReverbGainNode3.gain.value = this.getParameterValue('reverbSend3',preset);
-        this.audioNodes.sendReverbGainNode4.gain.value = this.getParameterValue('reverbSend4',preset);
-
-        const  masterEffectsGain = this.getParameterValue('masterEffectsGain', preset);
-        this.setMasterEffectsGain(this.audioNodes, masterEffectsGain); 
-
-
-        // Setejem les propietats dels players en funció de l'estat del paràmetre corresponent
-        const tempsBeat = this.getTempsBeat();
-        this.applyPlayerSettings('open_hat', 
-            Math.pow(2, (this.getParameterValue('tone1',preset)/12)), 
-            this.getParameterValue('volume1',preset),
-            this.getParameterValue('atack1',preset)*tempsBeat,
-            this.getParameterValue('release1',preset)*tempsBeat); 
-        this.applyPlayerSettings('closed_hat', 
-            Math.pow(2, (this.getParameterValue('tone2',preset)/12)), 
-            this.getParameterValue('volume2',preset),
-            this.getParameterValue('atack2',preset)*tempsBeat,
-            this.getParameterValue('release2',preset)*tempsBeat); 
-        this.applyPlayerSettings('snare', 
-            Math.pow(2, (this.getParameterValue('tone3',preset)/12)), 
-            this.getParameterValue('volume3',preset),
-            this.getParameterValue('atack3',preset)*tempsBeat,
-            this.getParameterValue('release3',preset)*tempsBeat);  
-        this.applyPlayerSettings('kick', 
-            Math.pow(2, (this.getParameterValue('tone4',preset)/12)), 
-            this.getParameterValue('volume4',preset),
-            this.getParameterValue('atack4',preset)*tempsBeat,
-            this.getParameterValue('release4',preset)*tempsBeat);  
     }
-    updateAudioGraphParameter(nomParametre, preset) {
-        // Si el paràmetre que ha canviat és la URL d'un so, el carreguem al sampler
-        if (nomParametre === 'sound1URL' || nomParametre === 'sound2URL' || nomParametre === 'sound3URL' || nomParametre === 'sound4URL') {
-            this.loadSoundinPlayer(this.getParameterValue(nomParametre, preset))
-        }
-        // Si el paràmetre que ha canviat són els sends, actualitzem el seu valor 
 
-        if(nomParametre === 'reverbSend1'){
-            this.audioNodes.sendReverbGainNode1.gain.value = this.getParameterValue('reverbSend1',preset);
-        }
-        else if (nomParametre === 'reverbSend2'){
-            this.audioNodes.sendReverbGainNode2.gain.value = this.getParameterValue('reverbSend2',preset);
-        }
-        else if (nomParametre === 'reverbSend3'){
-            this.audioNodes.sendReverbGainNode3.gain.value = this.getParameterValue('reverbSend3',preset);
-        }
-        else if (nomParametre === 'reverbSend4'){
-            this.audioNodes.sendReverbGainNode4.gain.value = this.getParameterValue('reverbSend4',preset);
-        }
-        else if (nomParametre === 'masterEffectsGain'){
-            const  masterEffectsGain = this.getParameterValue('masterEffectsGain', preset);
-            this.setMasterEffectsGain(this.audioNodes, masterEffectsGain);        
-        }  
-        //Si el paràmetre que ha canviat són les propietats dels players
-        const tempsBeat = this.getTempsBeat();
-        if(nomParametre === 'tone1' || nomParametre === 'volume1'||  nomParametre === 'atack1' || nomParametre === 'release1'){
-            this.applyPlayerSettings('open_hat', 
-                Math.pow(2, (this.getParameterValue('tone1',preset)/12)), 
-                this.getParameterValue('volume1',preset),
-                this.getParameterValue('atack1',preset)*tempsBeat,
-                this.getParameterValue('release1',preset)*tempsBeat);
-        }
-        else if(nomParametre === 'tone2' || nomParametre === 'volume2' ||  nomParametre === 'atack2' || nomParametre === 'release2'){
-            this.applyPlayerSettings('closed_hat', 
-                Math.pow(2, (this.getParameterValue('tone2',preset)/12)), 
-                this.getParameterValue('volume2',preset),
-                this.getParameterValue('atack2',preset)*tempsBeat,
-                this.getParameterValue('release2',preset)*tempsBeat);
-        }
-        else if(nomParametre === 'tone3' || nomParametre === 'volume3' ||  nomParametre === 'atack3' || nomParametre === 'release3'){
-            this.applyPlayerSettings('snare', 
-                Math.pow(2, (this.getParameterValue('tone4',preset)/12)), 
-                this.getParameterValue('volume3',preset),
-                this.getParameterValue('atack3',preset)*tempsBeat,
-                this.getParameterValue('release3',preset)*tempsBeat);
-        }
-        else if(nomParametre === 'tone4' || nomParametre === 'volume4' || nomParametre === 'atack4' || nomParametre === 'release4'){
-            this.applyPlayerSettings('kick', 
-                Math.pow(2, (this.getParameterValue('tone4',preset)/12)), 
-                this.getParameterValue('volume4',preset),
-                this.getParameterValue('atack4',preset)*tempsBeat,
-                this.getParameterValue('release4',preset)*tempsBeat);
+    setParameterInAudioGraph(name, value, preset) {
+        if (name == 'tone4') {
+            this.audioNodes.kick.set({
+                'playbackRate': Math.pow(2,(value/12)),
+            });
+        } else if (name =='volume4'){
+            this.audioNodes.kick.set({
+                'volume': value,
+            });
+        } else if (name =='atack4'){
+            this.audioNodes.kick.set({
+                'fadeIn': value*this.getTempsBeat(),
+            });
+        } else if (name =='release4'){
+            this.audioNodes.kick.set({
+                'fadeOut': value*this.getTempsBeat(),
+            });
+        } else if (name =='tone3'){
+            this.audioNodes.snare.set({
+                'playbackRate': Math.pow(2,(value/12)),
+            });
+        } else if (name =='volume3'){
+            this.audioNodes.snare.set({
+                'volume': value,
+            });
+        } else if (name =='atack3'){
+            this.audioNodes.snare.set({
+                'fadeIn': value*this.getTempsBeat(),
+            });
+        } else if (name =='release3'){
+            this.audioNodes.closed_hat.set({
+                'fadeOut': value*this.getTempsBeat(),
+            });
+        } else if (name =='tone2'){
+            this.audioNodes.closed_hat.set({
+                'playbackRate': Math.pow(2,(value/12)),
+            });
+        } else if (name =='volume2'){
+            this.audioNodes.closed_hat.set({
+                'volume': value,
+            });
+        } else if (name =='atack2'){
+            this.audioNodes.closed_hat.set({
+                'fadeIn': value*this.getTempsBeat(),
+            });
+        } else if (name =='release2'){
+            this.audioNodes.closed_hat.set({
+                'fadeOut': value*this.getTempsBeat(),
+            });
+        } else if (name =='tone1'){
+            this.audioNodes.open_hat.set({
+                'playbackRate': Math.pow(2,(value/12)),
+            });
+        } else if (name =='volume1'){
+            this.audioNodes.open_hat.set({
+                'volume': value,
+            });
+        } else if (name =='atack1'){
+            this.audioNodes.open_hat.set({
+                'fadeIn': value*this.getTempsBeat(),
+            });
+        } else if (name =='release1'){
+            this.audioNodes.open_hat.set({
+                'fadeOut': value*this.getTempsBeat(),
+            });
+        } else if (name === 'reverbSend1'){
+            this.audioNodes.sendReverbGainNode1.gain.value = value;
+        } else if (name === 'reverbSend2'){
+            this.audioNodes.sendReverbGainNode2.gain.value = value;
+        } else if (name === 'reverbSend3'){
+            this.audioNodes.sendReverbGainNode3.gain.value = value;
+        } else if (name === 'reverbSend4'){
+            this.audioNodes.sendReverbGainNode4.gain.value = value;
         }
     }
 
-    playSoundFromPlayer (playerName, time){
-        if (["open_hat", "closed_hat", "snare", "kick"].includes(playerName) && this.audioNodes[playerName].loaded ===true) {
+    playSoundFromPlayer(playerName, time) {
+        const validPlayers = ["kick", "snare", "closed_hat", "open_hat"];
+        if (validPlayers.includes(playerName) && this.audioNodes[playerName].buffer.loaded) {
             this.audioNodes[playerName].start(time);
         }
     }
-    stopSoundFromPlayer(playerName, time){
-        if (["open_hat", "closed_hat", "snare", "kick"].includes(playerName) && this.audioNodes[playerName].loaded ===true && this.audioNodes[playerName].state === "started") {
+    
+    stopSoundFromPlayer(playerName, time) {
+        const validPlayers = ["kick", "snare", "closed_hat", "open_hat"];
+        if (validPlayers.includes(playerName) && this.audioNodes[playerName].state === "started") {
             this.audioNodes[playerName].stop(time);
         }
     }
