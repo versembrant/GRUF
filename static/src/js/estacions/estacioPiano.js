@@ -11,9 +11,9 @@ export class EstacioPiano extends EstacioBase {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         timbre: {type: 'float', label: 'Timbre', min: 1200, max: 12000, initial: 12000, logarithmic: true},
         // FX
-        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 0.0},
+        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
