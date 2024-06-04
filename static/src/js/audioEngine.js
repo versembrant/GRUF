@@ -232,6 +232,8 @@ export class AudioGraph {
             });
             Tone.Transport.stop()
             this.setMainSequencerCurrentStep(-1);
+            
+            this.updateParametreAudioGraph('playingArranjement', false)
         }
     }
 

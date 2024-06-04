@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if session %}
 <session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
 <div id="root">Carregant...</div>
+{% else %}
+<h1>Aquest GRUF no existeix...</h1>
+<a href="{{ url_for('app.frontpage') }}">Ves a l'inici</a>
+{% endif %}
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/sessio.js') }}"></script>
+{% if session %}<script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/sessio.js') }}"></script>{% endif %}
 {% endblock %}

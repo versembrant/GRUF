@@ -115,7 +115,7 @@ export class MonoSynth extends EstacioBase {
 
     onTransportStop() {
         // Stop all notes that are still playing
-        this.audioNodes.synth.releaseAll()
+        this.audioNodes.synth.triggerRelease(Tone.now())
     }
 
     lastNoteOnBeats = {}
@@ -134,7 +134,7 @@ export class MonoSynth extends EstacioBase {
                 this.lastNoteOnBeats[midiNoteNumber] = currentStep;
             }
         } else {
-            this.audioNodes.synth.triggerRelease(Tone.Frequency(midiNoteNumber, "midi").toNote(), Tone.now());
+            this.audioNodes.synth.triggerRelease(Tone.now());
             if (recEnabled){
                 // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]

@@ -1,6 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
+import { AudioTransportControlsComputer } from "../components/audioTransport";
 
 
 export const Arranjament = () => {
@@ -71,7 +72,9 @@ export const Arranjament = () => {
     return (
         <div className="arranjament">
             <div>
-                <h2>Arranjament</h2>
+                <h1>Computer</h1>
+                <AudioTransportControlsComputer/>
+                <br/>
                 <div className="grid-default">
                     {stepsElementsPerEstacio.map(function(stepsElements, i){
                         return <div className="grid-row-default" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
