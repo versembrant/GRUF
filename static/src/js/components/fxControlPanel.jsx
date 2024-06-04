@@ -13,7 +13,7 @@ export const AudioEffectsControlPanel = () => {
 
     return (
         <div>
-            <h3>Estació de control d'efectes</h3>
+            <h3>Control d'efectes</h3>
             {/* Diccionari que passa per cada efecte de l'store */}
             {Object.entries(getAudioGraphInstance().getEffectParameters()).map(([param, value]) => {
                 const isEqParameter = param.includes('eq3');

@@ -2,7 +2,7 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
 
-export const EntradaMidi = () => {
+export const EntradaMidi = ({estacioSelected}) => {
 
     let baseNote = 60;
     document.baseNote = baseNote;
@@ -194,11 +194,11 @@ export const EntradaMidi = () => {
     return (
         <div>
             <h2>Entrada MIDI</h2>
-            <div>
+            <div style={{display:"none"}}>
                 Enviar a estació: 
                 <select 
                     id="entradaMidiNomEstacio"
-                    defaultValue={getCurrentSession().getNomsEstacions()[0]}>
+                    defaultValue={estacioSelected}>
                     {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option key={nomEstacio} value={nomEstacio}>{nomEstacio}</option>)}
                 </select>
             </div>

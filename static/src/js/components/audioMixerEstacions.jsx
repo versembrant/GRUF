@@ -1,6 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
+import { AudioEffectsControlPanel} from  "../components/fxControlPanel"
 
 
 export const AudioMixerEstacions = () => {
@@ -17,6 +18,7 @@ export const AudioMixerEstacions = () => {
 
     return (
         <div className="mixer">
+            <h1>Mixer</h1>
             {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
                 return (
                 <div key={nomEstacio}>
@@ -31,6 +33,8 @@ export const AudioMixerEstacions = () => {
                     />{nomEstacio}
                 </div>);
             })}
+            <AudioEffectsControlPanel/>
         </div>
+
     )
 };

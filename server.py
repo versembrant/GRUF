@@ -290,12 +290,16 @@ def notifica_available_sessions():
 
 
 @bp.route('/')
+def frontpage():
+    return render_template('frontpage.html')
+
+
+@bp.route('/connecta/')
 def llista_sessions():
-    log('Loading existing sessions from redis')
     return render_template('llista_sessions.html')
 
 
-@bp.route('/new_session/', methods=['GET', 'POST'])
+@bp.route('/nova_sessio/', methods=['GET', 'POST'])
 def new():
     if request.method == 'POST':
         name = request.form['name']
@@ -309,11 +313,9 @@ def new():
     return render_template('nova_sessio.html')
 
 
-@bp.route('/session/<session_id>/')
+@bp.route('/gruf/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
-    if s is None:
-        raise Exception('Session not found')
     return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1')
 
 

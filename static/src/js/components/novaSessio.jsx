@@ -1,11 +1,34 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState } from "react";
 
+function sample(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+  }
+
+function generateTitle() {
+    var name_prefixes = ["Master", "Mr.", "Professor", "Mrs.", "Princess", "Prince", "The Pauper's", "The", "Betsy", "Billy", "Johnny"];
+    var primary_nouns = ["Crystal", "Bugle", "Dreamer", "Dream", "Castle", "Moss", "Mountain", "Pit", "Bigfoot", "Dream maker", "Oathbreaker", "Bard", "X'arahan'tu", "Magic", "Acorn", "Sun", "Son", "Stump", "Arm"];
+    var adjectives = ["Lost", "Five", "Faded", "Ancient", "Blackened", "Den of", "Despairing", "Golden", "Many", "Merry", "Clever", "Wonderful", "Sullen", "Angry", "Little", "Cowardly", "Silver", "Lasting", "Heavy", "Festive", "Gleeful", "Enchanted", "Wise", "Wistful", "Dark", "Untold"];
+    var secondary_nouns = ["Hearts", "Stones", "Diamond Dogs", "Painted Toes", "Songs", "Tales", "Lords", "Promise", "Screams", "Plagues", "Dreams", "Roads", "Curses", "Spells", "Gloam", "Lands", "Marsh", "Hearts", "Rules", "Swamp", "Tale", "Apex", "Beggar"];
+    var name_prefix = sample(name_prefixes);
+    var primary_noun = sample(primary_nouns);
+    var adjective = sample(adjectives);
+    var secondary_noun = sample(secondary_nouns);
+    var title = "";
+    if (Math.random() < 0.5) {
+      title = `${name_prefix} ${primary_noun} and the ${adjective} ${secondary_noun}`;
+    } else {
+      title = `The ${adjective} ${secondary_noun} of ${name_prefix} ${primary_noun}`;
+    }
+    return title;
+  }
+
 export const NovaSessio = () => {
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
     const estacionsDefault = Object.keys(estacionsDisponibles);
     const [estacionsSelected, setEstacionsSelected] = useState(estacionsDefault);
-    const [nomSessio, setNomSessio] = useState("");
+    const [nomSessio, setNomSessio] = useState(generateTitle());
 
     const handleAddStation = (stationToAdd) => {
         setEstacionsSelected([...estacionsSelected, stationToAdd]);
@@ -53,9 +76,16 @@ export const NovaSessio = () => {
 
     return(
         <div>
-            <h1>Nova sessió</h1>
-            <a href={appPrefix + "/"}>Torna a la llista de sessions</a>
+            <h1>Nou GRUF</h1>
             <div>
+                Nom:<input
+                    style={{width:"300px"}}
+                    value={nomSessio}
+                    onChange={e => setNomSessio(e.target.value)}
+                />
+            </div>
+            <div>
+                <br/>
                 Estacions triades:
                 <ul>
                     {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
@@ -68,11 +98,12 @@ export const NovaSessio = () => {
                 <button onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
             </div>
             <div>
-                <input
-                    value={nomSessio}
-                    onChange={e => setNomSessio(e.target.value)}
-                />
-                <button onClick={handleSubmitForm} type="submit">Crear sessió</button>
+                <br/>
+                <button onClick={handleSubmitForm} type="submit">Crear GRUF!</button>
+            </div>
+            <div>
+                <br/>
+                <a href={appPrefix + "/"}>Torna enrere</a>
             </div>
         </div>
     )

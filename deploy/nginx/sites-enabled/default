@@ -1,20 +1,20 @@
 server {
     server_name cl2024011711001.dnssw.net;
 
-    # Bruixit main deployment
-    location /bruixit/static/ {
+    # Gruf main deployment
+    location /gruf/static/ {
         alias /home/versembrant/versembrant-bruixit/static/;
     }
-    location /bruixit/ {
+    location /gruf/ {
         include uwsgi_params;
         uwsgi_pass unix:/home/versembrant/versembrant-bruixit/versembrant_bruixit.sock;
     }
 
-    # Bruixit test deployment
-    location /bruixit-test/static/ {
+    # Gruf test deployment
+    location /gruf-test/static/ {
         alias /home/versembrant/test/versembrant-bruixit/static/;
     }
-    location /bruixit-test/ {
+    location /gruf-test/ {
         include uwsgi_params;
         uwsgi_pass unix:/home/versembrant/test/versembrant-bruixit/versembrant_bruixit.sock;
     }
@@ -48,9 +48,9 @@ server {
         uwsgi_pass unix:/home/versembrant/sonicpi-renderer/django_app/versembrant-sonicpi-server.sock;
     }
 
-    # Redirect from / to /bruixit
+    # Redirect from / to /gruf
     location / {
-        rewrite (/.*)?$ /bruixit$1 permanent;
+        rewrite (/.*)?$ /gruf$1 permanent;
     }
 
     # SSL configuration
