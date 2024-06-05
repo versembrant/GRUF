@@ -63,6 +63,11 @@ export class EstacioPiano extends EstacioBase {
         }
     }
 
+    onTransportStop() {
+        // Stop all notes that are still playing
+        this.audioNodes.piano.stopAll()
+    }
+
     lastNoteOnBeats = {}
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
