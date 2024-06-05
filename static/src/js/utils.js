@@ -97,6 +97,7 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
     return root;
 }
 
+// Parameter range conversions
 const exponent = 2;
 
 export const norm2Real = (x, parameterDescription) => {
@@ -166,4 +167,28 @@ export const getPatroPredefinitAmbNom = (parameterDescription, nomPatro) => {
         }
     }
     return []
+}
+
+// URL params utils
+
+export const getURLParamValue = (paramName, defaultValue) => {
+    var queryString = location.search
+    let params = new URLSearchParams(queryString)
+    if (!params.has(paramName)) {
+        return defaultValue
+    }
+    return params.get(paramName)
+}
+
+export const removeURLParam = (paramName) => {
+    let url = new URL(window.location.href)
+    let params = new URLSearchParams(url.search.slice(1))
+    if (params.has(paramName)) {
+        params.delete(paramName)
+        let newUrl = window.location.pathname;
+        if (`${params}` !== '' || window.location.hash !== '') {
+            newUrl += `?${params}${window.location.hash}`
+        }
+        window.history.replaceState(null, null, newUrl)
+    }    
 }
