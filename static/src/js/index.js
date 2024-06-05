@@ -22,3 +22,6 @@ registerEstacioDisponible(EstacioPiano);
 
 import {MonoSynth} from './estacions/monoSynth'
 registerEstacioDisponible(MonoSynth);
+
+import {EstacioBaix} from './estacions/estacioBaix'
+registerEstacioDisponible(EstacioBaix);

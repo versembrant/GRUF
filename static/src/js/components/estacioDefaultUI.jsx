@@ -183,8 +183,12 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
         getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
-    const getLowestNote = (sequence) => {
+    const getLowestNoteForYOffset = () => {
         // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
+        if (parameterDescription.permetScrollVertical === 0) {
+            return parameterDescription.notaMesBaixaPermesa;
+        }
+
         let lowestNote = 127
         for (let i = 0; i < parameterValue.length; i++) {
             if (parameterValue[i].n < lowestNote) {
@@ -192,7 +196,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
             }
         }
         if (lowestNote == 127) {
-            return 48
+            return parameterDescription.notaMesBaixaPermesa || 48
         } else {
             return lowestNote
         }
@@ -206,12 +210,12 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
                     id={uniqueId + "_id"}
                     width="600"
                     xrange={numSteps}
-                    yrange={24}
-                    yoffset={getLowestNote()}
+                    yrange={parameterDescription.rangDeNotesPermeses || 24}
+                    yoffset={getLowestNoteForYOffset()}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
-                    yscroll={1}
+                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
                 ></webaudio-pianoroll>
             </div>
             <button onMouseDown={(evt)=>
