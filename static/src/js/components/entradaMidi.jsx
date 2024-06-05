@@ -75,6 +75,22 @@ export const EntradaMidi = ({estacioSelected}) => {
         getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
     }
 
+    const bindMidiInputDevice = (nomDevice) => {
+        bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
+            if (midiMessage.data[0] === 144) {
+                // Note on
+                sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
+            } else if (midiMessage.data[0] === 128) {
+                // Note off
+                sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
+            }
+        })
+    }
+
+    if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
+        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+    }
+
     const panic = () => {
         // Sends a note off for all active notes in all devices
         for (let nomEstacio in document.notesActivades) {
@@ -227,17 +243,11 @@ export const EntradaMidi = ({estacioSelected}) => {
             {isWebMidiEnabled() && 
                 <div>
                     <select
+                        defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
                         onChange={async (evt) => {
                             await buildAudioGraphIfNotBuilt();
-                            bindMidiInputOnMidiMessage(evt.target.value, (midiMessage) => {
-                                if (midiMessage.data[0] === 144) {
-                                    // Note on
-                                    sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
-                                } else if (midiMessage.data[0] === 128) {
-                                    // Note off
-                                    sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
-                                }
-                            });
+                            localStorage.setItem("lastMidiInputDevice", evt.target.value);
+                            bindMidiInputDevice(evt.target.value);
                         }}>
                         <option value="cap">Cap</option>
                         {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
