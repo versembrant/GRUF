@@ -183,7 +183,8 @@ class Session(object):
     def remove_user(self, username):
         usernames_connected_per_session[self.id].remove(username)
         updated_users = self.connected_users.copy()
-        updated_users.remove(username)
+        if username in updated_users:
+            updated_users.remove(username)
         self.update_parametre_sessio('connected_users', updated_users)
 
     def clear_connected_users(self, update_clients=True):
