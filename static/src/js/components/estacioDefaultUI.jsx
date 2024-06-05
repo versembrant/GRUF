@@ -183,6 +183,21 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
         getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
+    const getLowestNote = (sequence) => {
+        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
+        let lowestNote = 127
+        for (let i = 0; i < parameterValue.length; i++) {
+            if (parameterValue[i].n < lowestNote) {
+                lowestNote = parameterValue[i].n
+            }
+        }
+        if (lowestNote == 127) {
+            return 48
+        } else {
+            return lowestNote
+        }
+    }
+
     return (
         <div>
             <p>{parameterDescription.label}: {JSON.stringify(parameterValue)}</p>
@@ -192,6 +207,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
                     width="600"
                     xrange={numSteps}
                     yrange={24}
+                    yoffset={getLowestNote()}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
