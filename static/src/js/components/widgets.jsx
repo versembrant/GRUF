@@ -31,7 +31,7 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             min={0.0}
             max={1.0}
             step={0.01}
-            size={50}
+            size={60}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
             valueColor="#fff" 
@@ -43,7 +43,7 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
     )
 };
 
-export const GrufKnobPetit = ({estacio, parameterName}) => {
+export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
