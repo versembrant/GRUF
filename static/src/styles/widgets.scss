@@ -53,6 +53,29 @@
     }
 }
 
+.gruf-reverb-time {
+    position: absolute;
+
+    display: grid;
+    grid-template-columns: 40px 170px;
+    column-gap: 10px;
+    grid-gap: 3px;
+    font-size: 12px;
+
+    button {
+        background-color: $grey;
+        border: 0px;
+        border-radius: 4px;
+        height: 10px;
+        margin-top: 2.5px;
+        cursor: pointer;
+    }
+
+    .selected {
+        background-color: $yellow;
+    }
+}
+
 .grid-default {
     user-select: none;
     

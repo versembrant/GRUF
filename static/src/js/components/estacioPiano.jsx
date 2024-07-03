@@ -3,7 +3,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns } from "./widgets";
+import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime } from "./widgets";
 
 
 export const EstacioPianoUI = ({estacio}) => {
@@ -17,6 +17,7 @@ export const EstacioPianoUI = ({estacio}) => {
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="75px" left="125px" />
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" />
+            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="60%" left="70%" />
         </div>
         <div className="estacio-bottom-bar">
             {estacio.tipus}
