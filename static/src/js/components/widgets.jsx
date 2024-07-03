@@ -75,11 +75,41 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
         <div className="gruf-enum-2-columns" style={{top: top, left: left}}>
             {enumOptions.map((option, index) => {
                 return (
-                    <button key={index} className={parameterValue == option ? 'selected' : ''} onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, option)}>
+                    <button 
+                        key={index} 
+                        className={parameterValue == option ? 'selected' : ''} 
+                        onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, option)}
+                    >
                         {option}
                     </button>
                 )
             })}
+        </div>
+    )
+}
+
+export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    
+    return (
+        <div className="gruf-reverb-time" style={{top: top, left: left}}>
+            <div>Curta</div><div><button
+                style={{width: "20%"}}
+                className={parameterValue == "1.0" ? 'selected' : ''} 
+                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "1.0")}
+            ></button></div>
+            <div>Mitja</div><div><button
+                style={{width: "50%"}}
+                className={parameterValue == "5.0" ? 'selected' : ''} 
+                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "5.0")}
+            ></button></div>
+            <div>Llarga</div><div><button
+                style={{width: "100%"}}
+                className={parameterValue == "12.0" ? 'selected' : ''} 
+                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "12.0")}
+            ></button></div>
         </div>
     )
 }
