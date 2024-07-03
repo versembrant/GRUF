@@ -1,3 +1,8 @@
+.gruf-label {
+    position: absolute;
+    font-size: 14px;
+}
+
 .gruf-knob-gran {
     position: absolute;
     font-size: 14px;
@@ -8,15 +13,9 @@
     }
 }
 
-.gruf-label {
-    position: absolute;
-    font-size: 14px;
-}
-
-
 .gruf-knob-petit {
     position: absolute;
-    font-size: 14px;
+    font-size: 12px;
 
     div {
         text-align: center;

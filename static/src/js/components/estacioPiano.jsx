@@ -9,11 +9,11 @@ import { GrufKnobGran, GrufKnobPetit, GrufLabel } from "./widgets";
 export const EstacioPianoUI = ({estacio}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
-    
+
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main">
-            <GrufLabel text="Reverb" top="43px" left="52px" />
-            <GrufKnobGran estacio={estacio} parameterName="fxLow" top="75px" left="44px" />
+            <GrufLabel text="Eq" top="6.8%" left="6%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxLow" top="88px" left="59px" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="75px" left="125px" />
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
         </div>
