@@ -5,3 +5,4 @@ __pycache__/
 versembrant_bruixit.sock
 redis-data
 uploads
+.DS_Store

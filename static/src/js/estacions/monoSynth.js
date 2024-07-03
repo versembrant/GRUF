@@ -123,7 +123,7 @@ export class MonoSynth extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
 
-        const recEnabled = document.getElementById(this.nom + '_notes_REC').checked;
+        const recEnabled = this.recEnabled('notes');
         if (!noteOff){
             this.audioNodes.synth.triggerAttack(Tone.Frequency(midiNoteNumber, "midi").toNote(), Tone.now());
             if (recEnabled){

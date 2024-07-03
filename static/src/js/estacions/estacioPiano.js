@@ -2,6 +2,7 @@ import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { Piano } from '@tonejs/piano'
+import { EstacioPianoUI } from "../components/estacioPiano";
 
 export class EstacioPiano extends EstacioBase {
 
@@ -21,6 +22,10 @@ export class EstacioPiano extends EstacioBase {
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+    }
+
+    getUserInterfaceComponent() {
+        return EstacioPianoUI
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -73,7 +78,7 @@ export class EstacioPiano extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
 
-        const recEnabled = document.getElementById(this.nom + '_notes_REC').checked;
+        const recEnabled = this.recEnabled('notes');
         if (!noteOff){
             this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()})
             if (recEnabled){

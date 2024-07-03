@@ -319,6 +319,15 @@ export class EstacioBase {
         // noteOff = boolean which will be true if the message is a noteOff
     }
 
+    recEnabled(sequenceParameterName) {
+        // Checks if the "REC" button of the provided parameter name estació is pressed
+        const recToggleElement = document.getElementById(this.nom + '_' + sequenceParameterName + '_REC');
+        if (recToggleElement !== null){
+            return recToggleElement.checked;
+        }
+        return false;
+    }
+
 }
 
 export class Session {
