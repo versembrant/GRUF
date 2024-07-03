@@ -7,6 +7,10 @@
     position: absolute;
     font-size: 14px;
 
+    .p-knob {
+        cursor: pointer;
+    }
+
     div {
         text-align: center;
         padding-top: 3px;
@@ -17,9 +21,35 @@
     position: absolute;
     font-size: 12px;
 
+    .p-knob {
+        cursor: pointer;
+    }
+
     div {
         text-align: center;
         padding-top: 3px;
+    }
+}
+
+.gruf-enum-2-columns {
+    position: absolute;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    grid-gap: 5px;
+
+    button {
+        color: $font-color;
+        background-color: $black;
+        border: 1px solid $grey;
+        border-radius: 9px;
+        width: 50px;
+        cursor: pointer;
+    }
+
+    .selected {
+        background-color: $yellow;
     }
 }
 
