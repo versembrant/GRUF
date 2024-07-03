@@ -65,3 +65,21 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
         </div>
     )
 };
+
+export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    const enumOptions=parameterDescription.options;
+    return (
+        <div className="gruf-enum-2-columns" style={{top: top, left: left}}>
+            {enumOptions.map((option, index) => {
+                return (
+                    <button key={index} className={parameterValue == option ? 'selected' : ''} onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, option)}>
+                        {option}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
