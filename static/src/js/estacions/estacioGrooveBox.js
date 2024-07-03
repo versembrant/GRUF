@@ -246,7 +246,7 @@ export class EstacioGrooveBox extends EstacioBase {
         const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
 
         if (!noteOff){
-            const recEnabled = document.getElementById(this.nom + '_pattern_REC').checked;
+            const recEnabled = this.recEnabled('pattern');
             // Si Rec està ON
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();

@@ -10,7 +10,7 @@ import { getURLParamValue, removeURLParam } from "../utils";
 
 const Estacio = ({estacio}) => {
     return (
-        <div key={estacio.nom} className="estacio">
+        <div key={estacio.nom}>
             {createElement(estacio.getUserInterfaceComponent(), {estacio})}
         </div>
     )
@@ -79,8 +79,8 @@ export const Sessio = () => {
                 <br/>
                 <div className="estacions">
                     {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)}/>)}
-                    {estacioSelected == "mixer" ? <div className="estacio"><AudioMixerEstacions/></div>: ""}
-                    {estacioSelected == "computer" ? <div className="estacio"><Arranjament/></div>: ""}
+                    {estacioSelected == "mixer" ? <AudioMixerEstacions/>: ""}
+                    {estacioSelected == "computer" ? <Arranjament/>: ""}
                 </div>
                 {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacioSelected={estacioSelected}/>: ""}
                 <div>

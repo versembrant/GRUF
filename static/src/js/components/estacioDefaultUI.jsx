@@ -264,7 +264,7 @@ export const EstacioDefaultUI = ({estacio}) => {
         parametresElements.push(creaUIWidgetPerParametre(estacio, nomParametre));
     });
 
-    return (<div key={estacio.nom}>
+    return (<div key={estacio.nom} className="estacio-default">
         <div>
             <div className="preset-buttons grid-default">
                 <div className="grid-row-default">
