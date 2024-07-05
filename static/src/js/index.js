@@ -25,3 +25,6 @@ registerEstacioDisponible(MonoSynth);
 
 import {EstacioBaix} from './estacions/estacioBaix'
 registerEstacioDisponible(EstacioBaix);
+
+import {EstacioSampler} from './estacions/estacioSampler'
+registerEstacioDisponible(EstacioSampler);
