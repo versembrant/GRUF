@@ -9,6 +9,9 @@ export class EstacioSampler extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, followsPreset: true},
+        //General Controls
+        volume: {type: 'float', label: 'Volume', min: -30, max: 6, initial: 0},
+        pan: {type: 'float', label: 'Pan', min: -1, max: 1, initial:0},
         //URLs
         sound1URL: {type: 'text', label: 'Sample1', initial: 'https://cdn.freesound.org/previews/559/559850_12295155-lq.mp3'}, 
         sound2URL: {type: 'text', label: 'Sample2', initial: 'https://cdn.freesound.org/previews/75/75840_260058-hq.mp3'}, 
@@ -30,8 +33,13 @@ export class EstacioSampler extends EstacioBase {
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true}, 
 
+        attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
+        decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
+        sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
+        release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
+
         // FX
-        /* fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
@@ -40,7 +48,9 @@ export class EstacioSampler extends EstacioBase {
         fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0} */
+        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+
+        
     }
 
     getTempsBeat = () => {
@@ -74,16 +84,27 @@ export class EstacioSampler extends EstacioBase {
         }
     }
 
-
     buildEstacioAudioGraph(estacioMasterChannel) {
 
-        const hpf = new Tone.Filter(6000, "highpass", -24);
+        const ampEnv = new Tone.AmplitudeEnvelope({
+            attack: 0.1,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.8,
+        });
+
+        const samplerChannel = new Tone.Channel({
+            volume:0,
+            pan: 0,
+        }).connect(ampEnv);
+
+        const hpf = new Tone.Filter(6000, "highpass", -24).connect(samplerChannel);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
 
-        const player1 = new Tone.Player().connect(estacioMasterChannel);
-        const player2 = new Tone.Player().connect(estacioMasterChannel);
-        const player3 = new Tone.Player().connect(estacioMasterChannel);
-        const player4 = new Tone.Player().connect(estacioMasterChannel);
+        const player1 = new Tone.Player().connect(lpf);
+        const player2 = new Tone.Player().connect(lpf);
+        const player3 = new Tone.Player().connect(lpf);
+        const player4 = new Tone.Player().connect(lpf);
 
         this.audioBuffers = {
             sample1: null,
@@ -100,8 +121,10 @@ export class EstacioSampler extends EstacioBase {
             player4: player4,
             lpf: lpf,
             hpf: hpf,
+            ampEnv: ampEnv, 
+            gain: samplerChannel,
         }
-        this.addEffectChainNodes(hpf, estacioMasterChannel);
+        this.addEffectChainNodes(ampEnv, estacioMasterChannel);
     }
 
     setParameterInAudioGraph(name, value, preset) {
@@ -113,38 +136,40 @@ export class EstacioSampler extends EstacioBase {
             this.loadSoundInBuffer('sample3', value);
         } else if (name === 'sound4URL'){
             this.loadSoundInBuffer('sample4', value);
-        } 
-
+        } else if ((name == "attack")
+            || (name == "decay")
+            || (name == "sustain")
+            || (name == "release")){
+            this.audioNodes.ampEnv.set({
+                name:value}
+            );
+        } else if (name=== 'volume'){
+            this.audioNodes.gain.volume.value = value;
+        } else if (name=== 'pan'){
+            this.audioNodes.gain.pan.value = value;
+        } else if (name == "hpf") {
+            this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+        } else if (name == "lpf") {
+            this.audioNodes.lpf.frequency.rampTo(value, 0.01);
+        }
         if (name.startsWith('start') || name.startsWith('end')) {
             this[name] = value;
         }    
     }
 
-    /* playSoundFromPlayer(playerName, time) {
-        const validPlayers = ["sample1", "sample2", "sample3", "sample4"];
-        if (validPlayers.includes(playerName) && this.audioNodes[playerName].buffer.loaded) {
-            this.audioNodes[playerName].start(time);
+    playSoundFromPlayer(playerName, time) {
+        const validPlayers = ["player1", "player2", "player3", "player4"];
+        if (validPlayers.includes(playerName)) {
+            const bufferName = `sample${playerName.slice(-1)}`;
+            const buffer = this.audioBuffers[bufferName];
+            const start = this[`start${bufferName.slice(-1)}`];
+            const end = this[`end${bufferName.slice(-1)}`];
+            const player = this.audioNodes[playerName];
+            const ampEnv = this.audioNodes.ampEnv;
+            ampEnv.triggerAttackRelease(0.5);
+            this.playBufferSlice(player, buffer, start, end, time);
         }
-    } */
-
-        playSoundFromPlayer(playerName, time) {
-            const validPlayers = ["player1", "player2", "player3", "player4"];
-            if (validPlayers.includes(playerName)) {
-                const bufferName = `sample${playerName.slice(-1)}`;
-                const buffer = this.audioBuffers[bufferName];
-                const start = this[`start${bufferName.slice(-1)}`];
-                const end = this[`end${bufferName.slice(-1)}`];
-                const player = this.audioNodes[playerName];
-                this.playBufferSlice(player, buffer, start, end, time);
-            }
-        }
-    
-    /* stopSoundFromPlayer(playerName, time) {
-        const validPlayers = ["sample1", "sample2", "sample3", "sample4"];
-        if (validPlayers.includes(playerName) && this.audioNodes[playerName].state === "started") {
-            this.audioNodes[playerName].stop(time);
-        }
-    } */
+    }
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
