@@ -6,6 +6,8 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+import { Slider } from 'primereact/slider';
+
 
 
 const valueToText = (value) => {
@@ -113,3 +115,25 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufSlider = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-slider" style={{top: top, left: left}}>
+            <Slider 
+            value={real2Norm(parameterValue, parameterDescription)}
+            min={0.0}
+            max={1.0}
+            step={0.01}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
+            // valueTemplate={""}
+            // valueColor="#fff" 
+            // rangeColor="#969697"
+            //valueTemplate={valueToText(parameterValue)}
+            />
+            <div>{parameterDescription.label}</div>
+        </div>
+    )
+};
