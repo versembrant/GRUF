@@ -31,6 +31,20 @@
     }
 }
 
+.gruf-slider {
+    position: absolute;
+    font-size: 14px;
+
+    .p-slider {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+}
+
 .gruf-enum-2-columns {
     position: absolute;
 
