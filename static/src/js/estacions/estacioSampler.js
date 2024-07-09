@@ -13,10 +13,18 @@ export class EstacioSampler extends EstacioBase {
             ...acc,
             [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: ''},
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: 0},
-            [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: 1}
+            [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: 1},
+            [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, min: 0, max: 10, initial: 0.01},
+            [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, min: 0, max: 10, initial: 0.1},
+            [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 0.5},
+            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, min: 0, max: 10, initial: 1},
+            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, min: -60, max: 0, initial: 0},
+            [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
         }), {}),
+        
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true}, 
+        hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
+
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
@@ -61,38 +69,41 @@ export class EstacioSampler extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
-        const ampEnv = new Tone.AmplitudeEnvelope({
-            attack: 0.1,
-            decay: 0.2,
-            sustain: 0.5,
-            release: 0.8,
-        });
-
-        const samplerChannel = new Tone.Channel({
-            volume:0,
-            pan: 0,
-        }).connect(ampEnv);
-
-        const hpf = new Tone.Filter(6000, "highpass", -24).connect(samplerChannel);
+        const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
-
-        /* const player1 = new Tone.Player().connect(lpf);
-        const player2 = new Tone.Player().connect(lpf);
-        const player3 = new Tone.Player().connect(lpf);
-        const player4 = new Tone.Player().connect(lpf); */
 
         this.audioBuffers = Array(16).fill(null);
 
-        
         // Creem els nodes del graph
         this.audioNodes = {
-            ampEnv: ampEnv, 
+            players: Array(16).fill(null),
+            envelopes: Array(16).fill(null),
+            channels: Array(16).fill(null),
             lpf: lpf,
             hpf: hpf,
-            players: Array.from({ length: 16 }, () => new Tone.Player().connect(estacioMasterChannel)),
-            gain: samplerChannel,
+        };
+
+        for (let i = 0; i < 16; i++) {
+            const envelope = new Tone.AmplitudeEnvelope({
+                attack: this[`attack${i + 1}`] || 0.01,
+                decay: this[`decay${i + 1}`] || 0.1,
+                sustain: this[`sustain${i + 1}`] || 0.5,
+                release: this[`release${i + 1}`] || 1
+            }).connect(lpf);
+
+            const channel = new Tone.Channel({
+                volume: this[`volume${i + 1}`] || -6,
+                pan: this[`pan${i + 1}`] || 0,
+            }).connect(envelope);
+
+            const player = new Tone.Player().connect(channel);
+            
+            this.audioNodes.players[i] = player;
+            this.audioNodes.envelopes[i] = envelope;
+            this.audioNodes.channels[i] = channel;
         }
-        this.addEffectChainNodes(ampEnv, estacioMasterChannel);
+        
+        this.addEffectChainNodes(hpf, estacioMasterChannel);
     }
 
     setParameterInAudioGraph(name, value, preset) {
@@ -102,27 +113,29 @@ export class EstacioSampler extends EstacioBase {
             this.loadSoundInBuffer(index, value);
         }
 
-        const startEndMatch = name.match(/^(start|end)(\d+)$/);
-        if (startEndMatch) {
-            const [_, type, indexStr] = startEndMatch;
+        const parametersMatch = name.match(/^(start|end|attack|decay|sustain|release|volume|pan)(\d+)$/);
+        if (parametersMatch) {
+            const [_, type, indexStr] = parametersMatch;
             const index = parseInt(indexStr, 10) - 1;
             this[`${type}${index + 1}`] = value;
-        } else if ((name == "attack")
-            || (name == "decay")
-            || (name == "sustain")
-            || (name == "release")){
-            this.audioNodes.ampEnv.set({
-                name:value}
-            );
-        } else if (name=== 'volume'){
-            this.audioNodes.gain.volume.value = value;
-        } else if (name=== 'pan'){
-            this.audioNodes.gain.pan.value = value;
+
+            // Actualitza els paràmetres de ADSR i Channel
+            if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
+                const envelope = this.audioNodes.envelopes[index];
+                envelope[type] = value;
+            } else if (type === 'volume') {
+                const channel = this.audioNodes.channels[index];
+                channel.volume.value = value;
+            } else {
+                const channel = this.audioNodes.channels[index];
+                channel.pan.value = value;
+            }
+        }
+        if(name == 'lpf'){
+            this.audioNodes.lpf.frequency.rampTo(value, 0.01);
         } else if (name == "hpf") {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-        } else if (name == "lpf") {
-            this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-        }  
+        }
     }
 
     playSoundFromPlayer(playerIndex, time) {
@@ -130,7 +143,12 @@ export class EstacioSampler extends EstacioBase {
         const start = this[`start${playerIndex + 1}`];
         const end = this[`end${playerIndex + 1}`];
         const player = this.audioNodes.players[playerIndex];
-        this.playBufferSlice(player, buffer, start, end, time);
+        const envelope = this.audioNodes.envelopes[playerIndex];
+        
+        if (buffer && envelope) {
+            envelope.triggerAttackRelease(end - start, time);
+            this.playBufferSlice(player, buffer, start, end, time);
+        }
     }
 
     stopSoundFromPlayer(playerIndex, time) {
