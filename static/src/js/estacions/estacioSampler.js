@@ -20,6 +20,12 @@ export class EstacioSampler extends EstacioBase {
             [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, min: 0, max: 10, initial: 1},
             [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, min: -60, max: 0, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
+            [`pitch${i + 1}`]: {
+                type: 'enum', 
+                label: `Pitch${i + 1}`, 
+                options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0','1','2','3','4','5','6','7','8','9','10','11','12'], 
+                initial: '0'
+            }
         }), {}),
         
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
@@ -79,6 +85,7 @@ export class EstacioSampler extends EstacioBase {
             players: Array(16).fill(null),
             envelopes: Array(16).fill(null),
             channels: Array(16).fill(null),
+            pitchShifts: Array(16).fill(null),
             lpf: lpf,
             hpf: hpf,
         };
@@ -91,16 +98,22 @@ export class EstacioSampler extends EstacioBase {
                 release: this[`release${i + 1}`] || 1
             }).connect(lpf);
 
+            const pitchShift = new Tone.PitchShift({
+                pitch: parseInt(this[`pitch${i + 1}`]) || 0
+            }).connect(envelope);
+
             const channel = new Tone.Channel({
                 volume: this[`volume${i + 1}`] || -6,
                 pan: this[`pan${i + 1}`] || 0,
-            }).connect(envelope);
+            }).connect(pitchShift);
 
             const player = new Tone.Player().connect(channel);
             
             this.audioNodes.players[i] = player;
             this.audioNodes.envelopes[i] = envelope;
             this.audioNodes.channels[i] = channel;
+            this.audioNodes.pitchShifts[i] = pitchShift;
+
         }
         
         this.addEffectChainNodes(hpf, estacioMasterChannel);
@@ -113,7 +126,7 @@ export class EstacioSampler extends EstacioBase {
             this.loadSoundInBuffer(index, value);
         }
 
-        const parametersMatch = name.match(/^(start|end|attack|decay|sustain|release|volume|pan)(\d+)$/);
+        const parametersMatch = name.match(/^(start|end|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
         if (parametersMatch) {
             const [_, type, indexStr] = parametersMatch;
             const index = parseInt(indexStr, 10) - 1;
@@ -123,14 +136,20 @@ export class EstacioSampler extends EstacioBase {
             if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
                 const envelope = this.audioNodes.envelopes[index];
                 envelope[type] = value;
-            } else if (type === 'volume') {
+            } else if (type === 'volume'|| type === 'pan') {
                 const channel = this.audioNodes.channels[index];
-                channel.volume.value = value;
-            } else {
-                const channel = this.audioNodes.channels[index];
-                channel.pan.value = value;
+                if (type === 'volume'){
+                    channel.volume.value = value;
+                }
+                else {
+                    channel.pan.value = value;
+                }
+            } else if (type === 'pitch') {
+                const pitchShift = this.audioNodes.pitchShifts[index];
+                pitchShift.pitch = parseInt(value);
             }
         }
+
         if(name == 'lpf'){
             this.audioNodes.lpf.frequency.rampTo(value, 0.01);
         } else if (name == "hpf") {
