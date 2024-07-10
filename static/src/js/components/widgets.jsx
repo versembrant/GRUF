@@ -6,7 +6,8 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
-import { Slider } from 'primereact/slider';
+import Slider from '@mui/material/Slider';
+
 
 
 
@@ -124,8 +125,8 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
         <div className="gruf-slider" style={{top: top, left: left}}>
             <Slider 
             value={real2Norm(parameterValue, parameterDescription)}
-            min={0.0}
-            max={1.0}
+            min={1200}
+            max={12000}
             step={0.01}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             // valueTemplate={""}
