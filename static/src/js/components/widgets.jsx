@@ -1,4 +1,4 @@
-import { createElement, useState, useEffect } from "react";
+import { createElement, useState, useEffect, useRef } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
@@ -6,6 +6,7 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+import { Button } from 'primereact/button';
 
 
 const valueToText = (value) => {
@@ -113,3 +114,57 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufPad = ({ playerIndex }) => {
+    const [isClicked, setIsClicked] = useState(false);
+    const [isHeld, setIsHeld] = useState(false);
+    const holdTimer = useRef(null);
+
+    const handleMouseDown = () => {
+        setIsClicked(true);
+        holdTimer.current = setTimeout(() => {
+            setIsHeld(true);
+        }, 500); 
+    };
+
+    const handleMouseUp = () => {
+        clearTimeout(holdTimer.current);
+        setIsClicked(false);
+        if (isHeld) {
+            setIsHeld(false);
+        } else {
+            playSample(playerIndex);
+        }
+    };
+
+    const playSample = (index) => {
+        const estacio = getCurrentSession().getEstacio('estacioSamper');
+        if (estacio && estacio.playSoundFromPlayer) {
+            estacio.playSoundFromPlayer(index, Tone.now());
+        }
+    };
+
+    return (
+        <div className="gruf-pad">
+            <Button
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{ backgroundColor: isClicked ? 'orange' : 'gray', color: 'white', width: '100%', height: '100%', borderRadius: '10px' }}
+            />
+        </div>
+    );
+};
+
+export const PadGrid = ({ top, left }) => {
+    return (
+        <div className="pad-grid" style={{ top: top, left: left }}>
+            {Array.from({ length: 16 }).map((_, index) => (
+                <GrufPad
+                    key={index}
+                    playerIndex={index}
+                />
+            ))}
+        </div>
+    );
+};
