@@ -12,12 +12,16 @@ export const EstacioPianoUI = ({estacio}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main">
-            <GrufLabel text="Eq" top="6.8%" left="6%" />
-            <GrufKnobGran estacio={estacio} parameterName="fxLow" top="88px" left="59px" />
-            <GrufKnobGran estacio={estacio} parameterName="fxMid" top="75px" left="125px" />
-            <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
+            <GrufLabel text="EQ" top="7%" left="6%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxLow" top="12%" left="5.8%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxMid" top="12%" left="15.5%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="12%" left="25%" />
+            <GrufLabel text="Reverb" top="7.3%" left="37%" />
+            <GrufLabel text="Durada" top="11.5%" left="36.7%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" />
-            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="60%" left="70%" />
+            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15.5%" left="36.7%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.7%" left="54.8%" />
+            <GrufLabel text="Timbre" top="7.2%" left="68.2%" />
         </div>
         <div className="estacio-bottom-bar">
             {estacio.tipus}
