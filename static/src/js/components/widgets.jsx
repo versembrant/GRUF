@@ -138,7 +138,7 @@ export const GrufPad = ({ playerIndex }) => {
     };
 
     const playSample = (index) => {
-        const estacio = getCurrentSession().getEstacio('estacioSamper');
+        const estacio = getCurrentSession().getEstacio('EstacioSamper');
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(index, Tone.now());
         }
@@ -150,7 +150,7 @@ export const GrufPad = ({ playerIndex }) => {
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-                style={{ backgroundColor: isClicked ? 'orange' : 'gray', color: 'white', width: '100%', height: '100%', borderRadius: '10px' }}
+                style={{ backgroundColor: isClicked ? 'orange' : 'gray', color: 'white', width: '100%', height: '80%', borderRadius: '10px' }}
             />
         </div>
     );
