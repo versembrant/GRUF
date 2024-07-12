@@ -13,7 +13,7 @@
 .estacio {
     width: 1000px;
     height: 780px;
-    border: 1px solid white;
+    border: solid $orange;
 
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
@@ -42,6 +42,9 @@
         color: $orange;
     }
 }
+
+
+
 
 
 
