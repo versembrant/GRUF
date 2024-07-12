@@ -110,7 +110,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 5px;
+    gap: 0px 15px;
     width: 50%;
     height: 50%;
     transform: translate(-50%, -50%);

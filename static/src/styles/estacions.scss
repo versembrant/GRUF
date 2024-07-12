@@ -43,6 +43,18 @@
     }
 }
 
+.estacio-sampler {
+    .estacio-main {
+        background-image: url("../img/piano_bg.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    .estacio-bottom-bar {
+        color: $lightblue;
+    }
+}
+
 
 
 
