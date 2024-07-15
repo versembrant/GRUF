@@ -104,3 +104,48 @@
         
     }
 }
+
+.gruf-select-button {
+    position: absolute;
+    width: 120px;  
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid $white;
+    background-color: $background-color;
+    border-radius: 12px;
+    overflow: hidden;
+
+    .p-selectbutton {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: transparent;
+        overflow: hidden;
+
+        .circle-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: $yellow; 
+            border-radius: 100px;
+            transition: left 0.3s ease;
+        }
+
+        &.on .circle-icon {
+            left: 10px;
+        }
+
+        &.off .circle-icon {
+            left: auto;
+            right: 10px;
+        }
+    }
+}
