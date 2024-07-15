@@ -6,6 +6,9 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+import { SelectButton } from 'primereact/selectbutton';
+import { orange, red } from "@mui/material/colors";
+
 
 
 const valueToText = (value) => {
@@ -113,3 +116,25 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufSelectButton = ({ estacio, parameterName, top, left, currentColor}) => {
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const [value, setValue] = useState(parameterValue === 1 ? 'ON' : 'OFF');
+
+    const handleClick = () => {
+        const newValue = value === 'ON' ? 'OFF' : 'ON';
+        estacio.updateParametreEstacio(parameterName, newValue === 'ON' ? 1 : 0);
+        setValue(newValue);
+    };
+
+    return (
+        <div className="gruf-select-button" style={{ top: top, left: left}}>
+            <div
+                className={`p-selectbutton ${value === 'ON' ? 'on' : 'off'}`}
+                onClick={handleClick}
+            >
+                <div className="circle-icon"></div>
+            </div>
+        </div>
+    );
+};
