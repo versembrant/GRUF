@@ -6,6 +6,7 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+import { InputNumber } from 'primereact/inputnumber';
 
 
 const valueToText = (value) => {
@@ -113,3 +114,33 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufBpmCounter = ({ top, left }) => {
+    const [bpm, setBpm] = useState(getAudioGraphInstance().getBpm());
+
+    const handleBpmChange = (newBpm) => {
+        setBpm(newBpm);
+        getAudioGraphInstance().setBpm(newBpm);
+    };
+
+    return (
+        <div className="bpm-counter" style={{ top: top, left: left }}>
+            <div className="inner-square">
+                <InputNumber 
+                    value={bpm} 
+                    onValueChange={(e) => handleBpmChange(e.value)} 
+                    min={40} 
+                    max={300} 
+                    showButtons={false} 
+                    className="p-inputnumber"
+                />
+                <div className="bpm-buttons">
+                    <div className="button increment" onClick={() => handleBpmChange(bpm + 1)}></div>
+                    <div className="button decrement" onClick={() => handleBpmChange(bpm - 1)}></div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
