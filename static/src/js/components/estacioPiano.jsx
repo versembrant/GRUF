@@ -13,12 +13,13 @@ export const EstacioPianoUI = ({estacio}) => {
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main">
             <GrufLabel text="EQ" top="6.8%" left="6%" />
+            <GrufLabel text="Timbre" top="6.8%" left="68.3%"/>
             <GrufKnobGran estacio={estacio} parameterName="fxLow" top="88px" left="59px" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="75px" left="125px" />
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="60%" left="70%" />
-            <GrufSlider estacio={estacio} parameterName="timbre" top="30px" left="70px" />
+            <GrufSlider estacio={estacio} parameterName="timbre" top="110px" left="694px" />
         </div>
         <div className="estacio-bottom-bar">
             {estacio.tipus}

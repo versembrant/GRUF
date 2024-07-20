@@ -7,7 +7,7 @@ import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
 import Slider from '@mui/material/Slider';
-
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 
@@ -121,20 +121,91 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
+    const theme = createTheme({
+        palette: {
+          primary: {
+            main: '#fff',
+          },
+          secondary: {
+            main: "#969697",
+          },
+        },
+      });
+    const marks = [
+        {
+            value: 1200,
+            label: <div className="marques-slider">soft</div>
+        },
+        {
+            value: 12000,
+            label: <div className="marques-slider">hard</div>
+        },
+    ];
     return (
+        <ThemeProvider theme={theme}>
         <div className="gruf-slider" style={{top: top, left: left}}>
             <Slider 
+            sx={{
+                height: 17,
+                '& .MuiSlider-thumb': {
+                borderRadius: '2px',
+                height: 27,
+                width: 10,
+                },
+                '& .MuiSlider-mark':{
+                    height: '1px',
+                    color: "#969697",
+                }
+              }}
             value={real2Norm(parameterValue, parameterDescription)}
+            step={100}
             min={1200}
             max={12000}
-            step={0.01}
+            marks={marks}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
-            // valueTemplate={""}
-            // valueColor="#fff" 
-            // rangeColor="#969697"
             //valueTemplate={valueToText(parameterValue)}
             />
-            <div>{parameterDescription.label}</div>
         </div>
+        </ThemeProvider>
+    )
+};
+
+export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    const theme = createTheme({
+        palette: {
+          primary: {
+            main: '#fff',
+          },
+          secondary: {
+            main: "#969697",
+          },
+        },
+      });
+    return (
+        <ThemeProvider theme={theme}>
+        <div className="gruf-slider-vertical" style={{top: top, left: left}}>
+            <Slider 
+            sx={{
+                height: 17,
+                '& .MuiSlider-thumb': {
+                borderRadius: '2px',
+                height: 30,
+                width: 10,
+                },
+              }}
+            value={real2Norm(parameterValue, parameterDescription)}
+            step={100}
+            min={1200}
+            max={12000}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
+            // valueTemplate={""}
+            //valueTemplate={valueToText(parameterValue)}
+            />
+            {/* <div>{parameterDescription.label}</div> */}
+        </div>
+        </ThemeProvider>
     )
 };
