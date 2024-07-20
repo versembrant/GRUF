@@ -34,6 +34,7 @@
 .gruf-slider {
     position: absolute;
     font-size: 14px;
+    width: 24%;
 
     .p-slider {
         cursor: pointer;
@@ -88,6 +89,14 @@
     .selected {
         background-color: $yellow;
     }
+}
+
+.marques-slider{
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: $font-color;
 }
 
 .grid-default {
