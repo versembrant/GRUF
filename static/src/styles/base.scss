@@ -7,7 +7,7 @@ body {
     background-color: $background-color;
     color: $font-color;
 
-    padding: 30px;
+    margin: 0px;
 
     input:focus,
     select:focus,
@@ -15,8 +15,14 @@ body {
     button:focus {
         outline: none;
     }
+
+    a {
+        color: $white;
+        text-decoration: none;
+    
+        &:hover {
+            color: $grey;
+        }
+    }
 }
 
-a {
-    color: $white;
-}
