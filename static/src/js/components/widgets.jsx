@@ -92,7 +92,6 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     
@@ -117,23 +116,22 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSelectButton = ({ estacio, parameterName, top, left, currentColor}) => {
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const [value, setValue] = useState(parameterValue === 1 ? 'ON' : 'OFF');
-
+    const parameterValueOnOff = parameterValue === valueOn ? true : false;
+    
     const handleClick = () => {
-        const newValue = value === 'ON' ? 'OFF' : 'ON';
-        estacio.updateParametreEstacio(parameterName, newValue === 'ON' ? 1 : 0);
-        setValue(newValue);
+        const parameterInverted = !parameterValueOnOff;
+        estacio.updateParametreEstacio(parameterName, parameterInverted ? valueOn : valueOff);
     };
 
     return (
         <div className="gruf-select-button" style={{ top: top, left: left}}>
             <div
-                className={`p-selectbutton ${value === 'ON' ? 'on' : 'off'}`}
+                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
                 onClick={handleClick}
             >
-                <div className="circle-icon"></div>
+                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
             </div>
         </div>
     );
