@@ -16,13 +16,116 @@ body {
         outline: none;
     }
 
+    .content {
+        padding: 20px;
+    }
+
     a {
         color: $white;
         text-decoration: none;
     
         &:hover {
             color: $grey;
+        }        
+    }
+
+    .btn {
+        color: $white;
+        border: 1px solid $white;
+        border-radius: 10px;
+        padding: 10px 40px;
+        font-weight: 600;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $grey;
+            color: $grey;
         }
+    }
+
+    .btn-verd {
+        color: $green;
+        border: 1px solid $green;
+        border-radius: 10px;
+        padding: 10px 40px;
+        font-weight: 600;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $grey;
+            color: $grey;
+        }
+    }
+
+    .btn-petit {
+        color: $white;
+        border: 1px solid $white;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $grey;
+            color: $grey;
+        }
+    }
+
+    .btn-petit-vermell {
+        color: $red;
+        border: 1px solid $red;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $white;
+            color: $white;
+        }
+    }
+
+    .btn-petit-gris {
+        color: $grey;
+        border: 1px solid $grey;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $white;
+            color: $white;
+        }
+    }
+
+    .btn-black {
+        color: $black;
+        border: 1px solid $black;
+        border-radius: 10px;
+        padding: 10px 40px;
+        font-weight: 600;
+        cursor: pointer;
+        
+        &:hover {
+            border-color: $white;
+            color: $white;
+        }
+    }
+
+    h1 {
+        font-size: 80px;
+        font-weight: 800;
+    }
+
+    h2 {
+        font-size: 40px;
+        font-weight: 500;
+    }
+
+    .enrere {
+        text-align: center;
+        padding: 20px 0 80px 0;
     }
 }
 

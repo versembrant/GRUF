@@ -5,8 +5,17 @@
 <session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
 <div id="root">Carregant...</div>
 {% else %}
-<h1>Aquest GRUF no existeix...</h1>
-<a href="{{ url_for('app.frontpage') }}">Ves a l'inici</a>
+<div style="display: flex;align-items: center;justify-content: center;height: 100vh;">
+    <div style="width:100%">
+        <div class="connectat">
+            <h1>Oh no! Aquest Gruf no existeix! :(</h1>
+            <div><a href="{{ url_for('app.llista_sessions') }}" class="btn-black">Connecta't a un altre GRUF</a></div>
+        </div>
+        <div class="enrere" style="margin-top:20px;">
+            <a class="btn" href="{{ url_for('app.frontpage') }}">Ves a l'inici</a>
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
 

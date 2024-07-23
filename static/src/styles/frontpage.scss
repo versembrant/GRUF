@@ -34,23 +34,19 @@
     background-repeat: no-repeat;
     padding-top: 20px;
     padding-bottom: 80px;
-
-    h1 {
-        font-size: 80px;
-        color: $black;
-        font-weight: 800;
-    }
-
-    h2 {
-        font-size: 40px;
-        color: $black;
-        font-weight: 500;
-        padding: 0 10%;
-        margin-top: -20px;
-    }
+    color: $black;
 
     .buttons {
         margin-top: 60px;
+    }
+
+    h1 {
+        color: $black;
+    }
+
+    h2 {
+        padding: 0 10%;
+        margin-top: -20px;
     }
 
     ul {
@@ -60,29 +56,17 @@
         li {
             display:inline;
             margin-left: 20px;
-
-            a {
-                color: $black;
-                border: 1px solid $black;
-                border-radius: 10px;
-                padding: 10px 40px;
-                font-weight: 600;
-                
-                &:hover {
-                    border-color: $white;
-                    color: $white;
-                }
-            }
         }
     }
+}
+
+.heroWrapper {
+    height: calc(100% - 160px);
 }
 
 .footer {
     text-align: center;
     padding: 30px 0;
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
     background-color: $black;
 
     ul {

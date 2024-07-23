@@ -4,7 +4,7 @@
     "static/src/js/index.js",
     "static/src/js/pagines/sessio.js",
     "static/src/js/pagines/novaSessio.js",
-    "static/src/js/pagines/llistaSessions.js",
+    "static/src/js/pagines/connecta.js",
     "static/src/js/pagines/frontpage.js"
   ],
   "scripts": {
