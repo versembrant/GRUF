@@ -184,12 +184,12 @@
                 position: absolute;
             }
 
-            .increment::after {
+            .decrement::after {
                 border-width: 0 5px 7px 5px;
                 border-color: transparent transparent $grey transparent;
             }
 
-            .decrement::after {
+            .increment::after {
                 border-width: 7px 5px 0 5px;
                 border-color: $grey transparent transparent transparent;
             }
