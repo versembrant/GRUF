@@ -1,6 +1,6 @@
 import { subscribeToAvailableSessions } from "../serverComs"
 import { renderReactComponentInElement } from "../utils";
-import { LlistaSessions } from '../components/llistaSessions'
+import { Connecta } from '../components/connecta'
 
 let checkLoadedCorrectlyInterval = undefined;
 
@@ -12,5 +12,5 @@ let reactRoot = undefined;
 
 subscribeToAvailableSessions((infoSessions) => {
     clearInterval(checkLoadedCorrectlyInterval);
-    reactRoot = renderReactComponentInElement(LlistaSessions, 'root', {infoSessions}, reactRoot)
+    reactRoot = renderReactComponentInElement(Connecta, 'root', {infoSessions}, reactRoot)
 });
