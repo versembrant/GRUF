@@ -1,9 +1,6 @@
-import { createElement, useState, useEffect } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter } from "./widgets";
+import { GrufKnobGran, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter } from "./widgets";
 
 
 
@@ -22,8 +19,6 @@ export const EstacioPianoUI = ({estacio}) => {
             <GrufBpmCounter estacio={estacio} top="6.8%" left="55%" />
             <GrufOnOffButton estacio={estacio} parameterName="fxDelayWet" top="70%" left="80%" valueOn={0.5} valueOff={0.0} />
         </div>
-        <div className="estacio-bottom-bar">
-            {estacio.tipus}
-        </div>
+        <div className="estacio-bottom-bar"></div>
     </div>)
 };
