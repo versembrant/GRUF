@@ -133,11 +133,11 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
       });
     const marks = [
         {
-            value: 1200,
+            value: 0,
             label: <div className="marques-slider">soft</div>
         },
         {
-            value: 12000,
+            value: 1,
             label: <div className="marques-slider">hard</div>
         },
     ];
@@ -158,11 +158,11 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
                 }
               }}
             value={real2Norm(parameterValue, parameterDescription)}
-            step={100}
-            min={1200}
-            max={12000}
+            step={0.01}
+            min={0.0}
+            max={1.0}
             marks={marks}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
             //valueTemplate={valueToText(parameterValue)}
             />
         </div>
