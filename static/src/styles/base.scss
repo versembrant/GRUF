@@ -8,6 +8,13 @@ body {
     color: $font-color;
 
     padding: 30px;
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+        outline: none;
+    }
 }
 
 a {
