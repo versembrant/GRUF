@@ -6,9 +6,9 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+import { InputNumber } from 'primereact/inputnumber';
 import { SelectButton } from 'primereact/selectbutton';
 import { orange, red } from "@mui/material/colors";
-
 
 
 const valueToText = (value) => {
@@ -115,6 +115,33 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufBpmCounter = ({ top, left }) => {
+    const currentBpm = getAudioGraphInstance().getBpm()
+
+    const handleBpmChange = (newBpm) => {
+        getAudioGraphInstance().setBpm(newBpm);
+    };
+
+    return (
+        <div className="bpm-counter" style={{ top: top, left: left }}>
+            <div className="inner-square">
+                <InputNumber 
+                    value={currentBpm} 
+                    onValueChange={(e) => handleBpmChange(e.value)} 
+                    min={40} 
+                    max={300} 
+                    showButtons={false} 
+                    className="p-inputnumber"
+                />
+                <div className="bpm-buttons">
+                    <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
+                    <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
