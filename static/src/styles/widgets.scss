@@ -127,6 +127,7 @@
         align-items: center;
         background-color: transparent;
         overflow: hidden;
+        cursor: pointer;
 
         .circle-icon {
             position: absolute;
@@ -134,7 +135,7 @@
             transform: translateY(-50%);
             width: 16px;
             height: 16px;
-            background-color: $yellow; 
+            background-color: $dark-grey; 
             border-radius: 100px;
             transition: left 0.3s ease;
         }
