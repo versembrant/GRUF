@@ -7,6 +7,8 @@ import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
 import { InputNumber } from 'primereact/inputnumber';
+import { SelectButton } from 'primereact/selectbutton';
+import { orange, red } from "@mui/material/colors";
 
 
 const valueToText = (value) => {
@@ -90,7 +92,6 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     
@@ -142,4 +143,23 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValueOnOff = parameterValue === valueOn ? true : false;
+    
+    const handleClick = () => {
+        const parameterInverted = !parameterValueOnOff;
+        estacio.updateParametreEstacio(parameterName, parameterInverted ? valueOn : valueOff);
+    };
 
+    return (
+        <div className="gruf-select-button" style={{ top: top, left: left}}>
+            <div
+                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
+                onClick={handleClick}
+            >
+                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
+            </div>
+        </div>
+    );
+};
