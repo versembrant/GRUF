@@ -1,8 +1,11 @@
+.estacions {
+    display: flex;
+    justify-content: center;
+}
+
 .estacio-default {
-    margin: 10px 0px;
     padding: 10px;
     border: 1px solid black;
-    width: 100%;
     overflow: hidden;
 
     .preset-buttons {

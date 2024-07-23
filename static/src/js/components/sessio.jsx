@@ -50,8 +50,8 @@ export const Sessio = () => {
     
     if (estacioSelected === undefined) {
         return (
-            <div>
-                <h1>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h1>
+            <div class="sessio">
+                <h2>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h2>
                 <SessionConnectedUsers/>
                 <AudioTransportControlsMinimal/>
                 <br/>
@@ -63,14 +63,14 @@ export const Sessio = () => {
                 </ul>
                 <div>
                     <br/>
-                    <a href={appPrefix + "/"}>Surt del GRUF</a>
+                    <a class="btn" href={appPrefix + "/"}>Surt del GRUF</a>
                 </div>
             </div>
         )
     } else {
         return(
-            <div>
-                <h1>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h1>                
+            <div class="sessio">
+                <h2>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h2>                
                 <SessionConnectedUsers/>
                 <AudioTransportControlsMinimal/>
                 <div>
@@ -85,7 +85,7 @@ export const Sessio = () => {
                 {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacioSelected={estacioSelected}/>: ""}
                 <div>
                     <br/>
-                    <a href={appPrefix + "/"}>Surt del GRUF</a>
+                    <a class="btn" href={appPrefix + "/"}>Surt del GRUF</a>
                 </div>
             </div>
         )
