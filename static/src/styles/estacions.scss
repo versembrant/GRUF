@@ -13,33 +13,40 @@
 .estacio {
     width: 1000px;
     height: 780px;
-    border: 1px solid white;
 
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
 
     .estacio-main {
-        height: 92%;
+        height: 710px;
         position: relative;
+        background-color: $dark-grey;
     }
 
     .estacio-bottom-bar {
+        height: 70px;
+        line-height: 70px;
         text-align: center;
         text-transform: uppercase;
-        margin-top: 1.5%;
+        background-color: black;
+        color: $white;
     }
 }
 
 .estacio-piano {
     .estacio-main {
-        background-image: url("../img/piano_bg.png");
+        background-image: url("../img/piano_bg.svg");
         background-size: contain;
         background-repeat: no-repeat;
+        background-color: $orange;
     }
 
     .estacio-bottom-bar {
-        color: $orange;
+        background-image: url("../img/piano_logo.svg");
+        background-size: 90px;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
     .selected {
