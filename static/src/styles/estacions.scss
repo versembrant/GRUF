@@ -10,25 +10,13 @@
 
 .estacio {
     width: 1000px;
-    height: 780px;
-
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10 and IE 11 */
-    user-select: none; /* Standard syntax */
+    height: 710px;
 
     .estacio-main {
-        height: 710px;
+        height: 100%;
         position: relative;
         background-color: $dark-grey;
-    }
-
-    .estacio-bottom-bar {
-        height: 70px;
-        line-height: 70px;
-        text-align: center;
-        text-transform: uppercase;
-        background-color: $black;
-        color: $white;
+        border-radius: 15px;
     }
 }
 
@@ -39,18 +27,20 @@
         background-repeat: no-repeat;
         background-color: $orange;
     }
-
-    .estacio-bottom-bar {
-        background-image: url("../img/piano_logo.svg");
-        background-size: auto 30px;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
     .selected {
         background-color: $orange!important;
     }    
 }
+
+.estacio-piano-logo {
+    background-image: url("../img/piano_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 120px;
+}
+
 
 
 

@@ -1,7 +1,9 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
-import { useEffect } from "react";
+import Checkbox from '@mui/material/Checkbox';
+import NativeSelect from '@mui/material/NativeSelect';
+
 
 const buildAudioGraphIfNotBuilt = async () => {  
     if (!getAudioGraphInstance().graphIsBuilt()) {
@@ -284,18 +286,37 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         id="entradaMidiNomEstacio"
                         value={estacioSelected}>
                     </input>
-                    <select
+                    <NativeSelect
                         //defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
                         defaultValue={"cap"}
+                        disableUnderline={true}
                         onChange={async (evt) => {
                             await buildAudioGraphIfNotBuilt();
                             localStorage.setItem("lastMidiInputDevice", evt.target.value);
                             bindMidiInputDevice(evt.target.value);
-                        }}>
+                        }}
+                        sx={{
+                            color: "#fff",
+                            "font-family": "Montserrat, sans-serif",
+                            "svg": {
+                                fill: "#fff"
+                            }
+                        }}
+                        >
                         <option value="cap">Cap</option>
                         {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
-                    </select>
-                    <label><input id="forwardToServer" type="checkbox" defaultChecked={false} /></label>
+                    </NativeSelect>
+                    <Checkbox 
+                        id="forwardToServer" 
+                        title="Marca per enviar notes al servidor" 
+                        sx={{
+                            color: "#fff",
+                            '&.Mui-checked': {
+                            color: "#fff",
+                            },
+                        }}
+                    />
+                    
                 </div>
             }
         </div>

@@ -1,0 +1,80 @@
+button {
+    font-family: Montserrat, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 100%;
+    border: none;
+    background-color: transparent;
+}
+
+.btn {
+    color: $white;
+    border: 1px solid $white;
+    border-radius: 10px;
+    padding: 10px 40px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 58px;
+    height: 42px;
+    
+    &:hover {
+        border-color: $grey;
+        color: $grey;
+    }
+}
+
+.btn-menys-marge {
+    padding: 10px 20px;
+}
+
+.btn-petit {
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-weight: 500;
+    height: 30px;
+}
+
+.btn-verd {
+    color: $green;
+    border-color: $green;
+    
+    &:hover {
+        border-color: $grey;
+        color: $grey;
+    }
+}
+
+.btn-vermell {
+    color: $red;
+    border-color: $red;
+    
+    &:hover {
+        border-color: $white;
+        color: $white;
+    }
+}
+
+.btn-gris {
+    color: $grey;
+    border-color: $grey;
+   
+    &:hover {
+        border-color: $white;
+        color: $white;
+    }
+}
+
+.btn-black {
+    color: $black;
+    border-color: $black;
+   
+    &:hover {
+        border-color: $white;
+        color: $white;
+    }
+}
+
+.btn-no-border {
+    border: none;
+}

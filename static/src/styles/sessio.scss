@@ -1,20 +1,39 @@
-.sessio {
 
-    .header {
-        padding: 20px;
+.sessio-wrapper {
 
-        .titol {
-            color: $white;
+    display: flex;
+    justify-content: center;
+
+    .sessio {
+
+        width: 1000px;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+
+        .header {
+            padding: 0 5px;
+
+            .titol {
+                color: $white;
+                font-size: 20px;
+                height: 42px;
+                line-height: 42px;
+                max-width: 50%;
+            }
         }
+
+        .estacions {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .footer {
+            padding: 0 5px;
+            height: 42px;
+            line-height: 42px;
+        }
+        
     }
 
-    .estacions {
-        display: flex;
-        justify-content: center;
-    }
-    
-    .footer {
-        padding: 20px;
-    }
-    
 }

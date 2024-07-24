@@ -10,7 +10,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main">
             <GrufLabel text="Eq" top="6.8%" left="6%" />
-            <GrufButtonNoBorder text="Canvia estació" top="44px" left="825px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGran estacio={estacio} parameterName="fxLow" top="88px" left="59px" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="75px" left="125px" />
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
@@ -19,6 +19,5 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufBpmCounter estacio={estacio} top="6.8%" left="55%" />
             <GrufOnOffButton estacio={estacio} parameterName="fxDelayWet" top="70%" left="80%" valueOn={0.5} valueOff={0.0} />
         </div>
-        <div className="estacio-bottom-bar"></div>
     </div>)
 };

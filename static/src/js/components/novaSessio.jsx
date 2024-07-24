@@ -92,17 +92,17 @@ export const NovaSessio = () => {
                     <br/>
                     Estacions triades:
                     <ul>
-                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
+                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
                     </ul>
                     <select
                         value={selectedOption}
                         onChange={(evt) => setSelectedOption(evt.target.value)}>
                         {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
                     </select>
-                    <button onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
+                    <button className="btn btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
                 </div>
                 <div className="enrere">
-                    <a className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</a>&nbsp;
+                    <button className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
                     <a href={appPrefix + "/"} className="btn">Torna enrere</a>
                 </div>
             </div>

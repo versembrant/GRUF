@@ -50,42 +50,47 @@ export const Sessio = () => {
     
     if (estacioSelected === undefined) {
         return (
-            <div className="sessio">
-                <h2>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h2>
-                <SessionConnectedUsers/>
-                <AudioTransportPlayStop/>
-                <br/>
-                Tria estació:
-                <ul>
-                    {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <li key={nomEstacio}><a data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>{nomEstacio}</a></li>)}
-                    <li><a data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Mixer</a></li>
-                    <li><a data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Computer</a></li>
-                </ul>
-                <div>
+            <div className="sessio-wrapper">
+                <div className="sessio">
+                    <h2>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h2>
+                    <SessionConnectedUsers/>
+                    <AudioTransportPlayStop/>
                     <br/>
-                    <a className="btn" href={appPrefix + "/"}>Surt del GRUF</a>
+                    Tria estació:
+                    <ul>
+                        {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <li key={nomEstacio}><a data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>{nomEstacio}</a></li>)}
+                        <li><a data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Mixer</a></li>
+                        <li><a data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Computer</a></li>
+                    </ul>
+                    <div>
+                        <br/>
+                        <a className="btn" href={appPrefix + "/"}>Surt del GRUF</a>
+                    </div>
                 </div>
             </div>
         )
     } else {
         return(
-            <div className="sessio">
-                <div className="header between">
-                    <div className="titol">GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</div>
-                    <div className="between">
-                        {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
-                        <AudioTransportPlayStop/>
+            <div className="sessio-wrapper">
+                <div className="sessio">
+                    <div className="header between">
+                        <div className="titol ellipsis"><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
+                        <div className="between">
+                            {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
+                            <div className="estacio-piano-logo"></div>
+                            <AudioTransportPlayStop/>
+                        </div>
                     </div>
-                </div>
-                <div className="estacions">
-                    {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)} setEstacioSelected={setEstacioSelected}/>)}
-                    {estacioSelected == "mixer" ? <AudioMixerEstacions setEstacioSelected={setEstacioSelected} />: ""}
-                    {estacioSelected == "computer" ? <Arranjament setEstacioSelected={setEstacioSelected}/>: ""}
-                </div>
-                
-                <div className="footer between">
-                    <div><SessionConnectedUsers/></div>
-                    <div><a className="btn btn-petit" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                    <div className="estacions">
+                        {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)} setEstacioSelected={setEstacioSelected}/>)}
+                        {estacioSelected == "mixer" ? <AudioMixerEstacions setEstacioSelected={setEstacioSelected} />: ""}
+                        {estacioSelected == "computer" ? <Arranjament setEstacioSelected={setEstacioSelected}/>: ""}
+                    </div>
+                    
+                    <div className="footer between">
+                        <div className="ellipsis"><SessionConnectedUsers/></div>
+                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                    </div>
                 </div>
             </div>
         )
