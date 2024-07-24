@@ -1,18 +1,61 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
+import { useEffect } from "react";
+
+const buildAudioGraphIfNotBuilt = async () => {  
+    if (!getAudioGraphInstance().graphIsBuilt()) {
+        await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
+        getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
+    }
+}
+
+const sendNoteOn = (noteNumber, noteVelocity) => {
+    const messageData =  {
+        noteNumber: noteNumber,
+        velocity: noteVelocity,
+        type: 'noteOn'
+    }
+    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
+    if (nomEstacio == "all") {
+        nomEstacio = undefined;
+    }
+    document.notesActivades[nomEstacio].add(noteNumber);
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+}
+
+const sendNoteOff = (noteNumber, noteVelocity) => {
+    const messageData =  {
+        noteNumber: noteNumber,
+        velocity: noteVelocity,
+        type: 'noteOff'
+    }
+    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
+    if (nomEstacio == "all") {
+        nomEstacio = undefined;
+    }
+    document.notesActivades[nomEstacio].delete(noteNumber);
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+}
+
+const bindMidiInputDevice = (nomDevice) => {
+    console.log("Binding MIDI input device: " + nomDevice);
+    bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
+        if (midiMessage.data[0] === 144) {
+            // Note on
+            sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
+        } else if (midiMessage.data[0] === 128) {
+            // Note off
+            sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
+        }
+    })
+}
+
 
 export const EntradaMidi = ({estacioSelected}) => {
 
     let baseNote = 60;
     document.baseNote = baseNote;
-
-    const buildAudioGraphIfNotBuilt = async () => {  
-        if (!getAudioGraphInstance().graphIsBuilt()) {
-            await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
-            getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
-        }
-    }
 
     const getMidiNoteNoteNumber = buttonElement => {
         if (buttonElement.dataset.midiNote !== undefined) {
@@ -46,46 +89,6 @@ export const EntradaMidi = ({estacioSelected}) => {
     getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
         document.notesActivades[nomEstacio] = new Set();
     });
-
-    const sendNoteOn = (noteNumber, noteVelocity) => {
-        const messageData =  {
-            noteNumber: noteNumber,
-            velocity: noteVelocity,
-            type: 'noteOn'
-        }
-        let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-        if (nomEstacio == "all") {
-            nomEstacio = undefined;
-        }
-        document.notesActivades[nomEstacio].add(noteNumber);
-        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
-    }
-
-    const sendNoteOff = (noteNumber, noteVelocity) => {
-        const messageData =  {
-            noteNumber: noteNumber,
-            velocity: noteVelocity,
-            type: 'noteOff'
-        }
-        let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-        if (nomEstacio == "all") {
-            nomEstacio = undefined;
-        }
-        document.notesActivades[nomEstacio].delete(noteNumber);
-        getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
-    }
-
-    const bindMidiInputDevice = (nomDevice) => {
-        bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
-            if (midiMessage.data[0] === 144) {
-                // Note on
-                sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
-            } else if (midiMessage.data[0] === 128) {
-                // Note off
-                sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
-            }
-        })
-    }
 
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
@@ -260,3 +263,41 @@ export const EntradaMidi = ({estacioSelected}) => {
         </div>
     )
 };
+
+export const EntradaMidiMinimal = ({estacioSelected}) => {
+
+    document.notesActivades = {};
+    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
+        document.notesActivades[nomEstacio] = new Set();
+    });
+
+    if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
+        //bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+    }
+    
+    return (
+        <div>
+            {isWebMidiEnabled() && 
+                <div>
+                    <input 
+                        type="hidden"
+                        id="entradaMidiNomEstacio"
+                        value={estacioSelected}>
+                    </input>
+                    <select
+                        //defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
+                        defaultValue={"cap"}
+                        onChange={async (evt) => {
+                            await buildAudioGraphIfNotBuilt();
+                            localStorage.setItem("lastMidiInputDevice", evt.target.value);
+                            bindMidiInputDevice(evt.target.value);
+                        }}>
+                        <option value="cap">Cap</option>
+                        {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
+                    </select>
+                    <label><input id="forwardToServer" type="checkbox" defaultChecked={false} /></label>
+                </div>
+            }
+        </div>
+    )
+}

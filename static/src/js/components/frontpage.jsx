@@ -28,9 +28,9 @@ export const Frontpage = () => {
                 <div className="hero">
                     <h1>Grufa sense parar!</h1>
                     <h2>Crea la teva música sol o en comunitat amb programari llirue i gratuït</h2>
-                    <ul class="buttons">
-                        <li><a className="btn-black" href={appPrefix + "/connecta"}>Connecta't a un GRUF</a></li>
-                        <li><a className="btn-black" href={appPrefix + "/nova_sessio"}>Nou GRUF</a></li>
+                    <ul className="buttons">
+                        <li><a className="btn btn-black" href={appPrefix + "/connecta"}>Connecta't a un GRUF</a></li>
+                        <li><a className="btn btn-black" href={appPrefix + "/nova_sessio"}>Nou GRUF</a></li>
                     </ul>
                 </div>
             </div>

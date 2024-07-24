@@ -43,27 +43,19 @@ body {
         }
     }
 
-    .btn-verd {
-        color: $green;
-        border: 1px solid $green;
-        border-radius: 10px;
-        padding: 10px 40px;
-        font-weight: 600;
-        cursor: pointer;
-        
-        &:hover {
-            border-color: $grey;
-            color: $grey;
-        }
+    .btn-menys-marge {
+        padding: 10px 20px;
     }
 
     .btn-petit {
-        color: $white;
-        border: 1px solid $white;
         border-radius: 5px;
         padding: 5px 10px;
         font-weight: 500;
-        cursor: pointer;
+    }
+
+    .btn-verd {
+        color: $green;
+        border-color: $green;
         
         &:hover {
             border-color: $grey;
@@ -71,13 +63,9 @@ body {
         }
     }
 
-    .btn-petit-vermell {
+    .btn-vermell {
         color: $red;
-        border: 1px solid $red;
-        border-radius: 5px;
-        padding: 5px 10px;
-        font-weight: 500;
-        cursor: pointer;
+        border-color: $red;
         
         &:hover {
             border-color: $white;
@@ -85,14 +73,10 @@ body {
         }
     }
 
-    .btn-petit-gris {
+    .btn-gris {
         color: $grey;
-        border: 1px solid $grey;
-        border-radius: 5px;
-        padding: 5px 10px;
-        font-weight: 500;
-        cursor: pointer;
-        
+        border-color: $grey;
+       
         &:hover {
             border-color: $white;
             color: $white;
@@ -101,12 +85,8 @@ body {
 
     .btn-black {
         color: $black;
-        border: 1px solid $black;
-        border-radius: 10px;
-        padding: 10px 40px;
-        font-weight: 600;
-        cursor: pointer;
-        
+        border-color: $black;
+       
         &:hover {
             border-color: $white;
             color: $white;
@@ -126,6 +106,12 @@ body {
     .enrere {
         text-align: center;
         padding: 20px 0 80px 0;
+    }
+
+    .between {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
     }
 }
 

@@ -23,6 +23,14 @@ export const GrufLabel = ({text, top, left}) => {
     )
 }
 
+export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
+    return (
+        <div className="gruf-button-no-border" style={{top: top, left: left}}>
+            <a onClick={onClick}>{text}</a>
+        </div>
+    )
+}
+
 export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());

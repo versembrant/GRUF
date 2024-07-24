@@ -4,7 +4,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { AudioEffectsControlPanel} from  "../components/fxControlPanel"
 
 
-export const AudioMixerEstacions = () => {
+export const AudioMixerEstacions = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
@@ -18,6 +18,7 @@ export const AudioMixerEstacions = () => {
 
     return (
         <div className="mixer">
+            <button onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
             <h1>Mixer</h1>
             {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
                 return (

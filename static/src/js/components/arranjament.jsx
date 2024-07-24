@@ -4,7 +4,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { AudioTransportControlsComputer } from "../components/audioTransport";
 
 
-export const Arranjament = () => {
+export const Arranjament = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
@@ -72,6 +72,7 @@ export const Arranjament = () => {
     return (
         <div className="arranjament">
             <div>
+                <button onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
                 <h1>Computer</h1>
                 <AudioTransportControlsComputer/>
                 <br/>

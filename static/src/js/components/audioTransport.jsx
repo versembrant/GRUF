@@ -96,6 +96,18 @@ export const AudioTransportControlsMinimal = () => {
     )
 };
 
+export const AudioTransportPlayStop = () => {
+    subscribeToStoreChanges(getAudioGraphInstance());
+    return (
+        <div>
+            <div>
+                <a className="btn btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? '\u23F9' : '\u25B6'}</a>
+                
+            </div>
+        </div>
+    )
+};
+
 export const AudioTransportControlsComputer = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
     return (
