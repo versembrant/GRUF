@@ -1,11 +1,41 @@
+.estacions {
+    display: flex;
+    justify-content: center;
+}
+
+.tria-estacions {
+    height: 710px;
+}
+
 .estacio-default {
     padding: 10px;
     border: 1px solid black;
     overflow: hidden;
+    width: 100%;
 
     .preset-buttons {
         float: right;
     }
+}
+
+.logo_gruf {
+    background-image: url("../img/logo_gruf.svg");
+    background-size: 40px;
+    background-repeat: no-repeat;
+    background-position: 10px left;
+    height: 16px;
+    width: 48px;
+    display: inline-block;
+    padding-bottom: 10px;
+    margin-bottom: -10px;
+}
+
+.arranjament {
+    width: 100%;
+}
+
+.mixer {
+    width: 100%;
 }
 
 .estacio {
@@ -17,14 +47,14 @@
         position: relative;
         background-color: $dark-grey;
         border-radius: 15px;
+        background-size: contain;
+        background-repeat: no-repeat;
     }
 }
 
 .estacio-piano {
     .estacio-main {
         background-image: url("../img/piano_bg.svg");
-        background-size: contain;
-        background-repeat: no-repeat;
         background-color: $orange;
     }
     .selected {
@@ -41,6 +71,23 @@
     width: 120px;
 }
 
+.estacio-mixer-logo {
+    background-image: url("../img/mixer_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 150px;
+}
+
+.estacio-computer-logo {
+    background-image: url("../img/computer_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 150px;
+}
 
 
 
