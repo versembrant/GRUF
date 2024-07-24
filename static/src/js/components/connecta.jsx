@@ -29,9 +29,9 @@ export const Connecta = ({infoSessions}) => {
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
                     <div>
-                        <a id="connectaButton" className="btn btn-black"
+                        <button id="connectaButton" className="btn btn-black"
                             onClick={goToGruf}
-                        >Connecta't al GRUF</a>
+                        >Connecta't al GRUF</button>
                     </div>
                 </div>
             </div>

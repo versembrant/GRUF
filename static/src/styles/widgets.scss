@@ -4,17 +4,19 @@
 }
 
 .gruf-button-no-border {
+    font-family: "Montserrat", sans-serif;
+    border: none;
+    background-color: transparent;
     position: absolute;
     font-size: 14px;
+    font-weight: 400;
+    color: $white;
+    cursor: pointer;
 
-    a {
-        color: $white;
-        cursor: pointer;
-    
-        &:hover {
-            color: $grey;
-        }
+    &:hover {
+        color: $grey;
     }
+    
 }
 
 .gruf-knob-gran {

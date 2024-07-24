@@ -72,7 +72,7 @@ export const Arranjament = ({setEstacioSelected}) => {
     return (
         <div className="arranjament">
             <div>
-                <button onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
+                <button className="btn btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
                 <h1>Computer</h1>
                 <AudioTransportControlsComputer/>
                 <br/>

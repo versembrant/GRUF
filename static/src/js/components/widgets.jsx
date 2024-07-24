@@ -25,9 +25,9 @@ export const GrufLabel = ({text, top, left}) => {
 
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
-        <div className="gruf-button-no-border" style={{top: top, left: left}}>
-            <a onClick={onClick}>{text}</a>
-        </div>
+        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+            {text}
+        </button>
     )
 }
 

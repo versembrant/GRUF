@@ -18,7 +18,7 @@ export const AudioMixerEstacions = ({setEstacioSelected}) => {
 
     return (
         <div className="mixer">
-            <button onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
+            <button className="btn btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
             <h1>Mixer</h1>
             {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
                 return (

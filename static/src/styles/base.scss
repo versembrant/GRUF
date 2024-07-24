@@ -29,70 +29,6 @@ body {
         }        
     }
 
-    .btn {
-        color: $white;
-        border: 1px solid $white;
-        border-radius: 10px;
-        padding: 10px 40px;
-        font-weight: 600;
-        cursor: pointer;
-        
-        &:hover {
-            border-color: $grey;
-            color: $grey;
-        }
-    }
-
-    .btn-menys-marge {
-        padding: 10px 20px;
-    }
-
-    .btn-petit {
-        border-radius: 5px;
-        padding: 5px 10px;
-        font-weight: 500;
-    }
-
-    .btn-verd {
-        color: $green;
-        border-color: $green;
-        
-        &:hover {
-            border-color: $grey;
-            color: $grey;
-        }
-    }
-
-    .btn-vermell {
-        color: $red;
-        border-color: $red;
-        
-        &:hover {
-            border-color: $white;
-            color: $white;
-        }
-    }
-
-    .btn-gris {
-        color: $grey;
-        border-color: $grey;
-       
-        &:hover {
-            border-color: $white;
-            color: $white;
-        }
-    }
-
-    .btn-black {
-        color: $black;
-        border-color: $black;
-       
-        &:hover {
-            border-color: $white;
-            color: $white;
-        }
-    }
-
     h1 {
         font-size: 80px;
         font-weight: 800;
@@ -112,6 +48,7 @@ body {
         display: flex;
         justify-content: space-between;
         flex-direction: row;
+        align-items: center;
     }
 }
 
