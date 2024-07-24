@@ -1,7 +1,20 @@
 .sessio {
-    padding: 20px;
 
-    h2 {
-        color: $white;
+    .header {
+        padding: 20px;
+
+        .titol {
+            color: $white;
+        }
     }
+
+    .estacions {
+        display: flex;
+        justify-content: center;
+    }
+    
+    .footer {
+        padding: 20px;
+    }
+    
 }

@@ -266,8 +266,6 @@ def get_stored_sessions():
         sessions.append(s)
 
     sessions = sorted(sessions, key=lambda s: s.sort_timestamp, reverse=True)
-    for s in sessions:
-        print(s.id, s.sort_timestamp)
     return sessions
 
 

@@ -3,6 +3,20 @@
     font-size: 14px;
 }
 
+.gruf-button-no-border {
+    position: absolute;
+    font-size: 14px;
+
+    a {
+        color: $white;
+        cursor: pointer;
+    
+        &:hover {
+            color: $grey;
+        }
+    }
+}
+
 .gruf-knob-gran {
     position: absolute;
     font-size: 14px;

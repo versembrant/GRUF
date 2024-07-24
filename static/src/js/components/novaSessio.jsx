@@ -102,7 +102,7 @@ export const NovaSessio = () => {
                     <button onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
                 </div>
                 <div className="enrere">
-                    <a className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</a>&nbsp;
+                    <a className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</a>&nbsp;
                     <a href={appPrefix + "/"} className="btn">Torna enrere</a>
                 </div>
             </div>

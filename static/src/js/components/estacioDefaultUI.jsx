@@ -255,7 +255,7 @@ const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     }
 }
 
-export const EstacioDefaultUI = ({estacio}) => {
+export const EstacioDefaultUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
     
@@ -266,6 +266,7 @@ export const EstacioDefaultUI = ({estacio}) => {
 
     return (<div key={estacio.nom} className="estacio-default">
         <div>
+            <button onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
             <div className="preset-buttons grid-default">
                 <div className="grid-row-default">
                     {[...Array(estacio.numPresets).keys()].map(i => 
