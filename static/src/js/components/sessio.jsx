@@ -55,12 +55,18 @@ export const Sessio = () => {
                         </div>
                     </div>
                     <div className="tria-estacions">
-                        Tria estació:
-                        <ul>
-                            {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <li key={nomEstacio}><a data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>{nomEstacio}</a></li>)}
-                            <li><a data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Mixer</a></li>
-                            <li><a data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Computer</a></li>
-                        </ul>
+                        <h3>Tria una estació:</h3>
+                        <div className="grid-estacions">
+                            {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <div key={nomEstacio} className="grid-estacio-element" data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}><img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/><div data-nom-estacio={nomEstacio}>{nomEstacio}</div></div>)}
+                            <div className="grid-estacio-element" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
+                                <img data-nom-estacio="mixer" src={appPrefix + "/static/src/img/mixer_miniature.jpg"} title="Mixer" />
+                                <div data-nom-estacio="mixer">Mixer</div>
+                            </div>
+                            <div className="grid-estacio-element" data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
+                                <img data-nom-estacio="computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
+                                <div data-nom-estacio="computer">Computer</div>
+                            </div>
+                        </div>
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>

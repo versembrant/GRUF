@@ -1,6 +1,7 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState } from "react";
 import { Navbar, Footer } from "./frontpage";
+import { capitalizeFirstLetter } from "../utils";
 
 function sample(array) {
     const index = Math.floor(Math.random() * array.length);
@@ -51,7 +52,7 @@ export const NovaSessio = () => {
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-            const nomEstacio = `${estacioClassName}${numEstacionsSameClassAlreadyExisting + 1}`;
+            const nomEstacio = `${capitalizeFirstLetter(estacioClassName.replaceAll("_", " "))} ${numEstacionsSameClassAlreadyExisting + 1}`;
             const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
