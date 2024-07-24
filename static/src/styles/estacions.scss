@@ -4,7 +4,34 @@
 }
 
 .tria-estacions {
-    height: 710px;
+    height: 690px;
+
+    h3 {
+        color: $white;
+    }
+
+    .grid-estacions {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+
+        .grid-estacio-element {
+            padding:10px;
+            text-align: center;
+            color: $white;
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            &:hover {
+                background-color: $dark-grey;
+            }
+
+            img {
+                height: 180px;
+                margin-bottom: 5px;
+            }
+        }
+    }
 }
 
 .estacio-default {
