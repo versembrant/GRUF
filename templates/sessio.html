@@ -3,7 +3,7 @@
 {% block content %}
 {% if session %}
 <session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
-<div id="root">Carregant...</div>
+<div id="root"><div class="carregant"><div>Carregant...</div></div></div>
 {% else %}
 <div style="display: flex;align-items: center;justify-content: center;height: 100vh;">
     <div style="width:100%">
