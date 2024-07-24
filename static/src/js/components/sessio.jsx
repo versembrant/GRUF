@@ -9,11 +9,7 @@ import { AudioRecorder } from "../components/audioRecorder";
 import { getURLParamValue, removeURLParam } from "../utils";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
-    return (
-        <div key={estacio.nom}>
-            {createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})}
-        </div>
-    )
+    return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
 };
 
 
@@ -52,19 +48,23 @@ export const Sessio = () => {
         return (
             <div className="sessio-wrapper">
                 <div className="sessio">
-                    <h2>GRUF "{ getCurrentSession().getNom() }" (ID: { getCurrentSession().getID() }{ getCurrentSession().localMode ? " - local": ""})</h2>
-                    <SessionConnectedUsers/>
-                    <AudioTransportPlayStop/>
-                    <br/>
-                    Tria estació:
-                    <ul>
-                        {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <li key={nomEstacio}><a data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>{nomEstacio}</a></li>)}
-                        <li><a data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Mixer</a></li>
-                        <li><a data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Computer</a></li>
-                    </ul>
-                    <div>
-                        <br/>
-                        <a className="btn" href={appPrefix + "/"}>Surt del GRUF</a>
+                    <div className="header between">
+                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
+                        <div className="between">
+                            <AudioTransportPlayStop/>
+                        </div>
+                    </div>
+                    <div className="tria-estacions">
+                        Tria estació:
+                        <ul>
+                            {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <li key={nomEstacio}><a data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>{nomEstacio}</a></li>)}
+                            <li><a data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Mixer</a></li>
+                            <li><a data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>Computer</a></li>
+                        </ul>
+                    </div>
+                    <div className="footer between">
+                        <div><SessionConnectedUsers/></div>
+                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
             </div>
@@ -74,10 +74,12 @@ export const Sessio = () => {
             <div className="sessio-wrapper">
                 <div className="sessio">
                     <div className="header between">
-                        <div className="titol ellipsis"><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
+                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
                         <div className="between">
                             {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
-                            <div className="estacio-piano-logo"></div>
+                            {estacioSelected == "mixer" ?  <div className="estacio-mixer-logo"></div>: ""}
+                            {estacioSelected == "computer" ?  <div className="estacio-computer-logo"></div>: ""}
+                            {(estacioSelected != "computer" && estacioSelected != "mixer") ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
                             <AudioTransportPlayStop/>
                         </div>
                     </div>
@@ -86,9 +88,8 @@ export const Sessio = () => {
                         {estacioSelected == "mixer" ? <AudioMixerEstacions setEstacioSelected={setEstacioSelected} />: ""}
                         {estacioSelected == "computer" ? <Arranjament setEstacioSelected={setEstacioSelected}/>: ""}
                     </div>
-                    
                     <div className="footer between">
-                        <div className="ellipsis"><SessionConnectedUsers/></div>
+                        <div><SessionConnectedUsers/></div>
                         <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
