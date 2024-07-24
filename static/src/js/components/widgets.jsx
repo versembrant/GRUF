@@ -147,15 +147,6 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
             <Slider 
             sx={{
                 height: 17,
-                '& .MuiSlider-thumb': {
-                borderRadius: '2px',
-                height: 27,
-                width: 10,
-                },
-                '& .MuiSlider-mark':{
-                    height: '1px',
-                    color: "#969697",
-                }
               }}
             value={real2Norm(parameterValue, parameterDescription)}
             step={0.01}
@@ -163,7 +154,6 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
             max={1.0}
             marks={marks}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
-            //valueTemplate={valueToText(parameterValue)}
             />
         </div>
         </ThemeProvider>
@@ -190,21 +180,13 @@ export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
             <Slider 
             sx={{
                 height: 17,
-                '& .MuiSlider-thumb': {
-                borderRadius: '2px',
-                height: 30,
-                width: 10,
-                },
               }}
             value={real2Norm(parameterValue, parameterDescription)}
-            step={100}
-            min={1200}
-            max={12000}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
-            // valueTemplate={""}
-            //valueTemplate={valueToText(parameterValue)}
+            step={0.01}
+            min={0.0}
+            max={1.0}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
             />
-            {/* <div>{parameterDescription.label}</div> */}
         </div>
         </ThemeProvider>
     )
