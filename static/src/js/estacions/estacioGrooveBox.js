@@ -2,6 +2,8 @@ import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
 import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
 import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
+import { EstacioGrooveBoxUI } from "../components/estacioGrooveBox";
+
 
 export class EstacioGrooveBox extends EstacioBase {
     
@@ -53,6 +55,10 @@ export class EstacioGrooveBox extends EstacioBase {
     getTempsBeat = () => {
         return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
     };
+
+    getUserInterfaceComponent() {
+        return EstacioGrooveBoxUI
+    }
 
     loadSoundinPlayer (playerName, url){
         if (["kick", "snare", "closed_hat", "open_hat"].includes(playerName)) {

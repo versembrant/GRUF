@@ -90,6 +90,17 @@
     }    
 }
 
+.estacio-grooveBox {
+    .estacio-main {
+        background-image: url("../img/groovebox_bg.svg");
+        //background-image: url('../img/piano.jpg');
+        background-color: $orange;
+    }
+    .selected {
+        background-color: $orange!important;
+    }    
+}
+
 .estacio-piano-logo {
     background-image: url("../img/piano_logo.svg");
     background-size: auto 30px;
