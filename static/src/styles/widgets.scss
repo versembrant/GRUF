@@ -3,6 +3,12 @@
     font-size: 14px;
 }
 
+.gruf-label-petit {
+    position: absolute;
+    font-size: 10px;
+    font-weight: bold;
+}
+
 .gruf-button-no-border {
     font-family: "Montserrat", sans-serif;
     border: none;
@@ -221,7 +227,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid $white;
+    border: 1px solid $grey;
     background-color: $background-color;
     border-radius: 12px;
     overflow: hidden;

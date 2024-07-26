@@ -50,6 +50,11 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1', '0'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -30, max: 6, initial: -30},
+
+        //FX
+
+        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
+
     }
 
     getTempsBeat = () => {
