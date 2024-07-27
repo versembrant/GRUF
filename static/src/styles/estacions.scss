@@ -116,6 +116,43 @@
     width: 150px;
 }
 
+.poly-synth {
+    .estacio-main {
+        background-image: url("../img/synth_bg.svg");
+        background-color: $red;
+    }
+    .selected {
+        background-color: $red!important;
+    }    
+}
+
+.poly-synth-logo {
+    background-image: url("../img/synth_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 120px;
+}
+
+.mono-synth {
+    .estacio-main {
+        background-image: url("../img/synth_bass_bg.svg");
+        background-color: $red;
+    }
+    .selected {
+        background-color: $red!important;
+    }    
+}
+
+.mono-synth-logo {
+    background-image: url("../img/synth_bass_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 120px;
+}
 
 
 

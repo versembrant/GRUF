@@ -1,6 +1,7 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
+import { PolySynthUI } from "../components/polySynth";
 
 export class PolySynth extends EstacioBase {
 
@@ -29,6 +30,10 @@ export class PolySynth extends EstacioBase {
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0}
+    }
+
+    getUserInterfaceComponent() {
+        return PolySynthUI
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
