@@ -21,7 +21,7 @@ export class EstacioBaix extends MonoSynth {
         lpf: {type: 'float', label: 'LPF', min: 300, max: 12000, initial: 12000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 200, max: 3000, initial: 200, logarithmic: true},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
-        harmonicity: {type: 'float', label: 'Harmonicity', min: 0.95, max: 1.05, initial: 1.0},
+        harmonicity: {type: 'float', label: 'Detune', min: 0.95, max: 1.05, initial: 1.0},
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
