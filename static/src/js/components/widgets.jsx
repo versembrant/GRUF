@@ -1,24 +1,13 @@
-import { createElement, useState, useEffect, useRef } from "react";
-import { subscribeToStoreChanges } from "../utils";
+import { useState, useRef } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import isequal from 'lodash.isequal'
-
+import { real2Norm, norm2Real } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
-
 import Slider from '@mui/material/Slider';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { InputNumber } from 'primereact/inputnumber';
 
 import cssVariables from '../../styles/exports.module.scss';
-
-
-import { InputNumber } from 'primereact/inputnumber';
-import { SelectButton } from 'primereact/selectbutton';
-import { orange, red } from "@mui/material/colors";
-
-
 
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
@@ -133,46 +122,6 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufPad = ({ playerIndex }) => {
-    const [isClicked, setIsClicked] = useState(false);
-    const [isHeld, setIsHeld] = useState(false);
-    const holdTimer = useRef(null);
-
-    const handleMouseDown = () => {
-        setIsClicked(true);
-        holdTimer.current = setTimeout(() => {
-            setIsHeld(true);
-        }, 500); 
-    };
-
-    const handleMouseUp = () => {
-        clearTimeout(holdTimer.current);
-        setIsClicked(false);
-        if (isHeld) {
-            setIsHeld(false);
-        } else {
-            playSample(playerIndex);
-        }
-    };
-
-    const playSample = (index) => {
-        const estacio = getCurrentSession().getEstacio('EstacioSamper');
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(index, Tone.now());
-        }
-    };
-
-    return (
-        <div className="gruf-pad">
-            <Button
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                style={{ backgroundColor: isClicked ? 'orange' : 'gray', color: 'white', width: '100%', height: '80%', borderRadius: '10px' }}
-            />
-    )
-};
-
 export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
@@ -252,6 +201,46 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
+export const GrufPad = ({ playerIndex }) => {
+    const [isClicked, setIsClicked] = useState(false);
+    const [isHeld, setIsHeld] = useState(false);
+    const holdTimer = useRef(null);
+
+    const handleMouseDown = () => {
+        setIsClicked(true);
+        holdTimer.current = setTimeout(() => {
+            setIsHeld(true);
+        }, 500); 
+    };
+
+    const handleMouseUp = () => {
+        clearTimeout(holdTimer.current);
+        setIsClicked(false);
+        if (isHeld) {
+            setIsHeld(false);
+        } else {
+            playSample(playerIndex);
+        }
+    };
+
+    const playSample = (index) => {
+        const estacio = getCurrentSession().getEstacio('EstacioSamper');
+        if (estacio && estacio.playSoundFromPlayer) {
+            estacio.playSoundFromPlayer(index, Tone.now());
+        }
+    };
+
+    return (
+        <div className="gruf-pad">
+            <Button
+                className={ isClicked ? 'selected': '' }
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+            />
+        </div>
+    )
+}
 
 export const PadGrid = ({ top, left }) => {
     return (

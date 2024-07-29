@@ -118,14 +118,13 @@
 
 .estacio-sampler {
     .estacio-main {
-        background-image: url("../img/piano_bg.png");
-        background-size: contain;
-        background-repeat: no-repeat;
+        background-image: url("../img/sampler_bg.svg");
+        background-color: $lightblue;
     }
 
-    .estacio-bottom-bar {
-        color: $lightblue;
-    }
+    .selected {
+        background-color: $lightblue!important;
+    }    
 }
 
 
