@@ -132,7 +132,7 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({estacio, parameterName, top, left}) => {
+export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -146,8 +146,12 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
             label: <div className="marques-slider">hard</div>
         },
     ];
+    const style = {top: top, left: left};
+    if (width !== undefined) { 
+        style.width = width;
+    }
     return (
-        <div className="gruf-slider" style={{top: top, left: left}}>
+        <div className="gruf-slider" style={style}>
             <Slider 
                 value={real2Norm(parameterValue, parameterDescription)}
                 step={0.01}

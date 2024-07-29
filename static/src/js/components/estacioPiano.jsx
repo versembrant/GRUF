@@ -19,7 +19,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="75px" left="210px" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="60%" left="70%" />
-            <GrufSlider estacio={estacio} parameterName="timbre" top="110px" left="694px" />
+            <GrufSlider estacio={estacio} parameterName="timbre" top="110px" left="694px" width="225px"/>
             <GrufBpmCounter estacio={estacio} top="6.8%" left="55%" />
             <GrufOnOffButton estacio={estacio} parameterName="fxDelayWet" top="70%" left="80%" valueOn={0.5} valueOff={0.0} />
         </div>
