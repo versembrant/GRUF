@@ -1,15 +1,13 @@
-import { createElement, useState, useEffect } from "react";
-import { subscribeToStoreChanges } from "../utils";
+import { useState, useRef } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import isequal from 'lodash.isequal'
-
+import { real2Norm, norm2Real } from "../utils";
 import { Knob } from 'primereact/knob';
+import { Button } from 'primereact/button';
+import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
-import { SelectButton } from 'primereact/selectbutton';
-import { orange, red } from "@mui/material/colors";
 
+import cssVariables from '../../styles/exports.module.scss';
 
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
@@ -53,8 +51,8 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             size={60}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white} 
+            rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -76,8 +74,8 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             size={25}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white}
+            rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
             {/* <div>{parameterDescription.label}</div> */} {/* Això ho treuria, ja que no coincideixen els nostres labels amb els del disseny, millor afegir-los amb el widget label */}
@@ -132,6 +130,58 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
+export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    const marks = [
+        {
+            value: 0,
+            label: <div className="marques-slider">soft</div>
+        },
+        {
+            value: 1,
+            label: <div className="marques-slider">hard</div>
+        },
+    ];
+    const style = {top: top, left: left};
+    if (width !== undefined) { 
+        style.width = width;
+    }
+    return (
+        <div className="gruf-slider" style={style}>
+            <Slider 
+                value={real2Norm(parameterValue, parameterDescription)}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
+
+export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-slider-vertical" style={{top: top, left: left}}>
+            <Slider 
+            sx={{
+                height: 17,
+              }}
+            value={real2Norm(parameterValue, parameterDescription)}
+            step={0.01}
+            min={0.0}
+            max={1.0}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
+
 export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
 
@@ -159,6 +209,60 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
+export const GrufPad = ({ playerIndex }) => {
+    const [isClicked, setIsClicked] = useState(false);
+    const [isHeld, setIsHeld] = useState(false);
+    const holdTimer = useRef(null);
+
+    const handleMouseDown = () => {
+        setIsClicked(true);
+        holdTimer.current = setTimeout(() => {
+            setIsHeld(true);
+        }, 500); 
+    };
+
+    const handleMouseUp = () => {
+        clearTimeout(holdTimer.current);
+        setIsClicked(false);
+        if (isHeld) {
+            setIsHeld(false);
+        } else {
+            playSample(playerIndex);
+        }
+    };
+
+    const playSample = (index) => {
+        const estacio = getCurrentSession().getEstacio('EstacioSamper');
+        if (estacio && estacio.playSoundFromPlayer) {
+            estacio.playSoundFromPlayer(index, Tone.now());
+        }
+    };
+
+    return (
+        <div className="gruf-pad">
+            <Button
+                className={ isClicked ? 'selected': '' }
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+            />
+        </div>
+    )
+}
+
+export const PadGrid = ({ top, left }) => {
+    return (
+        <div className="pad-grid" style={{ top: top, left: left }}>
+            {Array.from({ length: 16 }).map((_, index) => (
+                <GrufPad
+                    key={index}
+                    playerIndex={index}
+                />
+            ))}
+        </div>
+    );
+};
+
 export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const parameterValueOnOff = parameterValue === valueOn ? true : false;
@@ -179,3 +283,4 @@ export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=tru
         </div>
     );
 };
+
