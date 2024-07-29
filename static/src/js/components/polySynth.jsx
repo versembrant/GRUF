@@ -17,7 +17,7 @@ export const PolySynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="40%" left="60%" />
+            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34%" left="70%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15%" left="51.2%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
