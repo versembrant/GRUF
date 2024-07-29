@@ -181,6 +181,7 @@ export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
             />
         </div>
     )
+};
 
 export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
