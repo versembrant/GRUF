@@ -20,8 +20,11 @@ registerEstacioDisponible(EstacioGrooveBox);
 import {EstacioPiano} from './estacions/estacioPiano'
 registerEstacioDisponible(EstacioPiano);
 
-import {MonoSynth} from './estacions/monoSynth'
-registerEstacioDisponible(MonoSynth);
+//import {MonoSynth} from './estacions/monoSynth'
+//registerEstacioDisponible(MonoSynth);
 
 import {EstacioBaix} from './estacions/estacioBaix'
 registerEstacioDisponible(EstacioBaix);
+
+import {EstacioSampler} from './estacions/estacioSampler'
+registerEstacioDisponible(EstacioSampler);

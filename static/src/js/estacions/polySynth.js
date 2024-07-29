@@ -4,7 +4,7 @@ import { getAudioGraphInstance } from '../audioEngine';
 
 export class PolySynth extends EstacioBase {
 
-    tipus = 'poly_synth'
+    tipus = 'synth'
     versio = '0.1'
     parametersDescription = {
         // Notes

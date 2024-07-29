@@ -1,0 +1,87 @@
+.navbar {
+    text-align: right;
+    padding: 30px 0;
+    width: 100%;
+
+    background-image: url("../img/logo_gruf_gris.svg");
+    background-size: auto 40px;
+    background-repeat: no-repeat;
+    background-position: 20px;
+    
+    background-color: $black;
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display:inline;
+            margin-right: 40px;
+            
+            img {
+                vertical-align: middle;
+                margin-left: 10px;
+            }
+        }
+    }
+}
+
+.hero {
+    text-align: center;
+    background-image: url("../img/home intro.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding-top: 20px;
+    padding-bottom: 80px;
+    color: $black;
+
+    .buttons {
+        margin-top: 60px;
+    }
+
+    h1 {
+        color: $black;
+    }
+
+    h2 {
+        padding: 0 10%;
+        margin-top: -20px;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        
+        li {
+            display:inline;
+            margin-left: 20px;
+        }
+    }
+}
+
+.heroWrapper {
+    height: calc(100% - 160px);
+}
+
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    background-color: $black;
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display:inline;
+            margin-left: 40px;
+            
+            img {
+                vertical-align: middle;
+                margin-left: 10px;
+            }
+        }
+    }
+}
