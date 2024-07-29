@@ -23,8 +23,5 @@ export const EstacioSamplerUI = ({estacio}) => {
             <GrufLabel text="Timbre" top="7.2%" left="68.2%" />
             <PadGrid top="60%" left="40%" />
         </div>
-        <div className="estacio-bottom-bar">
-            {estacio.tipus}
-        </div>
     </div>)
 };
