@@ -96,6 +96,15 @@ export const AudioTransportControlsMinimal = () => {
     )
 };
 
+export const AudioTransportPlayStop = () => {
+    subscribeToStoreChanges(getAudioGraphInstance());
+    return (
+        <div>
+            <button className="btn btn-petit btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={appPrefix + "/static/src/img/stop_button.svg"}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button.svg"}/>}</button>
+        </div>
+    )
+};
+
 export const AudioTransportControlsComputer = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
     return (

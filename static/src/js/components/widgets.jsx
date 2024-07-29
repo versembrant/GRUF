@@ -6,10 +6,16 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+
 import Slider from '@mui/material/Slider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import cssVariables from '../../styles/exports.module.scss';
+
+
+import { InputNumber } from 'primereact/inputnumber';
+import { SelectButton } from 'primereact/selectbutton';
+import { orange, red } from "@mui/material/colors";
 
 
 
@@ -22,6 +28,14 @@ export const GrufLabel = ({text, top, left}) => {
         <div className="gruf-label" style={{top: top, left: left}}>
             {text}
         </div>
+    )
+}
+
+export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
+    return (
+        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+            {text}
+        </button>
     )
 }
 
@@ -94,7 +108,6 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     
@@ -168,4 +181,51 @@ export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
             />
         </div>
     )
+
+export const GrufBpmCounter = ({ top, left }) => {
+    const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
+
+    const handleBpmChange = (newBpm) => {
+        getAudioGraphInstance().setBpm(newBpm);
+    };
+
+    return (
+        <div className="bpm-counter" style={{ top: top, left: left }}>
+            <div className="inner-square">
+                <InputNumber 
+                    value={currentBpm} 
+                    onValueChange={(e) => handleBpmChange(e.value)} 
+                    min={40} 
+                    max={300} 
+                    showButtons={false} 
+                    className="p-inputnumber"
+                />
+                <div className="bpm-buttons">
+                    <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
+                    <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValueOnOff = parameterValue === valueOn ? true : false;
+    
+    const handleClick = () => {
+        const parameterInverted = !parameterValueOnOff;
+        estacio.updateParametreEstacio(parameterName, parameterInverted ? valueOn : valueOff);
+    };
+
+    return (
+        <div className="gruf-select-button" style={{ top: top, left: left}}>
+            <div
+                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
+                onClick={handleClick}
+            >
+                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
+            </div>
+        </div>
+    );
 };

@@ -5,7 +5,7 @@ import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 
 export class EstacioGrooveBox extends EstacioBase {
     
-    tipus = 'groove box'
+    tipus = 'groovebox'
     versio = '0.1'
     parametersDescription = {
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[

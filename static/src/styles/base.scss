@@ -7,9 +7,58 @@ body {
     background-color: $background-color;
     color: $font-color;
 
-    padding: 30px;
+    margin: 0px;
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+        outline: none;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    a {
+        color: $white;
+        text-decoration: none;
+    
+        &:hover {
+            color: $grey;
+        }        
+    }
+
+    h1 {
+        font-size: 80px;
+        font-weight: 800;
+    }
+
+    h2 {
+        font-size: 40px;
+        font-weight: 500;
+    }
+
+    .enrere {
+        text-align: center;
+        padding: 20px 0 80px 0;
+    }
+
+    .between {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .carregant {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        color: $dark-grey;
+        font-size: 20px;
+    }
 }
 
-a {
-    color: $white;
-}

@@ -129,6 +129,10 @@ class Session(object):
         return self.data['name']
     
     @property
+    def sort_timestamp(self):
+        return int(self.data.get('creation_timestamp', 0))
+    
+    @property
     def connected_users(self):
         return self.data['connected_users']
 
@@ -260,6 +264,8 @@ def get_stored_sessions():
             r.delete(key)
             continue
         sessions.append(s)
+
+    sessions = sorted(sessions, key=lambda s: s.sort_timestamp, reverse=True)
     return sessions
 
 
