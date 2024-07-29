@@ -1,0 +1,41 @@
+.connectat {
+    text-align: center;
+    background-image: url("../img/home intro.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding-top: 100px;
+    padding-bottom: 100px;
+    
+    h1 {
+        color: $black;
+        font-size: 60px;
+    }
+
+    input {
+        /* input element with transparent background, montserrat font, adaptable width and only lower border */
+        background-color: transparent;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 60px;
+        border: none;
+        border-bottom: 1px dotted $black;
+        color: $black;
+        width: 250px;
+    }
+   
+}
+
+.ultimsGrufs {
+    padding: 20px;
+    color: white;
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            line-height: 40px;
+        }
+    }
+}
+

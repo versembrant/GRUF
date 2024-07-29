@@ -8,6 +8,17 @@ import isequal from 'lodash.isequal'
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 
+import Slider from '@mui/material/Slider';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import cssVariables from '../../styles/exports.module.scss';
+
+
+import { InputNumber } from 'primereact/inputnumber';
+import { SelectButton } from 'primereact/selectbutton';
+import { orange, red } from "@mui/material/colors";
+
+
 
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
@@ -18,6 +29,14 @@ export const GrufLabel = ({text, top, left}) => {
         <div className="gruf-label" style={{top: top, left: left}}>
             {text}
         </div>
+    )
+}
+
+export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
+    return (
+        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+            {text}
+        </button>
     )
 }
 
@@ -35,8 +54,8 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             size={60}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white} 
+            rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -58,8 +77,8 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             size={25}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white}
+            rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -90,7 +109,6 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     
@@ -152,9 +170,88 @@ export const GrufPad = ({ playerIndex }) => {
                 onMouseLeave={handleMouseUp}
                 style={{ backgroundColor: isClicked ? 'orange' : 'gray', color: 'white', width: '100%', height: '80%', borderRadius: '10px' }}
             />
+    )
+};
+
+export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    const marks = [
+        {
+            value: 0,
+            label: <div className="marques-slider">soft</div>
+        },
+        {
+            value: 1,
+            label: <div className="marques-slider">hard</div>
+        },
+    ];
+    const style = {top: top, left: left};
+    if (width !== undefined) { 
+        style.width = width;
+    }
+    return (
+        <div className="gruf-slider" style={style}>
+            <Slider 
+                value={real2Norm(parameterValue, parameterDescription)}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
+
+export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-slider-vertical" style={{top: top, left: left}}>
+            <Slider 
+            sx={{
+                height: 17,
+              }}
+            value={real2Norm(parameterValue, parameterDescription)}
+            step={0.01}
+            min={0.0}
+            max={1.0}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
+
+export const GrufBpmCounter = ({ top, left }) => {
+    const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
+
+    const handleBpmChange = (newBpm) => {
+        getAudioGraphInstance().setBpm(newBpm);
+    };
+
+    return (
+        <div className="bpm-counter" style={{ top: top, left: left }}>
+            <div className="inner-square">
+                <InputNumber 
+                    value={currentBpm} 
+                    onValueChange={(e) => handleBpmChange(e.value)} 
+                    min={40} 
+                    max={300} 
+                    showButtons={false} 
+                    className="p-inputnumber"
+                />
+                <div className="bpm-buttons">
+                    <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
+                    <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+                </div>
+            </div>
         </div>
     );
 };
+
 
 export const PadGrid = ({ top, left }) => {
     return (
@@ -168,3 +265,25 @@ export const PadGrid = ({ top, left }) => {
         </div>
     );
 };
+
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValueOnOff = parameterValue === valueOn ? true : false;
+    
+    const handleClick = () => {
+        const parameterInverted = !parameterValueOnOff;
+        estacio.updateParametreEstacio(parameterName, parameterInverted ? valueOn : valueOff);
+    };
+
+    return (
+        <div className="gruf-select-button" style={{ top: top, left: left}}>
+            <div
+                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
+                onClick={handleClick}
+            >
+                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
+            </div>
+        </div>
+    );
+};
+

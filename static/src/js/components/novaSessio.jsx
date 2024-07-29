@@ -1,5 +1,7 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState } from "react";
+import { Navbar, Footer } from "./frontpage";
+import { capitalizeFirstLetter } from "../utils";
 
 function sample(array) {
     const index = Math.floor(Math.random() * array.length);
@@ -41,6 +43,7 @@ export const NovaSessio = () => {
     const handleSubmitForm = (evt) => {
         // Create session data object
         const sessionData = {}
+        sessionData.creation_timestamp = new Date().getTime();
         sessionData.bpm = 120;
         sessionData.swing = 0;
         sessionData.modBars = 4;
@@ -49,7 +52,7 @@ export const NovaSessio = () => {
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-            const nomEstacio = `${estacioClassName}${numEstacionsSameClassAlreadyExisting + 1}`;
+            const nomEstacio = `${capitalizeFirstLetter(estacioClassName.replaceAll("_", " "))} ${numEstacionsSameClassAlreadyExisting + 1}`;
             const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
@@ -76,34 +79,33 @@ export const NovaSessio = () => {
 
     return(
         <div>
-            <h1>Nou GRUF</h1>
-            <div>
-                Nom:<input
-                    style={{width:"300px"}}
-                    value={nomSessio}
-                    onChange={e => setNomSessio(e.target.value)}
-                />
-            </div>
-            <div>
-                <br/>
-                Estacions triades:
-                <ul>
-                    {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
-                </ul>
-                <select
-                    value={selectedOption}
-                    onChange={(evt) => setSelectedOption(evt.target.value)}>
-                    {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
-                </select>
-                <button onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
-            </div>
-            <div>
-                <br/>
-                <button onClick={handleSubmitForm} type="submit">Crear GRUF!</button>
-            </div>
-            <div>
-                <br/>
-                <a href={appPrefix + "/"}>Torna enrere</a>
+            <Navbar/>
+            <div className="nou-gruf">
+                <h1>Nou GRUF</h1>
+                <div>
+                    Nom:<input
+                        style={{width:"300px"}}
+                        value={nomSessio}
+                        onChange={e => setNomSessio(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <br/>
+                    Estacions triades:
+                    <ul>
+                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
+                    </ul>
+                    <select
+                        value={selectedOption}
+                        onChange={(evt) => setSelectedOption(evt.target.value)}>
+                        {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
+                    </select>
+                    <button className="btn btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
+                </div>
+                <div className="enrere">
+                    <button className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
+                    <a href={appPrefix + "/"} className="btn">Torna enrere</a>
+                </div>
             </div>
         </div>
     )

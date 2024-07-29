@@ -2,7 +2,7 @@ import { MonoSynth } from "../estacions/monoSynth.js";
 
 export class EstacioBaix extends MonoSynth {
     
-    tipus = 'baix'
+    tipus = 'synth_bass'
     versio = '0.1'
     parametersDescription = {
         // Notes
