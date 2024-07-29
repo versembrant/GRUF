@@ -2,6 +2,7 @@ import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
 import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
 import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
+import { EstacioSamplerUI } from "../components/estacioSampler";
 
 export class EstacioSampler extends EstacioBase {
     
@@ -47,6 +48,10 @@ export class EstacioSampler extends EstacioBase {
     getTempsBeat = () => {
         return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
     };
+
+    getUserInterfaceComponent() {
+        return EstacioSamplerUI
+    }
 
     loadSoundInBuffer(bufferIndex, url) {
         const buffer = this.audioBuffers[bufferIndex];
