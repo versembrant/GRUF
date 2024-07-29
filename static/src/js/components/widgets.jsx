@@ -149,15 +149,12 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
     return (
         <div className="gruf-slider" style={{top: top, left: left}}>
             <Slider 
-            sx={{
-                height: 18,
-              }}
-            value={real2Norm(parameterValue, parameterDescription)}
-            step={0.01}
-            min={0.0}
-            max={1.0}
-            marks={marks}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+                value={real2Norm(parameterValue, parameterDescription)}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
             />
         </div>
     )
