@@ -9,7 +9,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-grooveBox">
         <div className="estacio-main">
-            <GrufKnobGran estacio={estacio} parameterName="volume1" top="7%" left="4.4%" />
+            <GrufKnobGran estacio={estacio} parameterName="volume1" top="7%" left="4.4%" label="test" />
             <GrufKnobGran estacio={estacio} parameterName="swing1" top="7%" left="17.8%" />
             <GrufKnobGran estacio={estacio} parameterName="swing2" top="7%" left="29.0%" />
             <GrufBpmCounter estacio={estacio} top="8.5%" left="39.6%" />
