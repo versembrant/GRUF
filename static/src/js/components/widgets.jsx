@@ -6,9 +6,17 @@ import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits
 import isequal from 'lodash.isequal'
 
 import { Knob } from 'primereact/knob';
+
+import Slider from '@mui/material/Slider';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import cssVariables from '../../styles/exports.module.scss';
+
+
 import { InputNumber } from 'primereact/inputnumber';
 import { SelectButton } from 'primereact/selectbutton';
 import { orange, red } from "@mui/material/colors";
+
 
 
 const valueToText = (value) => {
@@ -45,8 +53,8 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             size={60}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white} 
+            rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -68,8 +76,8 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             size={25}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white}
+            rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -123,6 +131,58 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
         </div>
     )
 }
+
+export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    const marks = [
+        {
+            value: 0,
+            label: <div className="marques-slider">soft</div>
+        },
+        {
+            value: 1,
+            label: <div className="marques-slider">hard</div>
+        },
+    ];
+    const style = {top: top, left: left};
+    if (width !== undefined) { 
+        style.width = width;
+    }
+    return (
+        <div className="gruf-slider" style={style}>
+            <Slider 
+                value={real2Norm(parameterValue, parameterDescription)}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
+
+export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-slider-vertical" style={{top: top, left: left}}>
+            <Slider 
+            sx={{
+                height: 17,
+              }}
+            value={real2Norm(parameterValue, parameterDescription)}
+            step={0.01}
+            min={0.0}
+            max={1.0}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+            />
+        </div>
+    )
+};
 
 export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
