@@ -9,6 +9,8 @@ import { Knob } from 'primereact/knob';
 import Slider from '@mui/material/Slider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import cssVariables from '../../styles/exports.module.scss';
+
 
 
 const valueToText = (value) => {
@@ -37,8 +39,8 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             size={60}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white} 
+            rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -60,8 +62,8 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             size={25}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
             valueTemplate={""}
-            valueColor="#fff" 
-            rangeColor="#969697"
+            valueColor={cssVariables.white}
+            rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
             <div>{parameterDescription.label}</div>
@@ -121,16 +123,6 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
-    const theme = createTheme({
-        palette: {
-          primary: {
-            main: '#fff',
-          },
-          secondary: {
-            main: "#969697",
-          },
-        },
-      });
     const marks = [
         {
             value: 0,
@@ -142,11 +134,10 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
         },
     ];
     return (
-        <ThemeProvider theme={theme}>
         <div className="gruf-slider" style={{top: top, left: left}}>
             <Slider 
             sx={{
-                height: 17,
+                height: 18,
               }}
             value={real2Norm(parameterValue, parameterDescription)}
             step={0.01}
@@ -156,7 +147,6 @@ export const GrufSlider = ({estacio, parameterName, top, left}) => {
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
             />
         </div>
-        </ThemeProvider>
     )
 };
 
@@ -164,18 +154,7 @@ export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
-    const theme = createTheme({
-        palette: {
-          primary: {
-            main: '#fff',
-          },
-          secondary: {
-            main: "#969697",
-          },
-        },
-      });
     return (
-        <ThemeProvider theme={theme}>
         <div className="gruf-slider-vertical" style={{top: top, left: left}}>
             <Slider 
             sx={{
@@ -188,6 +167,5 @@ export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
             />
         </div>
-        </ThemeProvider>
     )
 };

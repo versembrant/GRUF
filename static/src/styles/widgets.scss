@@ -119,20 +119,40 @@
         padding-top: 3px;
     }
     .MuiSlider-thumb {
-        border-radius: 10%;
+        border-radius: 5px;
         height: 27px;
         width: 10px;
+        color: $white;
+
+        &:hover {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            animation: none;
         }
+    }
+    .Mui-focusVisible {
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        animation: none;
+    }
     .MuiSlider-mark {
-        height: 1px;
-        color: #969697;
+        color: $grey;
+        height: 0px;
+    }
+    .MuiSlider-root {
+        border-radius: 5px;
+        
     }
     .MuiSlider-track {
-        color: #969697;
-        height: 17px;
+        color: $grey;
+        height: 8px;
     }
+    
     .MuiSlider-rail {
-        opacity: 0.5,
+        color: $grey;
+        height: 10px;
+        border-radius: 5px;
+        opacity: 0.5;
     }
 }
 

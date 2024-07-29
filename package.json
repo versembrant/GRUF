@@ -32,6 +32,8 @@
     "webmidi": "^3.1.9"
   },
   "devDependencies": {
-    "events": "^3.1.0"
+    "events": "^3.1.0",
+    "postcss": "^8.2.1",
+    "postcss-modules": "^4.3.0"
   }
 }
