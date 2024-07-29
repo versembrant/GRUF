@@ -37,7 +37,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
-export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
+export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -55,12 +55,12 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
-            <div>{parameterDescription.label}</div>
+            <div>{label || parameterDescription.label}</div>
         </div>
     )
 };
 
-export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
+export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -78,7 +78,7 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
-            {/* <div>{parameterDescription.label}</div> */} {/* Això ho treuria, ja que no coincideixen els nostres labels amb els del disseny, millor afegir-los amb el widget label */}
+            <div>{label || parameterDescription.label}</div>
         </div>
     )
 };
