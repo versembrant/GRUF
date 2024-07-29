@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>GRUF!</h1>
-<div>
-    <ul>
-        <li><a href="{{ url_for('app.new') }}">Nou GRUF</a></li>
-        <li><a href="{{ url_for('app.llista_sessions') }}">Connecta't a un GRUF</a></li>
-    </ul>
-</div>
+<div id="root"><div class="carregant"><div>Carregant...</div></div></div>
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/frontpage.js') }}"></script>
 {% endblock %}
+
+
+

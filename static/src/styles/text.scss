@@ -1,0 +1,9 @@
+.text-grey {
+    color: $grey;
+}
+
+.ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
