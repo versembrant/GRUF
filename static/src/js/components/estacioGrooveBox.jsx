@@ -7,8 +7,9 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
-    return (<div key={estacio.nom} className="estacio estacio-grooveBox">
+    return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGran estacio={estacio} parameterName="volume1" top="7%" left="4.4%" label="test" />
             <GrufKnobGran estacio={estacio} parameterName="swing1" top="7%" left="17.8%" />
             <GrufKnobGran estacio={estacio} parameterName="swing2" top="7%" left="29.0%" />
@@ -19,7 +20,6 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufReverbTime estacio={estacio} parameterName="reverbSend2" top="15.0%" left="51.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="6.6%" left="72.8%" />
             <GrufLabel text="Send" top="11.1%" left="72.2%" />
-            <GrufLabel text="Tria instrument" top="6.1%" left="81.2%" />
             <GrufLabel text="Delay" top="14%" left="82.5%" />
             <GrufOnOffButton estacio={estacio} parameterName="reverbSend3" top="19.5%" left="81.7%" />
             <GrufLabel text="EQ" top="29.2%" left="51.7%" />
@@ -90,20 +90,6 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Reverb" top="89.5%" left="86.5%" />
             <GrufLabelPetit text="Swing" top="89.5%" left="91.8%" />
                         
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
     </div>)
 };

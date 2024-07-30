@@ -82,22 +82,10 @@
 .estacio-piano {
     .estacio-main {
         background-image: url("../img/piano_bg.svg");
-        //background-image: url('../img/piano.jpg');
         background-color: $orange;
     }
     .selected {
         background-color: $orange!important;
-    }    
-}
-
-.estacio-grooveBox {
-    .estacio-main {
-        background-image: url("../img/groovebox_bg.svg");
-        //background-image: url('../img/groovebox.jpg');
-        background-color: $yellow;
-    }
-    .selected {
-        background-color: $yellow!important;
     }    
 }
 
@@ -108,6 +96,25 @@
     background-position: center;
     height: 30px;
     width: 120px;
+}
+
+.estacio-groovebox {
+    .estacio-main {
+        background-image: url("../img/groovebox_bg.svg");
+        background-color: $yellow;
+    }
+    .selected {
+        background-color: $yellow!important;
+    }    
+}
+
+.estacio-groovebox-logo {
+    background-image: url("../img/groovebox_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 160px;
 }
 
 .estacio-synth {
