@@ -263,17 +263,20 @@ export const PadGrid = ({ top, left }) => {
     );
 };
 
-export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn=true, valueOff=false}) => {
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0 }) => {
+    // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const parameterValueOnOff = parameterValue === valueOn ? true : false;
-    
+    const parameterValueOnOff = parameterValue === valueOn;
+
     const handleClick = () => {
-        const parameterInverted = !parameterValueOnOff;
-        estacio.updateParametreEstacio(parameterName, parameterInverted ? valueOn : valueOff);
+        // En clicar, invertim el valor i l'actualitzem
+        const newValue = !parameterValueOnOff;
+        estacio.updateParametreEstacio(parameterName, newValue ? valueOn : valueOff);
+        console.log(newValue ? valueOn : valueOff);
     };
 
     return (
-        <div className="gruf-select-button" style={{ top: top, left: left}}>
+        <div className="gruf-select-button" style={{ top: top, left: left }}>
             <div
                 className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
                 onClick={handleClick}
