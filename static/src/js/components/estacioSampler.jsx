@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufButtonNoBorder, GrufLabel, GrufReverbTime, PadGrid } from "./widgets";
+import { GrufKnobGran, GrufButtonNoBorder, GrufLabel, GrufReverbTime, GrufPadGrid } from "./widgets";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -19,7 +19,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15.5%" left="36.7%" />
             <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.7%" left="54.8%" />
             <GrufLabel text="Timbre" top="7.2%" left="68.2%" />
-            <PadGrid top="60%" left="40%" />
+            <GrufPadGrid top="60%" left="40%" />
         </div>
     </div>)
 };

@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit } from "./widgets";
+import { GrufKnobGran, GrufLabel, GrufLabelPetit, GrufOnOffGrid, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit } from "./widgets";
 
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
@@ -89,6 +89,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Release" top="89.5%" left="81.4%" />
             <GrufLabelPetit text="Reverb" top="89.5%" left="86.5%" />
             <GrufLabelPetit text="Swing" top="89.5%" left="91.8%" />
+
+            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="360px" left="180px" />
                         
         </div>
     </div>)
