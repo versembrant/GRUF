@@ -1,17 +1,15 @@
-import { createElement, useState, useEffect } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid } from "./widgets";
+import { GrufKnobGran, GrufButtonNoBorder, GrufLabel, GrufReverbTime, PadGrid } from "./widgets";
 
 
-export const EstacioSamplerUI = ({estacio}) => {
+export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
     return (<div key={estacio.nom} className="estacio estacio-sampler">
         <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufLabel text="EQ" top="7%" left="6%" />
             <GrufKnobGran estacio={estacio} parameterName="fxLow" top="12%" left="5.8%" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="12%" left="15.5%" />
