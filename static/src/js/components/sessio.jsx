@@ -91,7 +91,7 @@ export const Sessio = () => {
                     </div>
                     <div className="estacions">
                         {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)} setEstacioSelected={setEstacioSelected}/>)}
-                        {estacioSelected == "mixer" ? <EstacioMixerUI setEstacioSelected={setEstacioSelected} />: ""}
+                        {estacioSelected == "mixer" ? <EstacioMixerUI setEstacioSelected={setEstacioSelected} showLevelMeters={true} />: ""}
                         {estacioSelected == "computer" ? <EstacioComputerUI setEstacioSelected={setEstacioSelected}/>: ""}
                     </div>
                     <div className="footer between">

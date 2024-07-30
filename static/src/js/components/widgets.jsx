@@ -6,7 +6,6 @@ import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
-
 import cssVariables from '../../styles/exports.module.scss';
 
 const valueToText = (value) => {
