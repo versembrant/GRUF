@@ -1,7 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { MonoSynthUI } from "../components/monoSynth";
 
 export class MonoSynth extends EstacioBase {
 
@@ -31,10 +30,6 @@ export class MonoSynth extends EstacioBase {
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0}
-    }
-
-    getUserInterfaceComponent() {
-        return MonoSynthUI
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {

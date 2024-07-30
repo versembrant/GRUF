@@ -1,4 +1,5 @@
 import { MonoSynth } from "../estacions/monoSynth.js";
+import { EstacioBaixUI } from "../components/estacioBaix.jsx";
 
 export class EstacioBaix extends MonoSynth {
     
@@ -33,5 +34,9 @@ export class EstacioBaix extends MonoSynth {
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0}
+    }
+
+    getUserInterfaceComponent() {
+        return EstacioBaixUI
     }
 }
