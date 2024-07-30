@@ -1,0 +1,11 @@
+@import './colors.scss';
+
+:export {
+    white: #{$white};
+    grey: #{$grey};
+    darkGrey: #{$dark-grey};
+    black: #{$black};
+    orange: #{$orange};
+    yellow: #{$yellow};
+
+}

@@ -154,5 +154,13 @@
     width: 120px;
 }
 
+.estacio-sampler {
+    .estacio-main {
+        background-image: url("../img/sampler_bg.svg");
+        background-color: $lightblue;
+    }
 
-
+    .selected {
+        background-color: $lightblue!important;
+    }    
+}
