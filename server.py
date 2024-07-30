@@ -101,7 +101,7 @@ class Session(object):
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
-            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'polySynth':
+            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'synth':
                 for nom, valors_presets in estacio['parametres'].items():
                     if nom == 'pattern' or nom == 'notes':
                         nous_valors_presets = []

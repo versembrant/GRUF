@@ -98,6 +98,64 @@
     width: 120px;
 }
 
+.estacio-synth {
+    .estacio-main {
+        background-image: url("../img/synth_bg.svg");
+        background-color: $red;
+    }
+    .selected {
+        background-color: $red!important;
+    }    
+}
+
+.estacio-synth-logo {
+    background-image: url("../img/synth_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 110px;
+}
+
+.estacio-synth_bass {
+    .estacio-main {
+        background-image: url("../img/synth_bass_bg.svg");
+        background-color: $pink;
+    }
+    .selected {
+        background-color: $pink!important;
+    }    
+}
+
+.estacio-synth_bass-logo {
+    background-image: url("../img/synth_bass_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 165px;
+}
+
+.estacio-sampler {
+    .estacio-main {
+        background-image: url("../img/sampler_bg.svg");
+        background-color: $lightblue;
+    }
+
+    .selected {
+        background-color: $lightblue!important;
+    }    
+}
+
+.estacio-sampler-logo {
+    background-image: url("../img/sampler_logo.svg");
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 30px;
+    width: 145px;
+}
+
 .estacio-mixer-logo {
     background-image: url("../img/mixer_logo.svg");
     background-size: auto 30px;
@@ -115,21 +173,3 @@
     height: 30px;
     width: 150px;
 }
-
-.estacio-sampler {
-    .estacio-main {
-        background-image: url("../img/sampler_bg.svg");
-        background-color: $lightblue;
-    }
-
-    .selected {
-        background-color: $lightblue!important;
-    }    
-}
-
-
-
-
-
-
-
