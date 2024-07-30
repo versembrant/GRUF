@@ -23,6 +23,7 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
         sound1URL: {type: 'text', label: 'OpHat', initial: 'https://cdn.freesound.org/previews/125/125591_4948-hq.mp3'}, // OpHat
+        volume: {type: 'float', label: 'Volume', min: -30, max: 6, initial: 0},
         swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0, followsPreset: true},
         tone1: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
         volume1: {type: 'float', label: 'OpHatVolume', min: -30, max: 6, initial: 0},
@@ -51,9 +52,19 @@ export class EstacioGrooveBox extends EstacioBase {
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '1'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -30, max: 6, initial: -30},
 
-        //FX
 
+        // FX
+        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.5},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
+        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
+        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
+        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+
 
     }
 
@@ -78,6 +89,10 @@ export class EstacioGrooveBox extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
+        const mainChannel = new Tone.Channel({
+            volume: 0
+        })
+
         const channels = {
             kick: new Tone.Channel(),
             snare: new Tone.Channel(),
@@ -100,7 +115,7 @@ export class EstacioGrooveBox extends EstacioBase {
         const player3 = new Tone.Player().connect(channels.closed_hat);
         const player4 = new Tone.Player().connect(channels.open_hat);
         
-        Object.values(channels).forEach(channel => channel.connect(estacioMasterChannel));
+        Object.values(channels).forEach(channel => channel.connect(mainChannel));
 
         // Creem els nodes del graph
         this.audioNodes = {
@@ -112,7 +127,9 @@ export class EstacioGrooveBox extends EstacioBase {
             sendReverbGainNode2: channels.closed_hat.send("grooveBoxReverb", -100),
             sendReverbGainNode3: channels.snare.send("grooveBoxReverb", -100),
             sendReverbGainNode4: channels.kick.send("grooveBoxReverb", -100),
+            mainChannel: mainChannel,
         }
+        this.addEffectChainNodes(mainChannel, estacioMasterChannel);
     }
 
     setParameterInAudioGraph(name, value, preset) {

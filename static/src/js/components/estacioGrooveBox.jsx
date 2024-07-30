@@ -26,7 +26,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="34.5%" left="56.9%" label = 'Mid' /> 
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="34.5%" left="61.9%" label = 'High' />
             <GrufLabel text="Durada" top="29.5%" left="70.3%" />
-            {/* <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" /> */} {/* Falta implementar Delay */}
+            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="50%" left="50%" />
             {/* <GrufSlider estacio={estacio} parameterName="reverbSend1" top="110px" left="694px" width="225px"/> */}
             <GrufLabelPetit text="Mix" top="38.5%" left="84.2%" />
             <GrufLabelPetit text="Feedback" top="38.5%" left="88.0%" />
