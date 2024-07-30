@@ -161,21 +161,34 @@ export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
     )
 };
 
-export const GrufSliderVertical = ({estacio, parameterName, top, left}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio=estacio.nom;
+export const GrufSliderVertical = ({ estacio, parameterName, top, left, height }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const marks = [
+        {
+            value: 0,
+            label: <div className="marques-slider">soft</div>
+        },
+        {
+            value: 1,
+            label: <div className="marques-slider">hard</div>
+        },
+    ];
+    const style = { top: top, left: left };
+    if (height !== undefined) {
+        style.height = height;
+    }
     return (
-        <div className="gruf-slider-vertical" style={{top: top, left: left}}>
-            <Slider 
-            sx={{
-                height: 17,
-              }}
-            value={real2Norm(parameterValue, parameterDescription)}
-            step={0.01}
-            min={0.0}
-            max={1.0}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+        <div className="gruf-slider-vertical" style={style}>
+            <Slider
+                orientation="vertical"
+                value={real2Norm(parameterValue, parameterDescription)}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                // marks={marks} 
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))}
             />
         </div>
     )

@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder } from "./widgets";
+import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical } from "./widgets";
 
 
 export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
@@ -18,7 +18,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="portamento" top="7.8%" left="28%" />
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34%" left="70%" />
+            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34%" left="69.4%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15%" left="51.2%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
@@ -27,6 +27,14 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="Durada" top="29.3%" left="70.3%" />
             <GrufLabel text="Delay" top="14%" left="82.3%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxReverbWet" top="7.1%" left="70%" />
+            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%" width="225px" />
+            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%" width="225px" />
+            <GrufLabel text="HPF" top="21.8%" left="38.2%" />
+            <GrufLabel text="LPF" top="21.8%" left="43%" />
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="29%" left="83%" width="225px" />
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="29%" left="89.5%" width="225px" />
+            <GrufLabel text="Mix" top="40.3%" left="83%" />
+            <GrufLabel text="Feedback" top="40.3%" left="87.3%" />
         </div>
     </div>)
 };
