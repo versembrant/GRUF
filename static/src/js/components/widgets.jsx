@@ -21,6 +21,14 @@ export const GrufLabel = ({text, top, left}) => {
     )
 }
 
+export const GrufLabelPetit = ({text, top, left}) => {
+    return (
+        <div className="gruf-label-petit" style={{top: top, left: left}}>
+            {text}
+        </div>
+    )
+}
+
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
         <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
@@ -29,7 +37,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
-export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
+export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -47,12 +55,12 @@ export const GrufKnobGran = ({estacio, parameterName, top, left}) => {
             rangeColor={cssVariables.grey} 
             //valueTemplate={valueToText(parameterValue)}
             />
-            <div>{parameterDescription.label}</div>
+            <div>{label || parameterDescription.label}</div>
         </div>
     )
 };
 
-export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
+export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -70,7 +78,7 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left}) => {
             rangeColor={cssVariables.grey}
             //valueTemplate={valueToText(parameterValue)}
             />
-            <div>{parameterDescription.label}</div>
+            <div>{label || parameterDescription.label}</div>
         </div>
     )
 };
