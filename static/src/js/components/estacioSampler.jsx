@@ -3,7 +3,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid, GrufOnOffButton } from "./widgets";
+import { GrufKnobGran, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
 
 
 export const EstacioSamplerUI = ({estacio}) => {
@@ -23,9 +23,11 @@ export const EstacioSamplerUI = ({estacio}) => {
             <GrufLabel text="Durada" top="29.6%" left="70.3%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
             <GrufLabel text="Delay" top="14.1%" left="82.5%" />
-            <GrufOnOffButton estacio={estacio} parameterName="fxDelayWet" top="19.5%" left="81.8%" />
-            <GrufLabelPetit text="Mix" top="38.5%" left="84.2%" />
-            <GrufLabelPetit text="Feedback" top="38.5%" left="88.0%" />
+            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19.5%" left="81.8%" />
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="26.5%" left="83.6%" width="225px"/> 
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="26.5%" left="88.9%" width="225px"/> 
+            <GrufLabelPetit text="Mix" top="39.5%" left="84.2%" />
+            <GrufLabelPetit text="Feedback" top="39.5%" left="88.0%" />
             <PadGrid top="71%" left="69%" />
             <GrufKnobGran estacio={estacio} parameterName="volume1" top="50%" left="5%" label = 'Vol' />
             <GrufKnobGran estacio={estacio} parameterName="pan1" top="64.5%" left="5%" label = 'Pan' />
@@ -38,6 +40,9 @@ export const EstacioSamplerUI = ({estacio}) => {
 
             <GrufKnobGran estacio={estacio} parameterName="start1" top="8%" left="41.3%" label = 'Start' />
             <GrufKnobGran estacio={estacio} parameterName="end1" top="21%" left="41.3%" label = 'End' />
+
+            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="12.5%" left="28.6%" width="225px" label = 'HPF'/> 
+            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="12.5%" left="33.9%" width="225px" label = 'LPF'/> 
 
         </div>
     </div>)
