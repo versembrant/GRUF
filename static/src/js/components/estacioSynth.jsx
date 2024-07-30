@@ -9,6 +9,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-synth">
         <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobPetit estacio={estacio} parameterName="attack" top="35%" left="5%" />
             <GrufKnobPetit estacio={estacio} parameterName="decay" top="35%" left="10%" />
             <GrufKnobPetit estacio={estacio} parameterName="sustain" top="35%" left="14.7%" />
@@ -16,7 +17,6 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="EQ" top="29.3%" left="52%" />
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
-            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34%" left="70%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15%" left="51.2%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />

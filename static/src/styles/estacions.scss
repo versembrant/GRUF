@@ -175,6 +175,16 @@
     width: 145px;
 }
 
+.estacio-mixer {
+    .estacio-main {
+        background-image: url("../img/mixer_bg.svg");
+        background-color: $green;
+    }
+    .selected {
+        background-color: $green!important;
+    }    
+}
+
 .estacio-mixer-logo {
     background-image: url("../img/mixer_logo.svg");
     background-size: auto 30px;
@@ -182,6 +192,16 @@
     background-position: center;
     height: 30px;
     width: 150px;
+}
+
+.estacio-computer {
+    .estacio-main {
+        background-image: url("../img/computer_bg.svg");
+        background-color: $pale-orange;
+    }
+    .selected {
+        background-color: $pale-orange!important;
+    }    
 }
 
 .estacio-computer-logo {
