@@ -20,16 +20,17 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="fxReverbWet" top="6.6%" left="72.8%" label = 'Send' />
             <GrufLabel text="Tria instrument" top="6.2%" left="81.2%" />
             <GrufLabel text="Delay" top="14.1%" left="82.5%" />
-            <GrufOnOffButton estacio={estacio} parameterName="fxDelayWet" top="19.5%" left="81.8%" />
+            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19.5%" left="81.8%" />
             <GrufLabel text="EQ" top="29.6%" left="51.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label = 'Mid' /> 
             <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label = 'High' />
             <GrufLabel text="Durada" top="29.6%" left="70.3%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-            {/* <GrufSlider estacio={estacio} parameterName="reverbSend1" top="110px" left="694px" width="225px"/> */}
-            <GrufLabelPetit text="Mix" top="38.5%" left="84.2%" />
-            <GrufLabelPetit text="Feedback" top="38.5%" left="88.0%" />
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="26.5%" left="83.6%" width="225px"/> 
+            <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="26.5%" left="88.9%" width="225px"/> 
+            <GrufLabelPetit text="Mix" top="39.5%" left="84.2%" />
+            <GrufLabelPetit text="Feedback" top="39.5%" left="88.0%" />
             
             <GrufKnobPetit estacio={estacio} parameterName="volume4" top="48.5%" left="5%" label = 'Vol' />
             <GrufKnobPetit estacio={estacio} parameterName="tone4" top="48.5%" left="9%" label = 'Tone' />
