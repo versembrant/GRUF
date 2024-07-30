@@ -1,10 +1,11 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { AudioEffectsControlPanel} from  "../components/fxControlPanel"
+import { AudioEffectsControlPanel} from  "./fxControlPanel"
+import { GrufButtonNoBorder } from "../components/widgets";
 
 
-export const AudioMixerEstacions = ({setEstacioSelected}) => {
+export const EstacioMixerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
@@ -16,10 +17,9 @@ export const AudioMixerEstacions = ({setEstacioSelected}) => {
         getCurrentSession().liveSetGainsEstacions(allGainValues);
     }
 
-    return (
-        <div className="mixer">
-            <button className="btn btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
-            <h1>Mixer</h1>
+    return (<div key="mixer1" className="estacio estacio-mixer">
+        <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
                 return (
                 <div key={nomEstacio}>
@@ -36,6 +36,5 @@ export const AudioMixerEstacions = ({setEstacioSelected}) => {
             })}
             <AudioEffectsControlPanel/>
         </div>
-
-    )
+    </div>)
 };
