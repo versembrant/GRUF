@@ -1,9 +1,9 @@
 import * as Tone from 'tone'
 import { EstacioBase } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { PolySynthUI } from "../components/polySynth";
+import { EstacioSynthUI } from "../components/estacioSynth";
 
-export class PolySynth extends EstacioBase {
+export class Synth extends EstacioBase {
 
     tipus = 'synth'
     versio = '0.1'
@@ -33,7 +33,7 @@ export class PolySynth extends EstacioBase {
     }
 
     getUserInterfaceComponent() {
-        return PolySynthUI
+        return EstacioSynthUI
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
