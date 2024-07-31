@@ -6,6 +6,7 @@ import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
+import * as Tone from 'tone';
 
 import cssVariables from '../../styles/exports.module.scss';
 
@@ -222,10 +223,11 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ playerIndex }) => {
+export const GrufPad = ({ estacio, playerIndex, onClick }) => {
     const [isClicked, setIsClicked] = useState(false);
     const [isHeld, setIsHeld] = useState(false);
     const holdTimer = useRef(null);
+    const nomEstacio = estacio.nom;
 
     const handleMouseDown = () => {
         setIsClicked(true);
@@ -241,15 +243,16 @@ export const GrufPad = ({ playerIndex }) => {
             setIsHeld(false);
         } else {
             playSample(playerIndex);
+            onClick(playerIndex);
         }
     };
 
-    const playSample = (index) => {
-        const estacio = getCurrentSession().getEstacio('EstacioSamper');
+    const playSample = () => {
+        const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(index, Tone.now());
+            estacio.playSoundFromPlayer(0, Tone.now());
         }
-    };
+    }; 
 
     return (
         <div className="gruf-pad">
@@ -257,19 +260,20 @@ export const GrufPad = ({ playerIndex }) => {
                 className={ isClicked ? 'selected': '' }
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
             />
         </div>
     )
 }
 
-export const PadGrid = ({ top, left }) => {
+export const PadGrid = ({ estacio, top, left, onPadClick }) => {
     return (
         <div className="pad-grid" style={{ top: top, left: left }}>
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
                     playerIndex={index}
+                    onClick={onPadClick}
+                    estacio = {estacio}
                 />
             ))}
         </div>
