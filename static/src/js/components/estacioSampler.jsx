@@ -40,7 +40,7 @@ export const EstacioSamplerUI = ({ estacio }) => {
 
                 <GrufKnobGran estacio={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
                 <GrufKnobGran estacio={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
-                <GrufKnobDiscret estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
+                <GrufKnobGranDiscret estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
 
                 <GrufKnobPetit estacio={estacio} parameterName={`attack${selectedPad + 1}`} top="24%" left="5%" label='Attack' />
                 <GrufKnobPetit estacio={estacio} parameterName={`decay${selectedPad + 1}`} top="24%" left="10%" label='Decay' />
