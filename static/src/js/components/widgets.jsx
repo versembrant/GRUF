@@ -84,6 +84,37 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
     )
 };
 
+export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const optionCount = options.length;
+
+    const currentOptionIndex = options.indexOf(parameterValue);
+
+    return (
+        <div className="gruf-knob-gran" style={{ top, left }}>
+            <Knob
+                value={currentOptionIndex}
+                min={0}
+                max={optionCount - 1}
+                step={1}
+                size={60}
+                onChange={(evt) => {
+                    const selectedIndex = evt.value;
+                    const selectedOption = options[selectedIndex];
+                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, selectedOption);
+                }}
+                valueTemplate=""
+                valueColor={cssVariables.white}
+                rangeColor={cssVariables.grey}
+            />
+            <div>{label || parameterDescription.label}</div>
+        </div>
+    );
+};
+
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());

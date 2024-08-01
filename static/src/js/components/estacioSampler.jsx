@@ -3,7 +3,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufKnobPetit, GrufKnobGranDiscret, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
 
 
 export const EstacioSamplerUI = ({ estacio }) => {
@@ -40,7 +40,7 @@ export const EstacioSamplerUI = ({ estacio }) => {
 
                 <GrufKnobGran estacio={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
                 <GrufKnobGran estacio={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
-                <GrufKnobGran estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
+                <GrufKnobDiscret estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
 
                 <GrufKnobPetit estacio={estacio} parameterName={`attack${selectedPad + 1}`} top="24%" left="5%" label='Attack' />
                 <GrufKnobPetit estacio={estacio} parameterName={`decay${selectedPad + 1}`} top="24%" left="10%" label='Decay' />
