@@ -6,7 +6,13 @@ import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
+<<<<<<< HEAD
+import * as Tone from 'tone';
+
+=======
+>>>>>>> main
 import cssVariables from '../../styles/exports.module.scss';
+import { circularProgressClasses } from "@mui/material";
 
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
@@ -80,6 +86,37 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
             <div>{label || parameterDescription.label}</div>
         </div>
     )
+};
+
+export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const optionCount = options.length;
+
+    const currentOptionIndex = options.indexOf(parameterValue);
+
+    return (
+        <div className="gruf-knob-gran" style={{ top, left }}>
+            <Knob
+                value={currentOptionIndex}
+                min={0}
+                max={optionCount - 1}
+                step={1}
+                size={60}
+                onChange={(evt) => {
+                    const selectedIndex = evt.value;
+                    const selectedOption = options[selectedIndex];
+                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, selectedOption);
+                }}
+                valueTemplate=""
+                valueColor={cssVariables.white}
+                rangeColor={cssVariables.grey}
+            />
+            <div>{label || parameterDescription.label}</div>
+        </div>
+    );
 };
 
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
@@ -221,10 +258,11 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ playerIndex }) => {
+export const GrufPad = ({ estacio, playerIndex, onClick, isSelected }) => {
     const [isClicked, setIsClicked] = useState(false);
     const [isHeld, setIsHeld] = useState(false);
     const holdTimer = useRef(null);
+    const nomEstacio = estacio.nom;
 
     const handleMouseDown = () => {
         setIsClicked(true);
@@ -240,35 +278,41 @@ export const GrufPad = ({ playerIndex }) => {
             setIsHeld(false);
         } else {
             playSample(playerIndex);
+            onClick(playerIndex);
         }
     };
 
-    const playSample = (index) => {
-        const estacio = getCurrentSession().getEstacio('EstacioSamper');
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(index, Tone.now());
+    const playSample = () => {
+        if (!getAudioGraphInstance().graphIsBuilt()){
+            return;
         }
-    };
+        const estacio = getCurrentSession().getEstacio(nomEstacio);
+        if (estacio && estacio.playSoundFromPlayer) {
+            estacio.playSoundFromPlayer(0, Tone.now());
+        }
+    }; 
 
     return (
         <div className="gruf-pad">
             <Button
-                className={ isClicked ? 'selected': '' }
+                className={ (isClicked ? 'selected': '') + ' ' + (isSelected ? 'pad-selected': '') } 
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
             />
         </div>
     )
 }
 
-export const GrufPadGrid = ({ top, left }) => {
+export const GrufPadGrid = ({ estacio, top, left, onPadClick, currentSelectedPad }) => {
     return (
         <div className="pad-grid" style={{ top: top, left: left }}>
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
                     playerIndex={index}
+                    onClick={onPadClick}
+                    estacio={estacio}
+                    isSelected={currentSelectedPad===index}
                 />
             ))}
         </div>

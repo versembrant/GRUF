@@ -151,7 +151,11 @@
         background-color: $grey;
     }
     
-    .selected {
+    .selected { // S'utiliza per quan el pad s'apreta
+        background-color: $dark-grey;
+    }
+
+    .pad-selected { // S'utilitza per quan el pad està se·leccionat i es modifiquen els seus paràmetres
         background-color: $dark-grey;
     }
 }
