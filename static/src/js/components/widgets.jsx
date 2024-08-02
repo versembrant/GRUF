@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
@@ -6,6 +6,7 @@ import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
+import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
 
 
@@ -401,6 +402,108 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                 )
 
             }
+        </div>
+    )
+};
+
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width=600, height=300 }) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
+    const uniqueId = estacio.nom + "_" + parameterDescription.nom
+    let lastEditedData = "";
+    
+    useEffect(() => {
+        const jsElement = document.getElementById(uniqueId + "_id")
+        if (jsElement.dataset.alreadyBinded === undefined){
+            jsElement.addEventListener("pianoRollEdited", evt => {
+                const stringifiedData = JSON.stringify(evt.detail)
+                if (!isequal(stringifiedData, lastEditedData)) {
+                    handleSequenceEdited(evt.detail)
+                    lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
+                }
+            });
+            jsElement.dataset.alreadyBinded = true;
+        }
+        if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
+            jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
+            jsElement.redraw()
+        }
+        if (currentStep >= 0) {
+            jsElement.locate(currentStep);
+        } else {
+            jsElement.locate(-10);  // make it dissapear
+        }
+    })
+
+    const appSequenceToWidgetSequence = (sequence) => {
+        return sequence.map(value => {return {
+            't': value.b,  // time in beats
+            'n': value.n,  // midi note number
+            'g': value.d,  // note duration in beats
+            'f': value.s,  // note is selected
+            'on': value.on,  // original note
+            'ot': value.ob,  // original time
+            'og': value.od,  // original duration
+        }})
+    }
+
+    const widgetSequenceToAppSequence = (wSequence) => {
+        return wSequence.map(value => {return {
+            'b': value.t,  // beat position
+            'n': value.n,  // midi note number
+            'd': value.g,  // note duration in beats
+            's': value.f,  // note is selected
+            'on': value.on,  // original note
+            'ob': value.ot,  // original time
+            'od': value.og,  // original duration
+        }})
+    }
+
+    const handleSequenceEdited = (widgetSequence) => {
+        estacio.updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
+    }
+
+    const getLowestNoteForYOffset = () => {
+        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
+        if (parameterDescription.permetScrollVertical === 0) {
+            return parameterDescription.notaMesBaixaPermesa;
+        }
+
+        let lowestNote = 127
+        for (let i = 0; i < parameterValue.length; i++) {
+            if (parameterValue[i].n < lowestNote) {
+                lowestNote = parameterValue[i].n
+            }
+        }
+        if (lowestNote == 127) {
+            return parameterDescription.notaMesBaixaPermesa || 48
+        } else {
+            return lowestNote
+        }
+    }
+
+    return (
+        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
+            <div style={{overflow:"scroll"}}>
+                <webaudio-pianoroll
+                    id={uniqueId + "_id"}
+                    width={width}
+                    height={height}
+                    xrange={numSteps}
+                    yrange={parameterDescription.rangDeNotesPermeses || 24}
+                    yoffset={getLowestNoteForYOffset()}
+                    xruler={0}
+                    markstart={-10}  // make it dissapear
+                    markend={-10}  // make it dissapear
+                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                ></webaudio-pianoroll>
+            </div>
+            <button onMouseDown={(evt)=>
+                estacio.updateParametreEstacio(parameterDescription.nom, [])
+            }>Clear</button>
+            { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
         </div>
     )
 };
