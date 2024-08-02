@@ -6,11 +6,9 @@ import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
-<<<<<<< HEAD
 import * as Tone from 'tone';
 
-=======
->>>>>>> main
+
 import cssVariables from '../../styles/exports.module.scss';
 import { circularProgressClasses } from "@mui/material";
 
