@@ -1,17 +1,16 @@
-import { createElement, useState, useEffect } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, PadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufButtonNoBorder, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, GrufPadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
 
 
-export const EstacioSamplerUI = ({estacio}) => {
+export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
     return (<div key={estacio.nom} className="estacio estacio-sampler">
         <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufLabel text="EQ" top="29.6%" left="51.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label = 'Mid' /> 
@@ -28,7 +27,7 @@ export const EstacioSamplerUI = ({estacio}) => {
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="26.5%" left="88.9%" width="225px"/> 
             <GrufLabelPetit text="Mix" top="39.5%" left="84.2%" />
             <GrufLabelPetit text="Feedback" top="39.5%" left="88.0%" />
-            <PadGrid top="71%" left="69%" />
+            <GrufPadGrid top="71%" left="69%" />
             <GrufKnobGran estacio={estacio} parameterName="volume1" top="50%" left="5%" label = 'Vol' />
             <GrufKnobGran estacio={estacio} parameterName="pan1" top="64.5%" left="5%" label = 'Pan' />
             <GrufKnobGran estacio={estacio} parameterName="pitch1" top="79%" left="5%" label = 'Pitch' />
@@ -43,7 +42,6 @@ export const EstacioSamplerUI = ({estacio}) => {
 
             <GrufSliderVertical estacio={estacio} parameterName="hpf" top="12.5%" left="28.6%" width="225px" label = 'HPF'/> 
             <GrufSliderVertical estacio={estacio} parameterName="lpf" top="12.5%" left="33.9%" width="225px" label = 'LPF'/> 
-
         </div>
     </div>)
 };
