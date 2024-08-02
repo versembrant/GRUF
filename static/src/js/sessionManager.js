@@ -196,6 +196,10 @@ export class EstacioBase {
     }
 
     setFxParameterInAudioGraph(name, value, preset) {
+        if (this.audioNodes.hasOwnProperty('effects') === false){
+            // If estacio has no effect nodes, don't try tu update anything
+            return;
+        }
         if (name == "fxReverbWet"){
             this.audioNodes.effects['reverb'].set({'wet': value});
         } else if (name == "fxReverbDecay"){
@@ -452,6 +456,14 @@ export class Session {
         return this.store.getState().live.gainsEstacions
     }
 
+    getLiveMutesEstacions() {
+        return this.store.getState().live.mutesEstacions
+    }
+
+    getLiveSolosEstacions() {
+        return this.store.getState().live.solosEstacions
+    }
+
     liveSetPresetForEstacio(nomEstacio, preset) {
         const presets_estacions = {}
         presets_estacions[nomEstacio] = preset
@@ -475,6 +487,20 @@ export class Session {
         })
     }
 
+    liveSetMutesEstacions(mutesEstacions) {
+        this.updateParametreLive({
+            accio: 'set_mutes',
+            mutes_estacions: mutesEstacions,
+        })
+    }
+
+    liveSetSolosEstacions(solosEstacions) {
+        this.updateParametreLive({
+            accio: 'set_solos',
+            solos_estacions: solosEstacions,
+        })
+    }
+
     updateParametreLive(updateData) {
         if (!this.localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -491,6 +517,34 @@ export class Session {
         }
     }
 
+    setEstacionsMutesAndSolosInChannelNodes(mutes, solos) {
+        if (getAudioGraphInstance().graphIsBuilt() === false){
+            return;
+        };
+        const someAreSoloed = Object.values(solos).some(solo => solo === true);
+        Object.keys(mutes).forEach(nomEstacio => {
+            const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+            const channelIsSoloed = solos[nomEstacio];
+            const channelIsMuted = mutes[nomEstacio];
+            channelNode.mute = channelIsMuted;
+            if (someAreSoloed) {
+                // If some channels are soloed, we need to mute all channels which are not soloed, and mute also channels which are both soloed and muted
+                if (channelIsSoloed){
+                    if (channelIsMuted){
+                        channelNode.mute = true;
+                    } else {
+                        channelNode.mute = false;
+                    }
+                } else {
+                    channelNode.mute = true;
+                }
+            } else {
+                // If no channels are in solo mode, simply follow the mute rule
+                channelNode.mute = channelIsMuted;
+            }
+        });
+    }
+
     receiveUpdateLiveFromServer(updateData) {
         const liveActualitzat = Object.assign({}, this.getLive());
         if (updateData.accio === 'set_gains') {
@@ -504,6 +558,16 @@ export class Session {
                 }
                 
             })
+        } else if (updateData.accio === 'set_mutes') {
+            Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {
+                liveActualitzat.mutesEstacions[nomEstacio] = updateData.mutes_estacions[nomEstacio];
+            })
+            this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
+        } else if (updateData.accio === 'set_solos') {
+            Object.keys(updateData.solos_estacions).forEach(nomEstacio => {
+                liveActualitzat.solosEstacions[nomEstacio] = updateData.solos_estacions[nomEstacio];
+            })
+            this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
         } else if (updateData.accio === 'set_presets') {
             Object.keys(updateData.presets_estacions).forEach(nomEstacio => {
                 liveActualitzat.presetsEstacions[nomEstacio] = updateData.presets_estacions[nomEstacio];

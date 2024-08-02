@@ -1,12 +1,11 @@
 import { useState, useRef } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real } from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
-
 import cssVariables from '../../styles/exports.module.scss';
 
 const valueToText = (value) => {
@@ -263,7 +262,7 @@ export const GrufPad = ({ playerIndex }) => {
     )
 }
 
-export const PadGrid = ({ top, left }) => {
+export const GrufPadGrid = ({ top, left }) => {
     return (
         <div className="pad-grid" style={{ top: top, left: left }}>
             {Array.from({ length: 16 }).map((_, index) => (
@@ -297,5 +296,70 @@ export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1
             </div>
         </div>
     );
+};
+
+export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const numRows = parameterDescription.numRows;
+    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
+    const stepsElementsPerRow = []
+    for (let i = 0; i < numRows; i++) {
+        const stepsElements = []
+        for (let j = 0; j < numSteps; j++) {
+            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'filled' : '';
+            const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
+            stepsElements.push(
+            <div 
+                key={i + "_" + j} // To avoid React warning
+                className={'step ' + filledClass + ' ' + activeStep}
+                onMouseDown={(evt) => {
+                    let updatedParameterValue = [...parameterValue]
+                    const index = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j});
+                    if (index > -1){
+                        updatedParameterValue.splice(index, 1);
+                    } else {
+                        updatedParameterValue.push({'i': i, 'j': j})
+                    }
+                    estacio.updateParametreEstacio(parameterDescription.nom, updatedParameterValue)
+                }}>
+            </div>
+            )
+        }
+        stepsElementsPerRow.push(stepsElements)
+    }
+    
+    return (
+        <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
+            <div className="grid-default">
+                {stepsElementsPerRow.map(function(stepsElements, i){
+                    return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
+                })}
+            </div>
+            <div>
+            <button onMouseDown={(evt)=>
+                estacio.updateParametreEstacio(parameterDescription.nom, [])
+            }>Clear</button>
+            { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+            </div>
+            
+            {hasPatronsPredefinits(parameterDescription) &&
+                (
+                <div>
+                Patró:
+                <select 
+                    defaultValue={getNomPatroOCap(parameterDescription, parameterValue)}
+                    onChange={(evt) => estacio.updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))}
+                >              
+                    <option key="cap" value="Cap">Cap</option>
+                    {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
+                </select>
+                </div>
+                )
+
+            }
+        </div>
+    )
 };
 

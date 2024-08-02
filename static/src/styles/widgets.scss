@@ -63,7 +63,9 @@
         border: 1px solid $grey;
         border-radius: 9px;
         width: 50px;
+        height: 17px;
         cursor: pointer;
+        font-size: 12px;
     }
 
     .selected {
@@ -351,4 +353,9 @@
             right: 10px;
         }
     }
+}
+
+.gruf-on-off-grid {
+    position: absolute;
+    
 }

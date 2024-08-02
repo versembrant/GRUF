@@ -11,8 +11,8 @@ import '../styles/index.scss'
 // Estacions (per afegir noves estacions, s'ha d'importar la classe aquí i registrar-la amb "registerEstacioDisponible")
 import {registerEstacioDisponible} from './sessionManager'
 
-import {PolySynth} from './estacions/polySynth'
-registerEstacioDisponible(PolySynth);
+import {Synth} from './estacions/synth'
+registerEstacioDisponible(Synth);
 
 import {EstacioGrooveBox} from './estacions/estacioGrooveBox'
 registerEstacioDisponible(EstacioGrooveBox);

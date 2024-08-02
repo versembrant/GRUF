@@ -2,9 +2,10 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
 import { AudioTransportControlsComputer } from "../components/audioTransport";
+import { GrufButtonNoBorder } from "../components/widgets";
 
 
-export const Arranjament = ({setEstacioSelected}) => {
+export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
@@ -69,11 +70,10 @@ export const Arranjament = ({setEstacioSelected}) => {
         stepsElementsPerEstacio.push(stepsElements)
     }
 
-    return (
-        <div className="arranjament">
+    return (<div key="computer1" className="estacio estacio-computer">
+        <div className="estacio-main">
+            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <div>
-                <button className="btn btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
-                <h1>Computer</h1>
                 <AudioTransportControlsComputer/>
                 <br/>
                 <div className="grid-default">
@@ -87,5 +87,5 @@ export const Arranjament = ({setEstacioSelected}) => {
                 {JSON.stringify(getCurrentSession().getArranjamentClips())}
             </div>
         </div>
-    )
+    </div>)
 };
