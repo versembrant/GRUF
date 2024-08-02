@@ -63,7 +63,9 @@
         border: 1px solid $grey;
         border-radius: 9px;
         width: 50px;
+        height: 17px;
         cursor: pointer;
+        font-size: 12px;
     }
 
     .selected {
@@ -149,8 +151,71 @@
         background-color: $grey;
     }
     
-    .selected {
+    .selected { // S'utiliza per quan el pad s'apreta
         background-color: $dark-grey;
+    }
+
+    .pad-selected { // S'utilitza per quan el pad està se·leccionat i es modifiquen els seus paràmetres
+        background-color: $dark-grey;
+    }
+}
+
+.gruf-slider {
+    position: absolute;
+    font-size: 14px;
+    width: 200px; /* default width */
+
+    .p-slider {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+    .MuiSlider-thumb {
+        border-radius: 5px;
+        height: 27px;
+        width: 10px;
+        color: $white;
+
+        &:hover {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            animation: none;
+        }
+    }
+    .Mui-focusVisible {
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        animation: none;
+    }
+    .MuiSlider-mark {
+        color: $grey;
+        height: 0px;
+    }
+    .MuiSlider-root {
+        border-radius: 5px;
+        
+    }
+    .MuiSlider-track {
+        color: $grey;
+        height: 8px;
+    }
+    
+    .MuiSlider-rail {
+        color: $grey;
+        height: 10px;
+        border-radius: 5px;
+        opacity: 0.5;
+    }
+
+    .marques-slider{
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        color: $font-color;
     }
 }
 
@@ -169,6 +234,7 @@
         text-align: center;
         padding-top: 3px;
     }
+   
     .MuiSlider-thumb {
         border-radius: 5px;
         height: 18px; /* reduced size by 1/3 */
@@ -181,18 +247,26 @@
             animation: none;
         }
     }
+   
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+    
     .Mui-focusVisible {
         -webkit-box-shadow: none!important;
         box-shadow: none!important;
         animation: none;
     }
+    
     .MuiSlider-mark {
         color: $grey;
         width: 0px;
     }
+    
     .MuiSlider-root {
         border-radius: 5px;
     }
+
     .MuiSlider-track {
         color: $grey;
         width: 5.33px; /* reduced size by 1/3 */
@@ -351,4 +425,9 @@
             right: 10px;
         }
     }
+}
+
+.gruf-on-off-grid {
+    position: absolute;
+    
 }

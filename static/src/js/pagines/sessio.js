@@ -24,6 +24,8 @@ const onSessionDataLoaded = () => {
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
     }
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
+    getCurrentSession().liveSetMutesEstacions(currentSession.rawData.live.mutesEstacions);
+    getCurrentSession().liveSetSolosEstacions(currentSession.rawData.live.solosEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
     if (getAudioGraphInstance().graphIsBuilt()) {
         // Si el graph ja està construït, vol dir que estem rebent info nova d'una sessió que
