@@ -55,6 +55,7 @@
     grid-template-columns: 1fr 1fr;
     column-gap: 10px;
     grid-gap: 5px;
+    font-size: 10px;
 
     button {
         color: $font-color;
@@ -217,7 +218,9 @@
 .gruf-slider-vertical {
     position: absolute;
     font-size: 14px;
-    width: 24%;
+    height: 80px; 
+    display: flex;
+    justify-content: center;
 
     .p-slider {
         cursor: pointer;
@@ -228,9 +231,10 @@
         padding-top: 3px;
     }
     .MuiSlider-thumb {
-        border-radius: 10%;
-        height: 27px;
-        width: 5px;
+        border-radius: 5px;
+        height: 18px; /* reduced size by 1/3 */
+        width: 6.67px; /* reduced size by 1/3 */
+        color: $white;
 
         &:hover {
             -webkit-box-shadow: none;
@@ -238,29 +242,34 @@
             animation: none;
         }
     }
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
     .Mui-focusVisible {
         -webkit-box-shadow: none!important;
         box-shadow: none!important;
         animation: none;
     }
+    .MuiSlider-mark {
+        color: $grey;
+        width: 0px;
+    }
     .MuiSlider-root {
         border-radius: 5px;
     }
-    .MuiSlider-mark {
-        height: 0px;
-        color: $white;
-    }
     .MuiSlider-track {
         color: $grey;
-        height: 8px;
-    }
-    .MuiSlider-rail {
-        height: 10px;
-        opacity: 0.5;
-        border-radius: 5px;
+        width: 5.33px; /* reduced size by 1/3 */
     }
 
-    .marques-slider{
+    .MuiSlider-rail {
+        color: $grey;
+        width: 6.67px; /* reduced size by 1/3 */
+        border-radius: 5px;
+        opacity: 0.5;
+    }
+
+    .marques-slider {
         font-family: "Montserrat", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
@@ -268,6 +277,7 @@
         color: $font-color;
     }
 }
+
 
 .bpm-counter {
     position: absolute;
