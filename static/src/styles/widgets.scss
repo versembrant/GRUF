@@ -230,6 +230,7 @@
         text-align: center;
         padding-top: 3px;
     }
+   
     .MuiSlider-thumb {
         border-radius: 5px;
         height: 18px; /* reduced size by 1/3 */
@@ -242,21 +243,26 @@
             animation: none;
         }
     }
+   
     .MuiSlider-dragging {
         background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
     }
+    
     .Mui-focusVisible {
         -webkit-box-shadow: none!important;
         box-shadow: none!important;
         animation: none;
     }
+    
     .MuiSlider-mark {
         color: $grey;
         width: 0px;
     }
+    
     .MuiSlider-root {
         border-radius: 5px;
     }
+
     .MuiSlider-track {
         color: $grey;
         width: 5.33px; /* reduced size by 1/3 */
