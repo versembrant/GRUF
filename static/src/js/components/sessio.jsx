@@ -2,9 +2,9 @@ import { useState, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { AudioTransportPlayStop } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
-import { AudioMixerEstacions } from "../components/audioMixerEstacions";
-import { Arranjament } from "../components/arranjament";
-import { EntradaMidi, EntradaMidiMinimal } from "../components/entradaMidi";
+import { EstacioMixerUI } from "../components/estacioMixer";
+import { EstacioComputerUI } from "../components/estacioComputer";
+import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 import { getURLParamValue, removeURLParam } from "../utils";
 
@@ -91,8 +91,8 @@ export const Sessio = () => {
                     </div>
                     <div className="estacions">
                         {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)} setEstacioSelected={setEstacioSelected}/>)}
-                        {estacioSelected == "mixer" ? <AudioMixerEstacions setEstacioSelected={setEstacioSelected} />: ""}
-                        {estacioSelected == "computer" ? <Arranjament setEstacioSelected={setEstacioSelected}/>: ""}
+                        {estacioSelected == "mixer" ? <EstacioMixerUI setEstacioSelected={setEstacioSelected} showLevelMeters={true} />: ""}
+                        {estacioSelected == "computer" ? <EstacioComputerUI setEstacioSelected={setEstacioSelected}/>: ""}
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>

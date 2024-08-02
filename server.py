@@ -101,7 +101,7 @@ class Session(object):
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
-            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'polySynth':
+            if estacio['tipus'] == 'drum machine' or estacio['tipus'] == 'synth':
                 for nom, valors_presets in estacio['parametres'].items():
                     if nom == 'pattern' or nom == 'notes':
                         nous_valors_presets = []
@@ -236,6 +236,12 @@ class Session(object):
         if update_data['accio'] == 'set_gains':
             for nom_estacio, valor in update_data['gains_estacions'].items():
                 self.data['live']['gainsEstacions'][nom_estacio] = valor
+        elif update_data['accio'] == 'set_mutes':
+            for nom_estacio, valor in update_data['mutes_estacions'].items():
+                self.data['live']['mutesEstacions'][nom_estacio] = valor
+        elif update_data['accio'] == 'set_solos':
+            for nom_estacio, valor in update_data['solos_estacions'].items():
+                self.data['live']['solosEstacions'][nom_estacio] = valor
         elif update_data['accio'] == 'set_presets':
             for nom_estacio, valor in update_data['presets_estacions'].items():
                 self.data['live']['presetsEstacions'][nom_estacio] = valor

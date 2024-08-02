@@ -2,6 +2,7 @@ import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
+import { clamp } from './utils';
 
 var audioContextIsReady = false;
 
@@ -13,12 +14,15 @@ export class AudioGraph {
     constructor() {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
         this.estacionsMasterChannelNodes = {};
+        this.estacionsMeterNodes = {};
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
         const defaultsForPropertiesInStore = {
             bpm: 120,
             masterGain: 1.0,
             gainsEstacions: {},
+            mutesEstacions: {},
+            solosEstacions: {},
             mainSequencerCurrentStep: -1,
             graphIsBuilt: false,
             isMasterAudioEngine: true,
@@ -104,6 +108,17 @@ export class AudioGraph {
         return this.estacionsMasterChannelNodes[nomEstacio]
     }
 
+    getCurrentLevelEstacio(nomEstacio) {
+        if (this.graphIsBuilt()) {
+            const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
+            const dBuLevel = dBFSLevel + 18;
+            const gainLevel = Tone.dbToGain(dBFSLevel)
+            return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
+        } else {
+            return {"db": -60, "gain": 0};
+        }
+    }
+
     //Creem uns efectes
     initEffects(){
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
@@ -174,16 +189,21 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            const estacioMeterNode = new Tone.Meter();
+            estacioMasterChannel.connect(estacioMeterNode);
             estacio.buildEstacioAudioGraph(estacioMasterChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
+            this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
         })
         
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
 
-        // Carrega els volumns dels channels de cada estació ara que els objectes ha estan creats
+        // Carrega els volumns, mute i solo dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+        getCurrentSession().liveSetMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
+        getCurrentSession().liveSetSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
 
         // Carrega els paràmetres dels efectes
         this.applyEffectParameters(this.getEffectParameters());
