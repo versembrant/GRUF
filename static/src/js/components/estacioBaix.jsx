@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll } from "./widgets";
 
 
 export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
@@ -35,6 +35,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="29%" left="89.5%" width="225px" />
             <GrufLabel text="Mix" top="40.3%" left="83%" />
             <GrufLabel text="Feedback" top="40.3%" left="87.3%" />
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="50%" left="5%" />
         </div>
     </div>)
 };
