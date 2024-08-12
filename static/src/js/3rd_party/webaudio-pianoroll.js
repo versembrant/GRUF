@@ -105,6 +105,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
     height: 100%;
     background-size:100% calc(100%*12/16);
     background-position:left bottom;
+    border-radius: 14px;
 }
 #wac-menu {
     display:none;
