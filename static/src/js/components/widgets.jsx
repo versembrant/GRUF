@@ -406,7 +406,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width=600, height=300 }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -484,13 +484,20 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width=600, he
         }
     }
 
+    const style = {top: top, left: left};
+    if (width !== undefined) { 
+        style.width = width;
+    }
+    if (height !== undefined) { 
+        style.height = height;
+    }
     return (
-        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
+        <div className="gruf-piano-roll" style={style}>
             <div style={{overflow:"scroll"}}>
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
-                    width={width}
-                    height={height}
+                    // width={width}
+                    // height={height}
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 24}
                     yoffset={getLowestNoteForYOffset()}
