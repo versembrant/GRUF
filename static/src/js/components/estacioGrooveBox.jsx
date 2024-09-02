@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabel, GrufLabelPetit, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit, GrufSliderVertical } from "./widgets";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
@@ -8,7 +8,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
-            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufButtonNoBorder text="Canvia estació" top="43px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGran estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
             <GrufKnobGran estacio={estacio} parameterName="swing1" top="8%" left="17.8%" label = 'Swing' />
             <GrufKnobGran estacio={estacio} parameterName="swing2" top="8%" left="29.0%" label = 'Tempo' />
@@ -63,7 +63,12 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="85%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing1" top="85%" left="93%" label = 'Swing' />
 
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="360px" left="180px" />
+            <GrufLabelPetitVertical text="OpHat" top="50.7%" left="13.6%" />
+            <GrufLabelPetitVertical text="CHat" top="63.3%" left="14%" />
+            <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
+            <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
+
+            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="48%" left="180px" />
 
             
                         
