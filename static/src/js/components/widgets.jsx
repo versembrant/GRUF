@@ -33,6 +33,14 @@ export const GrufLabelPetit = ({text, top, left}) => {
     )
 }
 
+export const GrufLabelPetitVertical = ({text, top, left}) => {
+    return (
+        <div className="gruf-label-petit transformed" style={{top: top, left: left}}>
+            {text}
+        </div>
+    )
+}
+
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
         <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
