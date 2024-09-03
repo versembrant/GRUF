@@ -73,6 +73,7 @@ export class EstacioSampler extends EstacioBase {
 
     playBufferSlice(player, buffer, startPoint, endPoint, time) {
         if (buffer && buffer.loaded) {
+            player.stop(0);
             const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
             player.buffer = buffer;
             player.loop = true;
@@ -174,15 +175,17 @@ export class EstacioSampler extends EstacioBase {
         const envelope = this.audioNodes.envelopes[playerIndex];
         
         if (buffer && envelope) {
-            envelope.triggerAttackRelease(end - start, time);
+            envelope.triggerAttack(time);
             this.playBufferSlice(player, buffer, start, end, time);
         }
     }
 
     stopSoundFromPlayer(playerIndex, time) {
         const player = this.audioNodes.players[playerIndex];
+        const envelope = this.audioNodes.envelopes[playerIndex];
         if (player) {
-            player.stop(time);
+            player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+            envelope.triggerRelease(time);
         }
     }
 
@@ -201,7 +204,7 @@ export class EstacioSampler extends EstacioBase {
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const playerIndex = 15 - note.n
                 this.playSoundFromPlayer(playerIndex, time);
-                this.stopSoundFromPlayer(playerIndex, time + note.d * Tone.Time("16n").toSeconds() + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+                this.stopSoundFromPlayer(playerIndex, time + note.d * Tone.Time("16n").toSeconds());
             }
         }
     }
