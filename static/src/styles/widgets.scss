@@ -242,6 +242,12 @@
     display: flex;
     justify-content: center;
 
+    &.gruf-slider-background-ratllat {
+        background-image: url("../img/slider_bg.svg");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
     .p-slider {
         cursor: pointer;
     }
@@ -249,6 +255,10 @@
     div {
         text-align: center;
         padding-top: 3px;
+    }
+
+    .MuiSlider-vertical {
+        margin-right: 0px!important;
     }
    
     .MuiSlider-thumb {
@@ -541,4 +551,34 @@
 
 .gruf-piano-roll {
     position: absolute;
+
+    @keyframes blink {
+        50% {
+            opacity: 0.0;
+        }
+    }
+      
+
+    .gruf-piano-roll-controls{
+        height: 30px;
+        overflow: hidden;
+        margin-top:8px;
+
+        button {
+            font-family: "Montserrat", sans-serif;
+            border: none;
+            background-color: transparent;
+            font-size: 14px;
+            font-weight: 400;
+            color: $white;
+            cursor: pointer;
+
+            &.recording {
+                color: $red;
+                animation: blink 1s steps(7, start) infinite;
+            }
+        }
+    }
+
+    
 }

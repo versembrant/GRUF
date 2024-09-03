@@ -25,10 +25,10 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label='Mid' /> 
                 <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label='High' />
 
-                <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="28.2%" width="225px" />
-                <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="33%" width="225px" />
-                <GrufLabel text="HPF" top="21.8%" left="28.2%" />
-                <GrufLabel text="LPF" top="21.8%" left="33%" />
+                <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="29%" height="126px" fons="linies" />
+                <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="33.8%" height="126px" fons="linies" />
+                <GrufLabel text="HPF" top="28.2%" left="29%" />
+                <GrufLabel text="LPF" top="28.2%" left="33.8%" />
                 
                 <GrufLabel text="Reverb" top="7.3%" left="52%" />
                 <GrufLabel text="Durada" top="12.7%" left="51.7%" />
