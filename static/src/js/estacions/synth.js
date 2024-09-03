@@ -9,7 +9,7 @@ export class Synth extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 36, permetScrollVertical: true},
         // Synth params
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
