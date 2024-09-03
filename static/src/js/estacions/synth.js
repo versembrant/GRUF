@@ -25,7 +25,7 @@ export class Synth extends EstacioBase {
         fxDelayOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/8', '1/16','1/8T', '1/16T'], initial: '1/8'},
+        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
         fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
