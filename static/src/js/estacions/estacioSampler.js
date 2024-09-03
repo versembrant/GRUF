@@ -9,7 +9,7 @@ export class EstacioSampler extends EstacioBase {
     tipus = 'sampler'
     versio = '0.1'
     parametersDescription = {
-        pattern: {type: 'grid', label:'Pattern', numRows: 16, initial:[], showRecButton: true, followsPreset: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 16, permetScrollVertical: false},
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
             [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: ''},
@@ -35,12 +35,12 @@ export class EstacioSampler extends EstacioBase {
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 1.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
@@ -75,6 +75,9 @@ export class EstacioSampler extends EstacioBase {
         if (buffer && buffer.loaded) {
             const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
             player.buffer = buffer;
+            player.loop = true;
+            player.loopStart = start;
+            player.loopEnd = end;
             player.start(time, start, end - start);
         }
     }
@@ -165,8 +168,8 @@ export class EstacioSampler extends EstacioBase {
 
     playSoundFromPlayer(playerIndex, time) {
         const buffer = this.audioBuffers[playerIndex];
-        const start = this[`start${playerIndex + 1}`];
-        const end = this[`end${playerIndex + 1}`];
+        const start = this.getParameterValue(`start${playerIndex + 1}`, this.currentPreset);
+        const end = this.getParameterValue(`end${playerIndex + 1}`, this.currentPreset);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
         
@@ -184,16 +187,25 @@ export class EstacioSampler extends EstacioBase {
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
-        const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps());
-        const pattern = this.getParameterValue('pattern', this.currentPreset);
-
-        for (let i = 0; i < 16; i++) {
-            const shouldPlaySound = indexOfArrayMatchingObject(pattern, {'i': i, 'j': currentStep}) > -1;
-            if (shouldPlaySound) {
-                this.playSoundFromPlayer(i, time);
+        // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
+        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+        const notes = this.getParameterValue('notes', this.currentPreset);
+        for (let i = 0; i < notes.length; i++) {
+            const minBeat = currentStep;
+            const maxBeat = currentStep + 1;
+            const note = notes[i];
+            // note will be an object with properties
+            // b = beat (or step in which the note has to be played)
+            // n = midi note number
+            // d = duration of the note in beats (or steps)
+            if ((note.b >= minBeat) && (note.b < maxBeat)) {
+                const playerIndex = 15 - note.n
+                this.playSoundFromPlayer(playerIndex, time);
+                this.stopSoundFromPlayer(playerIndex, time + note.d * Tone.Time("16n").toSeconds() + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
             }
         }
     }
+
     onMidiNote (midiNoteNumber, midiVelocity, noteOff) {
         const playerIndex = midiNoteNumber % 16;
 
