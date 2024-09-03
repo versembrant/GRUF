@@ -406,7 +406,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width=600, height=300 }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height, colorNotes }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -484,26 +484,40 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width=600, he
         }
     }
 
+    // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
             <div style={{overflow:"scroll"}}>
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
-                    width={width}
-                    height={height}
+                    width={width ? width.replace('px', ''): 500}
+                    height={width ? height.replace('px', ''): 200}
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 24}
                     yoffset={getLowestNoteForYOffset()}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
+                    //cursoroffset={2500}  // make it dissapear
                     yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    colnote={colorNotes || "#f22"}
+                    colnotesel={colorNotes || "#f22"}
+                    collt={"rgb(200, 200, 200)"}
+                    coldk={"rgb(176, 176, 176)"}
+                    colgrid={"#999"}
+                    colnoteborder={colorNotes || "#f22"}
+                    colrulerbg={"#969697"}
+                    colrulerfg={"#fff"}
+                    colrulerborder={"#969697"}
+                    kbwidth={65}
                 ></webaudio-pianoroll>
             </div>
+            <div style={{display:"none"}}>
             <button onMouseDown={(evt)=>
                 estacio.updateParametreEstacio(parameterDescription.nom, [])
             }>Clear</button>
             { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+            </div>
         </div>
     )
 };
