@@ -131,10 +131,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 0px 15px;
-    width: 50%;
-    height: 50%;
-    transform: translate(-50%, -50%);
+    gap: 0px 10px;
 }
 
 .gruf-pad {
@@ -148,15 +145,32 @@
         width: 100%;
         height: 80%;
         border-radius: 10px;
-        background-color: $grey;
-    }
-    
-    .selected { // S'utiliza per quan el pad s'apreta
         background-color: $dark-grey;
     }
 
+    .p-button-label {
+        font-size: 12px;
+        color: $font-color;
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+    }
+    
+    .selected { // S'utiliza per quan el pad s'apreta
+        background-color: $grey;
+
+        .p-button-label {
+            color: $white;
+        }
+    }
+
     .pad-selected { // S'utilitza per quan el pad està se·leccionat i es modifiquen els seus paràmetres
-        background-color: $dark-grey;
+        background-color: $grey;
+
+        .p-button-label {
+            color: $white;
+        }
     }
 }
 

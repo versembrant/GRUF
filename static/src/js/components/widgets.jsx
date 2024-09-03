@@ -271,7 +271,7 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ estacio, playerIndex, onClick, isSelected }) => {
+export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) => {
     const [isClicked, setIsClicked] = useState(false);
     const [isHeld, setIsHeld] = useState(false);
     const holdTimer = useRef(null);
@@ -311,14 +311,15 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected }) => {
                 className={ (isClicked ? 'selected': '') + ' ' + (isSelected ? 'pad-selected': '') } 
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
+                label={label}
             />
         </div>
     )
 }
 
-export const GrufPadGrid = ({ estacio, top, left, onPadClick, currentSelectedPad }) => {
+export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px", onPadClick, currentSelectedPad }) => {
     return (
-        <div className="pad-grid" style={{ top: top, left: left }}>
+        <div className="pad-grid" style={{ top: top, left: left, width: width, height:height }}>
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
@@ -326,6 +327,7 @@ export const GrufPadGrid = ({ estacio, top, left, onPadClick, currentSelectedPad
                     onClick={onPadClick}
                     estacio={estacio}
                     isSelected={currentSelectedPad===index}
+                    label={index + 1}
                 />
             ))}
         </div>
