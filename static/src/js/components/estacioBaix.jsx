@@ -35,7 +35,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="29%" left="89.5%" width="225px" />
             <GrufLabel text="Mix" top="40.3%" left="83%" />
             <GrufLabel text="Feedback" top="40.3%" left="87.3%" />
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="50%" left="5%" />
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="350px" colorNotes="#d98adc"/>
         </div>
     </div>)
 };

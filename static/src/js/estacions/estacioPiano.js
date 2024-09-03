@@ -9,7 +9,7 @@ export class EstacioPiano extends EstacioBase {
     tipus = 'piano'
     versio = '0.1'
     parametersDescription = {
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 36, permetScrollVertical: true},
         timbre: {type: 'float', label: 'Timbre', min: 1200, max: 12000, initial: 12000, logarithmic: true},
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.5},
