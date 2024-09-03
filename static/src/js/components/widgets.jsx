@@ -173,20 +173,23 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
+export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft, labelRight}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
-    const marks = [
-        {
+    const marks = []
+    if (labelLeft !== undefined) {
+        marks.push({
             value: 0,
-            label: <div className="marques-slider">soft</div>
-        },
-        {
+            label: labelLeft
+        });
+    }
+    if (labelRight !== undefined) {
+        marks.push({
             value: 1,
-            label: <div className="marques-slider">hard</div>
-        },
-    ];
+            label: labelRight
+        });
+    }
     const style = {top: top, left: left};
     if (width !== undefined) { 
         style.width = width;
