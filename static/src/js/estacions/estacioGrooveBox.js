@@ -56,7 +56,7 @@ export class EstacioGrooveBox extends EstacioBase {
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.5},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},

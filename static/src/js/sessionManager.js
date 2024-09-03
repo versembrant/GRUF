@@ -210,6 +210,12 @@ export class EstacioBase {
             this.audioNodes.effects['delay'].set({'delayTime': this.getDelayTimeValue(value)});
         } else if (name == "fxDelayFeedback"){
             this.audioNodes.effects['delay'].set({'feedback': value});
+        } else if (name == "fxDelayOnOff"){
+            if (value) {
+                this.audioNodes.effects['delay'].set({'wet': this.getParameterValue("fxDelayWet", preset)});            
+            } else {
+                this.audioNodes.effects['delay'].set({'wet': 0});
+            }
         } else if (name == "fxDrive"){
             this.audioNodes.effects['drive'].set({'wet': 1.0});
             this.audioNodes.effects['drive'].set({'distortion': value});

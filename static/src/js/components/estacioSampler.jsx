@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, GrufPadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
+import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, GrufPadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -57,6 +57,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobGran estacio={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
 
                 <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
+                <GrufPianoRoll estacio={estacio} parameterName="notes" top="328px" left="405px" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
             </div>
 
         </div>
