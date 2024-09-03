@@ -36,8 +36,6 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufLabelPetit text="Mix" top="39.5%" left="84.2%" />
                 <GrufLabelPetit text="Feedback" top="39.5%" left="88.0%" />
 
-                <GrufPadGrid estacio={estacio} top="71%" left="69%" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
-
                 <GrufKnobGran estacio={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
                 <GrufKnobGran estacio={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
                 <GrufKnobGranDiscret estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
@@ -52,6 +50,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
                 <GrufSliderVertical estacio={estacio} parameterName="hpf" top="12.5%" left="28.6%" width="225px" label='HPF' /> 
                 <GrufSliderVertical estacio={estacio} parameterName="lpf" top="12.5%" left="33.9%" width="225px" label='LPF' /> 
+
+                <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
             </div>
 
         </div>
