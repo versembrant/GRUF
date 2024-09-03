@@ -33,6 +33,14 @@ export const GrufLabelPetit = ({text, top, left}) => {
     )
 }
 
+export const GrufLabelPetitVertical = ({text, top, left}) => {
+    return (
+        <div className="gruf-label-petit transformed" style={{top: top, left: left}}>
+            {text}
+        </div>
+    )
+}
+
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
         <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
@@ -197,20 +205,23 @@ export const GrufSlider = ({estacio, parameterName, top, left, width}) => {
     )
 };
 
-export const GrufSliderVertical = ({ estacio, parameterName, top, left, height }) => {
+export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, labelBottom, labelTop }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
-    const marks = [
-        {
+    const marks = []
+    if (labelBottom !== undefined) {
+        marks.push({
             value: 0,
-            label: <div className="marques-slider">soft</div>
-        },
-        {
+            label: labelBottom
+        });
+    }
+    if (labelTop !== undefined) {
+        marks.push({
             value: 1,
-            label: <div className="marques-slider">hard</div>
-        },
-    ];
+            label: labelTop
+        });
+    }
     const style = { top: top, left: left };
     if (height !== undefined) {
         style.height = height;
@@ -223,7 +234,7 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height }
                 step={0.01}
                 min={0.0}
                 max={1.0}
-                /* marks={marks} */
+                marks={marks} 
                 onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))}
             />
         </div>
@@ -318,7 +329,7 @@ export const GrufPadGrid = ({ estacio, top, left, onPadClick, currentSelectedPad
     );
 };
 
-export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0 }) => {
+export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
     // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const parameterValueOnOff = parameterValue === valueOn;
@@ -337,6 +348,8 @@ export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1
             >
                 <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
             </div>
+            <div className="select-button-label select-button-label-on">{labelOn}</div>
+            <div className="select-button-label select-button-label-off">{labelOff}</div>
         </div>
     );
 };
@@ -351,7 +364,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     for (let i = 0; i < numRows; i++) {
         const stepsElements = []
         for (let j = 0; j < numSteps; j++) {
-            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'filled' : '';
+            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'selected' : '';
             const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
             stepsElements.push(
             <div 
@@ -380,28 +393,26 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
-            <div>
-            <button onMouseDown={(evt)=>
-                estacio.updateParametreEstacio(parameterDescription.nom, [])
-            }>Clear</button>
-            { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+            <div style={{display:"none"}}>
+                <button onMouseDown={(evt)=>
+                    estacio.updateParametreEstacio(parameterDescription.nom, [])
+                }>Clear</button>
+                { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+                {hasPatronsPredefinits(parameterDescription) &&
+                    (
+                    <div>
+                    Patró:
+                    <select 
+                        defaultValue={getNomPatroOCap(parameterDescription, parameterValue)}
+                        onChange={(evt) => estacio.updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))}
+                    >              
+                        <option key="cap" value="Cap">Cap</option>
+                        {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
+                    </select>
+                    </div>
+                    )
+                }
             </div>
-            
-            {hasPatronsPredefinits(parameterDescription) &&
-                (
-                <div>
-                Patró:
-                <select 
-                    defaultValue={getNomPatroOCap(parameterDescription, parameterValue)}
-                    onChange={(evt) => estacio.updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))}
-                >              
-                    <option key="cap" value="Cap">Cap</option>
-                    {parameterDescription.patronsPredefinits.map(patro => <option key={patro.nom} value={patro.nom}>{patro.nom}</option>)}
-                </select>
-                </div>
-                )
-
-            }
         </div>
     )
 };
