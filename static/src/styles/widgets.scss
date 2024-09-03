@@ -5,7 +5,7 @@
 
 .gruf-label-petit {
     position: absolute;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .transformed {
@@ -53,22 +53,20 @@
 
 .gruf-enum-2-columns {
     position: absolute;
-
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 10px;
-    grid-gap: 5px;
+    column-gap: 8px;
+    grid-gap: 4px;
     font-size: 10px;
 
     button {
         color: $font-color;
         background-color: $black;
         border: 1px solid $grey;
-        border-radius: 9px;
+        border-radius: 6px;
         width: 50px;
         height: 17px;
         cursor: pointer;
-        font-size: 12px;
     }
 
     .selected {
@@ -79,9 +77,8 @@
 
 .gruf-reverb-time {
     position: absolute;
-
     display: grid;
-    grid-template-columns: 40px 170px;
+    grid-template-columns: 40px 200px;
     column-gap: 10px;
     grid-gap: 3px;
     font-size: 12px;
@@ -239,9 +236,9 @@
     }
    
     .MuiSlider-thumb {
-        border-radius: 5px;
-        height: 18px; /* reduced size by 1/3 */
-        width: 6.67px; /* reduced size by 1/3 */
+        border-radius: 2px;
+        height: 5px; 
+        width: 16px;
         color: $white;
 
         &:hover {
@@ -265,6 +262,16 @@
         color: $grey;
         width: 0px;
     }
+
+    .MuiSlider-markLabel {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        color: $font-color;
+        font-size: 10px;
+        margin-left: -10px;
+    }
     
     .MuiSlider-root {
         border-radius: 5px;
@@ -272,22 +279,14 @@
 
     .MuiSlider-track {
         color: $grey;
-        width: 5.33px; /* reduced size by 1/3 */
+        width: 1px;
     }
 
     .MuiSlider-rail {
         color: $grey;
-        width: 6.67px; /* reduced size by 1/3 */
+        width: 5px; /* reduced size by 1/3 */
         border-radius: 5px;
         opacity: 0.5;
-    }
-
-    .marques-slider {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        color: $font-color;
     }
 }
 
@@ -394,12 +393,11 @@
     border: 1px solid $grey;
     background-color: $background-color;
     border-radius: 12px;
-    overflow: hidden;
 
     .p-selectbutton {
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 120%;
+        height: 120%;
         border: none;
         display: flex;
         justify-content: center;
@@ -427,6 +425,22 @@
             left: auto;
             right: 10px;
         }
+    }
+
+    .select-button-label {
+        font-size: 12px;
+    }
+
+    .select-button-label-on{
+        position: absolute;
+        top: 35px;
+        left: 3px;
+    }
+
+    .select-button-label-off{
+        position: absolute;
+        top: 35px;
+        right: 3px;
     }
 }
 
