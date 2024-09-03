@@ -281,31 +281,39 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     const holdTimer = useRef(null);
     const nomEstacio = estacio.nom;
 
-    const handleMouseDown = () => {
+    const handleMouseDown = (evt) => {
         setIsClicked(true);
-        holdTimer.current = setTimeout(() => {
-            setIsHeld(true);
-        }, 500); 
+        playSample(playerIndex);
+        setIsHeld(true);  // He canviar el comportament de "is held" perquè sempre soni la nota quan es toca el pad. Però com que només sona mentre el pad s'aguanta, no passa res si es clicka rapid per triar un pad
     };
 
-    const handleMouseUp = () => {
-        clearTimeout(holdTimer.current);
-        setIsClicked(false);
+    const handleMouseUp = (evt) => {
         if (isHeld) {
+            clearTimeout(holdTimer.current);
+            setIsClicked(false);
             setIsHeld(false);
-        } else {
-            playSample(playerIndex);
+            stopSample(playerIndex);
             onClick(playerIndex);
         }
     };
 
-    const playSample = () => {
+    const playSample = (playerIndex) => {
         if (!getAudioGraphInstance().graphIsBuilt()){
             return;
         }
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(0, Tone.now());
+            estacio.playSoundFromPlayer(playerIndex, Tone.now());
+        }
+    }; 
+
+    const stopSample = (playerIndex) => {
+        if (!getAudioGraphInstance().graphIsBuilt()){
+            return;
+        }
+        const estacio = getCurrentSession().getEstacio(nomEstacio);
+        if (estacio && estacio.playSoundFromPlayer) {
+            estacio.stopSoundFromPlayer(playerIndex, Tone.now());
         }
     }; 
 
@@ -315,6 +323,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
                 className={ (isClicked ? 'selected': '') + ' ' + (isSelected ? 'pad-selected': '') } 
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
+                onMouseOut={handleMouseUp}
                 label={label}
             />
         </div>
