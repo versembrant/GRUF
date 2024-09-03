@@ -426,7 +426,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height, colorNotes }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", colorNotes }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -517,14 +517,15 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height
         }
     }
 
+
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
             <div style={{overflow:"scroll"}}>
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
-                    width={width ? width.replace('px', ''): 500}
-                    height={width ? height.replace('px', '') - 30: 200}
+                    width={width.replace('px', '')}
+                    height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 24}
                     yoffset={getLowestNoteForYOffset()}
@@ -549,8 +550,23 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
                 { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
                 { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
+                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 22} left={width.replace('px', '') - 100} height="23px"/>
             </div>
         </div>
     )
 };
+
+export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    return (
+        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, "line-height":height}}>
+            {[...Array(estacio.numPresets).keys()].map(i => 
+            <div key={"preset_" + i}
+                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
+                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
+                    {i + 1}
+            </div>
+            )}
+        </div>
+    )
+}
 

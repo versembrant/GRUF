@@ -47,7 +47,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                     // TODO: increase preset by 1 (and cycle presets if needed)
                     const estacio = getCurrentSession().getEstacio(nomsEstacions[i]);
                     let nextPreset = preset + 1;
-                    if (nextPreset > estacio.numPresets) {
+                    if (nextPreset >= estacio.numPresets) {
                         nextPreset = -1;
                     }
                     if (nextPreset > -1){
@@ -63,7 +63,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                     }
 
                 }}>
-            {preset > -1 ? preset : ''}
+            {preset > -1 ? preset + 1 : ''}
             </div>
             )
         }

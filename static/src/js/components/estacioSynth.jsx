@@ -40,7 +40,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="350px" colorNotes="#d43b5d"/>
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d"/>
         </div>
     </div>)
 };
