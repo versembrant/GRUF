@@ -43,7 +43,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="360px" colorNotes="#d98adc"/>
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d98adc"/>
         </div>
     </div>)
 };

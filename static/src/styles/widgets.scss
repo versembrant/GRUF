@@ -579,6 +579,34 @@
             }
         }
     }
+   
+}
 
-    
+.gruf-selector-presets {
+    position: absolute;
+    display: flex;
+
+    div {
+        font-family: "Montserrat", sans-serif;
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: 400;
+        border: 1px solid $dark-grey;
+        border-radius: 4px;
+        height: 100%;
+        width: 20px;
+        text-align: center;
+        vertical-align: middle;
+        margin-right: 4px;
+        cursor: hand;
+
+        &.selected {
+            background-color: $grey;
+            color: $white;
+        }
+
+        &.active {
+            border-color: $white;
+        }
+    }
 }

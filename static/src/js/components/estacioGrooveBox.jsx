@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit, GrufSliderVertical } from "./widgets";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
@@ -72,7 +72,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px" />            
+            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
+            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />            
         </div>
     </div>)
 };
