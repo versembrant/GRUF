@@ -15,7 +15,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="fxLow" top="12%" left="5.8%" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="12%" left="15.5%" />
             <GrufKnobGran estacio={estacio} parameterName="fxHigh" top="12%" left="25%" />
-            <GrufLabel text="Reverb" top="7.3%" left="37%" />
+            <GrufLabel text="Reverb" top="7.4%" left="37%" />
             <GrufLabel text="Durada" top="12.5%" left="36.7%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="16.2%" left="36.7%" />
             <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="56.2%" label="Send" />

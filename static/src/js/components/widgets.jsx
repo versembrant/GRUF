@@ -208,7 +208,7 @@ export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft,
     )
 };
 
-export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, labelBottom, labelTop }) => {
+export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, labelBottom, labelTop, fons }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -229,8 +229,12 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
     if (height !== undefined) {
         style.height = height;
     }
+    let classeFons = "";
+    if (fons === "linies") {
+        classeFons = "gruf-slider-background-ratllat";
+    }
     return (
-        <div className="gruf-slider-vertical" style={style}>
+        <div className={"gruf-slider-vertical " + classeFons} style={style}>
             <Slider
                 orientation="vertical"
                 value={real2Norm(parameterValue, parameterDescription)}
@@ -500,6 +504,19 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height
         }
     }
 
+    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+
+    const toggleRecording = (button) => {
+        const recordingInputElement = document.getElementById(recordingElementId);
+        if (recordingInputElement.checked) {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
+        } else {
+            recordingInputElement.checked = true;
+            button.classList.add('recording');
+        }
+    }
+
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
@@ -507,7 +524,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height
                 <webaudio-pianoroll
                     id={uniqueId + "_id"}
                     width={width ? width.replace('px', ''): 500}
-                    height={width ? height.replace('px', ''): 200}
+                    height={width ? height.replace('px', '') - 30: 200}
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 24}
                     yoffset={getLowestNoteForYOffset()}
@@ -528,11 +545,10 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width, height
                     kbwidth={65}
                 ></webaudio-pianoroll>
             </div>
-            <div style={{display:"none"}}>
-            <button onMouseDown={(evt)=>
-                estacio.updateParametreEstacio(parameterDescription.nom, [])
-            }>Clear</button>
-            { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+            <div className="gruf-piano-roll-controls">
+                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+                { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
+                { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
             </div>
         </div>
     )

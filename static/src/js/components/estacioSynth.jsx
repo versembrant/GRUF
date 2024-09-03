@@ -26,8 +26,8 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="35%" left="60.9%" />
             
-            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%" width="225px" />
-            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%" width="225px" />
+            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%"  fons="linies" />
+            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%"  fons="linies" />
             <GrufLabel text="HPF" top="21.8%" left="38.2%" />
             <GrufLabel text="LPF" top="21.8%" left="43%" />
 

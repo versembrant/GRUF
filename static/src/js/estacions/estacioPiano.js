@@ -18,7 +18,7 @@ export class EstacioPiano extends EstacioBase {
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: false},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},

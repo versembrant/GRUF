@@ -16,7 +16,9 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="sustain" top="35%" left="14.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="release" top="35%" left="19.8%" />
             <GrufLabel text="EQ" top="29.3%" left="52%" />
-            <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
+            
+            <GrufKnobGran estacio={estacio} parameterName="portamento" top="10%" left="28%" />
+            <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="27%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
             <GrufLabel text="Durada" top="12.7%" left="51.7%" />
@@ -27,8 +29,8 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="35%" left="60.9%" />
             
-            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%" width="225px" />
-            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%" width="225px" />
+            <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%"  fons="linies" />
+            <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%"  fons="linies" />
             <GrufLabel text="HPF" top="21.8%" left="38.2%" />
             <GrufLabel text="LPF" top="21.8%" left="43%" />
 
@@ -41,7 +43,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="350px" colorNotes="#d98adc"/>
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="360px" colorNotes="#d98adc"/>
         </div>
     </div>)
 };
