@@ -20,21 +20,29 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
             <div className="estacio-main">
                 <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
                 <GrufLabel text="EQ" top="29.6%" left="51.7%" />
+                
                 <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label='Low' />
                 <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label='Mid' /> 
                 <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label='High' />
-                <GrufLabel text="Reverb" top="7.3%" left="51.7%" />
-                <GrufKnobPetit estacio={estacio} parameterName="fxReverbWet" top="6.6%" left="72.8%" label='Send' />
-                <GrufLabel text="Durada" top="12.3%" left="51.7%" />
-                <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="15.0%" left="51.7%" />
+
+                <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="28.2%" width="225px" />
+                <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="33%" width="225px" />
+                <GrufLabel text="HPF" top="21.8%" left="28.2%" />
+                <GrufLabel text="LPF" top="21.8%" left="33%" />
+                
+                <GrufLabel text="Reverb" top="7.3%" left="52%" />
+                <GrufLabel text="Durada" top="12.7%" left="51.7%" />
+                <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
+                <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
+                
+                <GrufLabel text="Delay" top="14%" left="82.3%" />
+                <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
                 <GrufLabel text="Durada" top="29.6%" left="70.3%" />
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-                <GrufLabel text="Delay" top="14.1%" left="82.5%" />
-                <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19.5%" left="81.8%" />
-                <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="26.5%" left="83.6%" width="225px" /> 
-                <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="26.5%" left="88.9%" width="225px" /> 
-                <GrufLabelPetit text="Mix" top="39.5%" left="84.2%" />
-                <GrufLabelPetit text="Feedback" top="39.5%" left="88.0%" />
+                <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 
+                <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelBottom="0%" labelTop="100%" /> 
+                <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
+                <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
 
                 <GrufKnobGran estacio={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
                 <GrufKnobGran estacio={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
@@ -45,11 +53,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobPetit estacio={estacio} parameterName={`sustain${selectedPad + 1}`} top="24%" left="15%" label='Sustain' />
                 <GrufKnobPetit estacio={estacio} parameterName={`release${selectedPad + 1}`} top="24%" left="20%" label='Release' />
 
-                <GrufKnobGran estacio={estacio} parameterName={`start${selectedPad + 1}`} top="8%" left="41.3%" label='Start' />
+                <GrufKnobGran estacio={estacio} parameterName={`start${selectedPad + 1}`} top="7.3%" left="41.3%" label='Start' />
                 <GrufKnobGran estacio={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
-
-                <GrufSliderVertical estacio={estacio} parameterName="hpf" top="12.5%" left="28.6%" width="225px" label='HPF' /> 
-                <GrufSliderVertical estacio={estacio} parameterName="lpf" top="12.5%" left="33.9%" width="225px" label='LPF' /> 
 
                 <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
             </div>
