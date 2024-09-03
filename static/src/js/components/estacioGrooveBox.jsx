@@ -16,9 +16,9 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="bpm" top="17.3%" left="41%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="51.7%" />
-            <GrufLabel text="Durada" top="12.3%" left="51.7%" />
+            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnobPetit estacio={estacio} parameterName="fxReverbWet" top="6.6%" left="72.8%" label = 'Send' />
+            <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
             
             <GrufLabel text="Delay" top="14.1%" left="82.5%" />
             <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="135px" left="818px" />

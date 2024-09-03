@@ -18,9 +18,9 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
-            <GrufLabel text="Durada" top="12.3%" left="51.7%" />
+            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnobPetit estacio={estacio} parameterName="fxReverbWet" top="6.6%" left="72.8%" label = 'Send' />
+            <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
             
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
