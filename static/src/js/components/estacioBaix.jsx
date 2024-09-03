@@ -33,10 +33,9 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="LPF" top="21.8%" left="43%" />
 
             <GrufLabel text="Delay" top="14%" left="82.3%" />
-            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="20%" left="81.7%" valueOn={0.5} valueOff={0.0} />
+            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
             <GrufLabel text="Durada" top="29.6%" left="70.3%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-            
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelBottom="0%" labelTop="100%" /> 
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
