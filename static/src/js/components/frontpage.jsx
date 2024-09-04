@@ -4,7 +4,7 @@ export const Navbar = () => {
     return  <div className="navbar">
                 <ul>
                     <li><a href={appPrefix + "/"}>Versembrant</a></li>
-                    <li><a href={appPrefix + "/"}>Turorials</a></li>
+                    <li><a href={appPrefix + "/"}>Tutorials</a></li>
                 </ul>
             </div>}
 
