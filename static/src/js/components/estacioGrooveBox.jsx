@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical } from "./widgets";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
@@ -10,8 +10,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="43px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGran estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
-            <GrufKnobGran estacio={estacio} parameterName="swing1" top="8%" left="17.8%" label = 'Swing' />
-            <GrufKnobGran estacio={estacio} parameterName="swing2" top="8%" left="29.0%" label = 'Tempo' />
+            <GrufKnobGranGlobal estacio={estacio} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
+            <GrufKnobGranGlobal estacio={estacio} parameterName="bpm" top="8%" left="29.0%" label = 'Tempo' />
             <GrufBpmCounter estacio={estacio} top="8%" left="39.6%" />
             <GrufLabel text="bpm" top="17.3%" left="41%" />
             

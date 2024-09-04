@@ -157,6 +157,44 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     );
 };
 
+export const GrufKnobGranGlobal = ({ parameterName, top, left, label }) => {
+    const [parameterValue, setParameterValue] = useState(0); 
+
+    useEffect(() => {
+        if (parameterName === 'swing') {
+            setParameterValue(getAudioGraphInstance().getSwing());
+        } else if (parameterName === 'bpm') {
+            setParameterValue(getAudioGraphInstance().getBpm());
+        }
+    }, [parameterName]);
+
+    const handleKnobChange = (value) => {
+        setParameterValue(value);
+        if (parameterName === 'swing') {
+            getAudioGraphInstance().updateParametreAudioGraph('swing', value);
+        } else if (parameterName === 'bpm') {
+            getAudioGraphInstance().updateParametreAudioGraph('bpm', value);
+        }
+    };
+
+    return (
+        <div className="gruf-knob-gran" style={{ top: top, left: left }}>
+            <Knob
+                value={parameterValue}
+                min={parameterName === 'bpm' ? 40 : 0} 
+                max={parameterName === 'bpm' ? 300 : 1}
+                step={parameterName === 'bpm' ? 1 : 0.01}
+                size={60}
+                onChange={(e) => handleKnobChange(e.value)}
+                valueTemplate={""}
+                valueColor={cssVariables.white}
+                rangeColor={cssVariables.grey}            
+                />
+            <div>{label || parameterName}</div>
+        </div>
+    );
+};
+
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
