@@ -4,6 +4,28 @@ import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
 import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 import { EstacioSamplerUI } from "../components/estacioSampler";
 
+
+const getInitialSoundUrl = (numSound) => {
+    if (numSound < 8) {
+        return 'https://cdn.freesound.org/previews/320/320068_313780-hq.mp3'  // Japanese music
+    } else {
+        return 'https://cdn.freesound.org/previews/262/262495_2331961-hq.mp3' // Dark pad 
+    }
+}
+
+const getInitialStartValue = (numSound) => {
+    const totalSlices = 8;
+    const sliceNum = numSound % totalSlices;
+    return sliceNum * 1/totalSlices;
+}
+
+const getInitialEndValue = (numSound) => {
+    const totalSlices = 8;
+    const sliceNum = numSound % totalSlices;
+    return (sliceNum + 1) * 1/totalSlices;
+}
+
+
 export class EstacioSampler extends EstacioBase {
     
     tipus = 'sampler'
@@ -12,9 +34,9 @@ export class EstacioSampler extends EstacioBase {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 16, permetScrollVertical: false},
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
-            [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: ''},
-            [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: 0},
-            [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: 1},
+            [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl(i)},
+            [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
+            [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
             [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, min: 0, max: 10, initial: 0.01},
             [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, min: 0, max: 10, initial: 0.1},
             [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 0.5},
