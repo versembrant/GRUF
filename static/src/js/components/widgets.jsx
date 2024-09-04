@@ -136,7 +136,7 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     const currentOptionIndex = options.indexOf(parameterValue);
 
     return (
-        <div className="gruf-knob-gran" style={{ top, left }}>
+        <div className="gruf-knob-petit" style={{ top, left }}>
             <Knob
                 value={currentOptionIndex}
                 min={0}
