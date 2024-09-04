@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufLabelPetit, GrufSliderVertical } from "./widgets";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
@@ -36,34 +36,34 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
            
             <GrufKnobPetit estacio={estacio} parameterName="volume4" top="48.5%" left="5%" label = 'Vol' />
-            <GrufKnobPetit estacio={estacio} parameterName="tone4" top="48.5%" left="9%" label = 'Tone' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="tone4" top="48.5%" left="9%" label = 'Tone' />
 
             <GrufKnobPetit estacio={estacio} parameterName="volume3" top="61.0%" left="5%" label = 'Vol' />
-            <GrufKnobPetit estacio={estacio} parameterName="tone3" top="61.0%" left="9%" label = 'Tone' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="tone3" top="61.0%" left="9%" label = 'Tone' />
 
             <GrufKnobPetit estacio={estacio} parameterName="volume2" top="72.5%" left="5%" label = 'Vol' />
-            <GrufKnobPetit estacio={estacio} parameterName="tone2" top="72.5%" left="9%" label = 'Tone' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="tone2" top="72.5%" left="9%" label = 'Tone' />
 
             <GrufKnobPetit estacio={estacio} parameterName="volume1" top="85.0%" left="5%" label = 'Vol' />
-            <GrufKnobPetit estacio={estacio} parameterName="tone1" top="85.0%" left="9%" label = 'Tone' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="tone1" top="85.0%" left="9%" label = 'Tone' />
 
-            <GrufKnobPetit estacio={estacio} parameterName="atack4" top="48.5%" left="77%" label = 'Attack' />
-            <GrufKnobPetit estacio={estacio} parameterName="release4" top="48.5%" left="82%" label = 'Release' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack4" top="48.5%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="release4" top="48.5%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend4" top="48.5%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing4" top="48.5%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetit estacio={estacio} parameterName="atack3" top="61%" left="77%" label = 'Attack' />
-            <GrufKnobPetit estacio={estacio} parameterName="release3" top="61%" left="82%" label = 'Release' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack3" top="61%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="release3" top="61%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend3" top="61%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing3" top="61%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetit estacio={estacio} parameterName="atack2" top="72.5%" left="77%" label = 'Attack' />
-            <GrufKnobPetit estacio={estacio} parameterName="release2" top="72.5%" left="82%" label = 'Release' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack2" top="72.5%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="release2" top="72.5%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend2" top="72.5%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing2" top="72.5%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetit estacio={estacio} parameterName="atack1" top="85%" left="77%" label = 'Attack' />
-            <GrufKnobPetit estacio={estacio} parameterName="release1" top="85%" left="82%" label = 'Release' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack1" top="85%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="release1" top="85%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="85%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing1" top="85%" left="93%" label = 'Swing' />
 
