@@ -157,7 +157,7 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     );
 };
 
-export const GrufKnobGranGlobal = ({ parameterName, top, left, label }) => {
+export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label }) => {
     const [parameterValue, setParameterValue] = useState(0); 
 
     useEffect(() => {
@@ -165,15 +165,22 @@ export const GrufKnobGranGlobal = ({ parameterName, top, left, label }) => {
             setParameterValue(getAudioGraphInstance().getSwing());
         } else if (parameterName === 'bpm') {
             setParameterValue(getAudioGraphInstance().getBpm());
+        } else if (parameterName === 'volume') {
+            setParameterValue(getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0);
         }
-    }, [parameterName]);
+    }, [parameterName, estacio]);
 
     const handleKnobChange = (value) => {
         setParameterValue(value);
+
         if (parameterName === 'swing') {
             getAudioGraphInstance().updateParametreAudioGraph('swing', value);
         } else if (parameterName === 'bpm') {
             getAudioGraphInstance().updateParametreAudioGraph('bpm', value);
+        } else if (parameterName === 'volume') {
+            const currentGains = getCurrentSession().getLiveGainsEstacions();
+            currentGains[estacio.nom] = parseFloat(value, 10);
+            getCurrentSession().liveSetGainsEstacions(currentGains);  
         }
     };
 
@@ -189,7 +196,7 @@ export const GrufKnobGranGlobal = ({ parameterName, top, left, label }) => {
                 valueTemplate={""}
                 valueColor={cssVariables.white}
                 rangeColor={cssVariables.grey}            
-                />
+            />
             <div>{label || parameterName}</div>
         </div>
     );
