@@ -3,6 +3,8 @@ import { joinSessionInServer } from "../serverComs";
 import { renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { Sessio } from "../components/sessio";
+import { buildAudioGraphIfNotBuilt } from "../utils";
+
 
 const sessionElement = document.getElementsByTagName('session')[0];
 let checkLoadedCorrectlyInterval = undefined;
@@ -35,6 +37,9 @@ const onSessionDataLoaded = () => {
             estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
         })
     }
+
+    // Build audio graph if needed
+    // buildAudioGraphIfNotBuilt(); // Can't do that here because web audio click limitations, we should first show some dialog to the user and then build the audio graph
 
     // Some log statements useful for debugging
     console.log(getCurrentSession());

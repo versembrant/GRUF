@@ -1,5 +1,14 @@
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
+import { getAudioGraphInstance } from './audioEngine';
+
+
+export const buildAudioGraphIfNotBuilt = async () => {  
+    if (!getAudioGraphInstance().graphIsBuilt()) {
+        await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
+        getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
+    }
+}
 
 export const  capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);

@@ -1,6 +1,7 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
 import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
@@ -8,6 +9,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
+            <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonNoBorder text="Canvia estació" top="43px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
             <GrufKnobGranGlobal estacio={estacio} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
