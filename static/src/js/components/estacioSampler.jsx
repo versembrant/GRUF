@@ -3,6 +3,7 @@ import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
 import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, GrufPadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
+import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -18,6 +19,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     return (
         <div key={estacio.nom} className="estacio estacio-sampler">
             <div className="estacio-main">
+                <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
+                
                 <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
                 <GrufLabel text="EQ" top="29.6%" left="51.7%" />
                 

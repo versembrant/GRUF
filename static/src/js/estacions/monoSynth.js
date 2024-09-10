@@ -51,7 +51,7 @@ export class MonoSynth extends EstacioBase {
                 decayCurve: "exponential",
                 releaseCurve: "exponential"
             },
-            volume: -12 // Avoid clipping, specially when using sine
+            volume: -20 // Avoid clipping, specially when using sine
         });
 
         // Adegeix els nodes al diccionari de nodes de l'estació
