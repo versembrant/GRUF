@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll2 } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
@@ -43,7 +43,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d"/>
+            <GrufPianoRoll2 estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d" colorNotesDissalowed="#50121f" allowedNotes={[]}/>
         </div>
     </div>)
 };
