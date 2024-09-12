@@ -248,23 +248,23 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
     )
 };
 
-export const GrufSliderOna = ({ estacio, parameterName, top, left, height }) => {
+export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
     const style = { top: top, left: left };
+    //const num2String();
     if (height !== undefined) {
         style.height = height;
     }
-
     return (
-        <div className={"gruf-slider-vertical "} style={style}>
+        <div className={"gruf-slider-vertical"} style={style}>
             <Slider
                 orientation="vertical"
                 value={real2Norm(parameterValue, parameterDescription)}
-                step={0.25}
+                step={1.0}
                 min={0.0}
-                max={1.0}
+                max={3.0}
                 marks 
                 onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))}
             />
