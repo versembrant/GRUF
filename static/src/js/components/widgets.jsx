@@ -8,6 +8,7 @@ import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
+import { Dropdown } from 'primereact/dropdown';
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -656,3 +657,20 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
+export const GrufDesplegable = ({estacio, parameterName, top, left, label}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-desplegable" style={{top: top, left: left}}>
+            <Dropdown 
+            value={getNomPatroOCap(parameterDescription, parameterValue)}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
+            options={parameterDescription}
+            placeholder="Cap"
+            valueTemplate={""}
+            />
+            <div>{label || parameterDescription.label}</div>
+        </div>
+    )
+};
