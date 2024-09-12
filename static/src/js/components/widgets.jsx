@@ -666,7 +666,7 @@ export const GrufDesplegable = ({estacio, parameterName, top, left, label}) => {
             <Dropdown 
             value={getNomPatroOCap(parameterDescription, parameterValue)}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
-            options={parameterDescription}
+            //options={}
             placeholder="Cap"
             valueTemplate={""}
             />
