@@ -657,18 +657,18 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufDesplegable = ({estacio, parameterName, top, left, label}) => {
+export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, label}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     return (
-        <div className="gruf-desplegable" style={{top: top, left: left}}>
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left}}>
             <Dropdown 
             value={getNomPatroOCap(parameterDescription, parameterValue)}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
-            //options={}
+            options={parameterDescription.patronsPredefinits.map(patro => {patro.nom})}
             placeholder="Cap"
-            valueTemplate={""}
+            //valueTemplate={""}
             />
             <div>{label || parameterDescription.label}</div>
         </div>
