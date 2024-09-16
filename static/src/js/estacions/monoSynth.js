@@ -14,7 +14,7 @@ export class MonoSynth extends EstacioBase {
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
-        waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sawtooth'},
+        waveform: {type: 'enum', label:'Waveform', options: ['sawtooth', 'triangle', 'square', 'sine'], initial: 'sawtooth'},
         lpf: {type: 'float', label: 'LPF', min: 300, max: 12000, initial: 12000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 200, max: 3000, initial: 200, logarithmic: true},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
