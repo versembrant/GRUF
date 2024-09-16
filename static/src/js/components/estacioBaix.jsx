@@ -45,7 +45,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             
             <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d98adc"/>
 
-            <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="8.5%" left="73%"  />
+            <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="30%" left="36.5%"  />
         </div>
     </div>)
 };
