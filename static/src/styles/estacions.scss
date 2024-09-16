@@ -194,6 +194,46 @@
     width: 150px;
 }
 
+.estacio-mixer-container {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-around; 
+    align-items: center; 
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.estacio-columna {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin: 10px;
+    width: 50px;
+    padding: 10px; 
+    border-radius: 10px; 
+    border: 2px solid $light-grey; 
+}
+
+.mute-solo-container {
+    display: flex;
+    flex-direction: row; 
+    width: 100px; 
+    margin-top: 10px; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.nom-estacio-container {
+    display: flex;
+    flex-direction: row; 
+    width: 100px; 
+    margin-top: 10px; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 9px;
+    font-style: bold;
+}
+
 .estacio-computer {
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
