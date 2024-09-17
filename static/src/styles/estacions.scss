@@ -196,6 +196,7 @@
 
 .estacio-mixer-container {
     display: flex; 
+    overflow: scroll;
     flex-direction: row; 
     justify-content: space-around; 
     align-items: center; 
