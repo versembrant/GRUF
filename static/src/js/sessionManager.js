@@ -419,6 +419,7 @@ export class Session {
         data.bpm = getAudioGraphInstance().getBpm();
         data.swing = getAudioGraphInstance().getSwing();
         data.compas = getAudioGraphInstance().getCompas();
+        data.tonality = getAudioGraphInstance().getTonality();
         data.effectParameters = getAudioGraphInstance().getEffectParameters();
         return data
     }

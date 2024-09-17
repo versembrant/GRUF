@@ -698,3 +698,25 @@
         border-color: $black;
     }
 }
+
+.tonality-selector {
+    position: absolute;
+    width: 250px; 
+    margin-bottom: 10px;
+
+    .p-dropdown {
+        width: 100%; 
+        .p-dropdown-label {
+            font-size: 14px;  
+        }
+
+        .p-dropdown-item {
+            font-size: 12px;  
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            &:hover {
+                background-color: yellowgreen;  
+            }
+        }
+    }
+}
