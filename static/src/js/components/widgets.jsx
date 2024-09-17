@@ -126,6 +126,82 @@ export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }
     );
 };
 
+export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const optionCount = options.length;
+
+    const currentOptionIndex = options.indexOf(parameterValue);
+
+    return (
+        <div className="gruf-knob-petit" style={{ top, left }}>
+            <Knob
+                value={currentOptionIndex}
+                min={0}
+                max={optionCount - 1}
+                step={1}
+                size={25}
+                onChange={(evt) => {
+                    const selectedIndex = evt.value;
+                    const selectedOption = options[selectedIndex];
+                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, selectedOption);
+                }}
+                valueTemplate=""
+                valueColor={cssVariables.white}
+                rangeColor={cssVariables.grey}
+            />
+            <div>{label || parameterDescription.label}</div>
+        </div>
+    );
+};
+
+export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label }) => {
+    const [parameterValue, setParameterValue] = useState(0); 
+
+    useEffect(() => {
+        if (parameterName === 'swing') {
+            setParameterValue(getAudioGraphInstance().getSwing());
+        } else if (parameterName === 'bpm') {
+            setParameterValue(getAudioGraphInstance().getBpm());
+        } else if (parameterName === 'volume') {
+            setParameterValue(getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0);
+        }
+    }, [parameterName, estacio]);
+
+    const handleKnobChange = (value) => {
+        setParameterValue(value);
+
+        if (parameterName === 'swing') {
+            getAudioGraphInstance().updateParametreAudioGraph('swing', value);
+        } else if (parameterName === 'bpm') {
+            getAudioGraphInstance().updateParametreAudioGraph('bpm', value);
+        } else if (parameterName === 'volume') {
+            const currentGains = getCurrentSession().getLiveGainsEstacions();
+            currentGains[estacio.nom] = parseFloat(value, 10);
+            getCurrentSession().liveSetGainsEstacions(currentGains);  
+        }
+    };
+
+    return (
+        <div className="gruf-knob-gran" style={{ top: top, left: left }}>
+            <Knob
+                value={parameterValue}
+                min={parameterName === 'bpm' ? 40 : 0} 
+                max={parameterName === 'bpm' ? 300 : 1}
+                step={parameterName === 'bpm' ? 1 : 0.01}
+                size={60}
+                onChange={(e) => handleKnobChange(e.value)}
+                valueTemplate={""}
+                valueColor={cssVariables.white}
+                rangeColor={cssVariables.grey}            
+            />
+            <div>{label || parameterName}</div>
+        </div>
+    );
+};
+
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());

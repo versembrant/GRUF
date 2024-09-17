@@ -204,12 +204,12 @@ export class EstacioBase {
             this.audioNodes.effects['reverb'].set({'wet': value});
         } else if (name == "fxReverbDecay"){
             this.audioNodes.effects['reverb'].set({'decay': value});
-        } else if (name == "fxDelayWet"){
-            this.audioNodes.effects['delay'].set({'wet': value});
         } else if (name == "fxDelayTime"){
             this.audioNodes.effects['delay'].set({'delayTime': this.getDelayTimeValue(value)});
         } else if (name == "fxDelayFeedback"){
             this.audioNodes.effects['delay'].set({'feedback': value});
+        } else if (name == "fxDelayWet"){
+            this.audioNodes.effects['delay'].set({'wet': this.getParameterValue("fxDelayOnOff", preset) ? value: 0});
         } else if (name == "fxDelayOnOff"){
             if (value) {
                 this.audioNodes.effects['delay'].set({'wet': this.getParameterValue("fxDelayWet", preset)});            
