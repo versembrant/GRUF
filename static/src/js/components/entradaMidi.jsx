@@ -292,7 +292,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         }}
                         sx={{
                             color: "#fff",
-                            "font-family": "Montserrat, sans-serif",
+                            "fontFamily": "Montserrat, sans-serif",
                             "svg": {
                                 fill: "#fff"
                             }
