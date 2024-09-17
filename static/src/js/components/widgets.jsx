@@ -8,6 +8,7 @@ import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
+import { Dropdown } from 'primereact/dropdown';
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -319,6 +320,32 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
                 max={1.0}
                 marks={marks} 
                 onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))}
+            />
+        </div>
+    )
+};
+
+export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const style = { top: top, left: left };
+    //const num2String();
+    if (height !== undefined) {
+        style.height = height;
+    }
+    return (
+        <div className={"gruf-slider-vertical"} style={style}>
+            <Slider
+                sx={{ height: 56}}
+                orientation="vertical"
+                value={options.indexOf(parameterValue)}
+                step={1.0}
+                min={0.0}
+                max={options.length -1}
+                marks 
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, options[evt.target.value])}
             />
         </div>
     )
@@ -794,3 +821,19 @@ export const GrufPianoRoll2 = ({ estacio, parameterName, top, left, width="500px
     )
 };
 
+export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+            <Dropdown 
+            value={getNomPatroOCap(parameterDescription, parameterValue)}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
+            options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
+            placeholder="Cap"
+            />
+            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+        </div>
+    )
+}
