@@ -4,6 +4,7 @@ import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
@@ -656,3 +657,51 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
+export const GrufSelectorTonalitat = ({ top, left }) => {
+    const tonalityOptions = [
+    { label: 'Do Major', value: 'domajor' },
+    { label: 'Do Menor', value: 'domenor' },
+    { label: 'Do# Major', value: 'do#major' },
+    { label: 'Do# Menor', value: 'do#menor' },
+    { label: 'Re Major', value: 'remajor' },
+    { label: 'Re Menor', value: 'remenor' },
+    { label: 'Mi♭ Major', value: 'mi♭major' },
+    { label: 'Mi♭ Menor', value: 'mi♭menor' },
+    { label: 'Mi Major', value: 'mimajor' },
+    { label: 'Mi Menor', value: 'mimenor' },
+    { label: 'Fa Major', value: 'famayor' },
+    { label: 'Fa Menor', value: 'famenor' },
+    { label: 'Fa# Major', value: 'fa#major' },
+    { label: 'Fa# Menor', value: 'fa#menor' },
+    { label: 'Sol Major', value: 'solmajor' },
+    { label: 'Sol Menor', value: 'solmenor' },
+    { label: 'La♭ Major', value: 'la♭major' },
+    { label: 'La♭ Menor', value: 'la♭menor' },
+    { label: 'La Major', value: 'lamajor' },
+    { label: 'La Menor', value: 'lamenor' },
+    { label: 'Si♭ Major', value: 'si♭major' },
+    { label: 'Si♭ Menor', value: 'si♭menor' },
+    { label: 'Si Major', value: 'simajor' },
+    { label: 'Si Menor', value: 'simenor' }
+];
+    
+    const currentTonality = getAudioGraphInstance().getTonality();
+
+    const handleTonalityChange = (event) => {
+        const selectedTonality = event.target.value;
+        getAudioGraphInstance().setTonality(selectedTonality); 
+    };
+
+    return (
+        <div className="tonality-selector" style={{ position: 'absolute', top: top, left: left }}>
+            <Dropdown
+                value={currentTonality}  
+                options={tonalityOptions}  
+                onChange={handleTonalityChange} 
+                placeholder="Selecciona Tonalitat"  
+                scrollHeight="200px"  
+                className="small-font-dropdown"  
+            />
+        </div>
+    );
+};

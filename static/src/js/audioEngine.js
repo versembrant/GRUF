@@ -31,6 +31,7 @@ export class AudioGraph {
             playingArranjement: false,
             swing: 0,
             compas: '4/4',
+            tonality : 'doMajor',
             effectParameters: {
                 reverbWet:0,
                 reverbDecay: 0.1,
@@ -41,7 +42,7 @@ export class AudioGraph {
                 eq3HighGain: 0,
                 eq3MidGain: 0,
                 eq3LowGain: 0,
-            }
+            },
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -364,6 +365,14 @@ export class AudioGraph {
         this.setParametreInStore('compas', compas);
     }
 
+    getTonality(){
+        return this.store.getState().tonality;
+    }
+
+    setTonality(tonality){
+        this.setParametreInStore('tonality', tonality);
+    }
+
     getNumSteps (){
         const compas = this.getCompas();
         if (compas === '2/4'){
@@ -407,6 +416,8 @@ export class AudioGraph {
             this.setEffectParameters(valor);
         } else if (nomParametre === 'compas'){
             this.setCompas(valor);
+        } else if (nomParametre === 'tonality'){
+            this.setTonality(valor);
         }
         else {
             this.setParametreInStore(nomParametre, valor);
