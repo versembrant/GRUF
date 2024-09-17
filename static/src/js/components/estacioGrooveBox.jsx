@@ -75,7 +75,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
             <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    
 
-            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="50px" left="50px" />       
+            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
         </div>
     </div>)
 };

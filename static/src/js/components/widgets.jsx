@@ -657,20 +657,23 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, label}) => {
+export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
+    console.log(parameterDescription)
+    console.log(parameterDescription.patronsPredefinits.map(patro => {patro.nom}))
     return (
-        <div className="gruf-selector-patrons-grid" style={{top: top, left: left}}>
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
             <Dropdown 
             value={getNomPatroOCap(parameterDescription, parameterValue)}
             onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
-            options={parameterDescription.patronsPredefinits.map(patro => {patro.nom})}
+            options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
             placeholder="Cap"
-            //valueTemplate={""}
             />
-            <div>{label || parameterDescription.label}</div>
+            
+            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+            
         </div>
     )
 };
