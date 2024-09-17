@@ -231,11 +231,11 @@ export class EstacioSampler extends EstacioBase {
         }
     }
 
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         const playerIndex = midiNoteNumber % 16;
 
         if (!noteOff) {
-            const recEnabled = this.recEnabled('pattern');
+            const recEnabled = this.recEnabled('notes') && !skipRecording;
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
@@ -250,6 +250,40 @@ export class EstacioSampler extends EstacioBase {
             }
         } else {
             this.stopSoundFromPlayer(playerIndex);
+        }
+    }
+
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
+        if (!getAudioGraphInstance().graphIsBuilt()){ return };
+        const playerIndex = midiNoteNumber % 16;
+        const reducedMidiNoteNumber = playerIndex;
+        const recEnabled = this.recEnabled('notes') && !skipRecording;
+        if (!noteOff){
+            this.playSoundFromPlayer(playerIndex, Tone.now());
+            if (recEnabled){
+                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
+                // the note on time to save it
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
+            }
+        } else {
+            this.stopSoundFromPlayer(playerIndex);
+            if (recEnabled){
+                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
+                const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
+                if (lastNoteOnTimeForNote !== undefined){
+                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                    const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                    if (lastNoteOnTimeForNote < currentStep){
+                        // Only save the note if note off time is bigger than note on time
+                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        notes.push({'n': reducedMidiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
+                        this.updateParametreEstacio('notes', notes); // save change in server!
+                    }
+                    this.lastNoteOnBeats[reducedMidiNoteNumber] = undefined;
+                }
+            }
         }
     }
 }

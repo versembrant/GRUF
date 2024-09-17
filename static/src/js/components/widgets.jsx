@@ -9,6 +9,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
+import { sendNoteOn, sendNoteOff } from './entradaMidi';
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -552,7 +553,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -570,6 +571,16 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
                 }
             });
+            if (triggerNotes){
+                jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
+                    // When a note is created or selected, we will trigger a callback
+                    console.log(evt.detail)
+                    sendNoteOn(evt.detail.midiNote, 127);
+                    setTimeout(() => {
+                        sendNoteOff(evt.detail.midiNote, 0);
+                    }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
+                });
+            }
             jsElement.dataset.alreadyBinded = true;
         }
         if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {

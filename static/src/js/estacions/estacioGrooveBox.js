@@ -271,11 +271,11 @@ export class EstacioGrooveBox extends EstacioBase {
 
         }
     }
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff){
+    onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false){
         const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
 
         if (!noteOff){
-            const recEnabled = this.recEnabled('pattern');
+            const recEnabled = this.recEnabled('pattern') && !skipRecording;
             // Si Rec està ON
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();

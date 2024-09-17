@@ -120,10 +120,10 @@ export class MonoSynth extends EstacioBase {
 
     lastNoteOnBeats = {}
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
 
-        const recEnabled = this.recEnabled('notes');
+        const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             this.audioNodes.synth.triggerAttack(Tone.Frequency(midiNoteNumber, "midi").toNote(), Tone.now());
             if (recEnabled){

@@ -966,8 +966,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.sortSequence();
             }
 
+            var noteWasDeleted = false;
+            const ht =this.hitTest(pos);
             if (this.secondclickdelete){
-                const ht =this.hitTest(pos);
                 if ((this.hitNoteInitialData !== undefined) && (this.hitNoteInitialData.idx  === ht.i)) {
                     // If duration, note or time position has not changed, the note has not been dragged and should be deleted
                     // Also check that only short time has passed since the note was clicked, otherwise it might have been dragged and left at the same position
@@ -976,7 +977,20 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                         && (this.hitNoteInitialData.seq.n == this.sequence[ht.i].n)
                         && (Date.now()/1000 - this.hitNoteInitialData.time < 0.25)) {
                         this.delNote(ht.i);
+                        noteWasDeleted = true;
                     }
+                }
+            }
+
+            if (!noteWasDeleted) {
+                const noteSquenceData =  this.sequence[ht.i];
+                if (noteSquenceData !== undefined){
+                    const event = new CustomEvent("pianoRollNoteSelectedOrCreated", { detail: {
+                        midiNote: noteSquenceData.n,
+                        durationInBeats: noteSquenceData.g,
+         
+                    }});
+                    this.dispatchEvent(event);
                 }
             }
 
