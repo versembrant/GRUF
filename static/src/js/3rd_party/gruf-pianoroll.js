@@ -72,6 +72,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 markendoffset:      {type:Number, value:-24},
                 kbsrc:              {type:String, value:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSI0ODAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgo8cGF0aCBmaWxsPSIjZmZmIiBzdHJva2U9IiMwMDAiIGQ9Ik0wLDAgaDI0djQ4MGgtMjR6Ii8+CjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik0wLDQwIGgxMnY0MGgtMTJ6IE0wLDEyMCBoMTJ2NDBoLTEyeiBNMCwyMDAgaDEydjQwaC0xMnogTTAsMzIwIGgxMnY0MGgtMTJ6IE0wLDQwMCBoMTJ2NDBoLTEyeiIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGQ9Ik0wLDYwIGgyNCBNMCwxNDAgaDI0IE0wLDIyMCBoMjQgTTAsMjgwIGgyNCBNMCwzNDAgaDI0IE0wLDQyMCBoMjQiLz4KPC9zdmc+Cg==", observer:'layout'},
                 kbwidth:            {type:Number,value:40},
+                kbstyle:            {type:String, value:"piano"},
                 loop:               {type:Number, value:0},
                 preload:            {type:Number, value:1.0},
                 tempo:              {type:Number, value:120, observer:'updateTimer'},
@@ -1035,7 +1036,8 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const bodystyle = this.body.style;
             if(this.bgsrc)
                 proll.style.background="url('"+this.bgsrc+"')";
-            this.kbimg.style.background="url('"+this.kbsrc+"')";
+            if (this.kbstyle === "piano")
+                this.kbimg.style.background="url('"+this.kbsrc+"')";
             if(this.width){
                 proll.width = this.width;
                 bodystyle.width = proll.style.width = this.width+"px";
@@ -1061,10 +1063,15 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         };
         this.redrawGrid=function(){
             for(let y=0;y<128;++y){
-                if(this.semiflag[y%12]&1)
-                    this.ctx.fillStyle=this.coldk;
-                else
-                    this.ctx.fillStyle=this.collt;
+                if (this.kbstyle === "piano") {
+                    if(this.semiflag[y%12]&1)
+                        this.ctx.fillStyle=this.coldk;
+                    else
+                        this.ctx.fillStyle=this.collt;
+                } else {
+                    this.ctx.fillStyle=y%2==0 ? this.coldk: this.collt;
+                }
+                    
                 let ys = this.height - (y - this.yoffset) * this.steph;
                 this.ctx.fillRect(this.yruler+this.kbwidth, ys|0, this.swidth,-this.steph);
                 this.ctx.fillStyle=this.colgrid;
@@ -1102,7 +1109,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.redrawYRuler=function(){
             if(this.yruler){
                 this.ctx.textAlign="right";
-                this.ctx.font=(this.steph)+"px 'sans-serif'";
+                if (this.kbstyle !== "piano") {
+                    this.ctx.font=(this.steph - 6)+"px Arial";
+                } else {
+                    this.ctx.font=(this.steph - 1)+"px Arial";
+                }
                 this.ctx.fillStyle=this.colrulerbg;
                 this.ctx.fillRect(0,this.xruler,this.yruler,this.sheight);
                 this.ctx.fillStyle=this.colrulerborder;
@@ -1110,10 +1121,18 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.ctx.fillRect(this.yruler,this.xruler,1,this.sheight);
                 this.ctx.fillRect(0,this.height-1,this.yruler,1);
                 this.ctx.fillStyle=this.colrulerfg;
-                for(let y=0;y<128;y+=12){
-                    const ys=this.height-this.steph*(y-this.yoffset);
-                    this.ctx.fillRect(0,ys|0,this.yruler,-1);
-                    this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-4,ys-4);
+                if (this.kbstyle === "piano") {
+                    for(let y=0;y<128;y+=12){
+                        const ys=this.height-this.steph*(y-this.yoffset);
+                        //this.ctx.fillRect(0,ys|0,this.yruler,-1);
+                        this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-2,ys-4);
+                    }
+                } else {
+                    for(let y=0;y<128;y+=1){
+                        const ys=this.height-this.steph*(y-this.yoffset);
+                        //this.ctx.fillRect(0,ys|0,this.yruler,-1);
+                        this.ctx.fillText(y + 1,this.yruler -4,ys-4);
+                    }
                 }
             }
             this.kbimg.style.top=(this.xruler)+"px";

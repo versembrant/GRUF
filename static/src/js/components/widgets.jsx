@@ -552,138 +552,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", colorNotes, modeSampler }) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const numSteps =  getAudioGraphInstance().getNumSteps();
-    const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
-    const uniqueId = estacio.nom + "_" + parameterDescription.nom
-    let lastEditedData = "";
-    
-    useEffect(() => {
-        const jsElement = document.getElementById(uniqueId + "_id")
-        if (jsElement.dataset.alreadyBinded === undefined){
-            jsElement.addEventListener("pianoRollEdited", evt => {
-                const stringifiedData = JSON.stringify(evt.detail)
-                if (!isequal(stringifiedData, lastEditedData)) {
-                    handleSequenceEdited(evt.detail)
-                    lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
-                }
-            });
-            jsElement.dataset.alreadyBinded = true;
-        }
-        if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
-            jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
-            jsElement.redraw()
-        }
-        if (currentStep >= 0) {
-            jsElement.locate(currentStep);
-        } else {
-            jsElement.locate(-10);  // make it dissapear
-        }
-    })
-
-    const appSequenceToWidgetSequence = (sequence) => {
-        return sequence.map(value => {return {
-            't': value.b,  // time in beats
-            'n': value.n,  // midi note number
-            'g': value.d,  // note duration in beats
-            'f': value.s,  // note is selected
-            'on': value.on,  // original note
-            'ot': value.ob,  // original time
-            'og': value.od,  // original duration
-        }})
-    }
-
-    const widgetSequenceToAppSequence = (wSequence) => {
-        return wSequence.map(value => {return {
-            'b': value.t,  // beat position
-            'n': value.n,  // midi note number
-            'd': value.g,  // note duration in beats
-            's': value.f,  // note is selected
-            'on': value.on,  // original note
-            'ob': value.ot,  // original time
-            'od': value.og,  // original duration
-        }})
-    }
-
-    const handleSequenceEdited = (widgetSequence) => {
-        estacio.updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
-    }
-
-    const getLowestNoteForYOffset = () => {
-        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
-        if (parameterDescription.permetScrollVertical === 0) {
-            return parameterDescription.notaMesBaixaPermesa;
-        }
-
-        let lowestNote = 127
-        for (let i = 0; i < parameterValue.length; i++) {
-            if (parameterValue[i].n < lowestNote) {
-                lowestNote = parameterValue[i].n
-            }
-        }
-        if (lowestNote == 127) {
-            return parameterDescription.notaMesBaixaPermesa || 48
-        } else {
-            return lowestNote
-        }
-    }
-
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    }
-
-
-    // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
-    return (
-        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
-            <div style={{overflow:"scroll"}}>
-                <webaudio-pianoroll
-                    id={uniqueId + "_id"}
-                    width={width.replace('px', '')}
-                    height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
-                    xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 24}
-                    yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
-                    xruler={0}
-                    markstart={-10}  // make it dissapear
-                    markend={-10}  // make it dissapear
-                    //cursoroffset={2500}  // make it dissapear
-                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
-                    colnote={colorNotes || "#f22"}
-                    colnotesel={colorNotes || "#f22"}
-                    collt={"rgb(200, 200, 200)"}
-                    coldk={"rgb(176, 176, 176)"}
-                    colgrid={"#999"}
-                    colnoteborder={colorNotes || "#f22"}
-                    colrulerbg={"#000"}
-                    colrulerfg={"#fff"}
-                    colrulerborder={"#000"}
-                    kbwidth={modeSampler === undefined ? 65: 0}
-                    yruler={modeSampler === undefined ? 18: 0}
-                ></webaudio-pianoroll>
-            </div>
-            <div className="gruf-piano-roll-controls">
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
-                { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
-                { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
-                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 22} left={width.replace('px', '') - 100} height="23px"/>
-            </div>
-        </div>
-    )
-};
-
-export const GrufPianoRoll2 = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -803,12 +672,13 @@ export const GrufPianoRoll2 = ({ estacio, parameterName, top, left, width="500px
                     coldk={"rgb(176, 176, 176)"}
                     colgrid={"#999"}
                     colnoteborder={colorNotes || "#f22"}
-                    colrulerbg={"#000"}
+                    colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
-                    colrulerborder={"#000"}
+                    colrulerborder={"#4b4b4b"}
                     cursorsrc={"/gruf/static/src/img/playhead.svg"}
                     kbwidth={modeSampler === undefined ? 65: 0}
-                    yruler={modeSampler === undefined ? 18: 0}
+                    kbstyle={modeSampler === undefined ? "piano": "midi"}
+                    yruler={modeSampler === undefined ? 20: 22}
                 ></gruf-pianoroll>
             </div>
             <div className="gruf-piano-roll-controls">
