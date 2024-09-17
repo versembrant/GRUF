@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll2 } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll2, GrufSliderDiscret } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
@@ -42,6 +42,8 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelBottom="0%" labelTop="100%" /> 
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
+            
+            <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="30%" left="36.5%"  />
             
             <GrufPianoRoll2 estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d" colorNotesDissalowed="#50121f" allowedNotes={[]}/>
         </div>
