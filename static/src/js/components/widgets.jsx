@@ -8,6 +8,7 @@ import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
+import { Dropdown } from 'primereact/dropdown';
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -678,6 +679,23 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
                     {i + 1}
             </div>
             )}
+        </div>
+    )
+}
+
+export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
+    return (
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+            <Dropdown 
+            value={getNomPatroOCap(parameterDescription, parameterValue)}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
+            options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
+            placeholder="Cap"
+            />
+            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
         </div>
     )
 }
