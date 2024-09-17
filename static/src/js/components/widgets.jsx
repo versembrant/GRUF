@@ -325,6 +325,32 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
     )
 };
 
+export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const style = { top: top, left: left };
+    //const num2String();
+    if (height !== undefined) {
+        style.height = height;
+    }
+    return (
+        <div className={"gruf-slider-vertical"} style={style}>
+            <Slider
+                sx={{ height: 56}}
+                orientation="vertical"
+                value={options.indexOf(parameterValue)}
+                step={1.0}
+                min={0.0}
+                max={options.length -1}
+                marks 
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, options[evt.target.value])}
+            />
+        </div>
+    )
+};
+
 export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
 
@@ -661,8 +687,6 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
-    console.log(parameterDescription)
-    console.log(parameterDescription.patronsPredefinits.map(patro => {patro.nom}))
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
             <Dropdown 
@@ -671,9 +695,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
             options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
             placeholder="Cap"
             />
-            
             <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
-            
         </div>
     )
-};
+}

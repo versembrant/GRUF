@@ -15,7 +15,7 @@ export class Synth extends EstacioBase {
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
-        waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sawtooth'},
+        waveform: {type: 'enum', label:'Waveform', options: ['sawtooth', 'triangle', 'square', 'sine'], initial: 'sawtooth'},
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
         harmonicity: {type: 'float', label: 'Detune', min: 0.95, max: 1.05, initial: 1.0},
@@ -57,7 +57,7 @@ export class Synth extends EstacioBase {
                 decayCurve: "exponential",
                 releaseCurve: "exponential"
             },
-            volume: -12 // Avoid clipping, specially when using sine
+            volume: -20 // Avoid clipping, specially when using sine
         });
 
     
