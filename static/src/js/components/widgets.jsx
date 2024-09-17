@@ -574,7 +574,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    console.log(evt.detail)
                     sendNoteOn(evt.detail.midiNote, 127);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);
