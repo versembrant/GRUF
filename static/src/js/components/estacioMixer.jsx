@@ -1,13 +1,59 @@
 import { useEffect } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
-import { subscribeToStoreChanges } from "../utils";
+import { subscribeToStoreChanges} from "../utils";
 import { AudioEffectsControlPanel} from  "./fxControlPanel"
 import { GrufButtonNoBorder } from "../components/widgets";
 import Checkbox from '@mui/material/Checkbox';
 
 
 export const MuteCheckbox = ({ estacio }) => {
+    const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
+
+    const handleMuteToggle = (evt) => {
+        const currentMutes = getCurrentSession().getLiveMutesEstacions();
+        currentMutes[estacio.nom] = evt.target.checked;
+        getCurrentSession().liveSetMutesEstacions(currentMutes);
+    };
+
+    return (
+        <label className="gruf-mute-checkbox">
+            <input
+                type="checkbox"
+                checked={parameterValue}
+                onChange={handleMuteToggle}
+                className="gruf-mute-checkbox__input" 
+            />
+            <span className="gruf-mute-checkbox__visual">M</span> 
+        </label>
+    );
+};
+
+export const SoloCheckbox = ({ estacio }) => {
+    const parameterValue = getCurrentSession().getLiveSolosEstacions()[estacio.nom];
+
+    const handleSoloToggle = (evt) => {
+        const currentSolos = getCurrentSession().getLiveSolosEstacions();
+        currentSolos[estacio.nom] = evt.target.checked;
+        getCurrentSession().liveSetSolosEstacions(currentSolos);
+    };
+
+    return (
+        <label className="gruf-solo-checkbox">
+            <input
+                type="checkbox"
+                checked={parameterValue}
+                onChange={handleSoloToggle}
+                className="gruf-solo-checkbox__input" 
+            />
+            <span className="gruf-solo-checkbox__visual">S</span> 
+        </label>
+    );
+};
+
+
+
+/* export const MuteCheckbox = ({ estacio }) => {
     const parameterValue=getCurrentSession().getLiveMutesEstacions()[estacio.nom];
     return (<div><Checkbox 
         sx={{
@@ -23,9 +69,11 @@ export const MuteCheckbox = ({ estacio }) => {
             getCurrentSession().liveSetMutesEstacions(currentMutes);
         }}
     />M</div>)
-}
+} */
 
-export const SoloCheckbox = ({ estacio }) => {
+
+
+/* export const SoloCheckbox = ({ estacio }) => {
     const parameterValue=getCurrentSession().getLiveSolosEstacions()[estacio.nom];
     return (<div><Checkbox 
         sx={{
@@ -41,7 +89,7 @@ export const SoloCheckbox = ({ estacio }) => {
             getCurrentSession().liveSetSolosEstacions(currentSolos);
         }}
     />S</div>)
-}
+} */
 
 export const GainSlider = ({ estacio }) => {
     const parameterValue=getCurrentSession().getLiveSolosEstacions()[estacio.nom];
@@ -87,18 +135,18 @@ export const EstacioMixerUI = ({setEstacioSelected, showLevelMeters}) => {
 
     return (<div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
         <div className="estacio-main">
-            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
-                const estacio = getCurrentSession().getEstacio(nomEstacio);
-                return (
-                <div key={nomEstacio}>
-                    <GainSlider estacio={estacio} />
-                    <MuteCheckbox estacio={estacio} />
-                    <SoloCheckbox estacio={estacio} />
-                    
-                </div>);
-            })}
-            <AudioEffectsControlPanel/>
+                <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
+                {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
+                    const estacio = getCurrentSession().getEstacio(nomEstacio);
+                    return (
+                    <div key={nomEstacio}>
+                        <GainSlider estacio={estacio} />
+                        <MuteCheckbox estacio={estacio} />
+                        <SoloCheckbox estacio={estacio} />
+                        
+                    </div>);
+                })}
+                <AudioEffectsControlPanel/> 
         </div>
     </div>)
 };
