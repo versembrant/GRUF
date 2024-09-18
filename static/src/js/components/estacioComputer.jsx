@@ -2,7 +2,7 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
 import { AudioTransportControlsComputer } from "../components/audioTransport";
-import { GrufButtonNoBorder } from "../components/widgets";
+import { GrufButtonNoBorder, GrufBpmCounter } from "../components/widgets";
 
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
@@ -73,18 +73,19 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufBpmCounter top="11%" left="4.5%" />
             <div>
-                <AudioTransportControlsComputer/>
+                {/* <AudioTransportControlsComputer/> */}
                 <br/>
-                <div className="grid-default">
+                <div className="grid-computer">
                     {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-default" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
+                        return <div className="grid-row-computer" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
                     })}
                 </div>
             </div>
             <div>
                 <button onClick={handleClearClips}>Eliminar cips</button><br/>
-                {JSON.stringify(getCurrentSession().getArranjamentClips())}
+                {/* {JSON.stringify(getCurrentSession().getArranjamentClips())} */}
             </div>
         </div>
     </div>)

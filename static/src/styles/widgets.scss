@@ -753,3 +753,41 @@
         }
     }
 }
+
+.grid-computer {
+    user-select: none;
+    position: absolute;
+    top: 220px;
+    left: 70px;
+    
+    .grid-row-computer {
+        display: flex;
+    
+        .step {
+            height: 20px;
+            width: 20px;
+            text-align: center;
+            line-height: 20px;
+            vertical-align: middle;
+            cursor: hand;
+            border-radius: 5px;
+            margin: 2px;
+            background-color: $pale-orange;
+    
+            &.filled {
+                height: 18px;
+                width: 18px;
+                background-color: black;
+                color: gray;
+                border: 1px solid $pale-orange;
+                font-weight: bold;
+            }
+    
+            &.active {
+                border-color: red;
+            }
+        }
+    
+        
+    }
+}
