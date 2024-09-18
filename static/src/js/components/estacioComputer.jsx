@@ -73,7 +73,8 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufBpmCounter top="11%" left="4.5%" />
+            <GrufButtonNoBorder text="Elimina clips" top="42px" left="221px" onClick={handleClearClips}/>    
+            <GrufBpmCounter top="12%" left="4.5%" />
             <div>
                 {/* <AudioTransportControlsComputer/> */}
                 <br/>
@@ -84,7 +85,6 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                 </div>
             </div>
             <div>
-                <button onClick={handleClearClips}>Eliminar cips</button><br/>
                 {/* {JSON.stringify(getCurrentSession().getArranjamentClips())} */}
             </div>
         </div>
