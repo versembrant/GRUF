@@ -659,31 +659,31 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 
 export const GrufSelectorTonalitat = ({ top, left }) => {
     const tonalityOptions = [
-    { label: 'Do Major', value: 'domajor' },
-    { label: 'Do Menor', value: 'domenor' },
-    { label: 'Do# Major', value: 'do#major' },
-    { label: 'Do# Menor', value: 'do#menor' },
-    { label: 'Re Major', value: 'remajor' },
-    { label: 'Re Menor', value: 'remenor' },
-    { label: 'Mi♭ Major', value: 'mi♭major' },
-    { label: 'Mi♭ Menor', value: 'mi♭menor' },
-    { label: 'Mi Major', value: 'mimajor' },
-    { label: 'Mi Menor', value: 'mimenor' },
-    { label: 'Fa Major', value: 'famayor' },
-    { label: 'Fa Menor', value: 'famenor' },
-    { label: 'Fa# Major', value: 'fa#major' },
-    { label: 'Fa# Menor', value: 'fa#menor' },
-    { label: 'Sol Major', value: 'solmajor' },
-    { label: 'Sol Menor', value: 'solmenor' },
-    { label: 'La♭ Major', value: 'la♭major' },
-    { label: 'La♭ Menor', value: 'la♭menor' },
-    { label: 'La Major', value: 'lamajor' },
-    { label: 'La Menor', value: 'lamenor' },
-    { label: 'Si♭ Major', value: 'si♭major' },
-    { label: 'Si♭ Menor', value: 'si♭menor' },
-    { label: 'Si Major', value: 'simajor' },
-    { label: 'Si Menor', value: 'simenor' }
-];
+        { label: 'C Major', value: 'cmajor' },
+        { label: 'C Minor', value: 'cminor' },
+        { label: 'C# Major', value: 'c#major' },
+        { label: 'C# Minor', value: 'c#minor' },
+        { label: 'D Major', value: 'dmajor' },
+        { label: 'D Minor', value: 'dminor' },
+        { label: 'E♭ Major', value: 'ebmajor' },
+        { label: 'E♭ Minor', value: 'ebminor' },
+        { label: 'E Major', value: 'emajor' },
+        { label: 'E Minor', value: 'eminor' },
+        { label: 'F Major', value: 'fmajor' },
+        { label: 'F Minor', value: 'fminor' },
+        { label: 'F# Major', value: 'f#major' },
+        { label: 'F# Minor', value: 'f#minor' },
+        { label: 'G Major', value: 'gmajor' },
+        { label: 'G Minor', value: 'gminor' },
+        { label: 'A♭ Major', value: 'abmajor' },
+        { label: 'A♭ Minor', value: 'abminor' },
+        { label: 'A Major', value: 'amajor' },
+        { label: 'A Minor', value: 'aminor' },
+        { label: 'B♭ Major', value: 'bbmajor' },
+        { label: 'B♭ Minor', value: 'bbminor' },
+        { label: 'B Major', value: 'bmajor' },
+        { label: 'B Minor', value: 'bminor' }
+    ];
     
     const currentTonality = getAudioGraphInstance().getTonality();
 
