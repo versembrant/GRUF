@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges} from "../utils";
@@ -6,7 +6,38 @@ import { AudioEffectsControlPanel} from  "./fxControlPanel"
 import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
+import { Knob } from 'primereact/knob';
 
+export const GrufPanKnob = ({ estacio }) => {
+    const [panValue, setPanValue] = useState(0); 
+
+    useEffect(() => {
+        const initialPan = getAudioGraphInstance().getPanForEstacio(estacio.nom);
+        setPanValue(initialPan);
+    }, [estacio]);
+
+    const handlePanChange = (newValue) => {
+        setPanValue(newValue); 
+        getAudioGraphInstance().setPanForEstacio(estacio.nom, newValue); 
+    };
+
+    return (
+        <div className="gruf-pan-knob">
+            <Knob 
+                value={panValue}
+                min={-1} 
+                max={1} 
+                step={0.01} 
+                onChange={(e) => handlePanChange(e.value)}
+                size={50}
+                valueColor="#FFFFFF"
+                rangeColor="#AAAAAA"
+                showValue={false}
+            />
+            <div style={{display:"flex", justifyItems:"center", justifyContent:'center', fontSize: '12px', border: '5px'}}>PAN</div>
+        </div>
+    );
+};
 
 export const GrufMuteCheckbox = ({ estacio }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
@@ -138,12 +169,16 @@ export const EstacioMixerUI = ({setEstacioSelected, showLevelMeters}) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
                         <div key={nomEstacio} className="estacio-columna">
-                            <GrufGainSliderVertical estacio={estacio} top = '250px' left = '50px' height='450px' fons = 'linies'/>
+                            <GrufPanKnob estacio={estacio} />
+                            <GrufGainSliderVertical estacio={estacio} top = '500px' left = '50px' height='400px' fons = 'linies'/>
                             <div className="mute-solo-container">
                                 <GrufMuteCheckbox estacio={estacio} />
                                 <GrufSoloCheckbox estacio={estacio} />
                             </div>
-                            <GrufLabelEstacio estacio= {estacio} className='nom-estacio-container' />
+                            <div className="nom-estacio-container">
+
+                            </div>
+                            <GrufLabelEstacio estacio= {estacio} className='nom-estacio-container' /> 
                         </div>);
 
                     })}

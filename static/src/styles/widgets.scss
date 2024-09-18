@@ -332,9 +332,9 @@
 
 .gruf-gain-slider-vertical {
     font-size: 14px;
-    height: 80px; 
     display: inline-flex;
     justify-content: center;
+    margin-top: 10px ;
 
     &.gruf-slider-background-ratllat {
         background-image: url("../img/slider_bg.svg");
