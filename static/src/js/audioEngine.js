@@ -31,7 +31,7 @@ export class AudioGraph {
             playingArranjement: false,
             swing: 0,
             compas: '4/4',
-            tonality : 'doMajor',
+            tonality : 'cmajor',
             effectParameters: {
                 reverbWet:0,
                 reverbDecay: 0.1,
