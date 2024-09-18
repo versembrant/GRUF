@@ -138,7 +138,7 @@ export const EstacioMixerUI = ({setEstacioSelected, showLevelMeters}) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
                         <div key={nomEstacio} className="estacio-columna">
-                            <GrufGainSliderVertical estacio={estacio} top = '250px' left = '50px' height='300px' fons = 'linies'/>
+                            <GrufGainSliderVertical estacio={estacio} top = '250px' left = '50px' height='450px' fons = 'linies'/>
                             <div className="mute-solo-container">
                                 <GrufMuteCheckbox estacio={estacio} />
                                 <GrufSoloCheckbox estacio={estacio} />

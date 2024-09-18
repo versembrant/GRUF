@@ -198,21 +198,40 @@
     display: flex; 
     overflow: scroll;
     flex-direction: row; 
-    justify-content: space-around; 
-    align-items: center; 
-    min-height: 100vh;
-    padding: 20px;
+    justify-content: start; 
+    align-items: start; 
+    //min-height: 100vh;
+    padding: 30px;
+
+    scrollbar-width: thin;  
+    scrollbar-color: transparent transparent; 
+
+    // Webkit browsers (Chrome, Safari, Edge)
+    &::-webkit-scrollbar {
+        width: 8px; 
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent; 
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent; 
+    }
 }
 
 .estacio-columna {
     display: flex;
     flex-direction: column; 
-    align-items: center; 
+    align-items: center;
+    justify-content: end; 
     margin: 10px;
     width: 50px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid $light-grey; 
+    height: 100%;
+    margin-top: 75px;
 }
 
 .mute-solo-container {
@@ -220,7 +239,6 @@
     flex-direction: row; 
     width: 100px; 
     margin-top: 10px; 
-    align-items: center; 
     justify-content: center;
 }
 
@@ -229,11 +247,10 @@
     flex-direction: row; 
     width: 100px; 
     margin-top: 10px; 
-    align-items: center; 
     justify-content: center;
     font-size: 9px;
     font-style: bold;
-}
+} 
 
 .estacio-computer {
     .estacio-main {
