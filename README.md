@@ -24,13 +24,19 @@ docker compose run --rm server yarn install
 docker compose run --rm server yarn build
 ```
 
-4. Run server (this also inclues a static build watcher so that static files will be automatically rebuilt when modifying files):
+4. Build sample library: audio files for sampler and groovebox should be copied in `static/audio` folder, and the the following python script should be run to create `sampleLibrary.js` file (note that this needs to be run once, even if just to create an empty sound library):
+
+```
+docker compose run --rm server python make_sample_library.py
+```
+
+5. Run server (this also inclues a static build watcher so that static files will be automatically rebuilt when modifying files):
 
 ```
 docker compose up
 ```
 
-5. Open running application by poiting the browser at `http://localhost:5555/bruixit/`
+6. Open running application by poiting the browser at `http://localhost:5555/bruixit/`
 
 ## Diagrames
 
