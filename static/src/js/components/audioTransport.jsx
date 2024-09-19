@@ -14,7 +14,7 @@ const handlePlayButton = async () => {
     }
 }
 
-const handlePlayArranjementButton = async () => {  
+export const handlePlayArranjementButton = async () => {  
     await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
     if (!getAudioGraphInstance().isPlaying()){
         if ((getCurrentSession() !== undefined && (!getAudioGraphInstance().graphIsBuilt()))) {
@@ -110,10 +110,10 @@ export const AudioTransportControlsComputer = () => {
     return (
         <div>
             <div>
-                <button onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? 'Stop' : 'Playing arranjement'}</button>
+                {/* <button onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? 'Stop' : 'Playing arranjement'}</button> */}
                 {getAudioGraphInstance().isPlaying() && !getAudioGraphInstance().isPlayingArranjement() ? "Warning: not playing from arranjement!": ""}
             </div>
-            <div>
+            {/* <div>
                 BPM: <input type="range" min="40" max="300" step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}
             </div>
             <div>
@@ -129,7 +129,7 @@ export const AudioTransportControlsComputer = () => {
             </div>
             <div>
                 Current step: {getAudioGraphInstance().isPlayingArranjement() ? getAudioGraphInstance().getMainSequencerCurrentStep(): "-"}
-            </div>
+            </div> */}
         </div>
     )
 };
