@@ -1,8 +1,33 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
-import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
+import { indexOfArrayMatchingObject, clamp, necessitaSwing, getNomPatroOCap, hasPatronsPredefinits} from '../utils';
 import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 import { EstacioGrooveBoxUI } from "../components/estacioGrooveBox";
+import { sampleLibrary} from "../sampleLibrary";
+
+
+const getSoundURL = (soundNumber, presetname) => {
+    soundName = presetname + '-sound' + soundNumber;
+    soundFound = undefined;
+    sampleLibrary.groovebox.forEach((sound) => {
+        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
+            soundFound = sound.url;
+        }
+    });
+    if (soundFound !== undefined) {
+        return soundFound;
+    }
+    // Otherwise, return default sounds
+    if (soundNumber === 1) {
+        return 'https://cdn.freesound.org/previews/509/509984_8033171-hq.mp3';
+    } else if (soundNumber === 2) {
+        return 'https://cdn.freesound.org/previews/173/173537_1372815-hq.mp3';
+    } else if (soundNumber === 3) {
+        return 'https://cdn.freesound.org/previews/561/561511_12517458-hq.mp3';
+    } else  {
+        return 'https://cdn.freesound.org/previews/324/324982_3914271-hq.mp3';
+    }
+}
 
 
 export class EstacioGrooveBox extends EstacioBase {
@@ -15,14 +40,14 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Hip Hop classic 2' , 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}]},
             {'nom': 'Reggae Roots', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":15},{"i":2,"j":2},{"i":3,"j":4},{"i":0,"j":11},{"i":3,"j":11},{"i":1,"j":13},{"i":3,"j":13}]},
             {'nom': 'Dub Reggae', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":3,"j":4},{"i":1,"j":2},{"i":3,"j":2},{"i":2,"j":4},{"i":3,"j":6},{"i":0,"j":8},{"i":3,"j":8},{"i":3,"j":10},{"i":2,"j":12},{"i":3,"j":12},{"i":3,"j":14}]},
-            {'nom': 'Soul Pop (Billie Jean)', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":4},{"i":3,"j":8},{"i":2,"j":12}]},
+            {'nom': 'Soul Pop', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":4},{"i":3,"j":8},{"i":2,"j":12}]},
             {'nom': 'Funky Soul', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":2},{"i":3,"j":8},{"i":1,"j":14},{"i":2,"j":15}]},
             {'nom': 'Acid House', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":8},{"i":0,"j":0},{"i":3,"j":4},{"i":3,"j":12},{"i":0,"j":14}]},
             {'nom': 'Trap 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":1,"j":7},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":14},{"i":1,"j":15}]},
             {'nom': 'Trap 2', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":15},{"i":1,"j":4},{"i":3,"j":4},{"i":1,"j":9},{"i":3,"j":15}]},
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
-        sound1URL: {type: 'text', label: 'OpHat', initial: 'https://cdn.freesound.org/previews/509/509984_8033171-hq.mp3'}, // OpHat
+        sound1URL: {type: 'text', label: 'OpHat', initial: getSoundURL(1, 'Hip Hop Classic 1')}, // OpHat
         volume: {type: 'float', label: 'Volume', min: -30, max: 6, initial: 0},
         swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0, followsPreset: true},
         tone1: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
@@ -30,28 +55,27 @@ export class EstacioGrooveBox extends EstacioBase {
         atack1: {type: 'enum', label: 'Atack1', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
         release1: {type: 'enum', label: 'Release1', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
         reverbSend1:{type: 'float', label: 'OpHatReverb ', min: -30, max: 6, initial: -30},
-        sound2URL: {type: 'text', label: 'CHat', initial: 'https://cdn.freesound.org/previews/173/173537_1372815-hq.mp3'}, // CHat
+        sound2URL: {type: 'text', label: 'CHat', initial: getSoundURL(2, 'Hip Hop Classic 1')}, // CHat
         swing2: {type: 'float', label: 'Swing2', min: 0, max: 1, initial: 0, followsPreset: true},
         tone2: {type: 'enum', label: 'Tone2', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
         volume2: {type: 'float', label: 'CHatVolume', min: -30, max: 6, initial: 0},
         atack2: {type: 'enum', label: 'Atack2', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
         release2: {type: 'enum', label: 'Release2', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
         reverbSend2:{type: 'float', label: 'CHatReverb ', min: -30, max: 6, initial: -30},
-        sound3URL: {type: 'text', label: 'Snare', initial: 'https://cdn.freesound.org/previews/561/561511_12517458-hq.mp3'}, // Snare
+        sound3URL: {type: 'text', label: 'Snare', initial: getSoundURL(3, 'Hip Hop Classic 1')}, // Snare
         swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0, followsPreset: true},
         tone3: {type: 'enum', label: 'Tone3', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
         volume3: {type: 'float', label: 'SnareVolume', min: -30, max: 6, initial: 0},
         atack3: {type: 'enum', label: 'Atack3', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
         release3: {type: 'enum', label: 'Release3', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
         reverbSend3:{type: 'float', label: 'SnareReverb ', min: -30, max: 6, initial: -30},
-        sound4URL: {type: 'text', label: 'Kick', initial: 'https://cdn.freesound.org/previews/324/324982_3914271-hq.mp3'}, // Kick
+        sound4URL: {type: 'text', label: 'Kick', initial: getSoundURL(4, 'Hip Hop Classic 1')}, // Kick
         swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0, followsPreset: true},
         tone4: {type: 'enum', label: 'Tone4', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
         volume4: {type: 'float', label: 'KickVolume', min: -30, max: 6, initial: 0},
         atack4: {type: 'enum', label: 'Atack4', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -30, max: 6, initial: -30},
-
 
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
@@ -65,8 +89,6 @@ export class EstacioGrooveBox extends EstacioBase {
         fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
-
-
     }
 
     getTempsBeat = () => {
@@ -214,6 +236,19 @@ export class EstacioGrooveBox extends EstacioBase {
             this.loadSoundinPlayer('snare', value);
         } else if (name === 'sound4URL'){
             this.loadSoundinPlayer('kick', value);
+        } else if (name === 'pattern'){
+            // If a pattern is changed, set the 4 individual sounds to what they are supposed to be
+            const parameterDescription = this.getParameterDescription(name)
+            const nomPatro = getNomPatroOCap(parameterDescription, value)
+            if (  nomPatro !== "Cap"){
+                setTimeout(()=> {
+                    // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
+                    this.updateParametreEstacio('sound1URL', getSoundURL(1, nomPatro));
+                    this.updateParametreEstacio('sound2URL', getSoundURL(2, nomPatro));
+                    this.updateParametreEstacio('sound3URL', getSoundURL(3, nomPatro));
+                    this.updateParametreEstacio('sound4URL', getSoundURL(4, nomPatro));
+                }, 50)
+            }   
         }
     }
 
