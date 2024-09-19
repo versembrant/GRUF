@@ -9,6 +9,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
+import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 
 
@@ -537,7 +538,21 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", colorNotes, modeSampler }) => {
+export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    return (
+        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
+            {[...Array(estacio.numPresets).keys()].map(i => 
+            <div key={"preset_" + i}
+                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
+                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
+                    {i + 1}
+            </div>
+            )}
+        </div>
+    )
+}
+
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  getAudioGraphInstance().getNumSteps();
@@ -555,6 +570,15 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
                 }
             });
+            if (triggerNotes){
+                jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
+                    // When a note is created or selected, we will trigger a callback
+                    sendNoteOn(evt.detail.midiNote, 127);
+                    setTimeout(() => {
+                        sendNoteOff(evt.detail.midiNote, 0);
+                    }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
+                });
+            }
             jsElement.dataset.alreadyBinded = true;
         }
         if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
@@ -633,10 +657,14 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
             <div style={{overflow:"scroll"}}>
-                <webaudio-pianoroll
+                <gruf-pianoroll
                     id={uniqueId + "_id"}
+                    editmode={monophonic ? "dragmono" : "dragpoly"}
+                    secondclickdelete={true}
+                    allowednotes={allowedNotes}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
+                    grid={2}
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 24}
                     yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
@@ -645,18 +673,22 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     markend={-10}  // make it dissapear
                     //cursoroffset={2500}  // make it dissapear
                     yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
+                    colnotedissalowed={colorNotesDissalowed || "#333"}
                     collt={"rgb(200, 200, 200)"}
                     coldk={"rgb(176, 176, 176)"}
                     colgrid={"#999"}
                     colnoteborder={colorNotes || "#f22"}
-                    colrulerbg={"#000"}
+                    colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
-                    colrulerborder={"#000"}
+                    colrulerborder={"#4b4b4b"}
+                    cursorsrc={"/gruf/static/src/img/playhead.svg"}
                     kbwidth={modeSampler === undefined ? 65: 0}
-                    yruler={modeSampler === undefined ? 18: 0}
-                ></webaudio-pianoroll>
+                    kbstyle={modeSampler === undefined ? "piano": "midi"}
+                    yruler={modeSampler === undefined ? 20: 22}
+                ></gruf-pianoroll>
             </div>
             <div className="gruf-piano-roll-controls">
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
@@ -667,20 +699,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         </div>
     )
 };
-
-export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
-    return (
-        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
-            {[...Array(estacio.numPresets).keys()].map(i => 
-            <div key={"preset_" + i}
-                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
-                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
-                    {i + 1}
-            </div>
-            )}
-        </div>
-    )
-}
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);

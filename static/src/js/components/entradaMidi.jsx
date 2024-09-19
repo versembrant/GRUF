@@ -7,7 +7,7 @@ import { buildAudioGraphIfNotBuilt } from "../utils";
 
 
 
-const sendNoteOn = (noteNumber, noteVelocity) => {
+export const sendNoteOn = (noteNumber, noteVelocity) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
@@ -21,7 +21,7 @@ const sendNoteOn = (noteNumber, noteVelocity) => {
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-const sendNoteOff = (noteNumber, noteVelocity) => {
+export const sendNoteOff = (noteNumber, noteVelocity) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
