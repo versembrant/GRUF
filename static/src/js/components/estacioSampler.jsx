@@ -1,8 +1,7 @@
-import { createElement, useState } from "react";
+import { useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
-import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPad, GrufPadGrid, GrufOnOffButton, GrufSliderVertical } from "./widgets";
+import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
@@ -58,6 +57,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
                 <GrufKnobGran estacio={estacio} parameterName={`start${selectedPad + 1}`} top="7.3%" left="41.3%" label='Start' />
                 <GrufKnobGran estacio={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
+
+                <GrufSelectorSonsSampler estacio={estacio} top="266px" left="70px" width="210px" />
 
                 <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
                 <GrufPianoRoll estacio={estacio} parameterName="notes" top="328px" left="405px" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>

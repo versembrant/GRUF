@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, buildAudioGraphIfNotBuilt } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
@@ -10,6 +10,7 @@ import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
+import { sampleLibrary} from "../sampleLibrary";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -401,10 +402,8 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
         }
     };
 
-    const playSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){
-            return;
-        }
+    const playSample = async (playerIndex) => {
+        await buildAudioGraphIfNotBuilt()
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(playerIndex, Tone.now());
@@ -717,3 +716,19 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
         </div>
     )
 }
+
+export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
+    return (
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+            <Dropdown 
+            value={estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset())}
+            onChange={(evt) => {
+                estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
+            }} 
+            options={sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}) )}
+            placeholder="Cap"
+            />
+        </div>
+    )
+}
+
