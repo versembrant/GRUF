@@ -28,7 +28,7 @@ def create_sample_library_from_audio_folder():
             tonality = get_tonality_from_filaname(filaname)
             if tonality is not None:
                 library['sampler'].append({
-                    'name': filaname.split('.wav')[0],
+                    'name': filaname.split(' - ')[0],
                     'url': f'/{app_prefix}/static/audio/sampler/{filaname}',
                     'tonality': tonality,
                 })
