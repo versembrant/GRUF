@@ -246,19 +246,19 @@
     .volume-meter {
         position: relative;
         width: 10px;
-        background-color: rgba(0, 255, 0, 0.2);
+        background-color: rgba(0, 255, 0, 0.2); 
         border: none;
         display: flex;
-        flex-direction: column-reverse; 
+        flex-direction: column-reverse;
         height: 100%; 
         z-index: 0;
     }
-
+    
     .volume-level {
         width: 100%;
         background-color: green;
-        height: 0; 
-        transition: height 0.1s ease-in-out;
+        height: 0;
+        transition: height 0.1s ease-in-out, background-color 0.1s ease-in-out; 
     }
 
     .mute-solo-container {
