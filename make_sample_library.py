@@ -29,7 +29,7 @@ def create_sample_library_from_audio_folder():
             if tonality is not None:
                 library['sampler'].append({
                     'name': filaname.split(' - ')[0],
-                    'url': f'/{app_prefix}/static/audio/sampler/{filaname}',
+                    'url': f'/{app_prefix}/static/audio/sampler/{filaname.replace('#', '%23')}',
                     'tonality': tonality,
                 })
 
