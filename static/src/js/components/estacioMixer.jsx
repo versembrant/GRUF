@@ -151,25 +151,32 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
             document.levelMeterInterval = setInterval(() => {
                 getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
                     const levelData = getAudioGraphInstance().getCurrentLevelEstacio(nomEstacio);
-                    const meterLevelDiv = metersRef.current[nomEstacio];
-
+                    const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
+    
                     if (meterLevelDiv) {
                         const db = Math.max(-60, Math.min(levelData.db, 12)); // Limitar entre -60 y 12 dB
-                        const height = ((db + 60) / 60) * 100;
-
+                        const height = ((db + 60) / 60) * 100; // Escalar entre 0 y 100%
+    
                         meterLevelDiv.style.height = `${height}%`;
-
-                        if (db > 0) {
-                            meterLevelDiv.style.backgroundColor = "red";
-                        } else if (db < 0 && db > -10) {
-                            meterLevelDiv.style.backgroundColor = "yellow";
+    
+                        let color;
+                        if (db <= -2) {
+                            const greenToYellow = Math.min(1, (db + 60) / 50);
+                            const green = Math.round(255 * (1 - greenToYellow));
+                            const red = Math.round(255 * greenToYellow);
+                            color = `rgb(${red}, 255, 0)`; 
                         } else {
-                            meterLevelDiv.style.backgroundColor = "green";
+                            const yellowToRed = Math.min(1, (db + 10) / 16);
+                            const red = 255;
+                            const green = Math.round(255 * (1 - yellowToRed));
+                            color = `rgb(${red}, ${green}, 0)`; 
                         }
+    
+                        meterLevelDiv.style.backgroundColor = color;
                     }
                 });
             }, 100);
-
+    
             return () => {
                 clearInterval(document.levelMeterInterval);
             };
