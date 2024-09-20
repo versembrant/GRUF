@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
-import { subscribeToStoreChanges} from "../utils";
-import { AudioEffectsControlPanel} from  "./fxControlPanel"
+import { subscribeToStoreChanges } from "../utils";
 import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
@@ -84,23 +83,26 @@ export const GrufSoloCheckbox = ({ estacio }) => {
 };
 
 export const GrufGainSlider = ({ estacio }) => {
-    const parameterValue=getCurrentSession().getLiveSolosEstacions()[estacio.nom];
-    return (<div>
-        <input 
-            type="range"
-            min="0.0" 
-            max="1.0"
-            step="0.1"
-            value={getCurrentSession().getLiveGainsEstacions()[estacio.nom]}
-            name={estacio.nom}
-            onInput={(evt) => {
-                const currentGains = getCurrentSession().getLiveGainsEstacions();
-                currentGains[estacio.nom] = parseFloat(evt.target.value, 10);
-                getCurrentSession().liveSetGainsEstacions(currentGains);
-            }}
-        />{estacio.nom}
-    </div>)
-}
+    const parameterValue = getCurrentSession().getLiveGainsEstacions()[estacio.nom];
+    return (
+        <div>
+            <input 
+                type="range"
+                min="0.0" 
+                max="1.0"
+                step="0.1"
+                value={parameterValue}
+                name={estacio.nom}
+                onInput={(evt) => {
+                    const currentGains = getCurrentSession().getLiveGainsEstacions();
+                    currentGains[estacio.nom] = parseFloat(evt.target.value, 10);
+                    getCurrentSession().liveSetGainsEstacions(currentGains);
+                }}
+            />
+            {estacio.nom}
+        </div>
+    );
+};
 
 export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => {
     const nomEstacio = estacio.nom; 
@@ -133,58 +135,79 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
                 max={1.0}
                 marks={marks}
                 onChange={handleGainChange}
-                labelBottom = {nomEstacio}
             />
         </div>
     );
 };
 
-export const EstacioMixerUI = ({setEstacioSelected, showLevelMeters}) => {
+export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
 
+    const metersRef = useRef({});
+
     useEffect(() => {
-        if (showLevelMeters) {
-            // Setup interval to update level meters
+        if (showLevelMeters) {
             document.levelMeterInterval = setInterval(() => {
-                {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
+                getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
                     const levelData = getAudioGraphInstance().getCurrentLevelEstacio(nomEstacio);
-                    // TODO: draw level data on screen
-                })}
+                    const meterLevelDiv = metersRef.current[nomEstacio];
+
+                    if (meterLevelDiv) {
+                        const db = Math.max(-60, Math.min(levelData.db, 12)); // Limitar entre -60 y 12 dB
+                        const height = ((db + 60) / 60) * 100;
+
+                        meterLevelDiv.style.height = `${height}%`;
+
+                        if (db > 0) {
+                            meterLevelDiv.style.backgroundColor = "red";
+                        } else if (db < 0 && db > -10) {
+                            meterLevelDiv.style.backgroundColor = "yellow";
+                        } else {
+                            meterLevelDiv.style.backgroundColor = "green";
+                        }
+                    }
+                });
             }, 100);
 
             return () => {
-                // cleanup function
-                clearInterval(document.levelMeterInterval);        
-            }
+                clearInterval(document.levelMeterInterval);
+            };
         }
-    });
+    }, [showLevelMeters]);
 
-
-    return (<div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
-        <div className="estacio-main">
-                <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
+    return (
+        <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
+            <div className="estacio-main">
+                <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => { setEstacioSelected(undefined); }} />
                 <div className="estacio-mixer-container">
-                    {getCurrentSession().getNomsEstacions().map(function(nomEstacio, i){
+                    {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
-                        <div key={nomEstacio} className="estacio-columna">
-                            <GrufPanKnob estacio={estacio} />
-                            <GrufGainSliderVertical estacio={estacio} top = '500px' left = '50px' height='400px' fons = 'linies'/>
-                            <div className="mute-solo-container">
-                                <GrufMuteCheckbox estacio={estacio} />
-                                <GrufSoloCheckbox estacio={estacio} />
-                            </div>
-                            <div className="nom-estacio-container">
+                            <div key={nomEstacio} className="estacio-columna">
+                                <GrufPanKnob estacio={estacio} />
+                                
+                                <div className="slider-wrapper">
+                                    <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
+                                    <div
+                                        id={`meter-${nomEstacio}`}
+                                        className="volume-meter"
+                                        ref={(el) => (metersRef.current[nomEstacio] = el)}
+                                    >
+                                        <div className="volume-level" />
+                                    </div>
+                                </div>
 
+                                <div className="mute-solo-container">
+                                    <GrufMuteCheckbox estacio={estacio} />
+                                    <GrufSoloCheckbox estacio={estacio} />
+                                </div>
+                                <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
                             </div>
-                            <GrufLabelEstacio estacio= {estacio} className='nom-estacio-container' /> 
-                        </div>);
-
+                        );
                     })}
-                    {/* <AudioEffectsControlPanel/>  */}
                 </div>
-                
+            </div>
         </div>
-    </div>)
+    );
 };
