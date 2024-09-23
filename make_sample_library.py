@@ -15,15 +15,8 @@ def get_tonality_from_filaname(filename):
         pass    
     return None
 
-
-def create_sample_library_from_audio_folder():
-    library = {
-        'sampler': [],
-        'groovebox': [],
-    }
-
-    # Load files for sampler
-    for filaname in os.listdir(os.path.join(audio_folder, 'sampler')):
+def load_files_for_sampler(library, sampler_folder):
+    for filaname in os.listdir(sampler_folder):
         if filaname.endswith('.wav'):
             tonality = get_tonality_from_filaname(filaname)
             if tonality is not None:
@@ -33,11 +26,12 @@ def create_sample_library_from_audio_folder():
                     'tonality': tonality,
                 })
 
-    # Load files for groovebox
-    for preset_name in os.listdir(os.path.join(audio_folder, 'groovebox')):
-        if not os.path.isdir(os.path.join(audio_folder, 'groovebox', preset_name)):
+def load_files_for_groovebox(library, groovebox_folder):
+    for preset_name in os.listdir():
+        preset_folder = os.path.join(groovebox_folder, preset_name)
+        if not os.path.isdir(preset_folder):
             continue
-        for filaname in os.listdir(os.path.join(audio_folder, 'groovebox', preset_name)):
+        for filaname in os.listdir(preset_folder):
             if filaname.endswith('.wav'):
                 if 'open hat' in filaname.lower() or 'tambourine' in filaname.lower():
                     name = 'sound1'
@@ -53,6 +47,20 @@ def create_sample_library_from_audio_folder():
                     'name': preset_name + '-' + name,
                     'url': f'/{app_prefix}/static/audio/groovebox/{preset_name}/{filaname}',
                 })
+
+def create_sample_library_from_audio_folder():
+    library = {
+        'sampler': [],
+        'groovebox': [],
+    }
+
+    sampler_folder = os.path.join(audio_folder, 'sampler')
+    os.makedirs(sampler_folder, exist_ok=True)
+    load_files_for_sampler(library, sampler_folder)
+
+    groovebox_folder = os.path.join(audio_folder, 'groovebox')
+    os.makedirs(groovebox_folder, exist_ok=True)
+    load_files_for_groovebox(library, groovebox_folder)
 
     return library
 
