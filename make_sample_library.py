@@ -22,7 +22,7 @@ def load_files_for_sampler(library, sampler_folder):
             if tonality is not None:
                 library['sampler'].append({
                     'name': filaname.split(' - ')[0],
-                    'url': f'/{app_prefix}/static/audio/sampler/{filaname}',
+                    'url': f'/{app_prefix}/static/audio/sampler/{filaname.replace('#', '%23')}',
                     'tonality': tonality,
                 })
 

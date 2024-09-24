@@ -91,6 +91,11 @@ export class EstacioGrooveBox extends EstacioBase {
         fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
     }
 
+    getNumSteps (){
+        // L'estació groovebox només te 1 compàs
+        return getAudioGraphInstance().getNumSteps(1);
+    }
+
     getTempsBeat = () => {
         return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
     };
@@ -268,7 +273,7 @@ export class EstacioGrooveBox extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
-        const currentStep = currentMainSequencerStep % (getAudioGraphInstance().getNumSteps());
+        const currentStep = currentMainSequencerStep % (this.getNumSteps());
         const pattern = this.getParameterValue('pattern', this.currentPreset);
         const shouldPlaySound1 = indexOfArrayMatchingObject(pattern, {'i': 0, 'j': currentStep}) > -1;
         const shouldPlaySound2 = indexOfArrayMatchingObject(pattern, {'i': 1, 'j': currentStep}) > -1;
@@ -314,7 +319,7 @@ export class EstacioGrooveBox extends EstacioBase {
             // Si Rec està ON
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
                 const pattern = this.getParameterValue('pattern', this.currentPreset);
                 const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
                 if (index === -1) {

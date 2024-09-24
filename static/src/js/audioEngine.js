@@ -297,7 +297,7 @@ export class AudioGraph {
 
     sendMidiEvent(nomEstacio, data, forwardToServer = false) {
         // MIDI notes require the less latency the better, so we always directly invoke the method "receiveMidiEventFromServer" even if we're
-        // not in local mode. However, unlike other parameters, we can nto accept repeated note that would be cause by we calling 
+        // not in local mode. However, unlike other parameters, we can not accept repeated note that would be cause by we calling 
         // "receiveMidiEventFromServer" and then "receiveMidiEventFromServer" being called again by the server when the note event hits the
         // server and is sent to all clients (including the client who sent it). To avoid this problem, we ignore received note messages 
         // that originate from the same client (the same socket ID)
@@ -311,7 +311,7 @@ export class AudioGraph {
 
     receiveMidiEventFromServer(nomEstacio, data) {
         if ((!getCurrentSession().localMode) && (data.origin_socket_id === getSocketID())){
-            // If message comes from same client, ignore it
+            // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
         }
         if (nomEstacio !== undefined) {
@@ -364,16 +364,16 @@ export class AudioGraph {
         this.setParametreInStore('compas', compas);
     }
 
-    getNumSteps (){
+    getNumSteps (nCompassos = 2){
         const compas = this.getCompas();
         if (compas === '2/4'){
-            return 8
+            return 8 * nCompassos;
         } 
         else if (compas === '3/4') {
-            return 12
+            return 12 * nCompassos;
         }
         else if (compas === '4/4') {
-            return 16
+            return 16 * nCompassos;
         }
     } 
 
