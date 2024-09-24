@@ -6,3 +6,5 @@ versembrant_bruixit.sock
 redis-data
 uploads
 .DS_Store
+static/audio/
+sampleLibrary.js

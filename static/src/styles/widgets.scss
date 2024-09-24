@@ -255,7 +255,7 @@
     }
 }
 
-.gruf-slider-vertical {
+.gruf-slider-vertical{
     position: absolute;
     font-size: 14px;
     height: 80px; 
@@ -332,6 +332,88 @@
         color: $grey;
         width: 5px; /* reduced size by 1/3 */
         border-radius: 5px;
+        opacity: 0.5;
+    }
+}
+
+.gruf-gain-slider-vertical {
+    font-size: 14px;
+    display: inline-flex;
+    justify-content: center;
+    margin-top: 10px ;
+
+    &.gruf-slider-background-ratllat {
+        background-image: url("../img/slider_bg.svg");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .p-slider {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+
+    .MuiSlider-vertical {
+        margin-right: 0px!important;
+        padding: 0 3.5px!important;
+        z-index: 1;
+    }
+   
+    .MuiSlider-thumb {
+        border-radius: 2px;
+        height: 6px; 
+        width: 24px;
+        color: $white;
+
+        &:hover {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            animation: none;
+        }
+    }
+   
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+    
+    .Mui-focusVisible {
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        animation: none;
+    }
+    
+    .MuiSlider-mark {
+        color: $grey;
+        width: 0px;
+    }
+
+    .MuiSlider-markLabel {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        color: $font-color;
+        font-size: 10px;
+        margin-left: -10px;
+    }
+    
+    .MuiSlider-root {
+        border-radius: 5px;
+    }
+
+    .MuiSlider-track {
+        color: transparent;
+        width: 1px;
+    }
+
+    .MuiSlider-rail {
+        color: $white;
+        width: 10px; /* reduced size by 1/3 */
+        border-radius: 2px;
         opacity: 0.5;
     }
 }
@@ -637,6 +719,7 @@
     cursor: pointer;
     user-select: none;
     position: relative;
+    margin-right: 3px;
 
     &__input {
         display: none; // Ocultamos el checkbox nativo
@@ -645,8 +728,8 @@
     &__visual {
         width: 20px;
         height: 20px;
-        border: 2px solid $grey;
-        border-radius: 8px;
+        border: 1px solid $grey;
+        border-radius: 4px;
         background-color: transparent;
         color: $grey;
         font-size: 16px;
@@ -658,13 +741,13 @@
     }
 
     &__input:checked + .gruf-mute-checkbox__visual {
-        background-color: $bright-yellow;
+        background-color: $red;
         border-color: $black;
         color: $black;
     }
 
     &:hover .gruf-mute-checkbox__visual {
-        border-color: $black;
+        //border-color: $black;
     }
 }
 
@@ -682,8 +765,8 @@
     &__visual {
         width: 20px;
         height: 20px;
-        border: 2px solid $grey;
-        border-radius: 8px;
+        border: 1px solid $grey;
+        border-radius: 4px;
         background-color: transparent;
         color: $grey;
         font-size: 16px;
@@ -695,12 +778,67 @@
     }
 
     &__input:checked + .gruf-solo-checkbox__visual {
-        background-color: $light-grey;
+        background-color: $bright-yellow;
         border-color: $black;
         color: $black;
     }
 
     &:hover .gruf-solo-checkbox__visual {
-        border-color: $black;
+        //border-color: $black;
+    }
+}
+
+.gruf-selector-patrons-grid {
+    position: absolute;
+    font-size: 14px;
+
+    .p-dropdown {
+        width: 100%;
+        color: $white;
+
+
+        .p-placeholder {
+            color: $dark-grey
+        }
+
+        .p-dropdown-clear-icon {
+            color: $dark-grey;
+            margin-left: 85%;
+        }
+    }
+
+    button {
+        font-family: "Montserrat", sans-serif;
+        border: none;
+        background-color: transparent;
+        font-weight: 400;
+        color: $white;
+        cursor: pointer;
+        margin-left: calc(100% + 5px);
+        margin-top: -20px;
+
+        &.recording {
+            color: $red;
+            animation: blink 1s steps(7, start) infinite;
+        }
+    }
+      
+}
+
+.p-dropdown-items-wrapper {
+    background-color: $dark-grey!important;
+    padding: 5px;
+    max-height: 300px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+
+    .p-dropdown-item {
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        .p-dropdown-item-label {
+            color: $white;
+        }
     }
 }
