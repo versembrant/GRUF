@@ -53,6 +53,9 @@ def deploy(ctx, branch="main", test=False):
             # Build docker image
             c.run(f"TMPDIR=$HOME/{tmp_dir} docker compose -f {compose_file} build")
 
+            # Build sample library file
+            c.run(f"TMPDIR=$HOME/{tmp_dir} docker compose -f {compose_file} run --rm {server_service_name} python make_sample_library.py")
+            
             # Install and build static files
             c.run(f"TMPDIR=$HOME/{tmp_dir} docker compose -f {compose_file} run --rm {server_service_name} yarn install")
             c.run(f"TMPDIR=$HOME/{tmp_dir} docker compose -f {compose_file} run --rm {server_service_name} yarn build")

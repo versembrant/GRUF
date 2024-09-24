@@ -9,7 +9,7 @@ export class Synth extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 36, permetScrollVertical: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, permetScrollVertical: true},
         // Synth params
         attack: {type: 'float', label:'Attack', min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
@@ -100,7 +100,7 @@ export class Synth extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
-        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+        const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes', this.currentPreset);
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
@@ -126,6 +126,12 @@ export class Synth extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
 
+        const notes = this.getParameterDescription('notes');
+        if (notes.hasOwnProperty('rangDeNotesPermeses')){
+            const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
+            midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
+        }
+
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
@@ -133,7 +139,7 @@ export class Synth extends EstacioBase {
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
                 this.lastNoteOnBeats[midiNoteNumber] = currentStep;
             }
         } else {
@@ -143,10 +149,9 @@ export class Synth extends EstacioBase {
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
                 if (lastNoteOnTimeForNote !== undefined){
                     const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                    const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes', this.currentPreset);
                         notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }
