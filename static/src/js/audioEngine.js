@@ -364,8 +364,7 @@ export class AudioGraph {
         this.setParametreInStore('compas', compas);
     }
 
-    getNumSteps (){
-        const nCompassos = 2;
+    getNumSteps (nCompassos = 2){
         const compas = this.getCompas();
         if (compas === '2/4'){
             return 8 * nCompassos;

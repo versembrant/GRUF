@@ -92,17 +92,8 @@ export class EstacioGrooveBox extends EstacioBase {
     }
 
     getNumSteps (){
-        const nCompassos = 1;
-        const compas = getAudioGraphInstance().getCompas();
-        if (compas === '2/4'){
-            return 8 * nCompassos;
-        } 
-        else if (compas === '3/4') {
-            return 12 * nCompassos;
-        }
-        else if (compas === '4/4') {
-            return 16 * nCompassos;
-        }
+        // L'estació groovebox només te 1 compàs
+        return getAudioGraphInstance().getNumSteps(1);
     }
 
     getTempsBeat = () => {
