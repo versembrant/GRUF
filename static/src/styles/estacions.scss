@@ -286,6 +286,7 @@
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
         background-color: $pale-orange;
+        overflow: scroll;
     }
     .selected {
         background-color: $pale-orange!important;
