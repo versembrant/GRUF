@@ -1,7 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { AudioTransportControlsComputer } from "../components/audioTransport";
+import { AudioTransportControlsComputer, handlePlayArranjementButton } from "../components/audioTransport";
 import { GrufButtonNoBorder, GrufBpmCounter } from "../components/widgets";
 
 
@@ -73,13 +73,15 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufBpmCounter top="50%" left="20%" />
+            <GrufButtonNoBorder text="Elimina clips" top="42px" left="221px" onClick={handleClearClips}/>  
+            <button className="btn btn-petit btn-menys-marge" onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={appPrefix + "/static/src/img/stop_button.svg"}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button.svg"}/>}</button>
+            <GrufBpmCounter top="12%" left="4.5%" />
             <div>
                 {/* <AudioTransportControlsComputer/> */}
                 <br/>
-                <div className="grid-default" top="1000px" left="1000px" >
+                <div className="grid-computer">
                     {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-default" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
+                        return <div className="grid-row-computer" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
                     })}
                 </div>
             </div>
