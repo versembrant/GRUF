@@ -7,6 +7,7 @@ import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 import { getURLParamValue, removeURLParam } from "../utils";
+import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -47,6 +48,7 @@ export const Sessio = () => {
     if (estacioSelected === undefined) {
         return (
             <div className="sessio-wrapper">
+                <SessionWelcomeDialog />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
@@ -78,6 +80,7 @@ export const Sessio = () => {
     } else {
         return(
             <div className="sessio-wrapper">
+                <SessionWelcomeDialog />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
