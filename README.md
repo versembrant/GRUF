@@ -17,7 +17,7 @@ cd versembrant-bruixit/
 docker compose build
 ```
 
-3. Build sample library: audio files for sampler and groovebox should be copied in `static/audio` folder, inside the corresponding `/sampler` and `/groovebox` subfolders, and the the following python script should be run to create `sampleLibrary.js` file (note that this needs to be run once, even if just to create an empty sound library):
+3. Build sample library: audio files for sampler and groovebox should be copied in `static/audio` folder, inside the corresponding `/sampler` and `/groovebox` subfolders, and the the following python script should be run to create `sampleLibrary.js` file (note that this needs to be run once, even if just to create an empty sound library). Audio files can be downloaded here: https://drive.google.com/file/d/1evpcD3svnlILLIfc8wSDF1PQrzoufyrb/view?usp=share_link
 
 ```shell
 docker compose run --rm server python make_sample_library.py
