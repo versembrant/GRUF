@@ -1,8 +1,8 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { AudioTransportControlsComputer, handlePlayArranjementButton } from "../components/audioTransport";
-import { GrufButtonNoBorder, GrufBpmCounter } from "../components/widgets";
+import { handlePlayArranjementButton } from "../components/audioTransport";
+import { GrufButtonNoBorder } from "../components/widgets";
 
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
@@ -73,21 +73,18 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufButtonNoBorder text="Elimina clips" top="42px" left="221px" onClick={handleClearClips}/>  
-            <button className="btn btn-petit btn-menys-marge" onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={appPrefix + "/static/src/img/stop_button.svg"}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button.svg"}/>}</button>
-            <GrufBpmCounter top="12%" left="4.5%" />
             <div>
-                {/* <AudioTransportControlsComputer/> */}
-                <br/>
-                <div className="grid-computer">
-                    {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-computer" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
-                    })}
+                <div style={{position:"absolute", top:35, left: 45}}>
+                    <button className="btn btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
                 </div>
+                <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
             <div>
-                <button onClick={handleClearClips}>Eliminar cips</button><br/>
-                {/* {JSON.stringify(getCurrentSession().getArranjamentClips())} */}
+                <div className="grid-computer" style={{top:90, left: 150}}>
+                    {stepsElementsPerEstacio.map(function(stepsElements, i){
+                        return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
+                    })}
+                </div>
             </div>
         </div>
     </div>)

@@ -98,38 +98,10 @@ export const AudioTransportControlsMinimal = () => {
 
 export const AudioTransportPlayStop = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
+    // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "playing" si s'està fent play en mode live, no en mode arranjement
     return (
         <div>
-            <button className="btn btn-petit btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={appPrefix + "/static/src/img/stop_button.svg"}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button.svg"}/>}</button>
-        </div>
-    )
-};
-
-export const AudioTransportControlsComputer = () => {
-    subscribeToStoreChanges(getAudioGraphInstance());
-    return (
-        <div>
-            <div>
-                {/* <button onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? 'Stop' : 'Playing arranjement'}</button> */}
-                {getAudioGraphInstance().isPlaying() && !getAudioGraphInstance().isPlayingArranjement() ? "Warning: not playing from arranjement!": ""}
-            </div>
-            {/* <div>
-                BPM: <input type="range" min="40" max="300" step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}
-            </div>
-            <div>
-                Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
-            </div>
-            <div>
-                Compàs:
-                <select value={getAudioGraphInstance().getCompas()} onChange={handleCompasChange}>
-                    <option value="2/4">2/4</option>
-                    <option value="3/4">3/4</option>
-                    <option value="4/4">4/4</option>
-                </select>
-            </div>
-            <div>
-                Current step: {getAudioGraphInstance().isPlayingArranjement() ? getAudioGraphInstance().getMainSequencerCurrentStep(): "-"}
-            </div> */}
+            <button className="btn btn-petit btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/stop_button.svg"): (appPrefix + "/static/src/img/stop_button_grid.svg")}/> : <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/play_button.svg"):(appPrefix + "/static/src/img/play_button_grid.svg")}/>}</button>
         </div>
     )
 };
