@@ -3,7 +3,7 @@ import './serverComs'
 import './audioEngine'
 import './sessionManager'
 import './midi'
-import './3rd_party/webaudio-pianoroll'
+import './3rd_party/gruf-pianoroll'
 
 // CSS
 import '../styles/index.scss'
