@@ -506,10 +506,20 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
         }
         stepsElementsPerRow.push(stepsElements)
     }
+
+    // Calculate transform scale style to adjust number of steps to current display
+    let transformStyle = {}
+    const scaleXTransFormFactor = 16 / numSteps;
+    if (scaleXTransFormFactor < 1) {
+        transformStyle = {
+            transform: `scaleX(${scaleXTransFormFactor}) translateX(-10px)`,
+            transformOrigin: 'left'
+        }
+    }
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
-            <div className="grid-default">
+            <div className="grid-default" style={transformStyle}>
                 {stepsElementsPerRow.map(function(stepsElements, i){
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
