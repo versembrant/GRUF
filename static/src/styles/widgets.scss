@@ -359,8 +359,8 @@
    
     .MuiSlider-thumb {
         border-radius: 2px;
-        height: 5px; 
-        width: 16px;
+        height: 6px; 
+        width: 24px;
         color: $white;
 
         &:hover {
@@ -713,7 +713,7 @@
     cursor: pointer;
     user-select: none;
     position: relative;
-    margin-right: 1px;
+    margin-right: 3px;
 
     &__input {
         display: none; // Ocultamos el checkbox nativo
@@ -722,8 +722,8 @@
     &__visual {
         width: 20px;
         height: 20px;
-        border: 2px solid $grey;
-        border-radius: 8px;
+        border: 1px solid $grey;
+        border-radius: 4px;
         background-color: transparent;
         color: $grey;
         font-size: 16px;
@@ -735,13 +735,13 @@
     }
 
     &__input:checked + .gruf-mute-checkbox__visual {
-        background-color: $bright-yellow;
+        background-color: $red;
         border-color: $black;
         color: $black;
     }
 
     &:hover .gruf-mute-checkbox__visual {
-        border-color: $black;
+        //border-color: $black;
     }
 }
 
@@ -759,8 +759,8 @@
     &__visual {
         width: 20px;
         height: 20px;
-        border: 2px solid $grey;
-        border-radius: 8px;
+        border: 1px solid $grey;
+        border-radius: 4px;
         background-color: transparent;
         color: $grey;
         font-size: 16px;
@@ -772,13 +772,13 @@
     }
 
     &__input:checked + .gruf-solo-checkbox__visual {
-        background-color: $light-grey;
+        background-color: $bright-yellow;
         border-color: $black;
         color: $black;
     }
 
     &:hover .gruf-solo-checkbox__visual {
-        border-color: $black;
+        //border-color: $black;
     }
 }
 
