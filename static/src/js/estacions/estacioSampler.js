@@ -122,14 +122,16 @@ export class EstacioSampler extends EstacioBase {
     }
 
     playBufferSlice(player, buffer, startPoint, endPoint, time) {
+        
         if (buffer && buffer.loaded) {
-            player.stop(0);
             const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
             player.buffer = buffer;
             player.loop = true;
             player.loopStart = start;
             player.loopEnd = end;
+            console.log(player, player.state);
             player.start(time, start, end - start);
+            console.log(player, player.state);
         }
     }
 
@@ -230,18 +232,21 @@ export class EstacioSampler extends EstacioBase {
         const end = this.getParameterValue(`end${playerIndex + 1}`, this.currentPreset);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        
-        if (buffer && envelope) {
-            envelope.triggerAttack(time);
+        if (player && buffer && envelope) {
             this.playBufferSlice(player, buffer, start, end, time);
+            envelope.triggerAttack(time);
         }
     }
 
     stopSoundFromPlayer(playerIndex, time) {
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        if (player) {
-            player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+        if (player && envelope) {
+            // Per algun motiu incomprensible, si es programa un stop per "al cap d'una estona" hi poden haver problemes
+            // amb el player reproduïnt sons multiples vegades (?). Com que fem servir un envelope per l'amplitud, deixarem
+            // el player funcionant "sempre" i d'aquesta manera evitem els problemes. Això vol dir que consumirà més recursos,
+            // però tampoc sabem si és significatiu. 
+            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
             envelope.triggerRelease(time);
         }
     }
