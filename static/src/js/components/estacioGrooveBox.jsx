@@ -14,7 +14,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
             <GrufKnobGranGlobal estacio={estacio} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
             <GrufKnobGranGlobal estacio={estacio} parameterName="bpm" top="8%" left="29.0%" label = 'Tempo' />
-            <GrufBpmCounter estacio={estacio} top="8%" left="39.6%" />
+            <GrufBpmCounter top="8%" left="39.6%" />
             <GrufLabel text="bpm" top="17.3%" left="41%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="51.7%" />
