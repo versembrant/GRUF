@@ -377,6 +377,17 @@ export class AudioGraph {
         }
     } 
 
+    getPanForEstacio(nomEstacio) {
+        return this.estacionsMasterChannelNodes[nomEstacio]?.pan?.value || 0; // Retorna el valor del panning o 0 si no està definit
+    }
+
+    setPanForEstacio(nomEstacio, panValue) {
+        const channelNode = this.estacionsMasterChannelNodes[nomEstacio];
+        if (channelNode) {
+            channelNode.pan.value = panValue; // Ajusta el panning
+        }
+    }
+
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
