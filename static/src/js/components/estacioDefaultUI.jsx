@@ -63,7 +63,7 @@ const BoolParameterDefaultWidget = ({ parameterDescription, parameterValue, nomE
 const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     const estacio = getCurrentSession().getEstacio(nomEstacio);
     const numRows = parameterDescription.numRows;
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
     for (let i = 0; i < numRows; i++) {
@@ -127,7 +127,7 @@ const GridParameterDefaultWidget = ({parameterDescription, parameterValue, nomEs
 
 const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
     const estacio = getCurrentSession().getEstacio(nomEstacio);
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps = estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
     let lastEditedData = "";

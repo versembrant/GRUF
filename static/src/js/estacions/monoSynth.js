@@ -97,7 +97,7 @@ export class MonoSynth extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
-        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+        const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes', this.currentPreset);
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
@@ -130,7 +130,7 @@ export class MonoSynth extends EstacioBase {
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
                 this.lastNoteOnBeats[midiNoteNumber] = currentStep;
             }
         } else {
@@ -140,7 +140,7 @@ export class MonoSynth extends EstacioBase {
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
                 if (lastNoteOnTimeForNote !== undefined){
                     const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                    const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
                         const notes = this.getParameterValue('notes', this.currentPreset);
