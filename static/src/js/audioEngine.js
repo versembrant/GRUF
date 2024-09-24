@@ -365,15 +365,16 @@ export class AudioGraph {
     }
 
     getNumSteps (){
+        const nCompassos = 2;
         const compas = this.getCompas();
         if (compas === '2/4'){
-            return 8
+            return 8 * nCompassos;
         } 
         else if (compas === '3/4') {
-            return 12
+            return 12 * nCompassos;
         }
         else if (compas === '4/4') {
-            return 16
+            return 16 * nCompassos;
         }
     } 
 

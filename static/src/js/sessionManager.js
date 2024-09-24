@@ -136,6 +136,10 @@ export class EstacioBase {
         }
     }
 
+    getNumSteps() {
+        return getAudioGraphInstance().getNumSteps();
+    }
+
     getCurrentLivePreset() {
         return getCurrentSession().getLivePresetsEstacions()[this.nom]
     }

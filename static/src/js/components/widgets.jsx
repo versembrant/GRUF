@@ -479,7 +479,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numRows = parameterDescription.numRows;
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
     for (let i = 0; i < numRows; i++) {
@@ -555,7 +555,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
     let lastEditedData = "";
