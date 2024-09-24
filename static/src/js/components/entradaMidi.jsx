@@ -7,11 +7,14 @@ import { buildAudioGraphIfNotBuilt } from "../utils";
 
 
 
-const sendNoteOn = (noteNumber, noteVelocity) => {
+export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOn'
+    }
+    if (document.getElementById("entradaMidiNomEstacio") === null){
+        return;
     }
     let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
     if (nomEstacio == "all") {
@@ -19,13 +22,21 @@ const sendNoteOn = (noteNumber, noteVelocity) => {
     }
     document.notesActivades[nomEstacio].add(noteNumber);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    if (!skipTriggerEvent) {
+        //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
+        const event = new CustomEvent("midiNoteOn-" + nomEstacio, { detail: {note: noteNumber, velocity: noteVelocity }});
+        document.dispatchEvent(event);
+    }
 }
 
-const sendNoteOff = (noteNumber, noteVelocity) => {
+export const sendNoteOff = (noteNumber, noteVelocity) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOff'
+    }
+    if (document.getElementById("entradaMidiNomEstacio") === null){
+        return;
     }
     let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
     if (nomEstacio == "all") {
@@ -269,7 +280,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
     });
 
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
-        //bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
     }
     
     return (
@@ -282,8 +293,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         value={estacioSelected}>
                     </input>
                     <NativeSelect
-                        //defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
-                        defaultValue={"cap"}
+                        defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
                         disableUnderline={true}
                         onChange={async (evt) => {
                             await buildAudioGraphIfNotBuilt();
@@ -292,7 +302,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         }}
                         sx={{
                             color: "#fff",
-                            "font-family": "Montserrat, sans-serif",
+                            "fontFamily": "Montserrat, sans-serif",
                             "svg": {
                                 fill: "#fff"
                             }

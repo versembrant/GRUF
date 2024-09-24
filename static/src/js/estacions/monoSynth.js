@@ -14,7 +14,7 @@ export class MonoSynth extends EstacioBase {
         decay: {type: 'float', label:'Decay', min: 0.0, max: 2.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', min: 0.0, max: 5.0, initial: 0.01},
-        waveform: {type: 'enum', label:'Waveform', options: ['sine', 'square', 'triangle', 'sawtooth'], initial: 'sawtooth'},
+        waveform: {type: 'enum', label:'Waveform', options: ['sawtooth', 'triangle', 'square', 'sine'], initial: 'sawtooth'},
         lpf: {type: 'float', label: 'LPF', min: 300, max: 12000, initial: 12000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 200, max: 3000, initial: 200, logarithmic: true},
         portamento: {type: 'float', label: 'Glide', min: 0.0, max: 0.3, initial: 0.0},
@@ -97,7 +97,7 @@ export class MonoSynth extends EstacioBase {
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
-        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+        const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes', this.currentPreset);
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
@@ -120,17 +120,23 @@ export class MonoSynth extends EstacioBase {
 
     lastNoteOnBeats = {}
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         if (!getAudioGraphInstance().graphIsBuilt()){ return };
 
-        const recEnabled = this.recEnabled('notes');
+        const notes = this.getParameterDescription('notes');
+        if (notes.hasOwnProperty('rangDeNotesPermeses')){
+            const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
+            midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
+        }
+
+        const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             this.audioNodes.synth.triggerAttack(Tone.Frequency(midiNoteNumber, "midi").toNote(), Tone.now());
             if (recEnabled){
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
                 this.lastNoteOnBeats[midiNoteNumber] = currentStep;
             }
         } else {
@@ -140,7 +146,7 @@ export class MonoSynth extends EstacioBase {
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
                 if (lastNoteOnTimeForNote !== undefined){
                     const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                    const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
                         const notes = this.getParameterValue('notes', this.currentPreset);
