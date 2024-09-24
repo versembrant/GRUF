@@ -135,8 +135,6 @@
                 border-color: red;
             }
         }
-    
-        
     }
 }
 
@@ -834,5 +832,55 @@
         .p-dropdown-item-label {
             color: $white;
         }
+    }
+}
+
+.grid-computer {
+    user-select: none;
+    position: absolute;
+    padding: 15px; 
+    border-radius: 10px; 
+    border: 1px solid $light-grey; 
+    
+    .grid-row-computer {
+        display: flex;
+        
+        .step {
+            height: 20px;
+            width: 20px;
+            text-align: center;
+            line-height: 20px;
+            vertical-align: middle;
+            cursor: hand;
+            border-radius: 5px;
+            margin: 2px;
+            background-color: $pale-orange;
+    
+            &.filled {
+                height: 18px;
+                width: 18px;
+                background-color: $black;
+                color: $white;
+                border: 1px solid $pale-orange;
+            }
+    
+            &.active {
+                background-color: $green;
+                color: $black;
+            }
+        }
+
+        .estacio-nom {
+            color: white;
+            font-size: 12px;
+            margin-right: 10px;
+            line-height: 25px;
+            width: 120px;
+            text-align: right;
+            position: absolute;
+            left: -135px;
+        }
+    
+        
     }
 }
