@@ -46,7 +46,12 @@ export class EstacioSampler extends EstacioBase {
     tipus = 'sampler'
     versio = '0.1'
     parametersDescription = {
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 16, permetScrollVertical: false},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
+            followsPreset: true, 
+            notaMesBaixaPermesa: 0,
+            rangDeNotesPermeses: 16, 
+            permetScrollVertical: false
+        },
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
             [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl()},

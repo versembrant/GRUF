@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, buildAudioGraphIfNotBuilt } from "../utils";
@@ -583,12 +583,44 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    sendNoteOn(evt.detail.midiNote, 127);
+                    sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }
+            document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
+                let noteNumber = evt.detail.note;                
+                if (parameterDescription.hasOwnProperty("rangDeNotesPermeses")) {
+                    const notaMesBaixaPermesa = parameterDescription.notaMesBaixaPermesa || 0;
+                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % parameterDescription.rangDeNotesPermeses);   
+                }
+                const noteHeight = jsElement.height/jsElement.yrange;
+                let bottomPosition = noteHeight * noteNumber;
+                const canvasOffset = jsElement.yoffset*noteHeight;
+                bottomPosition = bottomPosition - canvasOffset;
+
+                if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
+                    const noteMarker = document.createElement('div');
+                    noteMarker.style.position = 'absolute';
+                    noteMarker.style.bottom = (bottomPosition + 38) + 'px';
+                    noteMarker.style.left = modeSampler ? '0px': '22px';
+                    noteMarker.style.width = modeSampler ? '22px': '62px';
+                    noteMarker.style.height = (noteHeight * 0.9) + 'px';
+                    noteMarker.style.backgroundColor = colorNotes;
+                    noteMarker.style.zIndex = 1000;
+                    noteMarker.style.borderRadius = '2px';
+                    noteMarker.style.opacity = '0.5';
+                    noteMarker.style.pointerEvents = 'none';
+                    noteMarker.style.transition = 'opacity 1s ease-in-out;';
+                    jsElement.appendChild(noteMarker);
+
+                    setTimeout(() => {
+                        noteMarker.remove();
+                    }, 500);
+                }
+            })
+            
             jsElement.dataset.alreadyBinded = true;
         }
         if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
@@ -662,7 +694,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
@@ -676,7 +707,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
                     xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 24}
+                    yrange={parameterDescription.rangDeNotesPermeses || 36}
                     yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
                     xruler={0}
                     markstart={-10}  // make it dissapear
