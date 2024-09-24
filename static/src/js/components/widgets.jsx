@@ -44,6 +44,14 @@ export const GrufLabelPetitVertical = ({text, top, left}) => {
     )
 }
 
+export const GrufLabelEstacio = ({ estacio, className }) => {
+    return (
+        <div className={className}>
+            {estacio.nom} 
+        </div>
+    );
+};
+
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
         <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
@@ -772,4 +780,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
         </div>
     )
 }
+
+
+
 
