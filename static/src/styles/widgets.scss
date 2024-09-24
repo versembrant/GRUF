@@ -249,7 +249,7 @@
     }
 }
 
-.gruf-slider-vertical {
+.gruf-slider-vertical{
     position: absolute;
     font-size: 14px;
     height: 80px; 
@@ -779,5 +779,60 @@
 
     &:hover .gruf-solo-checkbox__visual {
         border-color: $black;
+    }
+}
+
+.gruf-selector-patrons-grid {
+    position: absolute;
+    font-size: 14px;
+
+    .p-dropdown {
+        width: 100%;
+        color: $white;
+
+
+        .p-placeholder {
+            color: $dark-grey
+        }
+
+        .p-dropdown-clear-icon {
+            color: $dark-grey;
+            margin-left: 85%;
+        }
+    }
+
+    button {
+        font-family: "Montserrat", sans-serif;
+        border: none;
+        background-color: transparent;
+        font-weight: 400;
+        color: $white;
+        cursor: pointer;
+        margin-left: calc(100% + 5px);
+        margin-top: -20px;
+
+        &.recording {
+            color: $red;
+            animation: blink 1s steps(7, start) infinite;
+        }
+    }
+      
+}
+
+.p-dropdown-items-wrapper {
+    background-color: $dark-grey!important;
+    padding: 5px;
+    max-height: 300px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+
+    .p-dropdown-item {
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        .p-dropdown-item-label {
+            color: $white;
+        }
     }
 }
