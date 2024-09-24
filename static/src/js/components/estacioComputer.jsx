@@ -1,7 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { AudioTransportControlsComputer } from "../components/audioTransport";
+import { handlePlayArranjementButton } from "../components/audioTransport";
 import { GrufButtonNoBorder } from "../components/widgets";
 
 
@@ -74,17 +74,17 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
         <div className="estacio-main">
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <div>
-                <AudioTransportControlsComputer/>
-                <br/>
-                <div className="grid-default">
-                    {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-default" key={'row_' + i}>{stepsElements}{nomsEstacions[i]}</div>;
-                    })}
+                <div style={{position:"absolute", top:35, left: 45}}>
+                    <button className="btn btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
                 </div>
+                <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
             <div>
-                <button onClick={handleClearClips}>Eliminar cips</button><br/>
-                {JSON.stringify(getCurrentSession().getArranjamentClips())}
+                <div className="grid-computer" style={{top:90, left: 150}}>
+                    {stepsElementsPerEstacio.map(function(stepsElements, i){
+                        return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
+                    })}
+                </div>
             </div>
         </div>
     </div>)
