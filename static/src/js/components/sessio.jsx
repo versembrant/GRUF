@@ -48,7 +48,7 @@ export const Sessio = () => {
     if (estacioSelected === undefined) {
         return (
             <div className="sessio-wrapper">
-                <SessionWelcomeDialog />
+                <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
@@ -80,7 +80,7 @@ export const Sessio = () => {
     } else {
         return(
             <div className="sessio-wrapper">
-                <SessionWelcomeDialog />
+                <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
