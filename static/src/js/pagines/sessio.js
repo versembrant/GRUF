@@ -3,7 +3,6 @@ import { joinSessionInServer } from "../serverComs";
 import { renderReactComponentInElement } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import { Sessio } from "../components/sessio";
-import { buildAudioGraphIfNotBuilt } from "../utils";
 
 
 const sessionElement = document.getElementsByTagName('session')[0];
@@ -16,7 +15,8 @@ const onSessionDataLoaded = () => {
 
     // Configure some session-related things of the audio graph
     const currentSession = getCurrentSession();
-    const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
+
+    const isMasterAudioEngine = currentSession.localMode || sessionElement.dataset.masterAudioEngine === 'true';
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);
@@ -37,9 +37,6 @@ const onSessionDataLoaded = () => {
             estacio.updateAudioGraphFromState(estacio.getCurrentLivePreset())
         })
     }
-
-    // Build audio graph if needed
-    // buildAudioGraphIfNotBuilt(); // Can't do that here because web audio click limitations, we should first show some dialog to the user and then build the audio graph
 
     // Some log statements useful for debugging
     console.log(getCurrentSession());
