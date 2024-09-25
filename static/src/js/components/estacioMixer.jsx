@@ -191,7 +191,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
-                            <div key={nomEstacio} className="estacio-columna">
+                            <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
                                 <GrufPanKnob estacio={estacio} />
                                 
                                 <div className="slider-wrapper">
