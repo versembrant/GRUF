@@ -768,12 +768,14 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
             <Dropdown 
-            value={estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset())}
-            onChange={(evt) => {
-                estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
-            }} 
-            options={sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}) )}
-            placeholder="Cap"
+                value={estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset())}
+                onChange={(evt) => {
+                    estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
+                }} 
+                options={[...getCurrentSession().getRecordedFiles().map(item => ({'label': item + ' (-)', 'value': item})),
+                          ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
+                        ]}
+                placeholder="Cap"
             />
         </div>
     )
