@@ -24,6 +24,12 @@ button {
     }
 }
 
+button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
 .btn-menys-marge {
     padding: 10px 20px;
 }
@@ -40,8 +46,8 @@ button {
     border-color: $green;
     
     &:hover {
-        border-color: $grey;
-        color: $grey;
+        border-color: $white;
+        color: $white;
     }
 }
 

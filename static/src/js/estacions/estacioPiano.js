@@ -77,7 +77,7 @@ export class EstacioPiano extends EstacioBase {
     lastNoteOnBeats = {}
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().graphIsBuilt()){ return };
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
 
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
