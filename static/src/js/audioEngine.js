@@ -310,6 +310,7 @@ export class AudioGraph {
     }
 
     receiveMidiEventFromServer(nomEstacio, data) {
+        
         if ((!getCurrentSession().localMode) && (data.origin_socket_id === getSocketID())){
             // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
@@ -322,6 +323,12 @@ export class AudioGraph {
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
             });
+        }
+
+        //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
+        if (!data.skipTriggerEvent) {    
+            const event = new CustomEvent("midiNoteOn-" + nomEstacio, { detail: {note: data.noteNumber, velocity: data.noteVelocity }});
+            document.dispatchEvent(event);
         }
     }
 

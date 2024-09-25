@@ -346,6 +346,7 @@ export class EstacioBase {
 
 export class Session {
     constructor(data, local=false) {
+        this.useAudioEngine = true
         this.localMode = local
         this.performLocalUpdatesBeforeServerUpdates = true
         
@@ -377,6 +378,14 @@ export class Session {
             }
         });
         this.store = createStore(combineReducers(reducers));
+    }
+
+    setAudioOff() {
+        this.useAudioEngine = false;
+    }
+
+    usesAudioEngine() {
+        return this.useAudioEngine;
     }
 
     setParametreInStore(nomParametre, valor) {
@@ -528,9 +537,7 @@ export class Session {
     }
 
     setEstacionsMutesAndSolosInChannelNodes(mutes, solos) {
-        if (getAudioGraphInstance().graphIsBuilt() === false){
-            return;
-        };
+        if (!getAudioGraphInstance().graphIsBuilt()){ return; };
         const someAreSoloed = Object.values(solos).some(solo => solo === true);
         Object.keys(mutes).forEach(nomEstacio => {
             const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);

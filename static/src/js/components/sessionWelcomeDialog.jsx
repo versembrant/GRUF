@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { LabelUsuarisConnectats } from './sessionConnectedUsers';
+import { buildAudioGraphIfNotBuilt } from "../utils";
+import { getCurrentSession } from '../sessionManager';
 
 
 export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
@@ -14,11 +16,11 @@ export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
      });
 
     const connectaAmbAudio = () => {
-        console.log("Connecta amb audio")
+        buildAudioGraphIfNotBuilt();
     }
 
     const connectaSenseAudio = () => {
-        console.log("Connecta sense audio")
+        getCurrentSession().setAudioOff()
     }
 
     const showDialog = () => {
