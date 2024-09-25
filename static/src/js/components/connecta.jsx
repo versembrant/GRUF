@@ -39,7 +39,7 @@ export const Connecta = ({infoSessions}) => {
                 <div>
                     <h3>Últims GRUFs:</h3>
                     <ul>
-                        {infoSessions.slice(0, 10).map((item, index) => <li key={item.id}>{ item.id } "{ item.name }" ({ item.num_estacions } estacions, { item.connected_users.length } usuaris)&nbsp;
+                        {infoSessions.slice(0, 10).map((item, index) => <li key={item.id}>{ item.id } "{ item.name }" ({ item.num_estacions + 2 } estacions, { item.connected_users.length } usuaris)&nbsp;
                             <a className="btn btn-petit btn-gris" href={appPrefix + "/gruf/" + item.id}>Connecta't</a>&nbsp;
                             <a className="btn btn-petit btn-gris" href={appPrefix + "/gruf/" + item.id + "/?local=1"}>Connecta't (mode local)</a>&nbsp;
                             <a className="btn btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}

@@ -1,80 +1,61 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Button } from 'primereact/button';
+import { LabelUsuarisConnectats } from './sessionConnectedUsers';
 
 
-
-export const SessionWelcomeDialog = () => {
+export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
 
     useEffect(() => {
         // call api or anything
         if (!document.hasOwnProperty("welcomeDialogShown")){
-            confirm1();
+            showDialog();
         }
         
      });
 
-    const accept = () => {
-        console.log("Accepted");
-        document.welcomeDialogShown = true;
-    };
+    const connectaAmbAudio = () => {
+        console.log("Connecta amb audio")
+    }
 
-    const reject = () => {
-        console.log("Reject");
-        document.welcomeDialogShown = true;
-    };
+    const connectaSenseAudio = () => {
+        console.log("Connecta sense audio")
+    }
 
-    const confirm1 = () => {
-        confirmDialog({
-            group: 'headless',
-            message: 'Are you sure you want to proceed?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            defaultFocus: 'accept',
-            accept,
-            reject
-        });
+    const showDialog = () => {
+        confirmDialog({group: 'headless'});
     };
-
-    
 
     return (
-        <div>
         <ConfirmDialog
             group="headless"
-            content={({ headerRef, contentRef, footerRef, hide, message }) => (
-                <div className="flex flex-column align-items-center p-5 surface-overlay border-round">
-                    <div className="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8">
-                        <i className="pi pi-question text-5xl"></i>
+            content={({ hide }) => (
+                <div>
+                    <div className="icona">
+                        <img src={appPrefix + "/static/src/img/logo_gruf_g.svg"}></img>
                     </div>
-                    <span className="font-bold text-2xl block mb-2 mt-4" ref={headerRef}>
-                        {message.header}
-                    </span>
-                    <p className="mb-0" ref={contentRef}>
-                        {message.message}
-                    </p>
-                    <div className="flex align-items-center gap-2 mt-4" ref={footerRef}>
-                        <Button
-                            label="Save"
-                            onClick={(event) => {
-                                hide(event);
-                                accept();
-                            }}
-                            className="w-8rem"
-                        ></Button>
-                        <Button
-                            label="Cancel"
-                            outlined
-                            onClick={(event) => {
-                                hide(event);
-                                reject();
-                            }}
-                            className="w-8rem"
-                        ></Button>
+                    <div className="info">
+                        <div className="titol">
+                            T'has afegit a la sessió <span className="text-grey">#{sessionID}</span> {nomSessio}
+                        </div>
+                        <div className="text-grey">
+                            (<LabelUsuarisConnectats/>)
+                        </div>
+                    </div>
+                    <div className="buttons">
+                        <button className="btn" onClick={(evt) => {
+                            hide(evt);
+                            document.welcomeDialogShown = true;
+                            connectaAmbAudio();
+                        }}>Connecta amb àudio <img height="20px" src={appPrefix + "/static/src/img/loudspeaker_on.svg"}></img></button>
+                        <button className="btn" onClick={(evt) => {
+                            hide(evt);
+                            document.welcomeDialogShown = true;
+                            connectaSenseAudio();
+                        }}>Connecta sense àudio <img height="20px" src={appPrefix + "/static/src/img/loudspeaker_off.svg"}></img></button>
+                        
                     </div>
                 </div>
             )}
         />
-        </div>
     )
 }
