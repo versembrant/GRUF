@@ -190,9 +190,10 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            const estacioPremuteChannel = new Tone.Channel().connect(estacioMasterChannel);
             const estacioMeterNode = new Tone.Meter();
-            estacioMasterChannel.connect(estacioMeterNode);
-            estacio.buildEstacioAudioGraph(estacioMasterChannel);
+            estacioPremuteChannel.connect(estacioMeterNode);
+            estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
