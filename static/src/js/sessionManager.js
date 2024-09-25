@@ -573,7 +573,7 @@ export class Session {
                     const volume = Tone.gainToDb(updateData.gains_estacions[nomEstacio]);
                     channelNode.volume.value = volume;
                 }
-                
+                this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
             })
         } else if (updateData.accio === 'set_mutes') {
             Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {
