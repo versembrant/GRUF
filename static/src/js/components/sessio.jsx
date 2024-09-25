@@ -57,7 +57,7 @@ export const Sessio = () => {
                         </div>
                     </div>
                     <div className="tria-estacions">
-                        <h3>Tria una estació:</h3>
+                        <h3 style={{fontWeight: 400}}>Tria una estació:</h3>
                         <div className="grid-estacions">
                             {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <div key={nomEstacio} className="grid-estacio-element" data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}><img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/><div data-nom-estacio={nomEstacio}>{nomEstacio}</div></div>)}
                             <div className="grid-estacio-element" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
