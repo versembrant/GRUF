@@ -84,6 +84,7 @@ export class AudioGraph {
 
     setMasterAudioEngine(valor) {
         this.setParametreInStore('isMasterAudioEngine', valor);
+        console.log("Master audio engine: ", this.isMasterAudioEngine())
     }
 
     audioEngineIsSyncedToRemote() {

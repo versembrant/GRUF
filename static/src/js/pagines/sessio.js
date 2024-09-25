@@ -15,7 +15,8 @@ const onSessionDataLoaded = () => {
 
     // Configure some session-related things of the audio graph
     const currentSession = getCurrentSession();
-    const isMasterAudioEngine = currentSession.localMode || currentSession.rawData.connected_users.length <= 1;
+
+    const isMasterAudioEngine = currentSession.localMode || sessionElement.dataset.masterAudioEngine === 'true';
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);

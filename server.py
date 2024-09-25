@@ -326,10 +326,16 @@ def new():
     return render_template('nova_sessio.html')
 
 
+@bp.route('/gruf/<session_id>/master/')
+def session_master(session_id):
+    s = get_session_by_id(session_id)
+    return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1', master_audio_engine=True)
+
+
 @bp.route('/gruf/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
-    return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1')
+    return render_template('sessio.html', session=s, local_mode=request.args.get('local') == '1', master_audio_engine=request.args.get('master') == '1')
 
 
 @bp.route('/delete_session/<session_id>/')

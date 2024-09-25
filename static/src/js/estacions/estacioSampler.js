@@ -129,9 +129,7 @@ export class EstacioSampler extends EstacioBase {
             player.loop = true;
             player.loopStart = start;
             player.loopEnd = end;
-            console.log(player, player.state);
             player.start(time, start, end - start);
-            console.log(player, player.state);
         }
     }
 
