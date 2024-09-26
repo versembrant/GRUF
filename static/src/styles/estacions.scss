@@ -282,13 +282,24 @@
     }
 
     .volume-meter {
-        position: relative;
+        // suposant que 0dB és al 91% (range entre -60 i +6)
+        background-image: linear-gradient(
+        0deg,
+        hsl(145deg 100% 50%) 0%,
+        hsl(62deg 100% 51%) 91%,
+        hsl(40deg 100% 50%) 95%,
+        hsl(30deg 100% 50%) 97%,
+        hsl(20deg 100% 50%) 99%,
+        hsl(10deg 100% 50%) 100%
+        );
+        --level: 0%;
+        clip-path: inset(calc(100% - var(--level)) 0 0 0);
+        height: 100%;
         width: 10px;
-        background-color: transparent;
         border: none;
+        position: relative;
         display: flex;
         flex-direction: column-reverse;
-        height: 100%; 
         z-index: 0;
     }
     

@@ -158,24 +158,9 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         const maxDB = 6;
                         const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre -60 i 0 dB
 
-                        const height = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+                        const level = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
     
-                        meterLevelDiv.style.height = `${height}%`;
-    
-                        let color;
-                        if (db <= -2) {
-                            const greenToYellow = Math.min(1, (db + 60) / 50);
-                            const green = Math.round(255 * (1 - greenToYellow));
-                            const red = Math.round(255 * greenToYellow);
-                            color = `rgb(${red}, 255, 0)`; 
-                        } else {
-                            const yellowToRed = Math.min(1, (db + 10) / 16);
-                            const red = 255;
-                            const green = Math.round(255 * (1 - yellowToRed));
-                            color = `rgb(${red}, ${green}, 0)`; 
-                        }
-    
-                        meterLevelDiv.style.backgroundColor = color;
+                        meterLevelDiv.style.setProperty('--level', `${level}%`);
                     }
                 });
             }, 100);
