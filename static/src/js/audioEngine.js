@@ -120,6 +120,11 @@ export class AudioGraph {
         }
     }
 
+    isMutedEstacio(nomEstacio) {
+        if (!this.graphIsBuilt()) return false;
+        return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
+    }
+
     //Creem uns efectes
     initEffects(){
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
