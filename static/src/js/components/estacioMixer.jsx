@@ -140,6 +140,31 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
+export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
+    return (
+        <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
+            <GrufPanKnob estacio={estacio} />
+
+            <div className="slider-wrapper">
+                <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
+                <div
+                    id={`meter-${nomEstacio}`}
+                    className="volume-meter"
+                    ref={(el) => (metersRef.current[nomEstacio] = el)}
+                >
+                    <div className="volume-level" />
+                </div>
+            </div>
+
+            <div className="mute-solo-container">
+                <GrufMuteCheckbox estacio={estacio} />
+                <GrufSoloCheckbox estacio={estacio} />
+            </div>
+            <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
+        </div>
+    )
+}
+
 export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
@@ -151,6 +176,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
             document.levelMeterInterval = setInterval(() => {
                 getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
                     const levelData = getAudioGraphInstance().getCurrentLevelEstacio(nomEstacio);
+                    const isMuted = getAudioGraphInstance().isMutedEstacio(nomEstacio);
                     const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
     
                     if (meterLevelDiv) {
@@ -173,6 +199,9 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         }
     
                         meterLevelDiv.style.backgroundColor = color;
+
+                        if (isMuted) meterLevelDiv.classList.add("grayscale");
+                        else meterLevelDiv.classList.remove("grayscale");
                     }
                 });
             }, 100);
@@ -191,26 +220,12 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
-                            <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-                                <GrufPanKnob estacio={estacio} />
-                                
-                                <div className="slider-wrapper">
-                                    <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
-                                    <div
-                                        id={`meter-${nomEstacio}`}
-                                        className="volume-meter"
-                                        ref={(el) => (metersRef.current[nomEstacio] = el)}
-                                    >
-                                        <div className="volume-level" />
-                                    </div>
-                                </div>
-
-                                <div className="mute-solo-container">
-                                    <GrufMuteCheckbox estacio={estacio} />
-                                    <GrufSoloCheckbox estacio={estacio} />
-                                </div>
-                                <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
-                            </div>
+                            <EstacioMixerTrack
+                            key={nomEstacio}
+                            nomEstacio={nomEstacio}
+                            estacio={estacio}
+                            metersRef = {metersRef}
+                            />
                         );
                     })}
                 </div>
