@@ -154,8 +154,11 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
     
                     if (meterLevelDiv) {
-                        const db = Math.max(-60, Math.min(levelData.db, 12)); // Limitar entre -60 y 12 dB
-                        const height = ((db + 60) / 60) * 100; // Escalar entre 0 y 100%
+                        const minDB = -60;
+                        const maxDB = 6;
+                        const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre -60 i 0 dB
+
+                        const height = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
     
                         meterLevelDiv.style.height = `${height}%`;
     
