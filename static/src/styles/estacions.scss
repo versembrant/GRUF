@@ -291,6 +291,10 @@
         height: 100%; 
         z-index: 0;
     }
+
+    .grayscale {
+        filter: grayscale(1);
+    }
     
     .volume-level {
         width: 100%;
