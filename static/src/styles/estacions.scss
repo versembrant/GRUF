@@ -220,7 +220,7 @@
     }
 }
 
-.estacio-columna {
+.estacio-mixer-columna {
     display: flex;
     flex-direction: column; 
     align-items: center;
@@ -282,6 +282,23 @@
         bottom: -25px;
     } 
 }
+
+.estacio-mixer-master-columna {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: end; 
+    margin: 10px;
+    margin-right: 0px;
+    width: 50px;
+    padding: 10px; 
+    border-radius: 10px; 
+    border: 1px solid $light-grey; 
+    height: 100%;
+    margin-top: 75px;
+    position: relative;
+}
+
 .estacio-computer {
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
