@@ -157,10 +157,8 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         const minDB = -60;
                         const maxDB = 6;
                         const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
-
-                        const level = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
-    
-                        meterLevelDiv.style.setProperty('--level', `${level}%`);
+                        const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+                        meterLevelDiv.style.setProperty('--meter-level', `${meterLevel}%`);
                     }
                 });
             }, 100);
