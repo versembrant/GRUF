@@ -174,8 +174,11 @@ export class AudioGraph {
 
         // Crea els nodes master  (per tenir un controls general)
         this.masterLimiter = new Tone.Limiter(-1).toDestination();
-        this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
-        this.masterGainNode = new Tone.Gain(this.getMasterGain()).connect(this.masterPanNode);
+        //this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
+        this.masterGainNode = new Tone.Channel({
+            volume: this.getMasterGain(),
+            pan: this.getMasterPan(),
+        }).connect(this.masterLimiter);
         
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
@@ -335,7 +338,7 @@ export class AudioGraph {
     setMasterGain(gain) {
         this.setParametreInStore('masterGain', gain);
         if (this.graphIsBuilt()){
-            this.masterGainNode.gain.value = gain;
+            this.masterGainNode.volume.value = Tone.gainToDb(gain); 
         }
     }
 
@@ -346,7 +349,7 @@ export class AudioGraph {
     setMasterPan(pan){
         this.setParametreInStore('masterPan', pan);
         if (this.graphIsBuilt()){
-            this.masterPanNode.pan.setValueAtTime(pan, 0.05);
+            this.masterGainNode.pan.setValueAtTime(pan, 0.05);
         }
     }
     
