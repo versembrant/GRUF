@@ -179,7 +179,7 @@ export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
     };
 
     return (
-        <div className="gruf-gain-slider-vertical" style={style}>
+        <div className="gruf-master-gain-slider-vertical" style={style}>
             <Slider
                 orientation="vertical"
                 value={masterGain}
@@ -265,9 +265,10 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             </div>
                         );
                     })}
-                    <div className="estacio-mixer-master-columna" label = "Master">
+                    <div className="estacio-mixer-master-columna">
                         <GrufMasterPanKnob/>
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                        <div className="master-label">Master</div>
                     </div>
                 </div>
             </div>
