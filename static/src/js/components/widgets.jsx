@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, buildAudioGraphIfNotBuilt } from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
@@ -411,7 +411,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     };
 
     const playSample = async (playerIndex) => {
-        await buildAudioGraphIfNotBuilt()
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(playerIndex, Tone.now());
@@ -419,9 +419,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     }; 
 
     const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){
-            return;
-        }
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.stopSoundFromPlayer(playerIndex, Tone.now());

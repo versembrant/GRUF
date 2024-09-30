@@ -38,11 +38,12 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
             const clip = getClipPerBeatIEstacio(nomsEstacions[i], j * beatsPerStep) 
             const preset = clip ? clip.preset : -1;
             const filledClass = preset > -1 ? 'filled' : '';
+            const estacioClasses = "estacio-" + getCurrentSession().getEstacio(nomsEstacions[i]).tipus + " computer-step"
             const activeStep = getAudioGraphInstance().isPlayingArranjement() && (currentStep >= j * beatsPerStep && currentStep < (j  + 1) * beatsPerStep) ? 'active' : '';
             stepsElements.push(
             <div 
                 key={i + "_" + j} // To avoid React warning
-                className={'step ' + filledClass + ' ' + activeStep}
+                className={'step ' + filledClass + ' ' + activeStep + ' ' + estacioClasses}
                 onMouseDown={(evt) => {
                     // TODO: increase preset by 1 (and cycle presets if needed)
                     const estacio = getCurrentSession().getEstacio(nomsEstacions[i]);
@@ -75,7 +76,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <div>
                 <div style={{position:"absolute", top:35, left: 45}}>
-                    <button className="btn btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
+                    <button disabled={!getAudioGraphInstance().graphIsBuilt()} className="btn btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
                 </div>
                 <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
