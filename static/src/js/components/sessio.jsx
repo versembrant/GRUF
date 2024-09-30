@@ -5,8 +5,9 @@ import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
-import { AudioRecorder } from "../components/audioRecorder";
+//import { AudioRecorder } from "../components/audioRecorder";
 import { getURLParamValue, removeURLParam } from "../utils";
+import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -47,6 +48,7 @@ export const Sessio = () => {
     if (estacioSelected === undefined) {
         return (
             <div className="sessio-wrapper">
+                <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
@@ -55,7 +57,7 @@ export const Sessio = () => {
                         </div>
                     </div>
                     <div className="tria-estacions">
-                        <h3>Tria una estació:</h3>
+                        <h3 style={{fontWeight: 400}}>Tria una estació:</h3>
                         <div className="grid-estacions">
                             {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <div key={nomEstacio} className="grid-estacio-element" data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}><img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/><div data-nom-estacio={nomEstacio}>{nomEstacio}</div></div>)}
                             <div className="grid-estacio-element" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
@@ -78,6 +80,7 @@ export const Sessio = () => {
     } else {
         return(
             <div className="sessio-wrapper">
+                <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
                         <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>

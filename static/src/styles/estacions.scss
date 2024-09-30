@@ -86,7 +86,14 @@
     }
     .selected {
         background-color: $orange!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $orange;
+    }  
+    &.computer-step {
+        border-color: $orange;
+        background-color: $orange;
+    }  
 }
 
 .estacio-piano-logo {
@@ -105,7 +112,14 @@
     }
     .selected {
         background-color: $yellow!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $yellow;
+    }
+    &.computer-step {
+        border-color: $yellow!important;
+        background-color: $yellow!important;
+    }  
 }
 
 .estacio-groovebox-logo {
@@ -124,7 +138,14 @@
     }
     .selected {
         background-color: $red!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $red;
+    }
+    &.computer-step {
+        border-color: $red!important;
+        background-color: $red!important;
+    }        
 }
 
 .estacio-synth-logo {
@@ -143,7 +164,14 @@
     }
     .selected {
         background-color: $pink!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $pink;
+    }
+    &.computer-step {
+        border-color: $pink!important;
+        background-color: $pink!important;
+    }  
 }
 
 .estacio-synth_bass-logo {
@@ -163,7 +191,15 @@
 
     .selected {
         background-color: $lightblue!important;
-    }    
+    }
+    
+    &.mixer-border {
+        border-color: $lightblue;
+    }
+    &.computer-step {
+        border-color: $lightblue!important;
+        background-color: $lightblue!important;
+    }  
 }
 
 .estacio-sampler-logo {
@@ -230,7 +266,7 @@
     width: 50px;
     padding: 10px; 
     border-radius: 10px; 
-    border: 1px solid $light-grey; 
+    border: 2px solid $light-grey; 
     height: 100%;
     margin-top: 75px;
     position: relative;
@@ -254,6 +290,10 @@
         flex-direction: column-reverse;
         height: 100%; 
         z-index: 0;
+    }
+
+    .grayscale {
+        filter: grayscale(1);
     }
     
     .volume-level {
@@ -293,7 +333,7 @@
     width: 50px;
     padding: 10px; 
     border-radius: 10px; 
-    border: 1px solid $light-grey; 
+    border: 2px solid $light-grey; 
     height: 100%;
     margin-top: 75px;
     position: relative;

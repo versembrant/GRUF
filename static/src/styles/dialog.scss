@@ -1,0 +1,46 @@
+.p-dialog-mask {
+    background-color: rgba(0,0,0,0.75);
+}
+
+.p-confirm-dialog {
+    background-color: $black;
+    padding: 30px;
+    border-radius: 10px;
+    color: $white;
+    font-size: 14px;
+
+    .icona {
+        text-align: center;
+        img {
+            height: 80px;
+        }
+    }
+
+    .info {
+        margin-bottom: 20px;
+        margin-top: 5px;
+        text-align: center;
+
+        .titol {
+            color: $white;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 10px;
+
+        }
+    }
+
+    .buttons {
+        text-align: center;
+
+        button {
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 10px;
+            img {
+                vertical-align: bottom;
+                margin-left: 5px;
+            }
+        }
+    }
+}
