@@ -732,6 +732,10 @@
         transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
+    &__input.indirect-mute + .gruf-mute-checkbox__visual {
+        background-color: $pale-orange;
+    }
+
     &__input:checked + .gruf-mute-checkbox__visual {
         background-color: $red;
         border-color: $black;
