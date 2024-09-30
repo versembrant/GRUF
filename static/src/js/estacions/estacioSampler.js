@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import { EstacioBase } from "../sessionManager";
+import { EstacioBase, getCurrentSession } from "../sessionManager";
 import { indexOfArrayMatchingObject} from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 import { EstacioSamplerUI } from "../components/estacioSampler";
@@ -7,6 +7,8 @@ import { sampleLibrary} from "../sampleLibrary";
 
 
 const getSoundURL = (soundName) => {
+    // Try find sound name in sample library
+    let soundFound = undefined;
     sampleLibrary.sampler.forEach((sound) => {
         if (sound.name.toLowerCase() === soundName.toLowerCase()) {
             soundFound = sound.url;
@@ -14,6 +16,11 @@ const getSoundURL = (soundName) => {
     });
     if (soundFound !== undefined) {
         return soundFound;
+    }
+    // Try find sound name in library of uploaded sounds
+    const uploadsSoundIndex = getCurrentSession().getRecordedFiles().indexOf(soundName);
+    if (uploadsSoundIndex > -1) {
+        return '/gruf/static/uploads/' + getCurrentSession().getID() +  '/' + getCurrentSession().getRecordedFiles()[uploadsSoundIndex];
     }
     // Otherwise, return default sound
     return 'https://cdn.freesound.org/previews/262/262495_2331961-hq.mp3' // Dark pad 
@@ -99,6 +106,7 @@ export class EstacioSampler extends EstacioBase {
 
     carregaSoDeLaLlibreria(soundName) {
         const url = getSoundURL(soundName);
+        console.log("Carregant so de la llibreria: ", url);
         for (let i = 0; i < 16; i++) {
             this.updateParametreEstacio(`sound${i + 1}URL`, url);
         }
@@ -182,6 +190,7 @@ export class EstacioSampler extends EstacioBase {
     setParameterInAudioGraph(name, value, preset) {
         const match = name.match(/^sound(\d+)URL$/);
         if (match) {
+            if (!getAudioGraphInstance().graphIsBuilt()) { return; }
             const index = parseInt(match[1], 10) - 1;
             this.loadSoundInBuffer(index, value);
         }
