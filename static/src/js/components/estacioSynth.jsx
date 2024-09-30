@@ -6,7 +6,6 @@ import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
-    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
     return (<div key={estacio.nom} className="estacio estacio-synth">
         <div className="estacio-main">

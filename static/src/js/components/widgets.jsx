@@ -11,6 +11,7 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
+import { subscribeToStoreChanges } from "../utils";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -482,6 +483,8 @@ export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1
 };
 
 export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
+    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
+
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numRows = parameterDescription.numRows;
@@ -569,6 +572,8 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 }
 
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
+    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
+
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numSteps =  estacio.getNumSteps();
@@ -731,7 +736,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
                     colrulerborder={"#4b4b4b"}
-                    cursorsrc={"/gruf/static/src/img/playhead.svg"}
+                    cursorsrc={"/gruf/static/src/img/playhead_long.svg"}
                     kbwidth={modeSampler === undefined ? 65: 0}
                     kbstyle={modeSampler === undefined ? "piano": "midi"}
                     yruler={modeSampler === undefined ? 20: 22}
