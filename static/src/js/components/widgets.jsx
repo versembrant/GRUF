@@ -12,6 +12,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import { subscribeToStoreChanges } from "../utils";
+import throttle from 'lodash.throttle'
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -73,7 +74,7 @@ export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
             max={1.0}
             step={0.01}
             size={60}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
+            onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
             valueTemplate={""}
             valueColor={cssVariables.white} 
             rangeColor={cssVariables.grey} 
@@ -96,7 +97,7 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
             max={1.0}
             step={0.01}
             size={25}
-            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription))} 
+            onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
             valueTemplate={""}
             valueColor={cssVariables.white}
             rangeColor={cssVariables.grey}
@@ -204,7 +205,7 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label })
                 max={parameterName === 'bpm' ? 300 : 1}
                 step={parameterName === 'bpm' ? 1 : 0.01}
                 size={60}
-                onChange={(e) => handleKnobChange(e.value)}
+                onChange={throttle((e) => handleKnobChange(e.value), getCurrentSession().continuousControlThrottleTime)}
                 valueTemplate={""}
                 valueColor={cssVariables.white}
                 rangeColor={cssVariables.grey}            
@@ -290,7 +291,7 @@ export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft,
                 min={0.0}
                 max={1.0}
                 marks={marks}
-                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))} 
+                onChange={(evt) => throttle(getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
             />
         </div>
     )
@@ -330,7 +331,7 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
                 min={0.0}
                 max={1.0}
                 marks={marks} 
-                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription))}
+                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
             />
         </div>
     )
