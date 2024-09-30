@@ -47,7 +47,7 @@ export const GrufLabelPetitVertical = ({text, top, left}) => {
 export const GrufLabelEstacio = ({ estacio, className }) => {
     return (
         <div className={className}>
-            {estacio.nom} 
+            {estacio.nom}
         </div>
     );
 };
