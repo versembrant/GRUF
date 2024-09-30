@@ -120,6 +120,11 @@ export class AudioGraph {
         }
     }
 
+    isMutedEstacio(nomEstacio) {
+        if (!this.graphIsBuilt()) return false;
+        return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
+    }
+
     //Creem uns efectes
     initEffects(){
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
@@ -190,9 +195,10 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            const estacioPremuteChannel = new Tone.Gain().connect(estacioMasterChannel);
             const estacioMeterNode = new Tone.Meter();
-            estacioMasterChannel.connect(estacioMeterNode);
-            estacio.buildEstacioAudioGraph(estacioMasterChannel);
+            estacioPremuteChannel.connect(estacioMeterNode);
+            estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
