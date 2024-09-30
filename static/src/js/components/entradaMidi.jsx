@@ -3,15 +3,17 @@ import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
 import Checkbox from '@mui/material/Checkbox';
 import NativeSelect from '@mui/material/NativeSelect';
-import { buildAudioGraphIfNotBuilt } from "../utils";
 
 
-
-const sendNoteOn = (noteNumber, noteVelocity) => {
+export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
-        type: 'noteOn'
+        type: 'noteOn',
+        skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
+    }
+    if (document.getElementById("entradaMidiNomEstacio") === null){
+        return;
     }
     let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
     if (nomEstacio == "all") {
@@ -21,11 +23,14 @@ const sendNoteOn = (noteNumber, noteVelocity) => {
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-const sendNoteOff = (noteNumber, noteVelocity) => {
+export const sendNoteOff = (noteNumber, noteVelocity) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOff'
+    }
+    if (document.getElementById("entradaMidiNomEstacio") === null){
+        return;
     }
     let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
     if (nomEstacio == "all") {
@@ -63,12 +68,10 @@ export const EntradaMidi = ({estacioSelected}) => {
     }
 
     const handleKeyDown = async (evt) => {
-        await buildAudioGraphIfNotBuilt()
         sendNoteOn(getMidiNoteNoteNumber(evt.target), 127);
     }
 
     const handleKeyUp = async (evt) => {  
-        await buildAudioGraphIfNotBuilt()
         sendNoteOff(getMidiNoteNoteNumber(evt.target), 127);
     }
 
@@ -109,7 +112,6 @@ export const EntradaMidi = ({estacioSelected}) => {
     if (document.inputKeyDownEventBinded === undefined){
         document.inputKeyDownEventBinded = true;
         document.addEventListener('keydown', async (evt) => {
-            await buildAudioGraphIfNotBuilt()
             if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
                 // If typing in a text input, do not trigger MIDI events from keypress
             } else if (evt.repeat) {
@@ -158,7 +160,6 @@ export const EntradaMidi = ({estacioSelected}) => {
         })
 
         document.addEventListener('keyup', async (evt) => {
-            await buildAudioGraphIfNotBuilt()
             if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
                 // If typing in a text input, do not trigger MIDI events from keypress
             } else if (evt.repeat) {
@@ -219,7 +220,7 @@ export const EntradaMidi = ({estacioSelected}) => {
                 </select>
             </div>
             <div>
-                <label>Enviar al servidor: <input id="forwardToServer" type="checkbox" defaultChecked={false} /></label>
+                <label>Enviar al servidor: <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} /></label>
             </div>
             <div>
                 <button data-midi-pad="0" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #1</button>
@@ -245,7 +246,6 @@ export const EntradaMidi = ({estacioSelected}) => {
                     <select
                         defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
                         onChange={async (evt) => {
-                            await buildAudioGraphIfNotBuilt();
                             localStorage.setItem("lastMidiInputDevice", evt.target.value);
                             bindMidiInputDevice(evt.target.value);
                         }}>
@@ -269,7 +269,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
     });
 
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
-        //bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
     }
     
     return (
@@ -282,17 +282,15 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         value={estacioSelected}>
                     </input>
                     <NativeSelect
-                        //defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
-                        defaultValue={"cap"}
+                        defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
                         disableUnderline={true}
                         onChange={async (evt) => {
-                            await buildAudioGraphIfNotBuilt();
                             localStorage.setItem("lastMidiInputDevice", evt.target.value);
                             bindMidiInputDevice(evt.target.value);
                         }}
                         sx={{
                             color: "#fff",
-                            "font-family": "Montserrat, sans-serif",
+                            "fontFamily": "Montserrat, sans-serif",
                             "svg": {
                                 fill: "#fff"
                             }
@@ -302,7 +300,9 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                         {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
                     </NativeSelect>
                     <Checkbox 
+                        style={{display:"none"}}
                         id="forwardToServer" 
+                        defaultChecked={!getCurrentSession().usesAudioEngine()}
                         title="Marca per enviar notes al servidor" 
                         sx={{
                             color: "#fff",
@@ -346,7 +346,6 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
     if (document.inputKeyDownEventBinded === undefined){
         document.inputKeyDownEventBinded = true;
         document.addEventListener('keydown', async (evt) => {
-            await buildAudioGraphIfNotBuilt()
             if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
                 // If typing in a text input, do not trigger MIDI events from keypress
             } else if (evt.repeat) {
@@ -402,7 +401,6 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
         })
 
         document.addEventListener('keyup', async (evt) => {
-            await buildAudioGraphIfNotBuilt()
             if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
                 // If typing in a text input, do not trigger MIDI events from keypress
             } else if (evt.repeat) {
@@ -454,7 +452,7 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
     return (
         <div>
             <input id="entradaMidiNomEstacio" type="hidden" value={estacio.nom}/>
-            <input id="forwardToServer" type="checkbox" defaultChecked={false} style={{display:"none"}} />
+            <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} style={{display:"none"}} />
         </div>
     )
 };

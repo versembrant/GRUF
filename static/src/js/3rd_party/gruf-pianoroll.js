@@ -1,4 +1,4 @@
-customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement {
+customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
     constructor(){
         super();
     }
@@ -24,12 +24,14 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
 //        else
           root=this;
         this.module = {
-            is:"webaudio-pianoroll",
+            is:"gruf-pianoroll",
             properties:{
                 width:              {type:Number, value:640, observer:'layout'},
                 height:             {type:Number, value:320, observer:'layout'},
                 timebase:           {type:Number, value:16, observer:'layout'},
                 editmode:           {type:String, value:"dragpoly"},
+                secondclickdelete:  {type:Boolean, value:false},
+                allowednotes:       {type:Array, value:[]},
                 xrange:             {type:Number, value:16, observer:'layout'},
                 yrange:             {type:Number, value:16, observer:'layout'},
                 xoffset:            {type:Number, value:0, observer:'layout'},
@@ -54,6 +56,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
                 colgrid:            {type:String, value:"#666"},
                 colnote:            {type:String, value:"#f22"},
                 colnotesel:         {type:String, value:"#0f0"},
+                colnotedissalowed:  {type:String, value:"#333"},
                 colnoteborder:      {type:String, value:"#000"},
                 colnoteselborder:   {type:String, value:"#fff"},
                 colrulerbg:         {type:String, value:"#666"},
@@ -69,6 +72,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
                 markendoffset:      {type:Number, value:-24},
                 kbsrc:              {type:String, value:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSI0ODAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgo8cGF0aCBmaWxsPSIjZmZmIiBzdHJva2U9IiMwMDAiIGQ9Ik0wLDAgaDI0djQ4MGgtMjR6Ii8+CjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik0wLDQwIGgxMnY0MGgtMTJ6IE0wLDEyMCBoMTJ2NDBoLTEyeiBNMCwyMDAgaDEydjQwaC0xMnogTTAsMzIwIGgxMnY0MGgtMTJ6IE0wLDQwMCBoMTJ2NDBoLTEyeiIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIGQ9Ik0wLDYwIGgyNCBNMCwxNDAgaDI0IE0wLDIyMCBoMjQgTTAsMjgwIGgyNCBNMCwzNDAgaDI0IE0wLDQyMCBoMjQiLz4KPC9zdmc+Cg==", observer:'layout'},
                 kbwidth:            {type:Number,value:40},
+                kbstyle:            {type:String, value:"piano"},
                 loop:               {type:Number, value:0},
                 preload:            {type:Number, value:1.0},
                 tempo:              {type:Number, value:120, observer:'updateTimer'},
@@ -105,7 +109,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
     height: 100%;
     background-size:100% calc(100%*12/16);
     background-position:left bottom;
-    border-radius: 14px;
+    border-radius: 4px;
 }
 #wac-menu {
     display:none;
@@ -134,6 +138,9 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
     background: repeat-y;
     background-size:100% calc(100%*12/16);
     background-position:left bottom;
+}
+#wac-cursor{
+    width:3px;
 }
 </style>
 <div class="wac-body" id="wac-body" touch-action="none">
@@ -771,6 +778,18 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
             this.downpos=this.getPos(e);
             this.downht=this.hitTest(this.downpos);
 
+            // Save current data of the selected note, as it will be later used to determine if the note was dragged or not
+            const selectedNoteIds = this.selectedNotes().map(note => note.i);
+            if (selectedNoteIds.indexOf(this.downht.i) > -1) {
+                this.hitNoteInitialData = {
+                    idx: this.downht.i,
+                    seq: {...this.sequence[this.downht.i]},  // make a copy because the sequence will be edited
+                    time: Date.now()/1000
+                }
+            } else {
+                this.hitNoteInitialData = undefined;
+            }
+     
             this.longtapcount = 0;
             this.longtaptimer = setInterval(this.longtapcountup.bind(this),100);
             window.addEventListener("touchmove", this.bindpointermove,false);
@@ -918,6 +937,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
             if(this.longtaptimer)
                 clearInterval(this.longtaptimer);
             const pos=this.getPos(e);
+            
             if(this.dragging.o=="m"){
                 this.menu.style.display="none";
                 this.rcMenu={x:0,y:0,width:0,height:0};
@@ -945,6 +965,35 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
             if(this.press){
                 this.sortSequence();
             }
+
+            var noteWasDeleted = false;
+            const ht =this.hitTest(pos);
+            if (this.secondclickdelete){
+                if ((this.hitNoteInitialData !== undefined) && (this.hitNoteInitialData.idx  === ht.i)) {
+                    // If duration, note or time position has not changed, the note has not been dragged and should be deleted
+                    // Also check that only short time has passed since the note was clicked, otherwise it might have been dragged and left at the same position
+                    if ((this.hitNoteInitialData.seq.t == this.sequence[ht.i].t) 
+                        && (this.hitNoteInitialData.seq.g == this.sequence[ht.i].g)
+                        && (this.hitNoteInitialData.seq.n == this.sequence[ht.i].n)
+                        && (Date.now()/1000 - this.hitNoteInitialData.time < 0.25)) {
+                        this.delNote(ht.i);
+                        noteWasDeleted = true;
+                    }
+                }
+            }
+
+            if (!noteWasDeleted) {
+                const noteSquenceData =  this.sequence[ht.i];
+                if (noteSquenceData !== undefined){
+                    const event = new CustomEvent("pianoRollNoteSelectedOrCreated", { detail: {
+                        midiNote: noteSquenceData.n,
+                        durationInBeats: noteSquenceData.g,
+         
+                    }});
+                    this.dispatchEvent(event);
+                }
+            }
+
             this.press = 0;
 //            this.mousemove(e);
             window.removeEventListener('touchstart',this.preventScroll,false);
@@ -1001,7 +1050,8 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
             const bodystyle = this.body.style;
             if(this.bgsrc)
                 proll.style.background="url('"+this.bgsrc+"')";
-            this.kbimg.style.background="url('"+this.kbsrc+"')";
+            if (this.kbstyle === "piano")
+                this.kbimg.style.background="url('"+this.kbsrc+"')";
             if(this.width){
                 proll.width = this.width;
                 bodystyle.width = proll.style.width = this.width+"px";
@@ -1027,10 +1077,15 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
         };
         this.redrawGrid=function(){
             for(let y=0;y<128;++y){
-                if(this.semiflag[y%12]&1)
-                    this.ctx.fillStyle=this.coldk;
-                else
-                    this.ctx.fillStyle=this.collt;
+                if (this.kbstyle === "piano") {
+                    if(this.semiflag[y%12]&1)
+                        this.ctx.fillStyle=this.coldk;
+                    else
+                        this.ctx.fillStyle=this.collt;
+                } else {
+                    this.ctx.fillStyle=y%2==0 ? this.coldk: this.collt;
+                }
+                    
                 let ys = this.height - (y - this.yoffset) * this.steph;
                 this.ctx.fillRect(this.yruler+this.kbwidth, ys|0, this.swidth,-this.steph);
                 this.ctx.fillStyle=this.colgrid;
@@ -1068,7 +1123,11 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
         this.redrawYRuler=function(){
             if(this.yruler){
                 this.ctx.textAlign="right";
-                this.ctx.font=(this.steph/2)+"px 'sans-serif'";
+                if (this.kbstyle !== "piano") {
+                    this.ctx.font=(this.steph - 6)+"px Arial";
+                } else {
+                    this.ctx.font=(this.steph - 1)+"px Arial";
+                }
                 this.ctx.fillStyle=this.colrulerbg;
                 this.ctx.fillRect(0,this.xruler,this.yruler,this.sheight);
                 this.ctx.fillStyle=this.colrulerborder;
@@ -1076,10 +1135,18 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
                 this.ctx.fillRect(this.yruler,this.xruler,1,this.sheight);
                 this.ctx.fillRect(0,this.height-1,this.yruler,1);
                 this.ctx.fillStyle=this.colrulerfg;
-                for(let y=0;y<128;y+=12){
-                    const ys=this.height-this.steph*(y-this.yoffset);
-                    this.ctx.fillRect(0,ys|0,this.yruler,-1);
-                    this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-4,ys-4);
+                if (this.kbstyle === "piano") {
+                    for(let y=0;y<128;y+=12){
+                        const ys=this.height-this.steph*(y-this.yoffset);
+                        //this.ctx.fillRect(0,ys|0,this.yruler,-1);
+                        this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-2,ys-4);
+                    }
+                } else {
+                    for(let y=0;y<128;y+=1){
+                        const ys=this.height-this.steph*(y-this.yoffset);
+                        //this.ctx.fillRect(0,ys|0,this.yruler,-1);
+                        this.ctx.fillText(y + 1,this.yruler -4,ys-4);
+                    }
                 }
             }
             this.kbimg.style.top=(this.xruler)+"px";
@@ -1132,6 +1199,10 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
                     this.ctx.fillStyle=this.colnotesel;
                 else
                     this.ctx.fillStyle=this.colnote;
+                const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(ev.n) > -1;
+                if (!noteIsAllowed) {
+                    this.ctx.fillStyle = this.colnotedissalowed;
+                }
                 w=ev.g*this.stepw;
                 x=(ev.t-this.xoffset)*this.stepw+this.yruler+this.kbwidth;
                 x2=(x+w)|0; x|=0;
@@ -1142,6 +1213,7 @@ customElements.define("webaudio-pianoroll", class Pianoroll extends HTMLElement 
                     this.ctx.fillStyle=this.colnoteselborder;
                 else
                     this.ctx.fillStyle=this.colnoteborder;
+                
                 this.ctx.fillRect(x,y,1,y2-y);
                 this.ctx.fillRect(x2,y,1,y2-y);
                 this.ctx.fillRect(x,y,x2-x,1);

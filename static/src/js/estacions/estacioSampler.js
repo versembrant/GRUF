@@ -1,26 +1,41 @@
 import * as Tone from 'tone'
-import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
-import { indexOfArrayMatchingObject, clamp, necessitaSwing} from '../utils';
-import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
+import { EstacioBase } from "../sessionManager";
+import { indexOfArrayMatchingObject} from '../utils';
+import { getAudioGraphInstance } from '../audioEngine';
 import { EstacioSamplerUI } from "../components/estacioSampler";
+import { sampleLibrary} from "../sampleLibrary";
 
 
-const getInitialSoundUrl = (numSound) => {
-    if (numSound < 8) {
-        return 'https://cdn.freesound.org/previews/320/320068_313780-hq.mp3'  // Japanese music
-    } else {
-        return 'https://cdn.freesound.org/previews/262/262495_2331961-hq.mp3' // Dark pad 
+const getSoundURL = (soundName) => {
+    sampleLibrary.sampler.forEach((sound) => {
+        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
+            soundFound = sound.url;
+        }
+    });
+    if (soundFound !== undefined) {
+        return soundFound;
     }
+    // Otherwise, return default sound
+    return 'https://cdn.freesound.org/previews/262/262495_2331961-hq.mp3' // Dark pad 
+}
+
+
+const getInitialSoundUrl = () => {
+    return getSoundURL(getInitialSoundName());
+}
+
+const getInitialSoundName = () => {
+    return 'adagio strings';
 }
 
 const getInitialStartValue = (numSound) => {
-    const totalSlices = 8;
+    const totalSlices = 16;
     const sliceNum = numSound % totalSlices;
     return sliceNum * 1/totalSlices;
 }
 
 const getInitialEndValue = (numSound) => {
-    const totalSlices = 8;
+    const totalSlices = 16;
     const sliceNum = numSound % totalSlices;
     return (sliceNum + 1) * 1/totalSlices;
 }
@@ -31,17 +46,22 @@ export class EstacioSampler extends EstacioBase {
     tipus = 'sampler'
     versio = '0.1'
     parametersDescription = {
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, rangDeNotesPermeses: 16, permetScrollVertical: false},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
+            followsPreset: true, 
+            notaMesBaixaPermesa: 0,
+            rangDeNotesPermeses: 16, 
+            permetScrollVertical: false
+        },
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
-            [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl(i)},
+            [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl()},
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
             [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
-            [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, min: 0, max: 10, initial: 0.01},
-            [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, min: 0, max: 10, initial: 0.1},
-            [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 0.5},
-            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, min: 0, max: 10, initial: 1},
-            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, min: -60, max: 0, initial: 0},
+            [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, min: 0, max: 2, initial: 0.01},
+            [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, min: 0, max: 1, initial: 0.1},
+            [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 1.0},
+            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, min: 0, max: 4, initial: 0.01},
+            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
             [`pitch${i + 1}`]: {
                 type: 'enum', 
@@ -50,7 +70,8 @@ export class EstacioSampler extends EstacioBase {
                 initial: '0'
             }
         }), {}),
-        
+        selecetdSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
+
         lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
 
@@ -76,6 +97,13 @@ export class EstacioSampler extends EstacioBase {
         return EstacioSamplerUI
     }
 
+    carregaSoDeLaLlibreria(soundName) {
+        const url = getSoundURL(soundName);
+        for (let i = 0; i < 16; i++) {
+            this.updateParametreEstacio(`sound${i + 1}URL`, url);
+        }
+    }
+
     loadSoundInBuffer(bufferIndex, url) {
         const buffer = this.audioBuffers[bufferIndex];
         if (buffer && buffer.url === url) {
@@ -94,8 +122,8 @@ export class EstacioSampler extends EstacioBase {
     }
 
     playBufferSlice(player, buffer, startPoint, endPoint, time) {
+        
         if (buffer && buffer.loaded) {
-            player.stop(0);
             const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
             player.buffer = buffer;
             player.loop = true;
@@ -187,6 +215,13 @@ export class EstacioSampler extends EstacioBase {
         } else if (name == "hpf") {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
         }
+
+        if (name === 'selecetdSoundName') {
+            setTimeout( () => {
+                // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
+                this.carregaSoDeLaLlibreria(value);
+            }, 50)
+        }
     }
 
     playSoundFromPlayer(playerIndex, time) {
@@ -195,25 +230,28 @@ export class EstacioSampler extends EstacioBase {
         const end = this.getParameterValue(`end${playerIndex + 1}`, this.currentPreset);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        
-        if (buffer && envelope) {
-            envelope.triggerAttack(time);
+        if (player && buffer && envelope) {
             this.playBufferSlice(player, buffer, start, end, time);
+            envelope.triggerAttack(time);
         }
     }
 
     stopSoundFromPlayer(playerIndex, time) {
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        if (player) {
-            player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+        if (player && envelope) {
+            // Per algun motiu incomprensible, si es programa un stop per "al cap d'una estona" hi poden haver problemes
+            // amb el player reproduïnt sons multiples vegades (?). Com que fem servir un envelope per l'amplitud, deixarem
+            // el player funcionant "sempre" i d'aquesta manera evitem els problemes. Això vol dir que consumirà més recursos,
+            // però tampoc sabem si és significatiu. 
+            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
             envelope.triggerRelease(time);
         }
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
-        const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+        const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes', this.currentPreset);
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
@@ -224,21 +262,21 @@ export class EstacioSampler extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                const playerIndex = 15 - note.n
+                const playerIndex = note.n
                 this.playSoundFromPlayer(playerIndex, time);
                 this.stopSoundFromPlayer(playerIndex, time + note.d * Tone.Time("16n").toSeconds());
             }
         }
     }
 
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff) {
+    onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         const playerIndex = midiNoteNumber % 16;
 
         if (!noteOff) {
-            const recEnabled = this.recEnabled('pattern');
+            const recEnabled = this.recEnabled('notes') && !skipRecording;
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % getAudioGraphInstance().getNumSteps();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
                 const pattern = this.getParameterValue('pattern', this.currentPreset);
                 const index = indexOfArrayMatchingObject(pattern, {'i': playerIndex, 'j': currentStep});
                 if (index === -1) {
@@ -250,6 +288,41 @@ export class EstacioSampler extends EstacioBase {
             }
         } else {
             this.stopSoundFromPlayer(playerIndex);
+        }
+    }
+
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+
+        const playerIndex = midiNoteNumber % 16;
+        const reducedMidiNoteNumber = playerIndex;
+        const recEnabled = this.recEnabled('notes') && !skipRecording;
+        if (!noteOff){
+            this.playSoundFromPlayer(playerIndex, Tone.now());
+            if (recEnabled){
+                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
+                // the note on time to save it
+                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                const currentStep = currentMainSequencerStep % this.getNumSteps();
+                this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
+            }
+        } else {
+            this.stopSoundFromPlayer(playerIndex);
+            if (recEnabled){
+                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
+                const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
+                if (lastNoteOnTimeForNote !== undefined){
+                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+                    const currentStep = currentMainSequencerStep % this.getNumSteps();
+                    if (lastNoteOnTimeForNote < currentStep){
+                        // Only save the note if note off time is bigger than note on time
+                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        notes.push({'n': reducedMidiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
+                        this.updateParametreEstacio('notes', notes); // save change in server!
+                    }
+                    this.lastNoteOnBeats[reducedMidiNoteNumber] = undefined;
+                }
+            }
         }
     }
 }
