@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
 import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
@@ -8,7 +7,6 @@ import { AudioRecorder } from "../components/audioRecorder";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
-    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
     const [selectedPad, setSelectedPad] = useState(0);
 
