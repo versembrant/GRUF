@@ -969,3 +969,20 @@
         
     }
 }
+
+.sampler-record-btn {
+    text-align: center;
+    width: 75px;
+}
+
+@keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+.sampler-recording-btn {
+    text-align: center;
+    animation: blinker 1s linear infinite;
+    width: 75px;
+}
