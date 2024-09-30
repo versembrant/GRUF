@@ -349,6 +349,7 @@ export class Session {
         this.useAudioEngine = true
         this.localMode = local
         this.performLocalUpdatesBeforeServerUpdates = true
+        this.continuousControlThrottleTime = 100
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data
