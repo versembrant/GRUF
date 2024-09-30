@@ -18,6 +18,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="sustain" top="35%" left="14.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="release" top="35%" left="19.8%" />
             <GrufLabel text="EQ" top="29.3%" left="52%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="52%" />

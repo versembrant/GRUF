@@ -346,6 +346,7 @@ export class EstacioBase {
 
 export class Session {
     constructor(data, local=false) {
+        this.useAudioEngine = true
         this.localMode = local
         this.performLocalUpdatesBeforeServerUpdates = true
         
@@ -377,6 +378,14 @@ export class Session {
             }
         });
         this.store = createStore(combineReducers(reducers));
+    }
+
+    setAudioOff() {
+        this.useAudioEngine = false;
+    }
+
+    usesAudioEngine() {
+        return this.useAudioEngine;
     }
 
     setParametreInStore(nomParametre, valor) {
@@ -528,30 +537,14 @@ export class Session {
     }
 
     setEstacionsMutesAndSolosInChannelNodes(mutes, solos) {
-        if (getAudioGraphInstance().graphIsBuilt() === false){
-            return;
-        };
+        if (!getAudioGraphInstance().graphIsBuilt()){ return; };
         const someAreSoloed = Object.values(solos).some(solo => solo === true);
         Object.keys(mutes).forEach(nomEstacio => {
             const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
             const channelIsSoloed = solos[nomEstacio];
-            const channelIsMuted = mutes[nomEstacio];
-            channelNode.mute = channelIsMuted;
-            if (someAreSoloed) {
-                // If some channels are soloed, we need to mute all channels which are not soloed, and mute also channels which are both soloed and muted
-                if (channelIsSoloed){
-                    if (channelIsMuted){
-                        channelNode.mute = true;
-                    } else {
-                        channelNode.mute = false;
-                    }
-                } else {
-                    channelNode.mute = true;
-                }
-            } else {
-                // If no channels are in solo mode, simply follow the mute rule
-                channelNode.mute = channelIsMuted;
-            }
+            const channelIsDirectMuted = mutes[nomEstacio];
+            const channelIsIndirectMuted = someAreSoloed && !channelIsSoloed;
+            channelNode.mute = channelIsDirectMuted || channelIsIndirectMuted;
         });
     }
 
@@ -566,7 +559,7 @@ export class Session {
                     const volume = Tone.gainToDb(updateData.gains_estacions[nomEstacio]);
                     channelNode.volume.value = volume;
                 }
-                
+                this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
             })
         } else if (updateData.accio === 'set_mutes') {
             Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {
