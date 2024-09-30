@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
+import { GrufButtonNoBorder, GrufLabelEstacio, GrufLabel } from "../components/widgets";
 import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
@@ -34,6 +34,31 @@ export const GrufPanKnob = ({ estacio }) => {
                 showValue={false}
             />
             <div style={{display:"flex", justifyItems:"center", justifyContent:'center', fontSize: '12px', border: '5px'}}>PAN</div>
+        </div>
+    );
+};
+
+export const GrufMasterPanKnob = () => {
+    const masterPan = getAudioGraphInstance().getMasterPan();
+
+    const handlePanChange = (newValue) => {
+        getAudioGraphInstance().setMasterPan(newValue);
+    };
+
+    return (
+        <div className="gruf-pan-knob">
+            <Knob 
+                value={masterPan}
+                min={-1}
+                max={1}
+                step={0.01}
+                onChange={(e) => handlePanChange(e.value)}
+                size={50}
+                valueColor="#FFFFFF"
+                rangeColor="#AAAAAA"
+                showValue={false}
+            />
+            <div style={{ display: "flex", justifyItems: "center", justifyContent: "center", fontSize: "12px" }}> PAN </div>
         </div>
     );
 };
@@ -140,9 +165,38 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
+
+export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
+    const masterGain = getAudioGraphInstance().getMasterGain(); 
+    const marks = [];
+
+    const style = { top: top, left: left };
+    if (height !== undefined) {
+        style.height = height;
+    }
+
+    const handleGainChange = (evt, value) => {
+        getAudioGraphInstance().setMasterGain(parseFloat(value, 10));
+    };
+
+    return (
+        <div className="gruf-master-gain-slider-vertical" style={style}>
+            <Slider
+                orientation="vertical"
+                value={masterGain}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={handleGainChange}
+            />
+        </div>
+    );
+};
+
 export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
     return (
-        <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
+        <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
             <GrufPanKnob estacio={estacio} />
 
             <div className="slider-wrapper">
@@ -164,6 +218,7 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
         </div>
     )
 }
+
 
 export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -221,13 +276,18 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
                             <EstacioMixerTrack
-                            key={nomEstacio}
-                            nomEstacio={nomEstacio}
-                            estacio={estacio}
-                            metersRef = {metersRef}
+                                key={nomEstacio}
+                                nomEstacio={nomEstacio}
+                                estacio={estacio}
+                                metersRef = {metersRef}
                             />
                         );
                     })}
+                    <div className="estacio-mixer-master-columna">
+                        <GrufMasterPanKnob/>
+                        <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                        <div className="master-label">Master</div>
+                    </div>
                 </div>
             </div>
         </div>
