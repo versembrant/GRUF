@@ -193,11 +193,12 @@ export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
     );
 };
 
-export const GrufMasterMeter = () => {
+export const GrufMasterMeter = ({showLevelMeters}) => {
     const leftMeterRef = useRef(null);
     const rightMeterRef = useRef(null);
 
     useEffect(() => {
+        if (!showLevelMeters) {return;}
         const interval = setInterval(() => {
             const levelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
 
@@ -206,7 +207,6 @@ export const GrufMasterMeter = () => {
                 const dbLeft = Math.max(-60, Math.min(levelData.left.db, 12));
                 const heightLeft = ((dbLeft + 60) / 60) * 100;
                 leftMeterRef.current.style.height = `${heightLeft}%`;
-
 
                 // Canal dret
                 const dbRight = Math.max(-60, Math.min(levelData.right.db, 12));
@@ -339,7 +339,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         <GrufMasterPanKnob/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                        <GrufMasterMeter />
+                        <GrufMasterMeter showLevelMeters={showLevelMeters} />
                         </div>
                         <div className="master-label">Master</div>
                     </div>
