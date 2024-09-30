@@ -2,8 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, GrufLabelEstacio, GrufLabel } from "../components/widgets";
-import Checkbox from '@mui/material/Checkbox';
+import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
 
@@ -194,6 +193,73 @@ export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
     );
 };
 
+export const GrufMasterMeter = () => {
+    const leftMeterRef = useRef(null);
+    const rightMeterRef = useRef(null);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const levelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
+
+            if (leftMeterRef.current && rightMeterRef.current) {
+                // Canal esquerre
+                const dbLeft = Math.max(-60, Math.min(levelData.left.db, 12));
+                const heightLeft = ((dbLeft + 60) / 60) * 100;
+                leftMeterRef.current.style.height = `${heightLeft}%`;
+
+
+                // Canal dret
+                const dbRight = Math.max(-60, Math.min(levelData.right.db, 12));
+                const heightRight = ((dbRight + 60) / 60) * 100;
+                rightMeterRef.current.style.height = `${heightRight}%`;
+
+                let colorLeft, colorRight;
+                if (dbLeft <= -2) {
+                    const greenToYellow = Math.min(1, (dbLeft + 60) / 50);
+                    const green = Math.round(255 * (1 - greenToYellow));
+                    const red = Math.round(255 * greenToYellow);
+                    colorLeft = `rgb(${red}, 255, 0)`;
+                } else {
+                    const yellowToRed = Math.min(1, (dbLeft + 10) / 16);
+                    const red = 255;
+                    const green = Math.round(255 * (1 - yellowToRed));
+                    colorLeft = `rgb(${red}, ${green}, 0)`;
+                }
+
+                if (dbRight <= -2) {
+                    const greenToYellow = Math.min(1, (dbRight + 60) / 50);
+                    const green = Math.round(255 * (1 - greenToYellow));
+                    const red = Math.round(255 * greenToYellow);
+                    colorRight = `rgb(${red}, 255, 0)`;
+                } else {
+                    const yellowToRed = Math.min(1, (dbRight + 10) / 16);
+                    const red = 255;
+                    const green = Math.round(255 * (1 - yellowToRed));
+                    colorRight = `rgb(${red}, ${green}, 0)`;
+                }
+
+                leftMeterRef.current.style.backgroundColor = colorLeft;
+                rightMeterRef.current.style.backgroundColor = colorRight;
+            }
+        }, 100);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return (
+        <div className="master-stereo-meters">
+            <div className="volume-meter">
+                <div className="volume-level" ref={leftMeterRef}></div>
+            </div>
+            <div className="volume-meter">
+                <div className="volume-level" ref={rightMeterRef}></div>
+            </div>
+        </div>
+    );
+};
+
 export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
@@ -285,7 +351,10 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     <div className="estacio-mixer-master-columna">
                         <GrufMasterPanKnob/>
+                        <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                        <GrufMasterMeter />
+                        </div>
                         <div className="master-label">Master</div>
                     </div>
                 </div>

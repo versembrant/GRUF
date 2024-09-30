@@ -337,6 +337,45 @@
     height: 100%;
     margin-top: 75px;
     position: relative;
+    .slider-wrapper {
+        display: flex;
+        flex-direction: row; 
+        justify-content: center; 
+        align-items: flex-end; 
+        gap: 0px; 
+        height: 400px; 
+        margin-top: 51px;
+
+        .master-stereo-meters {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 0px;  
+            height: 400px;
+            margin-bottom: 41px;
+            
+            .volume-meter {
+                position: relative;
+                width: 5px;  
+                background-color: transparent;
+                border: none;
+                display: flex;
+                flex-direction: column-reverse;
+                height: 100%; 
+                z-index: 0;
+            }
+        
+            .volume-level {
+                width: 100%;
+                background-color: green;
+                height: 0;
+                transition: height 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            }
+        }
+    }
+
+    
     .master-label {
         display: flex;
             flex-direction: row; 
