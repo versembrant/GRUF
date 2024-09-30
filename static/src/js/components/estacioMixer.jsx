@@ -38,7 +38,7 @@ export const GrufPanKnob = ({ estacio }) => {
     );
 };
 
-export const GrufMuteCheckbox = ({ estacio }) => {
+export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
 
     const handleMuteToggle = (evt) => {
@@ -47,26 +47,31 @@ export const GrufMuteCheckbox = ({ estacio }) => {
         getCurrentSession().liveSetMutesEstacions(currentMutes);
     };
 
+    
+
     return (
         <label className="gruf-mute-checkbox">
             <input
                 type="checkbox"
                 checked={parameterValue}
                 onChange={handleMuteToggle}
-                className="gruf-mute-checkbox__input" 
+                className={`gruf-mute-checkbox__input ${isIndirectMute ? "indirect-mute" : ""}`}
             />
             <span className="gruf-mute-checkbox__visual">M</span> 
         </label>
     );
 };
 
-export const GrufSoloCheckbox = ({ estacio }) => {
+export const GrufSoloCheckbox = ({ estacio, changeSoloState }) => {
     const parameterValue = getCurrentSession().getLiveSolosEstacions()[estacio.nom];
+    changeSoloState(parameterValue);
 
     const handleSoloToggle = (evt) => {
+        const isSolo = evt.target.checked;
         const currentSolos = getCurrentSession().getLiveSolosEstacions();
-        currentSolos[estacio.nom] = evt.target.checked;
+        currentSolos[estacio.nom] = isSolo;
         getCurrentSession().liveSetSolosEstacions(currentSolos);
+        changeSoloState(isSolo);
     };
 
     return (
@@ -140,7 +145,16 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
-export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
+export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, reportSoloChange}) => {
+    const [isSolo, setIsSolo] = useState(false);
+
+    const changeSoloState = (newState) => {
+        setIsSolo(newState);
+        reportSoloChange();
+    }
+
+    const isIndirectMute = isAnySolo && !isSolo;
+
     return (
         <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
             <GrufPanKnob estacio={estacio} />
@@ -157,8 +171,8 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
             </div>
 
             <div className="mute-solo-container">
-                <GrufMuteCheckbox estacio={estacio} />
-                <GrufSoloCheckbox estacio={estacio} />
+                <GrufMuteCheckbox estacio={estacio} isIndirectMute={isIndirectMute}/>
+                <GrufSoloCheckbox estacio={estacio} changeSoloState={changeSoloState} />
             </div>
             <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
         </div>
@@ -168,6 +182,13 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef}) => {
 export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
+
+    const [isAnySolo, setIsAnySolo] = useState(false);
+
+    const reportSoloChange = () => {
+        const isAnySolo = Object.values(getCurrentSession().getLiveSolosEstacions()).some(solo => solo === true);
+        setIsAnySolo(isAnySolo);
+    }
 
     const metersRef = useRef({});
 
@@ -225,6 +246,8 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             nomEstacio={nomEstacio}
                             estacio={estacio}
                             metersRef = {metersRef}
+                            isAnySolo = {isAnySolo}
+                            reportSoloChange = {reportSoloChange}
                             />
                         );
                     })}
