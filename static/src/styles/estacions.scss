@@ -262,8 +262,7 @@
     initial-value: 0%;
 }
 
-
-.estacio-columna {
+.estacio-mixer-columna {
     display: flex;
     flex-direction: column; 
     align-items: center;
@@ -310,6 +309,10 @@
         flex-direction: column-reverse;
         z-index: 0;
     }
+
+    .grayscale {
+        filter: grayscale(1);
+    }
     
     .volume-level {
         width: 100%;
@@ -337,6 +340,73 @@
         bottom: -25px;
     } 
 }
+
+.estacio-mixer-master-columna {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: end; 
+    margin: 10px;
+    margin-right: 0px;
+    width: 50px;
+    padding: 10px; 
+    border-radius: 10px; 
+    border: 2px solid $light-grey; 
+    height: 100%;
+    margin-top: 75px;
+    position: relative;
+    .slider-wrapper {
+        display: flex;
+        flex-direction: row; 
+        justify-content: center; 
+        align-items: flex-end; 
+        gap: 0px; 
+        height: 400px; 
+        margin-top: 51px;
+
+        .master-stereo-meters {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 0px;  
+            height: 400px;
+            margin-bottom: 41px;
+            
+            .volume-meter {
+                position: relative;
+                width: 5px;  
+                background-color: transparent;
+                border: none;
+                display: flex;
+                flex-direction: column-reverse;
+                height: 100%; 
+                z-index: 0;
+            }
+        
+            .volume-level {
+                width: 100%;
+                background-color: green;
+                height: 0;
+                transition: height 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            }
+        }
+    }
+
+    
+    .master-label {
+        display: flex;
+            flex-direction: row; 
+            width: 100px; 
+            margin-top: 10px; 
+            justify-content: center;
+            font-size: 12px;
+            color: $white;
+            position: absolute;
+            bottom: -25px;
+    }
+}
+
 .estacio-computer {
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
