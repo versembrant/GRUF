@@ -929,8 +929,8 @@
         display: flex;
         
         .step {
-            height: 20px;
-            width: 20px;
+            height: 18px;
+            width: 18px;
             text-align: center;
             line-height: 20px;
             vertical-align: middle;
@@ -938,18 +938,16 @@
             border-radius: 5px;
             margin: 2px;
             background-color: $pale-orange;
+            border: 1px solid $pale-orange;
     
             &.filled {
-                height: 18px;
-                width: 18px;
-                background-color: $black;
-                color: $white;
-                border: 1px solid $pale-orange;
+                background-color: $black!important;
+                color: $white!important;
             }
     
             &.active {
-                background-color: $green;
-                color: $black;
+                background-color: $white!important;
+                color: $black!important;
             }
         }
 

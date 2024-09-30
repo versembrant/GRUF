@@ -129,9 +129,7 @@ export class EstacioSampler extends EstacioBase {
             player.loop = true;
             player.loopStart = start;
             player.loopEnd = end;
-            console.log(player, player.state);
             player.start(time, start, end - start);
-            console.log(player, player.state);
         }
     }
 
@@ -294,7 +292,8 @@ export class EstacioSampler extends EstacioBase {
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().graphIsBuilt()){ return };
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+
         const playerIndex = midiNoteNumber % 16;
         const reducedMidiNoteNumber = playerIndex;
         const recEnabled = this.recEnabled('notes') && !skipRecording;
