@@ -20,8 +20,8 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="release" top="35%" left="19.8%" />
             <GrufLabel text="EQ" top="29.3%" left="52%" />
             
-            <GrufKnobGran estacio={estacio} parameterName="portamento" top="10%" left="28%" />
-            <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="27%" left="28%" />
+            <GrufKnobGran estacio={estacio} parameterName="portamento" top="8%" left="28%" />
+            <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
             <GrufLabel text="Durada" top="12.7%" left="51.7%" />
