@@ -121,6 +121,32 @@ export class AudioGraph {
         }
     }
 
+    getCurrentMasterLevelStereo() {
+        if (this.graphIsBuilt()) {
+            const levels = this.masterMeterNode.getValue();
+            const leftChannelLevel = levels[0];
+            const rightChannelLevel = levels[1]; 
+    
+            const dBuLeft = leftChannelLevel + 18;
+            const dBuRight = rightChannelLevel + 18;
+    
+            return {
+                left: {
+                    db: clamp(dBuLeft, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuLeft), 0, 1),
+                },
+                right: {
+                    db: clamp(dBuRight, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuRight), 0, 1),
+                }
+            };
+        } else {
+            return {
+                left: { db: -60, gain: 0 },
+                right: { db: -60, gain: 0 }
+            };
+        }
+
     isMutedEstacio(nomEstacio) {
         if (!this.graphIsBuilt()) return false;
         return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
@@ -179,13 +205,14 @@ export class AudioGraph {
         Tone.Transport.bpm.value = this.getBpm();
 
         // Crea els nodes master  (per tenir un controls general)
+        this.masterMeterNode = new Tone.Meter({ channels:2 });
         this.masterLimiter = new Tone.Limiter(-1).toDestination();
         //this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
         this.masterGainNode = new Tone.Channel({
             volume: this.getMasterGain(),
             pan: this.getMasterPan(),
-        }).connect(this.masterLimiter);
-        
+        }).chain(this.masterMeterNode, this.masterLimiter);
+
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
             if (this.isPlaying()) {
