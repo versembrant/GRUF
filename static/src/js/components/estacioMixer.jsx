@@ -193,11 +193,12 @@ export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
     );
 };
 
-export const GrufMasterMeter = () => {
+export const GrufMasterMeter = ({showLevelMeters}) => {
     const leftMeterRef = useRef(null);
     const rightMeterRef = useRef(null);
 
     useEffect(() => {
+        if (!showLevelMeters) {return;}
         const interval = setInterval(() => {
             const levelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
 
@@ -206,7 +207,6 @@ export const GrufMasterMeter = () => {
                 const dbLeft = Math.max(-60, Math.min(levelData.left.db, 12));
                 const heightLeft = ((dbLeft + 60) / 60) * 100;
                 leftMeterRef.current.style.height = `${heightLeft}%`;
-
 
                 // Canal dret
                 const dbRight = Math.max(-60, Math.min(levelData.right.db, 12));
@@ -301,25 +301,11 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
     
                     if (meterLevelDiv) {
-                        const db = Math.max(-60, Math.min(levelData.db, 12)); // Limitar entre -60 y 12 dB
-                        const height = ((db + 60) / 60) * 100; // Escalar entre 0 y 100%
-    
-                        meterLevelDiv.style.height = `${height}%`;
-    
-                        let color;
-                        if (db <= -2) {
-                            const greenToYellow = Math.min(1, (db + 60) / 50);
-                            const green = Math.round(255 * (1 - greenToYellow));
-                            const red = Math.round(255 * greenToYellow);
-                            color = `rgb(${red}, 255, 0)`; 
-                        } else {
-                            const yellowToRed = Math.min(1, (db + 10) / 16);
-                            const red = 255;
-                            const green = Math.round(255 * (1 - yellowToRed));
-                            color = `rgb(${red}, ${green}, 0)`; 
-                        }
-    
-                        meterLevelDiv.style.backgroundColor = color;
+                        const minDB = -60;
+                        const maxDB = 6;
+                        const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
+                        const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+                        meterLevelDiv.style.setProperty('--meter-level', `${meterLevel}%`);
 
                         if (isMuted) meterLevelDiv.classList.add("grayscale");
                         else meterLevelDiv.classList.remove("grayscale");
@@ -353,7 +339,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         <GrufMasterPanKnob/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                        <GrufMasterMeter />
+                        <GrufMasterMeter showLevelMeters={showLevelMeters} />
                         </div>
                         <div className="master-label">Master</div>
                     </div>
