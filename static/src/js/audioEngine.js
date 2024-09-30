@@ -20,6 +20,7 @@ export class AudioGraph {
         const defaultsForPropertiesInStore = {
             bpm: 120,
             masterGain: 1.0,
+            masterPan:0.0,
             gainsEstacions: {},
             mutesEstacions: {},
             solosEstacions: {},
@@ -120,6 +121,37 @@ export class AudioGraph {
         }
     }
 
+    getCurrentMasterLevelStereo() {
+        if (this.graphIsBuilt()) {
+            const levels = this.masterMeterNode.getValue();
+            const leftChannelLevel = levels[0];
+            const rightChannelLevel = levels[1]; 
+    
+            const dBuLeft = leftChannelLevel + 18;
+            const dBuRight = rightChannelLevel + 18;
+    
+            return {
+                left: {
+                    db: clamp(dBuLeft, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuLeft), 0, 1),
+                },
+                right: {
+                    db: clamp(dBuRight, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuRight), 0, 1),
+                }
+            };
+        } else {
+            return {
+                left: { db: -60, gain: 0 },
+                right: { db: -60, gain: 0 }
+            };
+        }
+
+    isMutedEstacio(nomEstacio) {
+        if (!this.graphIsBuilt()) return false;
+        return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
+    }
+
     //Creem uns efectes
     initEffects(){
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
@@ -172,9 +204,15 @@ export class AudioGraph {
         // Setteja el bpm al valor guardat
         Tone.Transport.bpm.value = this.getBpm();
 
-        // Crea node master gain (per tenir un volum general)
-        this.masterGainNode = new Tone.Gain(this.getMasterGain()).toDestination();
-        
+        // Crea els nodes master  (per tenir un controls general)
+        this.masterMeterNode = new Tone.Meter({ channels:2 });
+        this.masterLimiter = new Tone.Limiter(-1).toDestination();
+        //this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
+        this.masterGainNode = new Tone.Channel({
+            volume: this.getMasterGain(),
+            pan: this.getMasterPan(),
+        }).chain(this.masterMeterNode, this.masterLimiter);
+
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
             if (this.isPlaying()) {
@@ -190,9 +228,10 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            const estacioPremuteChannel = new Tone.Gain().connect(estacioMasterChannel);
             const estacioMeterNode = new Tone.Meter();
-            estacioMasterChannel.connect(estacioMeterNode);
-            estacio.buildEstacioAudioGraph(estacioMasterChannel);
+            estacioPremuteChannel.connect(estacioMeterNode);
+            estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
@@ -340,7 +379,18 @@ export class AudioGraph {
     setMasterGain(gain) {
         this.setParametreInStore('masterGain', gain);
         if (this.graphIsBuilt()){
-            this.masterGainNode.gain.value = gain;
+            this.masterGainNode.volume.value = Tone.gainToDb(gain); 
+        }
+    }
+
+    getMasterPan(){
+        return this.store.getState().masterPan;
+    }
+
+    setMasterPan(pan){
+        this.setParametreInStore('masterPan', pan);
+        if (this.graphIsBuilt()){
+            this.masterGainNode.pan.setValueAtTime(pan, 0.05);
         }
     }
     
