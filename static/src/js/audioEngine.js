@@ -20,6 +20,7 @@ export class AudioGraph {
         const defaultsForPropertiesInStore = {
             bpm: 120,
             masterGain: 1.0,
+            masterPan:0.0,
             gainsEstacions: {},
             mutesEstacions: {},
             solosEstacions: {},
@@ -85,6 +86,7 @@ export class AudioGraph {
 
     setMasterAudioEngine(valor) {
         this.setParametreInStore('isMasterAudioEngine', valor);
+        console.log("Master audio engine: ", this.isMasterAudioEngine())
     }
 
     audioEngineIsSyncedToRemote() {
@@ -118,6 +120,38 @@ export class AudioGraph {
         } else {
             return {"db": -60, "gain": 0};
         }
+    }
+
+    getCurrentMasterLevelStereo() {
+        if (this.graphIsBuilt()) {
+            const levels = this.masterMeterNode.getValue();
+            const leftChannelLevel = levels[0];
+            const rightChannelLevel = levels[1]; 
+    
+            const dBuLeft = leftChannelLevel + 18;
+            const dBuRight = rightChannelLevel + 18;
+    
+            return {
+                left: {
+                    db: clamp(dBuLeft, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuLeft), 0, 1),
+                },
+                right: {
+                    db: clamp(dBuRight, -60, 6),
+                    gain: clamp(Tone.dbToGain(dBuRight), 0, 1),
+                }
+            };
+        } else {
+            return {
+                left: { db: -60, gain: 0 },
+                right: { db: -60, gain: 0 }
+            };
+        }
+    }
+
+    isMutedEstacio(nomEstacio) {
+        if (!this.graphIsBuilt()) return false;
+        return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
     }
 
     //Creem uns efectes
@@ -172,9 +206,15 @@ export class AudioGraph {
         // Setteja el bpm al valor guardat
         Tone.Transport.bpm.value = this.getBpm();
 
-        // Crea node master gain (per tenir un volum general)
-        this.masterGainNode = new Tone.Gain(this.getMasterGain()).toDestination();
-        
+        // Crea els nodes master  (per tenir un controls general)
+        this.masterMeterNode = new Tone.Meter({ channels:2 });
+        this.masterLimiter = new Tone.Limiter(-1).toDestination();
+        //this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
+        this.masterGainNode = new Tone.Channel({
+            volume: this.getMasterGain(),
+            pan: this.getMasterPan(),
+        }).chain(this.masterMeterNode, this.masterLimiter);
+
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
             if (this.isPlaying()) {
@@ -190,9 +230,10 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
+            const estacioPremuteChannel = new Tone.Gain().connect(estacioMasterChannel);
             const estacioMeterNode = new Tone.Meter();
-            estacioMasterChannel.connect(estacioMeterNode);
-            estacio.buildEstacioAudioGraph(estacioMasterChannel);
+            estacioPremuteChannel.connect(estacioMeterNode);
+            estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
@@ -298,7 +339,7 @@ export class AudioGraph {
 
     sendMidiEvent(nomEstacio, data, forwardToServer = false) {
         // MIDI notes require the less latency the better, so we always directly invoke the method "receiveMidiEventFromServer" even if we're
-        // not in local mode. However, unlike other parameters, we can nto accept repeated note that would be cause by we calling 
+        // not in local mode. However, unlike other parameters, we can not accept repeated note that would be cause by we calling 
         // "receiveMidiEventFromServer" and then "receiveMidiEventFromServer" being called again by the server when the note event hits the
         // server and is sent to all clients (including the client who sent it). To avoid this problem, we ignore received note messages 
         // that originate from the same client (the same socket ID)
@@ -311,8 +352,9 @@ export class AudioGraph {
     }
 
     receiveMidiEventFromServer(nomEstacio, data) {
+        
         if ((!getCurrentSession().localMode) && (data.origin_socket_id === getSocketID())){
-            // If message comes from same client, ignore it
+            // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
         }
         if (nomEstacio !== undefined) {
@@ -324,6 +366,12 @@ export class AudioGraph {
                 getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
             });
         }
+
+        //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
+        if (!data.skipTriggerEvent) {    
+            const event = new CustomEvent("midiNoteOn-" + nomEstacio, { detail: {note: data.noteNumber, velocity: data.noteVelocity }});
+            document.dispatchEvent(event);
+        }
     }
 
     getMasterGain() {
@@ -333,7 +381,18 @@ export class AudioGraph {
     setMasterGain(gain) {
         this.setParametreInStore('masterGain', gain);
         if (this.graphIsBuilt()){
-            this.masterGainNode.gain.value = gain;
+            this.masterGainNode.volume.value = Tone.gainToDb(gain); 
+        }
+    }
+
+    getMasterPan(){
+        return this.store.getState().masterPan;
+    }
+
+    setMasterPan(pan){
+        this.setParametreInStore('masterPan', pan);
+        if (this.graphIsBuilt()){
+            this.masterGainNode.pan.setValueAtTime(pan, 0.05);
         }
     }
     
@@ -373,18 +432,30 @@ export class AudioGraph {
         this.setParametreInStore('tonality', tonality);
     }
 
-    getNumSteps (){
+    getNumSteps (nCompassos = 2){
+
         const compas = this.getCompas();
         if (compas === '2/4'){
-            return 8
+            return 8 * nCompassos;
         } 
         else if (compas === '3/4') {
-            return 12
+            return 12 * nCompassos;
         }
         else if (compas === '4/4') {
-            return 16
+            return 16 * nCompassos;
         }
     } 
+
+    getPanForEstacio(nomEstacio) {
+        return this.estacionsMasterChannelNodes[nomEstacio]?.pan?.value || 0; // Retorna el valor del panning o 0 si no està definit
+    }
+
+    setPanForEstacio(nomEstacio, panValue) {
+        const channelNode = this.estacionsMasterChannelNodes[nomEstacio];
+        if (channelNode) {
+            channelNode.pan.value = panValue; // Ajusta el panning
+        }
+    }
 
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {

@@ -86,7 +86,14 @@
     }
     .selected {
         background-color: $orange!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $orange;
+    }  
+    &.computer-step {
+        border-color: $orange;
+        background-color: $orange;
+    }  
 }
 
 .estacio-piano-logo {
@@ -105,7 +112,14 @@
     }
     .selected {
         background-color: $yellow!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $yellow;
+    }
+    &.computer-step {
+        border-color: $yellow!important;
+        background-color: $yellow!important;
+    }  
 }
 
 .estacio-groovebox-logo {
@@ -124,7 +138,14 @@
     }
     .selected {
         background-color: $red!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $red;
+    }
+    &.computer-step {
+        border-color: $red!important;
+        background-color: $red!important;
+    }        
 }
 
 .estacio-synth-logo {
@@ -143,7 +164,14 @@
     }
     .selected {
         background-color: $pink!important;
-    }    
+    }
+    &.mixer-border {
+        border-color: $pink;
+    }
+    &.computer-step {
+        border-color: $pink!important;
+        background-color: $pink!important;
+    }  
 }
 
 .estacio-synth_bass-logo {
@@ -163,7 +191,15 @@
 
     .selected {
         background-color: $lightblue!important;
-    }    
+    }
+    
+    &.mixer-border {
+        border-color: $lightblue;
+    }
+    &.computer-step {
+        border-color: $lightblue!important;
+        background-color: $lightblue!important;
+    }  
 }
 
 .estacio-sampler-logo {
@@ -194,14 +230,192 @@
     width: 150px;
 }
 
+.estacio-mixer-container {
+    display: flex; 
+    overflow: scroll;
+    flex-direction: row; 
+    justify-content: start; 
+    align-items: start; 
+    //min-height: 100vh;
+    padding: 30px;
+
+    scrollbar-width: thin;  
+    scrollbar-color: transparent transparent; 
+
+    // Webkit browsers (Chrome, Safari, Edge)
+    &::-webkit-scrollbar {
+        width: 8px; 
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent; 
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent; 
+    }
+}
+
+@property --meter-level {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
+}
+
+.estacio-mixer-columna {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: end; 
+    margin: 10px;
+    margin-right: 0px;
+    width: 50px;
+    padding: 10px; 
+    border-radius: 10px; 
+    border: 2px solid $light-grey; 
+    height: 100%;
+    margin-top: 75px;
+    position: relative;
+
+    .slider-wrapper {
+        display: flex;
+        flex-direction: row; 
+        justify-content: center; 
+        align-items: flex-end; 
+        gap: 0px; 
+        height: 400px; 
+        margin-top: 10px;
+    }
+
+    .volume-meter {
+        // suposant que 0dB és al 91% (range entre -60 i +6)
+        background-image: linear-gradient(
+        0deg,
+        hsl(145deg 100% 50%) 0%,
+        hsl(62deg 100% 51%) 91%,
+        hsl(40deg 100% 50%) 95%,
+        hsl(30deg 100% 50%) 97%,
+        hsl(20deg 100% 50%) 99%,
+        hsl(10deg 100% 50%) 100%
+        );
+        clip-path: inset(calc(100% - var(--meter-level)) 0 0 0);
+        $amp-sampling-freq: 100ms;
+        transition: --meter-level $amp-sampling-freq linear; // interpolate between amplitude samples
+        height: 100%;
+        width: 10px;
+        border: none;
+        position: relative;
+        display: flex;
+        flex-direction: column-reverse;
+        z-index: 0;
+    }
+
+    .grayscale {
+        filter: grayscale(1);
+    }
+    
+    .volume-level {
+        width: 100%;
+        background-color: green;
+        height: 0;
+        transition: height 0.1s ease-in-out, background-color 0.1s ease-in-out; 
+    }
+
+    .mute-solo-container {
+        display: flex;
+        flex-direction: row; 
+        width: 100px; 
+        margin-top: 20px; 
+        justify-content: center;
+    }
+    .nom-estacio-container {
+        display: flex;
+        flex-direction: row; 
+        width: 100px; 
+        margin-top: 10px; 
+        justify-content: center;
+        font-size: 12px;
+        color: $white;
+        position: absolute;
+        bottom: -25px;
+    } 
+}
+
+.estacio-mixer-master-columna {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: end; 
+    margin: 10px;
+    margin-right: 0px;
+    width: 50px;
+    padding: 10px; 
+    border-radius: 10px; 
+    border: 2px solid $light-grey; 
+    height: 100%;
+    margin-top: 75px;
+    position: relative;
+    .slider-wrapper {
+        display: flex;
+        flex-direction: row; 
+        justify-content: center; 
+        align-items: flex-end; 
+        gap: 0px; 
+        height: 400px; 
+        margin-top: 51px;
+
+        .master-stereo-meters {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 0px;  
+            height: 400px;
+            margin-bottom: 41px;
+            
+            .volume-meter {
+                position: relative;
+                width: 5px;  
+                background-color: transparent;
+                border: none;
+                display: flex;
+                flex-direction: column-reverse;
+                height: 100%; 
+                z-index: 0;
+            }
+        
+            .volume-level {
+                width: 100%;
+                background-color: green;
+                height: 0;
+                transition: height 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            }
+        }
+    }
+
+    
+    .master-label {
+        display: flex;
+            flex-direction: row; 
+            width: 100px; 
+            margin-top: 10px; 
+            justify-content: center;
+            font-size: 12px;
+            color: $white;
+            position: absolute;
+            bottom: -25px;
+    }
+}
+
 .estacio-computer {
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
         background-color: $pale-orange;
+        overflow: scroll;
     }
     .selected {
         background-color: $pale-orange!important;
-    }    
+    }
 }
 
 .estacio-computer-logo {

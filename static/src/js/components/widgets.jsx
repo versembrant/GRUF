@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
@@ -9,6 +9,9 @@ import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
 import * as Tone from 'tone';
+import { Dropdown } from 'primereact/dropdown';
+import { sendNoteOn, sendNoteOff } from './entradaMidi';
+import { sampleLibrary} from "../sampleLibrary";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -41,6 +44,14 @@ export const GrufLabelPetitVertical = ({text, top, left}) => {
         </div>
     )
 }
+
+export const GrufLabelEstacio = ({ estacio, className }) => {
+    return (
+        <div className={className}>
+            {estacio.nom}
+        </div>
+    );
+};
 
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
@@ -325,6 +336,32 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
     )
 };
 
+export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio = estacio.nom;
+    const options = parameterDescription.options;
+    const style = { top: top, left: left };
+    //const num2String();
+    if (height !== undefined) {
+        style.height = height;
+    }
+    return (
+        <div className={"gruf-slider-vertical"} style={style}>
+            <Slider
+                sx={{ height: 56}}
+                orientation="vertical"
+                value={options.indexOf(parameterValue)}
+                step={1.0}
+                min={0.0}
+                max={options.length -1}
+                marks 
+                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, options[evt.target.value])}
+            />
+        </div>
+    )
+};
+
 export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
 
@@ -374,10 +411,8 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
         }
     };
 
-    const playSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){
-            return;
-        }
+    const playSample = async (playerIndex) => {
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(playerIndex, Tone.now());
@@ -385,9 +420,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     }; 
 
     const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){
-            return;
-        }
+        if (!getAudioGraphInstance().graphIsBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.stopSoundFromPlayer(playerIndex, Tone.now());
@@ -453,7 +486,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const numRows = parameterDescription.numRows;
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
     for (let i = 0; i < numRows; i++) {
@@ -480,10 +513,20 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
         }
         stepsElementsPerRow.push(stepsElements)
     }
+
+    // Calculate transform scale style to adjust number of steps to current display
+    let transformStyle = {}
+    const scaleXTransFormFactor = 16 / numSteps;
+    if (scaleXTransFormFactor < 1) {
+        transformStyle = {
+            transform: `scaleX(${scaleXTransFormFactor}) translateX(-10px)`,
+            transformOrigin: 'left'
+        }
+    }
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
-            <div className="grid-default">
+            <div className="grid-default" style={transformStyle}>
                 {stepsElementsPerRow.map(function(stepsElements, i){
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
@@ -512,10 +555,24 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", colorNotes, modeSampler }) => {
+export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    return (
+        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
+            {[...Array(estacio.numPresets).keys()].map(i => 
+            <div key={"preset_" + i}
+                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
+                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
+                    {i + 1}
+            </div>
+            )}
+        </div>
+    )
+}
+
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const numSteps =  getAudioGraphInstance().getNumSteps();
+    const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
     let lastEditedData = "";
@@ -530,6 +587,47 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     lastEditedData = stringifiedData // Save using stringified version to avoid using a reference. If using a reference, "isequal" above will always be true after the first iteration
                 }
             });
+            if (triggerNotes){
+                jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
+                    // When a note is created or selected, we will trigger a callback
+                    sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
+                    setTimeout(() => {
+                        sendNoteOff(evt.detail.midiNote, 0);
+                    }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
+                });
+            }
+            document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
+                let noteNumber = evt.detail.note;                
+                if (parameterDescription.hasOwnProperty("rangDeNotesPermeses")) {
+                    const notaMesBaixaPermesa = parameterDescription.notaMesBaixaPermesa || 0;
+                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % parameterDescription.rangDeNotesPermeses);   
+                }
+                const noteHeight = jsElement.height/jsElement.yrange;
+                let bottomPosition = noteHeight * noteNumber;
+                const canvasOffset = jsElement.yoffset*noteHeight;
+                bottomPosition = bottomPosition - canvasOffset;
+
+                if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
+                    const noteMarker = document.createElement('div');
+                    noteMarker.style.position = 'absolute';
+                    noteMarker.style.bottom = (bottomPosition + 38) + 'px';
+                    noteMarker.style.left = modeSampler ? '0px': '22px';
+                    noteMarker.style.width = modeSampler ? '22px': '62px';
+                    noteMarker.style.height = (noteHeight * 0.9) + 'px';
+                    noteMarker.style.backgroundColor = colorNotes;
+                    noteMarker.style.zIndex = 1000;
+                    noteMarker.style.borderRadius = '2px';
+                    noteMarker.style.opacity = '0.5';
+                    noteMarker.style.pointerEvents = 'none';
+                    noteMarker.style.transition = 'opacity 1s ease-in-out;';
+                    jsElement.appendChild(noteMarker);
+
+                    setTimeout(() => {
+                        noteMarker.remove();
+                    }, 500);
+                }
+            })
+            
             jsElement.dataset.alreadyBinded = true;
         }
         if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
@@ -603,35 +701,42 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
             <div style={{overflow:"scroll"}}>
-                <webaudio-pianoroll
+                <gruf-pianoroll
                     id={uniqueId + "_id"}
+                    editmode={monophonic ? "dragmono" : "dragpoly"}
+                    secondclickdelete={true}
+                    allowednotes={allowedNotes}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
+                    grid={2}
                     xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 24}
+                    yrange={parameterDescription.rangDeNotesPermeses || 36}
                     yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
                     //cursoroffset={2500}  // make it dissapear
                     yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
+                    colnotedissalowed={colorNotesDissalowed || "#333"}
                     collt={"rgb(200, 200, 200)"}
                     coldk={"rgb(176, 176, 176)"}
                     colgrid={"#999"}
                     colnoteborder={colorNotes || "#f22"}
-                    colrulerbg={"#000"}
+                    colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
-                    colrulerborder={"#000"}
+                    colrulerborder={"#4b4b4b"}
+                    cursorsrc={"/gruf/static/src/img/playhead.svg"}
                     kbwidth={modeSampler === undefined ? 65: 0}
-                    yruler={modeSampler === undefined ? 18: 0}
-                ></webaudio-pianoroll>
+                    kbstyle={modeSampler === undefined ? "piano": "midi"}
+                    yruler={modeSampler === undefined ? 20: 22}
+                ></gruf-pianoroll>
             </div>
             <div className="gruf-piano-roll-controls">
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
@@ -643,16 +748,19 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     )
 };
 
-export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const nomEstacio=estacio.nom;
     return (
-        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
-            {[...Array(estacio.numPresets).keys()].map(i => 
-            <div key={"preset_" + i}
-                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
-                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
-                    {i + 1}
-            </div>
-            )}
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+            <Dropdown 
+            value={getNomPatroOCap(parameterDescription, parameterValue)}
+            onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, getPatroPredefinitAmbNom(parameterDescription, evt.target.value))} 
+            options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
+            placeholder="Cap"
+            />
+            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
         </div>
     )
 }
@@ -705,3 +813,18 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
         </div>
     );
 };
+
+export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
+    return (
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+            <Dropdown 
+            value={estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset())}
+            onChange={(evt) => {
+                estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
+            }} 
+            options={sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}) )}
+            placeholder="Cap"
+            />
+        </div>
+    )
+}

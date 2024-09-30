@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical } from "./widgets";
+import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical, GrufSelectorPatronsGrid } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
@@ -14,7 +14,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
             <GrufKnobGranGlobal estacio={estacio} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
             <GrufKnobGranGlobal estacio={estacio} parameterName="bpm" top="8%" left="29.0%" label = 'Tempo' />
-            <GrufBpmCounter estacio={estacio} top="8%" left="39.6%" />
+            <GrufBpmCounter top="8%" left="39.6%" />
             <GrufLabel text="bpm" top="17.3%" left="41%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="51.7%" />
@@ -75,7 +75,9 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
             <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />            
+            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    
+
+            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
         </div>
     </div>)
 };

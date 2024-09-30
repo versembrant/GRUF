@@ -1,6 +1,6 @@
 import { subscribeToStoreChanges } from "../utils";
 import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufSelectorTonalitat, GrufPianoRoll } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufSelectorTonalitat } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
@@ -18,6 +18,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="sustain" top="35%" left="14.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="release" top="35%" left="19.8%" />
             <GrufLabel text="EQ" top="29.3%" left="52%" />
+            <GrufKnobGran estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.3%" left="52%" />
@@ -44,7 +45,10 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
             <GrufSelectorTonalitat top="50.3%" left="80.6%" />
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d"/>
+       
+            <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="30%" left="36.5%"  />
+    
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d" colorNotesDissalowed="#50121f" allowedNotes={[]}/>
         </div>
     </div>)
 };
