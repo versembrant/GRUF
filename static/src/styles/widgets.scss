@@ -410,6 +410,89 @@
     }
 }
 
+.gruf-master-gain-slider-vertical {
+    font-size: 14px;
+    display: inline-flex;
+    justify-content: center;
+    margin-top: 10px ;
+    margin-bottom: 41px;
+
+    &.gruf-slider-background-ratllat {
+        background-image: url("../img/slider_bg.svg");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .p-slider {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+
+    .MuiSlider-vertical {
+        margin-right: 0px!important;
+        padding: 0 3.5px!important;
+        z-index: 1;
+    }
+   
+    .MuiSlider-thumb {
+        border-radius: 2px;
+        height: 6px; 
+        width: 24px;
+        color: $white;
+
+        &:hover {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            animation: none;
+        }
+    }
+   
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+    
+    .Mui-focusVisible {
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        animation: none;
+    }
+    
+    .MuiSlider-mark {
+        color: $grey;
+        width: 0px;
+    }
+
+    .MuiSlider-markLabel {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        color: $font-color;
+        font-size: 10px;
+        margin-left: -10px;
+    }
+    
+    .MuiSlider-root {
+        border-radius: 5px;
+    }
+
+    .MuiSlider-track {
+        color: transparent;
+        width: 1px;
+    }
+
+    .MuiSlider-rail {
+        color: $white;
+        width: 10px; /* reduced size by 1/3 */
+        border-radius: 2px;
+        opacity: 0.5;
+    }
+}
+
 
 .bpm-counter {
     position: absolute;
@@ -730,6 +813,10 @@
         justify-content: center;
         align-items: center;
         transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    &__input.indirect-mute + .gruf-mute-checkbox__visual {
+        background-color: $pale-orange;
     }
 
     &__input:checked + .gruf-mute-checkbox__visual {

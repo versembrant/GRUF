@@ -542,23 +542,9 @@ export class Session {
         Object.keys(mutes).forEach(nomEstacio => {
             const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
             const channelIsSoloed = solos[nomEstacio];
-            const channelIsMuted = mutes[nomEstacio];
-            channelNode.mute = channelIsMuted;
-            if (someAreSoloed) {
-                // If some channels are soloed, we need to mute all channels which are not soloed, and mute also channels which are both soloed and muted
-                if (channelIsSoloed){
-                    if (channelIsMuted){
-                        channelNode.mute = true;
-                    } else {
-                        channelNode.mute = false;
-                    }
-                } else {
-                    channelNode.mute = true;
-                }
-            } else {
-                // If no channels are in solo mode, simply follow the mute rule
-                channelNode.mute = channelIsMuted;
-            }
+            const channelIsDirectMuted = mutes[nomEstacio];
+            const channelIsIndirectMuted = someAreSoloed && !channelIsSoloed;
+            channelNode.mute = channelIsDirectMuted || channelIsIndirectMuted;
         });
     }
 
