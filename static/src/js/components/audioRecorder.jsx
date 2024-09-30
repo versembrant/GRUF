@@ -26,7 +26,8 @@ export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
             micOpened = true;
             // print the incoming mic levels in decibels
             meterInterval = setInterval(() => {
-                const valueForMeter = clamp(meter.getValue(), -100, 0);
+                //const valueForMeter = clamp(meter.getValue(), -100, 0);
+                valueForMeter = Math.random() * 100 - 100;
                 document.getElementById("inputMeterInner").style.width = `${valueForMeter + 100}%`;
             }, 100);
 
@@ -135,9 +136,9 @@ export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
 
     if (ui === "minimal") {
         return (<div>
-            {!isRecButtonDisabled ? <button className="btn btn-petit btn-no-border" id="startRecording" onClick={handleRecButton}>Record</button>:""}
-            {!isStopButtonDisabled ? <button className="btn btn-petit btn-no-border" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
-            <div id="inputMeterInner" style={{width:'0%', height: '100%', backgroundColor:'green'}}></div>
+            {!isRecButtonDisabled ? <button className="btn btn-petit btn-vermell sampler-record-btn" id="startRecording" onClick={handleRecButton}>Rec</button>:""}
+            {!isStopButtonDisabled ? <button className="btn btn-petit btn-vermell sampler-recording-btn" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
+            <div id="inputMeterInner" style={{width:'0%', height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
             <div style={{display:"none"}}>
                 <span id="recordingLength"></span>
                 <span id="serverFileURL"></span>

@@ -765,18 +765,53 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 }
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
+    const selectedSoundName = estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset());
+    const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+    const options = 
+        [...getCurrentSession().getRecordedFiles().map(item => ({'label': item, 'value': item})),
+        ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
+    ];
+    const optionNames = options.map(item => item.value);
+
+    const handleRemoveFileButton = (soundName) => {
+        const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
+        var fd = new FormData();
+        fd.append('filename', soundName);
+        fetch(deleteFileUrl, { 
+            method: "POST", 
+            body: fd,
+        })
+        .then(response => {
+            response.json().then(data => {
+                if (!data.error){
+                    // In local mode, simulate receiving a parameter update with the updated list of avialable files
+                    getCurrentSession().receiveUpdateParametreSessioFromServer('recorded_files', data.recorded_files)
+                    
+                    // Load a different sound in the sampler
+                    let selectedOptionIndex = optionNames.indexOf(selectedSoundName);
+                    const filteredOptionNames = optionNames.filter(item => item !== soundName);
+                    if (selectedOptionIndex > -1) {
+                        if (selectedOptionIndex >= filteredOptionNames.length) {
+                            selectedOptionIndex = filteredOptionNames.length - 1;
+                        }
+                        estacio.updateParametreEstacio('selecetdSoundName', filteredOptionNames[selectedOptionIndex])
+                    }
+                }
+            });
+        })
+    }
+
     return (
-        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
+        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
-                value={estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset())}
+                value={selectedSoundName}
                 onChange={(evt) => {
                     estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
                 }} 
-                options={[...getCurrentSession().getRecordedFiles().map(item => ({'label': item + ' (-)', 'value': item})),
-                          ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
-                        ]}
+                options={options}
                 placeholder="Cap"
             />
+            {showTrashOption ? <button style={{width: "28px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
         </div>
     )
 }

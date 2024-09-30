@@ -56,8 +56,8 @@ button:disabled{
     border-color: $red;
     
     &:hover {
-        border-color: $white;
-        color: $white;
+        border-color: lighten($red, 10%);
+        color: lighten($red, 10%);
     }
 }
 
