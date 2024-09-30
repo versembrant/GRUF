@@ -3,7 +3,6 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
 import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
-import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
 
@@ -34,6 +33,31 @@ export const GrufPanKnob = ({ estacio }) => {
                 showValue={false}
             />
             <div style={{display:"flex", justifyItems:"center", justifyContent:'center', fontSize: '12px', border: '5px'}}>PAN</div>
+        </div>
+    );
+};
+
+export const GrufMasterPanKnob = () => {
+    const masterPan = getAudioGraphInstance().getMasterPan();
+
+    const handlePanChange = (newValue) => {
+        getAudioGraphInstance().setMasterPan(newValue);
+    };
+
+    return (
+        <div className="gruf-pan-knob">
+            <Knob 
+                value={masterPan}
+                min={-1}
+                max={1}
+                step={0.01}
+                onChange={(e) => handlePanChange(e.value)}
+                size={50}
+                valueColor="#FFFFFF"
+                rangeColor="#AAAAAA"
+                showValue={false}
+            />
+            <div style={{ display: "flex", justifyItems: "center", justifyContent: "center", fontSize: "12px" }}> PAN </div>
         </div>
     );
 };
@@ -145,6 +169,101 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
+export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
+    const masterGain = getAudioGraphInstance().getMasterGain(); 
+    const marks = [];
+
+    const style = { top: top, left: left };
+    if (height !== undefined) {
+        style.height = height;
+    }
+
+    const handleGainChange = (evt, value) => {
+        getAudioGraphInstance().setMasterGain(parseFloat(value, 10));
+    };
+
+    return (
+        <div className="gruf-master-gain-slider-vertical" style={style}>
+            <Slider
+                orientation="vertical"
+                value={masterGain}
+                step={0.01}
+                min={0.0}
+                max={1.0}
+                marks={marks}
+                onChange={handleGainChange}
+            />
+        </div>
+    );
+};
+
+export const GrufMasterMeter = ({showLevelMeters}) => {
+    const leftMeterRef = useRef(null);
+    const rightMeterRef = useRef(null);
+
+    useEffect(() => {
+        if (!showLevelMeters) {return;}
+        const interval = setInterval(() => {
+            const levelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
+
+            if (leftMeterRef.current && rightMeterRef.current) {
+                // Canal esquerre
+                const dbLeft = Math.max(-60, Math.min(levelData.left.db, 12));
+                const heightLeft = ((dbLeft + 60) / 60) * 100;
+                leftMeterRef.current.style.height = `${heightLeft}%`;
+
+                // Canal dret
+                const dbRight = Math.max(-60, Math.min(levelData.right.db, 12));
+                const heightRight = ((dbRight + 60) / 60) * 100;
+                rightMeterRef.current.style.height = `${heightRight}%`;
+
+                let colorLeft, colorRight;
+                if (dbLeft <= -2) {
+                    const greenToYellow = Math.min(1, (dbLeft + 60) / 50);
+                    const green = Math.round(255 * (1 - greenToYellow));
+                    const red = Math.round(255 * greenToYellow);
+                    colorLeft = `rgb(${red}, 255, 0)`;
+                } else {
+                    const yellowToRed = Math.min(1, (dbLeft + 10) / 16);
+                    const red = 255;
+                    const green = Math.round(255 * (1 - yellowToRed));
+                    colorLeft = `rgb(${red}, ${green}, 0)`;
+                }
+
+                if (dbRight <= -2) {
+                    const greenToYellow = Math.min(1, (dbRight + 60) / 50);
+                    const green = Math.round(255 * (1 - greenToYellow));
+                    const red = Math.round(255 * greenToYellow);
+                    colorRight = `rgb(${red}, 255, 0)`;
+                } else {
+                    const yellowToRed = Math.min(1, (dbRight + 10) / 16);
+                    const red = 255;
+                    const green = Math.round(255 * (1 - yellowToRed));
+                    colorRight = `rgb(${red}, ${green}, 0)`;
+                }
+
+                leftMeterRef.current.style.backgroundColor = colorLeft;
+                rightMeterRef.current.style.backgroundColor = colorRight;
+            }
+        }, 100);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return (
+        <div className="master-stereo-meters">
+            <div className="volume-meter">
+                <div className="volume-level" ref={leftMeterRef}></div>
+            </div>
+            <div className="volume-meter">
+                <div className="volume-level" ref={rightMeterRef}></div>
+            </div>
+        </div>
+    );
+};
+
 export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, reportSoloChange}) => {
     const [isSolo, setIsSolo] = useState(false);
 
@@ -154,9 +273,8 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     }
 
     const isIndirectMute = isAnySolo && !isSolo;
-
     return (
-        <div key={nomEstacio} className={"estacio-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
+        <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
             <GrufPanKnob estacio={estacio} />
 
             <div className="slider-wrapper">
@@ -178,6 +296,7 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
         </div>
     )
 }
+
 
 export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -201,25 +320,11 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
     
                     if (meterLevelDiv) {
-                        const db = Math.max(-60, Math.min(levelData.db, 12)); // Limitar entre -60 y 12 dB
-                        const height = ((db + 60) / 60) * 100; // Escalar entre 0 y 100%
-    
-                        meterLevelDiv.style.height = `${height}%`;
-    
-                        let color;
-                        if (db <= -2) {
-                            const greenToYellow = Math.min(1, (db + 60) / 50);
-                            const green = Math.round(255 * (1 - greenToYellow));
-                            const red = Math.round(255 * greenToYellow);
-                            color = `rgb(${red}, 255, 0)`; 
-                        } else {
-                            const yellowToRed = Math.min(1, (db + 10) / 16);
-                            const red = 255;
-                            const green = Math.round(255 * (1 - yellowToRed));
-                            color = `rgb(${red}, ${green}, 0)`; 
-                        }
-    
-                        meterLevelDiv.style.backgroundColor = color;
+                        const minDB = -60;
+                        const maxDB = 6;
+                        const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
+                        const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+                        meterLevelDiv.style.setProperty('--meter-level', `${meterLevel}%`);
 
                         if (isMuted) meterLevelDiv.classList.add("grayscale");
                         else meterLevelDiv.classList.remove("grayscale");
@@ -242,15 +347,23 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
                             <EstacioMixerTrack
-                            key={nomEstacio}
-                            nomEstacio={nomEstacio}
-                            estacio={estacio}
-                            metersRef = {metersRef}
-                            isAnySolo = {isAnySolo}
-                            reportSoloChange = {reportSoloChange}
+                                key={nomEstacio}
+                                nomEstacio={nomEstacio}
+                                estacio={estacio}
+                                metersRef = {metersRef}
+                                isAnySolo = {isAnySolo}
+                                reportSoloChange = {reportSoloChange}
                             />
                         );
                     })}
+                    <div className="estacio-mixer-master-columna">
+                        <GrufMasterPanKnob/>
+                        <div className="slider-wrapper">
+                        <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                        <GrufMasterMeter showLevelMeters={showLevelMeters} />
+                        </div>
+                        <div className="master-label">Master</div>
+                    </div>
                 </div>
             </div>
         </div>
