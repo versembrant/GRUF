@@ -146,6 +146,7 @@ export class AudioGraph {
                 right: { db: -60, gain: 0 }
             };
         }
+    }
 
     isMutedEstacio(nomEstacio) {
         if (!this.graphIsBuilt()) return false;
