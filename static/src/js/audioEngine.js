@@ -3,6 +3,7 @@ import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
+import { channel } from 'process';
 
 var audioContextIsReady = false;
 

@@ -10,13 +10,14 @@ export const GrufPanKnob = ({ estacio }) => {
     const [panValue, setPanValue] = useState(0); 
 
     useEffect(() => {
-        const initialPan = getAudioGraphInstance().getPanForEstacio(estacio.nom);
-        setPanValue(initialPan);
+        setPanValue(getCurrentSession().getLivePansEstacions()[estacio.nom] || 0);
     }, [estacio]);
 
     const handlePanChange = (newValue) => {
         setPanValue(newValue); 
-        getAudioGraphInstance().setPanForEstacio(estacio.nom, newValue); 
+        const currentPans = getCurrentSession().getLivePansEstacions();
+        currentPans[estacio.nom] = parseFloat(newValue, 10);
+        getCurrentSession().liveSetPansEstacions(currentPans);
     };
 
     return (
