@@ -477,6 +477,10 @@ export class Session {
         return this.store.getState().live.gainsEstacions
     }
 
+    getLivePansEstacions() {
+        return this.store.getState().live.pansEstacions
+    }
+
     getLiveMutesEstacions() {
         return this.store.getState().live.mutesEstacions
     }
@@ -505,6 +509,13 @@ export class Session {
         this.updateParametreLive({
             accio: 'set_gains',
             gains_estacions: gainsEstacions,
+        })
+    }
+
+    liveSetPansEstacions(pansEstacions) {
+        this.updateParametreLive({
+            accio: 'set_pans',
+            pans_estacions: pansEstacions,
         })
     }
 
@@ -562,6 +573,16 @@ export class Session {
                     channelNode.volume.value = volume;
                 }
                 this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
+            })
+        } else if (updateData.accio === 'set_pans'){
+            Object.keys(updateData.pans_estacions).forEach(nomEstacio => {
+                liveActualitzat.pansEstacions[nomEstacio] = updateData.pans_estacions[nomEstacio];
+                // Update audio graph pans nodes
+                const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+                if (channelNode !== undefined){
+                    const pan = updateData.pans_estacions[nomEstacio];
+                    channelNode.pan.setValueAtTime(pan, 0.01);
+                }
             })
         } else if (updateData.accio === 'set_mutes') {
             Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {
