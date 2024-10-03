@@ -6,7 +6,7 @@ import { capitalizeFirstLetter } from "../utils";
 function sample(array) {
     const index = Math.floor(Math.random() * array.length);
     return array[index];
-  }
+}
 
 function generateTitle() {
     var name_prefixes = ["Master", "Mr.", "Professor", "Mrs.", "Princess", "Prince", "The Pauper's", "The", "Betsy", "Billy", "Johnny"];
@@ -24,7 +24,7 @@ function generateTitle() {
       title = `The ${adjective} ${secondary_noun} of ${name_prefix} ${primary_noun}`;
     }
     return title;
-  }
+}
 
 export const NovaSessio = () => {
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
@@ -41,7 +41,6 @@ export const NovaSessio = () => {
     }
 
     const handleSubmitForm = (evt) => {
-        // Create session data object
         const sessionData = {}
         sessionData.creation_timestamp = new Date().getTime();
         sessionData.bpm = 120;
@@ -62,7 +61,6 @@ export const NovaSessio = () => {
             sessionData.live.presetsEstacions[nomEstacio] = 0
         })
         
-        // Create HTML form with the data and submit it
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '.';
@@ -82,33 +80,42 @@ export const NovaSessio = () => {
     return(
         <div>
             <Navbar/>
-            <div className="nou-gruf">
-                <h1>Nou GRUF</h1>
-                <div>
-                    Nom:<input
-                        style={{width:"300px"}}
-                        value={nomSessio}
-                        onChange={e => setNomSessio(e.target.value)}
-                    />
+            <div className="nova-sessio-wrapper">
+                <div className="sessio-header">
+                    <h1>Nou GRUF</h1>
+                    <div className="input-title">
+                        <input
+                            value={nomSessio}
+                            onChange={e => setNomSessio(e.target.value)}
+                            placeholder="Nom de la Sessió"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <br/>
-                    Estacions triades:
-                    <ul>
-                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
-                    </ul>
+                <div className="estacions-list">
+                    <h2>Estacions Triades:</h2>
+                    <div className="selected-cards">
+                        {estacionsSelected.map((tipusEstacio, i) => (
+                            <div className="card" key={tipusEstacio + '_' + i}>
+                                <p>{tipusEstacio}</p>
+                                <button className="delete-btn" onClick={() => handleRemoveStation(i)}>X</button>
+                            </div>
+                        ))}
+                    </div>
                     <select
                         value={selectedOption}
                         onChange={(evt) => setSelectedOption(evt.target.value)}>
-                        {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
+                        {Object.keys(estacionsDisponibles).map(tipusEstacio => (
+                            <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>
+                        ))}
                     </select>
-                    <button className="btn btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
+                    <button className="add-btn" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
                 </div>
-                <div className="enrere">
-                    <button className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
-                    <a href={appPrefix + "/"} className="btn">Torna enrere</a>
+                <div className="footer-controls">
+                    <button className="primary-btn" onClick={handleSubmitForm}>Crear GRUF!</button>
+                    <a href={appPrefix + "/"} className="secondary-btn">Torna Enrere</a>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 };
