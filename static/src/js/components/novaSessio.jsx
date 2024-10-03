@@ -80,39 +80,41 @@ export const NovaSessio = () => {
     return(
         <div>
             <Navbar/>
-            <div className="nova-sessio-wrapper">
-                <div className="sessio-header">
-                    <h1>Nou GRUF</h1>
-                    <div className="input-title">
-                        <input
-                            value={nomSessio}
-                            onChange={e => setNomSessio(e.target.value)}
-                            placeholder="Nom de la Sessió"
-                        />
+            <div className="nova-sessio-container">
+                <div className="nova-sessio-wrapper">
+                    <div className="sessio-header">
+                        <h1>Nou GRUF</h1>
+                        <div className="input-title">
+                            <input
+                                value={nomSessio}
+                                onChange={e => setNomSessio(e.target.value)}
+                                placeholder="Nom de la Sessió"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="estacions-list">
-                    <h2>Estacions Triades:</h2>
-                    <div className="selected-cards">
-                        {estacionsSelected.map((tipusEstacio, i) => (
-                            <div className="card" key={tipusEstacio + '_' + i}>
-                                <p>{tipusEstacio}</p>
-                                <button className="delete-btn" onClick={() => handleRemoveStation(i)}>X</button>
-                            </div>
-                        ))}
+                    <div className="estacions-list">
+                        <h2>Estacions Triades:</h2>
+                        <div className="selected-cards">
+                            {estacionsSelected.map((tipusEstacio, i) => (
+                                <div className="card" key={tipusEstacio + '_' + i}>
+                                    <p>{tipusEstacio}</p>
+                                    <button className="delete-btn" onClick={() => handleRemoveStation(i)}>X</button>
+                                </div>
+                            ))}
+                        </div>
+                        <select
+                            value={selectedOption}
+                            onChange={(evt) => setSelectedOption(evt.target.value)}>
+                            {Object.keys(estacionsDisponibles).map(tipusEstacio => (
+                                <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>
+                            ))}
+                        </select>
+                        <button className="add-btn" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
                     </div>
-                    <select
-                        value={selectedOption}
-                        onChange={(evt) => setSelectedOption(evt.target.value)}>
-                        {Object.keys(estacionsDisponibles).map(tipusEstacio => (
-                            <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>
-                        ))}
-                    </select>
-                    <button className="add-btn" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
-                </div>
-                <div className="footer-controls">
-                    <button className="primary-btn" onClick={handleSubmitForm}>Crear GRUF!</button>
-                    <a href={appPrefix + "/"} className="secondary-btn">Torna Enrere</a>
+                    <div className="footer-controls">
+                        <button className="primary-btn" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <a href={appPrefix + "/"} className="secondary-btn">Torna Enrere</a>
+                    </div>
                 </div>
             </div>
             <Footer/>
