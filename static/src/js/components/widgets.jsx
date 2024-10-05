@@ -458,7 +458,7 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
     );
 };
 
-export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
+export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
     // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const parameterValueOnOff = parameterValue === valueOn;
