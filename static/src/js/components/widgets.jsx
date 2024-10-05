@@ -823,18 +823,17 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     )
 }
 
-export const GrufADSRWidget = ({estacio, top, left}) => {
+export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
     // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
-        <div className="gruf-adsr-widget" style={{top, left}}>
+        <div className="gruf-adsr-widget" style={{top, left, height}}>
             <div className="adsr-graph">
-
             </div>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName="attack" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="decay" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="sustain" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="release" position="static" />
+                <GrufKnobPetit estacio={estacio} parameterName={`attack${soundNumber}`} label='Attack' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={`decay${soundNumber}`} label='Decay' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={`sustain${soundNumber}`} label='Sustain' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={`release${soundNumber}`} label='Release' position="static" />
             </div>
         </div>
     )
