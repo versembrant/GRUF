@@ -80,6 +80,7 @@
 }
 
 .estacio-piano {
+    --accent-color: #{$orange};
     .estacio-main {
         background-image: url("../img/piano_bg.svg");
         background-color: $orange;
@@ -106,6 +107,7 @@
 }
 
 .estacio-groovebox {
+    --accent-color: #{$yellow};
     .estacio-main {
         background-image: url("../img/groovebox_bg.svg");
         background-color: $yellow;
@@ -132,6 +134,7 @@
 }
 
 .estacio-synth {
+    --accent-color: #{$red};
     .estacio-main {
         background-image: url("../img/synth_bg_2.svg");
         background-color: $red;
@@ -158,6 +161,7 @@
 }
 
 .estacio-synth_bass {
+    --accent-color: #{$pink};
     .estacio-main {
         background-image: url("../img/synth_bass_bg_2.svg");
         background-color: $pink;
@@ -184,6 +188,7 @@
 }
 
 .estacio-sampler {
+    --accent-color: #{$light-blue};
     .estacio-main {
         background-image: url("../img/sampler_bg.svg");
         background-color: $light-blue;
@@ -212,6 +217,7 @@
 }
 
 .estacio-mixer {
+    --accent-color: #{$green};
     .estacio-main {
         background-image: url("../img/mixer_bg.svg");
         background-color: $green;
@@ -408,6 +414,7 @@
 }
 
 .estacio-computer {
+    --accent-color: #{$pale-orange};
     .estacio-main {
         background-image: url("../img/computer_bg.svg");
         background-color: $pale-orange;
