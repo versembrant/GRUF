@@ -432,7 +432,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     return (
         <div className="gruf-pad">
             <Button
-                className={ (isClicked ? 'selected': '') + ' ' + (isSelected ? 'pad-selected': '') } 
+                className={ isClicked || isSelected ? 'selected': '' }
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseOut={handleMouseUp}
