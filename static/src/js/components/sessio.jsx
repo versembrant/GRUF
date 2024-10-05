@@ -71,7 +71,7 @@ export const Sessio = () => {
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>
-                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                        <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
             </div>
@@ -98,7 +98,7 @@ export const Sessio = () => {
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>
-                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                        <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
             </div>
