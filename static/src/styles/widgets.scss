@@ -994,8 +994,7 @@
     width: 220px;
 
     .adsr-graph {
-        display: flex;
-        height: 194px;
+        flex: 1;
     }
 
     .adsr-knobs {

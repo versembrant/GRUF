@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler } from "./widgets";
+import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -49,10 +49,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobGran estacio={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
                 <GrufKnobGranDiscret estacio={estacio} parameterName={`pitch${selectedPad + 1}`} top="79%" left="5%" label='Pitch' />
 
-                <GrufKnobPetit estacio={estacio} parameterName={`attack${selectedPad + 1}`} top="24%" left="5%" label='Attack' />
-                <GrufKnobPetit estacio={estacio} parameterName={`decay${selectedPad + 1}`} top="24%" left="10%" label='Decay' />
-                <GrufKnobPetit estacio={estacio} parameterName={`sustain${selectedPad + 1}`} top="24%" left="15%" label='Sustain' />
-                <GrufKnobPetit estacio={estacio} parameterName={`release${selectedPad + 1}`} top="24%" left="20%" label='Release' />
+                <GrufADSRWidget estacio={estacio} soundNumber={selectedPad + 1} top="4.8%" left="3.7%" height="197px"/>
 
                 <GrufKnobGran estacio={estacio} parameterName={`start${selectedPad + 1}`} top="7.3%" left="41.3%" label='Start' />
                 <GrufKnobGran estacio={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
