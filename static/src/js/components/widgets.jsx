@@ -470,15 +470,15 @@ export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, val
     };
 
     return (
-        <div className="gruf-select-button" style={{ top: top, left: left }}>
+        <div className="gruf-toggle" style={{ top: top, left: left }}>
             <div
-                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
+                className={`p-toggle ${parameterValueOnOff ? 'on' : 'off'}`}
                 onClick={handleClick}
             >
                 <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
             </div>
-            <div className="select-button-label select-button-label-on">{labelOn}</div>
-            <div className="select-button-label select-button-label-off">{labelOff}</div>
+            <div className="toggle-label toggle-label-off">{labelOff}</div>
+            <div className="toggle-label toggle-label-on">{labelOn}</div>
         </div>
     );
 };
