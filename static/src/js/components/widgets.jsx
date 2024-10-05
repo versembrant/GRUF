@@ -824,17 +824,96 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
 }
 
 export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
-    // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
+    const attackParamName = `attack${soundNumber}`;
+    const decayParamName = `decay${soundNumber}`;
+    const sustainParamName = `sustain${soundNumber}`;
+    const releaseParamName = `release${soundNumber}`;
+
+    const a = estacio.getParameterValue(attackParamName, estacio.getCurrentLivePreset());
+    const d = estacio.getParameterValue(decayParamName, estacio.getCurrentLivePreset());
+    const s = estacio.getParameterValue(sustainParamName, estacio.getCurrentLivePreset());
+    const r = estacio.getParameterValue(releaseParamName, estacio.getCurrentLivePreset());
+
+     // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
         <div className="gruf-adsr-widget" style={{top, left, height}}>
-            <div className="adsr-graph">
-            </div>
+            <ADSRGraph a={a} d={d} s={s} r={r}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName={`attack${soundNumber}`} label='Attack' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={`decay${soundNumber}`} label='Decay' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={`sustain${soundNumber}`} label='Sustain' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={`release${soundNumber}`} label='Release' position="static" />
+                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release' position="static" />
             </div>
+        </div>
+    )
+}
+
+const ADSRGraph = ({a, d, s, r}) => {
+    const timeValues = [a, d, r];
+    const levelValues = [0, 1, s, 0];
+
+    const xPoints = timeValues.reduce((xPointArray, timeValue, index) => {
+        const normTimeValue = timeValue / 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+        xPointArray.push(normTimeValue*100+xPointArray[index]);
+        return xPointArray;
+    },[0]);
+    const yPoints =  levelValues.map((levelValue)=>75-levelValue*50);
+    const xyPairs = xPoints.map((x, i) => [x, yPoints[i]]);
+
+    const adsrLineItems = xyPairs.slice(0, -1).map(([x1, y1], i) => {
+        // see https://issues.chromium.org/issues/41229159, straight lines with mask
+        let x2 = xyPairs[i+1][0];
+        let y2 = xyPairs[i+1][1];
+        // if (x2 === x1) x2 += 0.01;
+        // if (y2 == y1) y2 += 0.01;
+        return <line
+            key={`adsrLine-${i}`}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            vectorEffect="non-scaling-stroke"
+            mask="url(#clip-circles)"
+        />
+});
+
+
+    const adsrCircleItems = xyPairs.slice(1).map(([x, y], i) =>
+        <circle key={`adsrCircle-${i}`} cx={x} cy={y} r="1" vectorEffect="non-scaling-stroke"/>
+    );
+
+    const gridSize = 4;
+    let bgLineItems = [];
+    for (let i = 1; i < gridSize; i++) {
+        const crossAxisPos = i / (gridSize) * 100;
+        const hLine = <line key={`bgHLine-${i}`} x1='0' x2='100' y1={crossAxisPos} y2={crossAxisPos} vectorEffect="non-scaling-stroke"/>
+        const vLine = <line key={`bgVLine-${i}`} x1={crossAxisPos} x2={crossAxisPos} y1='100' y2='0' vectorEffect="non-scaling-stroke"/>
+        bgLineItems.push(hLine, vLine);
+    }
+
+
+    return (
+        <div className="adsr-graph">
+            <svg viewBox={"0 0 100 100"} preserveAspectRatio="none">
+                <g stroke="#555" strokeDasharray="1 4" strokeLinecap="round">
+                    {bgLineItems}
+                </g>
+
+                {/* <defs>
+                    <mask id="clip-circles">
+                        <rect x="0" y="0" width="100" height="100" fill="white"/>
+                        <g fill="black">
+                            {adsrCircleItems}
+                        </g>
+                    </mask>
+                </defs> */}
+
+                <g fill="none" stroke="var(--accent-color)" strokeWidth="3px" strokeLinecap="round">
+                    {adsrLineItems}
+                    {/* {adsrCircleItems} */}
+                </g>
+
+            </svg>
         </div>
     )
 }
