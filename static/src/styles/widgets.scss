@@ -82,11 +82,6 @@
         height: 17px;
         cursor: pointer;
     }
-
-    .selected {
-        background-color: $dark-grey;
-        color: white;
-    }
 }
 
 .gruf-reverb-time {
@@ -104,10 +99,6 @@
         height: 10px;
         margin-top: 2.5px;
         cursor: pointer;
-    }
-
-    .selected {
-        background-color: $dark-grey;
     }
 }
 
@@ -157,32 +148,16 @@
         width: 100%;
         height: 80%;
         border-radius: 10px;
+        color: $font-color;
         background-color: $dark-grey;
     }
 
     .p-button-label {
         font-size: 12px;
-        color: $font-color;
         font-family: "Montserrat", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-    }
-    
-    .selected { // S'utiliza per quan el pad s'apreta
-        background-color: $grey;
-
-        .p-button-label {
-            color: $white;
-        }
-    }
-
-    .pad-selected { // S'utilitza per quan el pad està se·leccionat i es modifiquen els seus paràmetres
-        background-color: $grey;
-
-        .p-button-label {
-            color: $white;
-        }
     }
 }
 
@@ -672,10 +647,6 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
 
-            &.selected {
-                background-color: $grey; 
-            }
-
             &.active {
                 border: 1px solid $grey;
                 -webkit-box-sizing:border-box;
@@ -776,11 +747,6 @@
         vertical-align: middle;
         margin-right: 4px;
         cursor: hand;
-
-        &.selected {
-            background-color: $grey;
-            color: $white;
-        }
 
         &.active {
             border-color: $white;
@@ -941,8 +907,8 @@
             cursor: hand;
             border-radius: 5px;
             margin: 2px;
-            background-color: $pale-orange;
-            border: 1px solid $pale-orange;
+            background-color: var(--accent-color, $pale-orange);
+            border: 1px solid var(--accent-color, $pale-orange);
     
             &.filled {
                 background-color: $black!important;
