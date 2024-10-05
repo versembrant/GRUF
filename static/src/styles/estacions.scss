@@ -186,19 +186,19 @@
 .estacio-sampler {
     .estacio-main {
         background-image: url("../img/sampler_bg.svg");
-        background-color: $lightblue;
+        background-color: $light-blue;
     }
 
     .selected {
-        background-color: $lightblue!important;
+        background-color: $light-blue!important;
     }
     
     &.mixer-border {
-        border-color: $lightblue;
+        border-color: $light-blue;
     }
     &.computer-step {
-        border-color: $lightblue!important;
-        background-color: $lightblue!important;
+        border-color: $light-blue!important;
+        background-color: $light-blue!important;
     }  
 }
 
