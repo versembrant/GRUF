@@ -21,6 +21,7 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);
     getAudioGraphInstance().setCompas(currentSession.rawData.compas);
+    getAudioGraphInstance().setTonality(currentSession.rawData.tonality);
     if (currentSession.rawData.effectParameters) { 
         // Only set parameters in store if there are any in the session. This is for compatibility with older sessions
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
