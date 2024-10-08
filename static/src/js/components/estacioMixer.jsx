@@ -7,14 +7,9 @@ import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
 
 export const GrufPanKnob = ({ estacio }) => {
-    const [panValue, setPanValue] = useState(0); 
-
-    useEffect(() => {
-        setPanValue(getCurrentSession().getLivePansEstacions()[estacio.nom] || 0);
-    }, [estacio]);
+    const parameterValue = getCurrentSession().getLivePansEstacions()[estacio.nom];
 
     const handlePanChange = (newValue) => {
-        setPanValue(newValue); 
         const currentPans = getCurrentSession().getLivePansEstacions();
         currentPans[estacio.nom] = parseFloat(newValue, 10);
         getCurrentSession().liveSetPansEstacions(currentPans);
@@ -23,7 +18,7 @@ export const GrufPanKnob = ({ estacio }) => {
     return (
         <div className="gruf-pan-knob">
             <Knob 
-                value={panValue}
+                value={parameterValue}
                 min={-1} 
                 max={1} 
                 step={0.01} 
