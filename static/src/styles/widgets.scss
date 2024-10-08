@@ -23,25 +23,61 @@
     cursor: pointer;
 }
 
-
 .knob {
-    position: absolute;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .knobctrl-wrapper {
+        position: relative;
+        display: flex;
+        .knobctrl {
+            cursor: pointer;
+            outline: none;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+        }
+        &::before {
+            width: 130%;
+            height: 130%;
+            position: absolute;
+            inset: 50%;
+            transform: translate(-50%, -50%);
+    }
+    
+    }
 
     &.knob-gran {
         font-size: 14px;
+        gap: 8px;
+        .knobctrl-wrapper {
+            width: 60px;
+            height: 60px;
+            .knobctrl {
+                background-image:url(../img/knob_gran_front.svg);
+            }
+            &::before {
+                content: url(../img/knob_gran_back.svg);
+            }
+        }
     }
 
     &.knob-petit {
         font-size: 12px;
-    }
-
-    .p-knob {
-        cursor: pointer;
-    }
-
-    div {
-        text-align: center;
-        padding-top: 3px;
+        gap: 5px;
+        .knobctrl-wrapper {
+            width: 25px;
+            height: 25px;
+            .knobctrl {
+                background-image:url(../img/knob_petit_front.svg);
+            }
+            &::before {
+                content: url(../img/knob_petit_back.svg);
+            }
+        }
     }
 }
 

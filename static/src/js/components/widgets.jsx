@@ -3,6 +3,7 @@ import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
+import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
@@ -62,54 +63,47 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
-export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
-    const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio=estacio.nom;
-    return (
-        <div className="knob knob-gran" style={{top: top, left: left}}>
-            <Knob 
-            value={real2Norm(parameterValue, parameterDescription)}
-            min={0.0}
-            max={1.0}
-            step={0.01}
-            size={60}
-            onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
-            valueTemplate={""}
-            valueColor={cssVariables.white} 
-            rangeColor={cssVariables.grey} 
-            //valueTemplate={valueToText(parameterValue)}
-            />
-            <div>{label || parameterDescription.label}</div>
-        </div>
-    )
-};
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnobPetit = ({estacio, parameterName, top, left, label, position}) => {
+export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
+
+    const normValue = real2Norm(parameterValue, parameterDescription);
+    const angleMin = -145;
+    const angleMax = 145;
+    const angle = normValue * (angleMax - angleMin) + angleMin;
+
+
     return (
-        <div className="knob knob-petit" style={{top: top, left: left, position}}>
-            <Knob 
-            value={real2Norm(parameterValue, parameterDescription)}
-            min={0.0}
-            max={1.0}
-            step={0.01}
-            size={25}
-            onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
-            valueTemplate={""}
-            valueColor={cssVariables.white}
-            rangeColor={cssVariables.grey}
-            //valueTemplate={valueToText(parameterValue)}
-            />
-            <div>{label || parameterDescription.label}</div>
+        <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
+                <div className="knobctrl-wrapper">
+                    <KnobHeadless className="knobctrl" style={{rotate: `${angle}deg`}}
+                        valueRaw={normValue}
+                        valueMin={0.0}
+                        valueMax={1.0}
+                        onValueRawChange={throttle((val) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(val, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
+                        valueRawRoundFn={(value)=>value.toFixed(2)}
+                        valueRawDisplayFn={(value)=>value.toFixed(2)}
+                        dragSensitivity="0.009"
+                        orientation='vertical' // quan
+                    />
+                </div>
+                <label>{label || parameterDescription.label}</label>
         </div>
     )
 };
 
-export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }) => {
+export const GrufKnobGran = (props) => {
+    return <GrufKnob {...props} mida="gran"/>
+};
+
+export const GrufKnobPetit = (props) => {
+    return <GrufKnob {...props} mida="petit"/>
+};
+
+export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label, position="absolute" }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -119,7 +113,7 @@ export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }
     const currentOptionIndex = options.indexOf(parameterValue);
 
     return (
-        <div className="knob knob-gran" style={{ top, left }}>
+        <div className="knob knob-gran" style={{ top, left, position }}>
             <Knob
                 value={currentOptionIndex}
                 min={0}
@@ -140,7 +134,7 @@ export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }
     );
 };
 
-export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label }) => {
+export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label, position="absolute" }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -150,7 +144,7 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     const currentOptionIndex = options.indexOf(parameterValue);
 
     return (
-        <div className="knob knob-petit" style={{ top, left }}>
+        <div className="knob knob-petit" style={{ top, left, position }}>
             <Knob
                 value={currentOptionIndex}
                 min={0}
@@ -171,7 +165,7 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     );
 };
 
-export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label }) => {
+export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, position="absolute" }) => {
     const [parameterValue, setParameterValue] = useState(0); 
 
     useEffect(() => {
@@ -199,7 +193,7 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label })
     };
 
     return (
-        <div className="knob knob-gran" style={{ top: top, left: left }}>
+        <div className="knob knob-gran" style={{ top: top, left: left, position }}>
             <Knob
                 value={parameterValue}
                 min={parameterName === 'bpm' ? 40 : 0} 
