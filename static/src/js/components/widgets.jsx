@@ -56,7 +56,7 @@ export const GrufLabelEstacio = ({ estacio, className }) => {
 
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
-        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+        <button className="btn-gruf no-border" onClick={onClick} style={{top: top, left: left}}>
             {text}
         </button>
     )
