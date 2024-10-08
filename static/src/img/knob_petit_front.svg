@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 172 172" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,0.216677,-7.8729)">
-        <g transform="matrix(4.16667,0,0,4.16667,-552.921,-2709.92)">
-            <path d="M153.289,688.604C161.956,688.604 168.983,681.578 168.983,672.91C168.983,664.243 161.956,657.216 153.289,657.216C144.622,657.216 137.595,664.243 137.595,672.91C137.595,681.578 144.622,688.604 153.289,688.604Z" style="fill:rgb(151,151,151);fill-rule:nonzero;"/>
-        </g>
-        <g transform="matrix(4.16667,0,0,4.16667,-552.921,-2709.92)">
-            <path d="M153.289,685.735C160.372,685.735 166.114,679.993 166.114,672.91C166.114,665.827 160.372,660.085 153.289,660.085C146.206,660.085 140.464,665.827 140.464,672.91C140.464,679.993 146.206,685.735 153.289,685.735Z" style="fill:rgb(34,35,37);fill-rule:nonzero;"/>
-        </g>
-        <g transform="matrix(4.16667,0,0,4.16667,-552.921,-2709.92)">
-            <path d="M146.201,668.016C146.854,668.016 147.383,667.487 147.383,666.835C147.383,666.183 146.854,665.654 146.201,665.654C145.549,665.654 145.02,666.183 145.02,666.835C145.02,667.487 145.549,668.016 146.201,668.016Z" style="fill:white;fill-rule:nonzero;"/>
-        </g>
-    </g>
+
+<svg viewBox="0 -7 7 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <circle cx="3.5" cy="-3.5" r="3.4" style="fill:rgb(151,151,151);fill-rule:nonzero;"/>
+    <circle cx="3.5" cy="-3.5" r="2.8" style="fill:rgb(34,35,37);fill-rule:nonzero;"/>
+    <circle cx="3.5" cy="-5.4" r="0.3" style="fill:white;fill-rule:nonzero;"/>
 </svg>
