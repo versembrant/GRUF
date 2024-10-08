@@ -797,7 +797,7 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
 
     const handleTonalityChange = (event) => {
         const selectedTonality = event.target.value;
-        getAudioGraphInstance().setTonality(selectedTonality); 
+        getAudioGraphInstance().setParametre('tonality', selectedTonality);
     };
 
     return (

@@ -17,11 +17,12 @@ const onSessionDataLoaded = () => {
     const currentSession = getCurrentSession();
 
     const isMasterAudioEngine = currentSession.localMode || sessionElement.dataset.masterAudioEngine === 'true';
-    getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
-    getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
-    getAudioGraphInstance().setSwing(currentSession.rawData.swing);
-    getAudioGraphInstance().setCompas(currentSession.rawData.compas);
-    getAudioGraphInstance().setTonality(currentSession.rawData.tonality);
+    getAudioGraphInstance().setParametre('masterAudioEngine', isMasterAudioEngine);
+    getAudioGraphInstance().setParametre('bpm', currentSession.rawData.bpm);
+    getAudioGraphInstance().setParametre('swing', currentSession.rawData.swing);
+    getAudioGraphInstance().setParametre('compas', currentSession.rawData.compas);
+    getAudioGraphInstance().setParametre('tonality', currentSession.rawData.tonality);
+
     if (currentSession.rawData.effectParameters) { 
         // Only set parameters in store if there are any in the session. This is for compatibility with older sessions
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
