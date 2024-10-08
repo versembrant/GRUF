@@ -117,7 +117,6 @@ export class MonoSynth extends EstacioBase {
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const ajustedNote = this.adjustNoteForWaveform(note.n);
-                console.log(note.n, ajustedNote)
                 this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(ajustedNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
             }
         }
