@@ -56,7 +56,7 @@ export const GrufLabelEstacio = ({ estacio, className }) => {
 
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
-        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+        <button className="btn-gruf no-border" onClick={onClick} style={{top: top, left: left}}>
             {text}
         </button>
     )
@@ -85,12 +85,13 @@ export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
     )
 };
 
-export const GrufKnobPetit = ({estacio, parameterName, top, left, label}) => {
+// TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
+export const GrufKnobPetit = ({estacio, parameterName, top, left, label, position}) => {
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     return (
-        <div className="gruf-knob-petit" style={{top: top, left: left}}>
+        <div className="gruf-knob-petit" style={{top: top, left: left, position}}>
             <Knob 
             value={real2Norm(parameterValue, parameterDescription)}
             min={0.0}
@@ -822,6 +823,19 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     )
 }
 
+export const GrufADSRWidget = ({estacio, top, left}) => {
+    // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
+    return (
+        <div className="gruf-adsr-widget" style={{top, left}}>
+            <div className="adsr-graph">
 
-
-
+            </div>
+            <div className="adsr-knobs">
+                <GrufKnobPetit estacio={estacio} parameterName="attack" position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName="decay" position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName="sustain" position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName="release" position="static" />
+            </div>
+        </div>
+    )
+}

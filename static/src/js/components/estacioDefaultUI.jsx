@@ -266,7 +266,7 @@ export const EstacioDefaultUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio-default">
         <div>
-            <button className="btn btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
+            <button className="btn-petit" onClick={(evt) => {setEstacioSelected(undefined)}}>Canvia d'estació</button>
             <div className="preset-buttons grid-default">
                 <div className="grid-row-default">
                     {[...Array(estacio.numPresets).keys()].map(i => 
