@@ -366,7 +366,7 @@ export const GrufBpmCounter = ({ top, left }) => {
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
 
     const handleBpmChange = (newBpm) => {
-        getAudioGraphInstance().setBpm(newBpm);
+        getAudioGraphInstance().updateParametreAudioGraph('bpm', newBpm);
     };
 
     return (
