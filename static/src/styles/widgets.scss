@@ -575,7 +575,7 @@
     }
 }
 
-.gruf-select-button {
+.gruf-toggle {
     position: absolute;
     width: 120px;  
     height: 30px;
@@ -586,50 +586,43 @@
     background-color: $background-color;
     border-radius: 12px;
 
-    .p-selectbutton {
+    .p-toggle {
         position: relative;
         width: 120%;
         height: 120%;
         border: none;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+        padding: 0 10px;
         background-color: transparent;
         overflow: hidden;
         cursor: pointer;
 
         .circle-icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             width: 16px;
             height: 16px;
             background-color: $dark-grey; 
             border-radius: 100px;
-            transition: left 0.3s ease;
+            transition: margin-left 0.3s ease;
         }
 
         &.on .circle-icon {
-            left: 10px;
-        }
-
-        &.off .circle-icon {
-            left: auto;
-            right: 10px;
+            margin-left: calc(100% - 16px); // el mateix que auto, però transicionable
         }
     }
 
-    .select-button-label {
+    .toggle-label {
         font-size: 12px;
     }
 
-    .select-button-label-on{
+    .toggle-label-off{
         position: absolute;
         top: 35px;
         left: 3px;
     }
 
-    .select-button-label-off{
+    .toggle-label-on{
         position: absolute;
         top: 35px;
         right: 3px;
