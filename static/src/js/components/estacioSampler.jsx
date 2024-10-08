@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
-import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler } from "./widgets";
+import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSliderVertical, GrufSelectorSonsSampler } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
+import { AudioRecorder } from "../components/audioRecorder";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
-    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar current step del sequencer principal
 
     const [selectedPad, setSelectedPad] = useState(0);
 
@@ -38,7 +37,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
                 
                 <GrufLabel text="Delay" top="14%" left="82.3%" />
-                <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
+                <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
                 <GrufLabel text="Durada" top="29.6%" left="70.3%" />
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
                 <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 
@@ -58,10 +57,17 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobGran estacio={estacio} parameterName={`start${selectedPad + 1}`} top="7.3%" left="41.3%" label='Start' />
                 <GrufKnobGran estacio={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
 
-                <GrufSelectorSonsSampler estacio={estacio} top="266px" left="70px" width="210px" />
+                <GrufSelectorSonsSampler estacio={estacio} top="268px" left="60px" width="220" />
 
                 <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
                 <GrufPianoRoll estacio={estacio} parameterName="notes" top="328px" left="405px" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
+
+                <div style={{position:"absolute", top:"263px", left:"295px"}}>
+                    <AudioRecorder ui="minimal" onRecordUploadedCallback={(data) => {
+                        console.log("Sound uploaded to server: ", data.url);
+                        estacio.updateParametreEstacio('selecetdSoundName', data.url.split("/").slice(-1)[0])
+                    }} />
+                </div>
             </div>
 
         </div>

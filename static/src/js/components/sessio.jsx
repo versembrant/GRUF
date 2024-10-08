@@ -5,7 +5,6 @@ import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
-//import { AudioRecorder } from "../components/audioRecorder";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 
@@ -72,7 +71,7 @@ export const Sessio = () => {
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>
-                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                        <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
             </div>
@@ -99,7 +98,7 @@ export const Sessio = () => {
                     </div>
                     <div className="footer between">
                         <div><SessionConnectedUsers/></div>
-                        <div><a className="btn btn-petit btn-no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+                        <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
             </div>
