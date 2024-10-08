@@ -23,37 +23,17 @@
     cursor: pointer;
 }
 
-.gruf-knob-gran {
+
+.knob {
     position: absolute;
-    font-size: 14px;
 
-    .p-knob {
-        cursor: pointer;
+    &.knob-gran {
+        font-size: 14px;
     }
 
-    div {
-        text-align: center;
-        padding-top: 3px;
+    &.knob-petit {
+        font-size: 12px;
     }
-}
-
-.gruf-knob-gran-global {
-    position: absolute;
-    font-size: 14px;
-
-    .p-knob {
-        cursor: pointer;
-    }
-
-    div {
-        text-align: center;
-        padding-top: 3px;
-    }
-}
-
-.gruf-knob-petit {
-    position: absolute;
-    font-size: 12px;
 
     .p-knob {
         cursor: pointer;
