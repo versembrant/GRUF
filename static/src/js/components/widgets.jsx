@@ -67,7 +67,7 @@ export const GrufKnobGran = ({estacio, parameterName, top, left, label}) => {
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     return (
-        <div className="gruf-knob-gran" style={{top: top, left: left}}>
+        <div className="knob knob-gran" style={{top: top, left: left}}>
             <Knob 
             value={real2Norm(parameterValue, parameterDescription)}
             min={0.0}
@@ -91,7 +91,7 @@ export const GrufKnobPetit = ({estacio, parameterName, top, left, label, positio
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     return (
-        <div className="gruf-knob-petit" style={{top: top, left: left, position}}>
+        <div className="knob knob-petit" style={{top: top, left: left, position}}>
             <Knob 
             value={real2Norm(parameterValue, parameterDescription)}
             min={0.0}
@@ -119,7 +119,7 @@ export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label }
     const currentOptionIndex = options.indexOf(parameterValue);
 
     return (
-        <div className="gruf-knob-gran" style={{ top, left }}>
+        <div className="knob knob-gran" style={{ top, left }}>
             <Knob
                 value={currentOptionIndex}
                 min={0}
@@ -150,7 +150,7 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label 
     const currentOptionIndex = options.indexOf(parameterValue);
 
     return (
-        <div className="gruf-knob-petit" style={{ top, left }}>
+        <div className="knob knob-petit" style={{ top, left }}>
             <Knob
                 value={currentOptionIndex}
                 min={0}
@@ -199,7 +199,7 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label })
     };
 
     return (
-        <div className="gruf-knob-gran" style={{ top: top, left: left }}>
+        <div className="knob knob-gran" style={{ top: top, left: left }}>
             <Knob
                 value={parameterValue}
                 min={parameterName === 'bpm' ? 40 : 0} 
