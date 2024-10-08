@@ -7,22 +7,18 @@ import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
 
 export const GrufPanKnob = ({ estacio }) => {
-    const [panValue, setPanValue] = useState(0); 
-
-    useEffect(() => {
-        const initialPan = getAudioGraphInstance().getPanForEstacio(estacio.nom);
-        setPanValue(initialPan);
-    }, [estacio]);
+    const parameterValue = getCurrentSession().getLivePansEstacions()[estacio.nom];
 
     const handlePanChange = (newValue) => {
-        setPanValue(newValue); 
-        getAudioGraphInstance().setPanForEstacio(estacio.nom, newValue); 
+        const currentPans = getCurrentSession().getLivePansEstacions();
+        currentPans[estacio.nom] = parseFloat(newValue, 10);
+        getCurrentSession().liveSetPansEstacions(currentPans);
     };
 
     return (
         <div className="gruf-pan-knob">
             <Knob 
-                value={panValue}
+                value={parameterValue}
                 min={-1} 
                 max={1} 
                 step={0.01} 

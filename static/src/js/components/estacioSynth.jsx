@@ -5,7 +5,6 @@ import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     return (<div key={estacio.nom} className="estacio estacio-synth">
         <div className="estacio-main">
