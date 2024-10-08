@@ -4,7 +4,6 @@ import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelP
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
