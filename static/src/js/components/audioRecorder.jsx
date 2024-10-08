@@ -14,7 +14,7 @@ let meterInterval = null;
 let startedRecordingTime = undefined;
 let recording = undefined;
 
-export const AudioRecorder = () => {
+export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
 
     subscribeToStoreChanges(getCurrentSession());
     
@@ -26,7 +26,8 @@ export const AudioRecorder = () => {
             micOpened = true;
             // print the incoming mic levels in decibels
             meterInterval = setInterval(() => {
-                const valueForMeter = clamp(meter.getValue(), -100, 0);
+                //const valueForMeter = clamp(meter.getValue(), -100, 0);
+                valueForMeter = Math.random() * 100 - 100;
                 document.getElementById("inputMeterInner").style.width = `${valueForMeter + 100}%`;
             }, 100);
 
@@ -70,6 +71,10 @@ export const AudioRecorder = () => {
             response.json().then(data => {
                 if (!data.error){
                     document.getElementById("serverFileURL").innerHTML = 'Sent to server!: <a href="' + data.url + '" target="_blank">' + data.url + '</a>';
+                    if (onRecordUploadedCallback) {
+                        onRecordUploadedCallback(data);
+                    }
+
                     setTimeout(() => {
                         document.getElementById("serverFileURL").innerHTML = "";
                         document.getElementById("recordingLength").innerText = "";
@@ -101,6 +106,11 @@ export const AudioRecorder = () => {
         });  
     }
 
+    const handleStopAndUploadButton = async () => {
+        await handleStopButton();
+        handleSendToServerButton();
+    }
+
     const handleRemoveFileButton = (evt) => {
         filename = evt.target.dataset.filename;
         const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
@@ -124,29 +134,41 @@ export const AudioRecorder = () => {
     const [isStopButtonDisabled, setStopButtonDisabled] = useState(true);
     const [isSendButtonDisabled, setSendButtonDisabled] = useState(true);
 
-    return (
-        <div>
-            <h2>MIC Recorder</h2>
-            <div>
-                <button id="startRecording" onClick={handleRecButton} disabled={isRecButtonDisabled}>Record</button>
-                <button id="stopRecording" onClick={handleStopButton} disabled={isStopButtonDisabled}>Stop recording</button>
-            </div>
-            <div style={{width:'100%', height: '20px', backgroundColor:'black'}}>
-                <div id="inputMeterInner" style={{width:'0%', height: '100%', backgroundColor:'green'}}></div>
-            </div>
-            <div>
+    if (ui === "minimal") {
+        return (<div>
+            {!isRecButtonDisabled ? <button className="btn-petit btn-vermell sampler-record-btn" id="startRecording" onClick={handleRecButton}>Rec</button>:""}
+            {!isStopButtonDisabled ? <button className="btn-petit btn-vermell sampler-recording-btn" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
+            <div id="inputMeterInner" style={{width:'0%', height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
+            <div style={{display:"none"}}>
                 <span id="recordingLength"></span>
-                <button id="sendToServerButton" disabled={isSendButtonDisabled} onClick={handleSendToServerButton}>Send to server</button>
                 <span id="serverFileURL"></span>
             </div>
-            <div>{ getCurrentSession().getRecordedFiles().length } recorded files
-            <ul>
-                { getCurrentSession().getRecordedFiles().map((file, index) => {
-                    return <li key={index}><a href={"/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/bruixit/")[0] + "/bruixit/static/uploads/" + getCurrentSession().getID() + "/" + file}</a> <button data-filename={file} onClick={handleRemoveFileButton}>Delete</button></li>
-                })}
-            </ul>
+        </div>)
+    } else {
+        return (
+            <div>
+                <h2>MIC Recorder</h2>
+                <div>
+                    <button id="startRecording" onClick={handleRecButton} disabled={isRecButtonDisabled}>Record</button>
+                    <button id="stopRecording" onClick={handleStopButton} disabled={isStopButtonDisabled}>Stop recording</button>
+                </div>
+                <div style={{width:'100%', height: '20px', backgroundColor:'black'}}>
+                    <div id="inputMeterInner" style={{width:'0%', height: '100%', backgroundColor:'green'}}></div>
+                </div>
+                <div>
+                    <span id="recordingLength"></span>
+                    <button id="sendToServerButton" disabled={isSendButtonDisabled} onClick={handleSendToServerButton}>Send to server</button>
+                    <span id="serverFileURL"></span>
+                </div>
+                <div>{ getCurrentSession().getRecordedFiles().length } recorded files
+                <ul>
+                    { getCurrentSession().getRecordedFiles().map((file, index) => {
+                        return <li key={index}><a href={"/gruf/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/gruf/")[0] + "/gruf/static/uploads/" + getCurrentSession().getID() + "/" + file}</a> <button data-filename={file} onClick={handleRemoveFileButton}>Delete</button></li>
+                    })}
+                </ul>
+                </div>
+                
             </div>
-            
-        </div>
-    )
+        )
+    }
 };
