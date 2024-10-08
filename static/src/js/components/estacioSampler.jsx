@@ -6,7 +6,6 @@ import { AudioRecorder } from "../components/audioRecorder";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     const [selectedPad, setSelectedPad] = useState(0);
 
