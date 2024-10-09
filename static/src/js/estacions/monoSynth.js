@@ -130,7 +130,7 @@ export class MonoSynth extends EstacioBase {
     lastNoteOnBeats = {}
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
 
         const notes = this.getParameterDescription('notes');
         if (notes.hasOwnProperty('rangDeNotesPermeses')){

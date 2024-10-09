@@ -312,7 +312,7 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
     onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false){
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
         
         const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
 

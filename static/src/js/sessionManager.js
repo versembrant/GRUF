@@ -166,7 +166,7 @@ export class EstacioBase {
         this.setParametreInStore(nomParametre, valor, preset);
 
         // Triguejem canvi a l'audio graph
-        if (getAudioGraphInstance().graphIsBuilt()){
+        if (getAudioGraphInstance().isGraphBuilt()){
             this.updateAudioGraphParameter(nomParametre, preset)
         }
     }
@@ -293,7 +293,7 @@ export class EstacioBase {
 
     setCurrentPreset(preset) {
         this.currentPreset = preset
-        if (getAudioGraphInstance().graphIsBuilt()){
+        if (getAudioGraphInstance().isGraphBuilt()){
             this.updateAudioGraphFromState(preset)
         }
     }
@@ -554,7 +554,7 @@ export class Session {
     }
 
     setEstacionsMutesAndSolosInChannelNodes(mutes, solos) {
-        if (!getAudioGraphInstance().graphIsBuilt()){ return; };
+        if (!getAudioGraphInstance().isGraphBuilt()){ return; };
         const someAreSoloed = Object.values(solos).some(solo => solo === true);
         Object.keys(mutes).forEach(nomEstacio => {
             const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
