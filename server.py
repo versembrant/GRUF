@@ -240,6 +240,8 @@ class Session(object):
                 self.data['live']['gainsEstacions'][nom_estacio] = valor
         elif update_data['accio'] == 'set_pans':
             for nom_estacio, valor in update_data['pans_estacions'].items():
+                if 'pansEstacions' not in self.data['live']:
+                    self.data['live']['pansEstacions'] = {}  # Per compatibilitat amb sessions antigues que no tenien pans
                 self.data['live']['pansEstacions'][nom_estacio] = valor
         elif update_data['accio'] == 'set_mutes':
             for nom_estacio, valor in update_data['mutes_estacions'].items():
