@@ -780,6 +780,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 }
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
+    subscribeToEstacioParameterChanges(estacio, 'selecetdSoundName');
     const selectedSoundName = estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset());
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 

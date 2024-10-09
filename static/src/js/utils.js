@@ -100,13 +100,15 @@ export const subscribeToStoreChanges = (objectWithStore) => {
 
 // Util function to subscribe a react component to partial changes of a store
 export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => {
-    const [_, setState] = useState(objectWithStore.store.getPartial(storeFilter).getState());
+    const partialStore = objectWithStore.store.getPartial(storeFilter)
+    const [, setState] = useState(partialStore.getState());
     useEffect(() => {
-        const unsubscribe = objectWithStore.store.subscribe(() => {
-            setState(objectWithStore.store.getPartial(storeFilter).getState());
+        const unsubscribe = partialStore.subscribe(() => {
+            setState(partialStore.getState());
         });
-        return () => unsubscribe();
-    }, [setState]);
+        return () => {
+            unsubscribe()};
+    }, [setState, storeFilter]);
 }
 
 // Util function to subscribe a react component to changes of a change of a parameter of a estacio
