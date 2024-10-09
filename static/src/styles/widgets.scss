@@ -46,8 +46,24 @@
             position: absolute;
             inset: 50%;
             transform: translate(-50%, -50%);
+        }
+    } 
+
+    output {
+        position: absolute;
+        inset: 50%;
+        text-align: center;
+        border: 1px solid $font-color;
+        width: 4ch; // TODO: make it change depending on how much info is there
+        height: fit-content;
+        border-radius: 5px;
+        padding: 0 0.7em;
+        background-color: $background-color;
+        visibility: hidden;
     }
-    
+
+    &:active output {
+        visibility: visible;
     }
 
     &.knob-gran {
@@ -63,6 +79,9 @@
                 content: url(../img/knob_gran_back.svg);
             }
         }
+        output {
+            transform: translate(-50%, 250%);
+        }
     }
 
     &.knob-petit {
@@ -77,6 +96,9 @@
             &::before {
                 content: url(../img/knob_petit_back.svg);
             }
+        }
+        output {
+            transform: translate(-50%, 150%);
         }
     }
 }
