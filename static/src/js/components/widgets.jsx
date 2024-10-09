@@ -853,9 +853,7 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
 }
 
 const ADSRGraph = ({estacio, adsrParameterNames}) => {
-    for (let i = 0; i < adsrParameterNames.length; i++) {
-        subscribeToEstacioParameterChanges(estacio, adsrParameterNames[i]);
-    }
+    adsrParameterNames.forEach(parameterName => subscribeToEstacioParameterChanges(estacio, parameterName));
 
     const a = estacio.getParameterValue(adsrParameterNames[0], estacio.getCurrentLivePreset());
     const d = estacio.getParameterValue(adsrParameterNames[1], estacio.getCurrentLivePreset());
