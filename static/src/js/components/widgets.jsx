@@ -854,27 +854,25 @@ const ADSRGraph = ({a, d, s, r}) => {
     const timeValues = [a, d, r];
     const levelValues = [1, s, 0];
 
-    const xPoints = timeValues.reduce((xPointsArray, timeValue, index) => {
+    const adsrPoints = timeValues.reduce((pointsArray, timeValue, index) => {
         const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
         const normTimeValue = timeValue / maxTime;
-        const xPointDiff = normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4; // we account for stroke width so that the line isn't clipped
-        xPointsArray.push(xPointDiff + (xPointsArray[index-1] || 0));
-        return xPointsArray;
+        const pointXDiff = normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4; // we account for stroke width so that the line isn't clipped
+        const point = {x: pointXDiff + (pointsArray[index-1]?.x || 0)}
+        pointsArray.push(point);
+        return pointsArray;
     }, []);
 
-    const yPoints = levelValues.map((levelValue) => {
-        return 75 - levelValue * 50;
-    });
+    levelValues.forEach((levelValue, index) => {
+        adsrPoints[index].y = 75 - levelValue * 50;
+    })
 
-
-    const xyPairs = xPoints.map((x, i) => [x, yPoints[i]]);
-
-    const adsrPathString = xyPairs.reduce((pathString, [x, y]) => {
-        return pathString + ` L ${x} ${y}`;
+    const adsrPathString = adsrPoints.reduce((pathString, point) => {
+        return pathString + ` L ${point.x} ${point.y}`;
     }, `M ${strokeWidthPx/4} 75`);
 
-    const adsrCircleItems = xyPairs.map(([x, y], i) =>
-        <circle key={`adsrCircle-${i}`} cx={x} cy={y} r="1" vectorEffect="non-scaling-stroke"/>
+    const adsrCircleItems = adsrPoints.map((point, i) =>
+        <circle key={`adsrCircle-${i}`} cx={point.x} cy={point.y} r="1" vectorEffect="non-scaling-stroke"/>
     );
 
     const gridSize = 4;
