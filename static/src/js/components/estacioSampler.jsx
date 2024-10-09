@@ -3,7 +3,6 @@ import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, G
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
-
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
     const [selectedPad, setSelectedPad] = useState(0);

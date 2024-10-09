@@ -4,7 +4,6 @@ import { subscribeToStoreChanges } from "../utils";
 import { handlePlayArranjementButton } from "../components/audioTransport";
 import { GrufButtonNoBorder } from "../components/widgets";
 
-
 export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     subscribeToStoreChanges(getCurrentSession());
