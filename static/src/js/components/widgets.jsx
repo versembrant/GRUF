@@ -852,10 +852,12 @@ const ADSRGraph = ({a, d, s, r}) => {
     const strokeWidthPx = 3;
 
     const timeValues = [a, d, r];
-    const levelValues = [1, s, 0];
 
-    const adsrPoints = timeValues.reduce((pointsArray, timeValue, index) => {
-        const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+    const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+    const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
+    const timeValuesWithSustain = [a, d, sustainTime, r];
+
+    const adsrPoints = timeValuesWithSustain.reduce((pointsArray, timeValue, index) => {
         const normTimeValue = timeValue / maxTime;
         const pointXDiff = normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4; // we account for stroke width so that the line isn't clipped
         const point = {x: pointXDiff + (pointsArray[index-1]?.x || 0)}
@@ -863,17 +865,17 @@ const ADSRGraph = ({a, d, s, r}) => {
         return pointsArray;
     }, []);
 
+    const levelValues = [1, s, s, 0];
+
     levelValues.forEach((levelValue, index) => {
         adsrPoints[index].y = 75 - levelValue * 50;
-    })
+    });
+
+    const sustainPoints = { x1: adsrPoints[1].x, x2: adsrPoints[2].x, y1: adsrPoints[1].y, y2: adsrPoints[2].y };
 
     const adsrPathString = adsrPoints.reduce((pathString, point) => {
         return pathString + ` L ${point.x} ${point.y}`;
     }, `M ${strokeWidthPx/4} 75`);
-
-    const adsrCircleItems = adsrPoints.map((point, i) =>
-        <circle key={`adsrCircle-${i}`} cx={point.x} cy={point.y} r="1" vectorEffect="non-scaling-stroke"/>
-    );
 
     const gridSize = 4;
     let bgLineItems = [];
@@ -892,18 +894,28 @@ const ADSRGraph = ({a, d, s, r}) => {
                     {bgLineItems}
                 </g>
 
-                {/* <defs>
-                    <mask id="clip-circles">
+                <defs>
+                    <mask id="adsr-mask">
                         <rect x="0" y="0" width="100" height="100" fill="white"/>
-                        <g fill="black">
-                            {adsrCircleItems}
+                        <g fill="black" stroke="black">
+                            <line
+                            x1={sustainPoints.x1} x2={sustainPoints.x2}
+                            y1={sustainPoints.y1} y2={sustainPoints.y2}
+                            vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                            strokeLinecap="round" />
+                            <g fill="white" stroke="white">
+                                <line
+                                    x1={sustainPoints.x1} x2={sustainPoints.x2}
+                                    y1={sustainPoints.y1} y2={sustainPoints.y2}
+                                    vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                                    strokeLinecap="round" strokeDasharray="8"/>
+                            </g>
                         </g>
                     </mask>
-                </defs> */}
+                </defs>
 
                 <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
-                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#clip-circles)" strokeLinejoin="round"></path>
-                    {/* {adsrCircleItems} */}
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#adsr-mask)" strokeLinejoin="round"></path>
                 </g>
 
             </svg>
