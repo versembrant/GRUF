@@ -79,6 +79,76 @@ export class AudioGraph {
         return !this.isPlayingArranjement();
     }
 
+    getMasterGain() {
+        return this.store.getState().masterGain;
+    }
+    
+    setMasterGain(gain) {
+        this.setParametreInStore('masterGain', gain);
+        if (!this.isGraphBuilt()) return;
+        this.masterGainNode.volume.value = Tone.gainToDb(gain);
+    }
+
+    getMasterPan(){
+        return this.store.getState().masterPan;
+    }
+
+    setMasterPan(pan){
+        this.setParametreInStore('masterPan', pan);
+        if (!this.isGraphBuilt()) return;
+        this.masterGainNode.pan.setValueAtTime(pan, 0.05);
+    }
+    
+    getBpm() {
+        return this.store.getState().bpm;
+    }
+    
+    setBpm(bpm) {
+        this.setParametreInStore('bpm', bpm);
+        if (!this.isGraphBuilt()) return;
+        Tone.Transport.bpm.rampTo(bpm);
+        this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
+    }
+
+    getSwing(){
+        return this.store.getState().swing;
+    }
+
+    setSwing(swing) {
+        this.setParametreInStore('swing', swing);
+    }
+
+    getCompas(){
+        return this.store.getState().compas;
+    }
+
+    setCompas(compas) {
+        this.setParametreInStore('compas', compas);
+    }
+
+    getTonality(){
+        return this.store.getState().tonality;
+    }
+
+    setTonality(tonality) {
+        this.setParametreInStore('tonality', tonality);
+    }
+
+    getNumSteps (nCompassos = 2){
+
+        const compas = this.getCompas();
+        if (compas === '2/4'){
+            return 8 * nCompassos;
+        } 
+        else if (compas === '3/4') {
+            return 12 * nCompassos;
+        }
+        else if (compas === '4/4') {
+            return 16 * nCompassos;
+        }
+    }
+
+
     isGraphBuilt() {
         return this.store.getState().isGraphBuilt;
     }
@@ -361,74 +431,6 @@ export class AudioGraph {
         }
     }
 
-    getMasterGain() {
-        return this.store.getState().masterGain;
-    }
-    
-    setMasterGain(gain) {
-        this.setParametreInStore('masterGain', gain);
-        if (!this.isGraphBuilt()) return;
-        this.masterGainNode.volume.value = Tone.gainToDb(gain);
-    }
-
-    getMasterPan(){
-        return this.store.getState().masterPan;
-    }
-
-    setMasterPan(pan){
-        this.setParametreInStore('masterPan', pan);
-        if (!this.isGraphBuilt()) return;
-        this.masterGainNode.pan.setValueAtTime(pan, 0.05);
-    }
-    
-    getBpm() {
-        return this.store.getState().bpm;
-    }
-    
-    setBpm(bpm) {
-        this.setParametreInStore('bpm', bpm);
-        if (!this.isGraphBuilt()) return;
-        Tone.Transport.bpm.rampTo(bpm);
-        this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
-    }
-
-    getSwing(){
-        return this.store.getState().swing;
-    }
-
-    setSwing(swing) {
-        this.setParametreInStore('swing', swing);
-    }
-
-    getCompas(){
-        return this.store.getState().compas;
-    }
-
-    setCompas(compas) {
-        this.setParametreInStore('compas', compas);
-    }
-
-    getTonality(){
-        return this.store.getState().tonality;
-    }
-
-    setTonality(tonality) {
-        this.setParametreInStore('tonality', tonality);
-    }
-
-    getNumSteps (nCompassos = 2){
-
-        const compas = this.getCompas();
-        if (compas === '2/4'){
-            return 8 * nCompassos;
-        } 
-        else if (compas === '3/4') {
-            return 12 * nCompassos;
-        }
-        else if (compas === '4/4') {
-            return 16 * nCompassos;
-        }
-    }
 
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
