@@ -7,7 +7,7 @@ import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
 
 export const GrufPanKnob = ({ estacio }) => {
-    const parameterValue = getCurrentSession().getLivePansEstacions()[estacio.nom];
+    const parameterValue = getCurrentSession().getLivePanEstacio(estacio.nom)
 
     const handlePanChange = (newValue) => {
         const currentPans = getCurrentSession().getLivePansEstacions();
