@@ -425,7 +425,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     };
 
     const playSample = async (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(playerIndex, Tone.now());
@@ -433,7 +433,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     }; 
 
     const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.stopSoundFromPlayer(playerIndex, Tone.now());
@@ -611,7 +611,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    if (getAudioGraphInstance().isPlaying()) { return};  // Do not trigger notes if we are playing
                     sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);

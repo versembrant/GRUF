@@ -190,7 +190,7 @@ export class EstacioSampler extends EstacioBase {
     setParameterInAudioGraph(name, value, preset) {
         const match = name.match(/^sound(\d+)URL$/);
         if (match) {
-            if (!getAudioGraphInstance().graphIsBuilt()) { return; }
+            if (!getAudioGraphInstance().isGraphBuilt()) { return; }
             const index = parseInt(match[1], 10) - 1;
             this.loadSoundInBuffer(index, value);
         }
@@ -301,7 +301,7 @@ export class EstacioSampler extends EstacioBase {
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
 
         const playerIndex = midiNoteNumber % 16;
         const reducedMidiNoteNumber = playerIndex;

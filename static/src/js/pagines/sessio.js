@@ -32,7 +32,7 @@ const onSessionDataLoaded = () => {
     getCurrentSession().liveSetMutesEstacions(currentSession.rawData.live.mutesEstacions);
     getCurrentSession().liveSetSolosEstacions(currentSession.rawData.live.solosEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
-    if (getAudioGraphInstance().graphIsBuilt()) {
+    if (getAudioGraphInstance().isGraphBuilt()) {
         // Si el graph ja està construït, vol dir que estem rebent info nova d'una sessió que
         // ja està carregada. El que fem és re-carregar l'estat a l'audio graph
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {

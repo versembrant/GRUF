@@ -27,11 +27,11 @@ export class AudioGraph {
             mutesEstacions: {},
             solosEstacions: {},
             mainSequencerCurrentStep: -1,
-            graphIsBuilt: false,
+            isGraphBuilt: false,
             isMasterAudioEngine: true,
-            audioEngineSyncedToRemote: true,
-            playing: false,
-            playingArranjement: false,
+            isAudioEngineSyncedToRemote: true,
+            isPlaying: false,
+            isPlayingArranjement: false,
             swing: 0,
             compas: '4/4',
             tonality : 'cmajor',
@@ -67,19 +67,19 @@ export class AudioGraph {
     }
 
     isPlaying() {
-        return this.store.getState().playing;
+        return this.store.getState().isPlaying;
     }
 
     isPlayingArranjement() {
-        return this.store.getState().playingArranjement;
+        return this.store.getState().isPlayingArranjement;
     }
 
     isPlayingLive() {
         return !this.isPlayingArranjement();
     }
 
-    graphIsBuilt() {
-        return this.store.getState().graphIsBuilt;
+    isGraphBuilt() {
+        return this.store.getState().isGraphBuilt;
     }
 
     isMasterAudioEngine() {
@@ -91,8 +91,8 @@ export class AudioGraph {
         console.log("Master audio engine: ", this.isMasterAudioEngine())
     }
 
-    audioEngineIsSyncedToRemote() {
-        return this.store.getState().audioEngineSyncedToRemote;
+    isAudioEngineSyncedToRemote() {
+        return this.store.getState().isAudioEngineSyncedToRemote;
     }
     
     setMainSequencerCurrentStep(currentStep) {
@@ -112,7 +112,7 @@ export class AudioGraph {
     }
 
     getCurrentLevelEstacio(nomEstacio) {
-        if (!this.graphIsBuilt()) return {"db": -60, "gain": 0};
+        if (!this.isGraphBuilt()) return {"db": -60, "gain": 0};
         const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
         const dBuLevel = dBFSLevel + 18;
         const gainLevel = Tone.dbToGain(dBFSLevel)
@@ -120,7 +120,7 @@ export class AudioGraph {
     }
 
     getCurrentMasterLevelStereo() {
-        if (!this.graphIsBuilt()) return {
+        if (!this.isGraphBuilt()) return {
             left: { db: -60, gain: 0 },
             right: { db: -60, gain: 0 }
         };
@@ -144,7 +144,7 @@ export class AudioGraph {
     }
 
     isMutedEstacio(nomEstacio) {
-        if (!this.graphIsBuilt()) return false;
+        if (!this.isGraphBuilt()) return false;
         return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
     }
 
@@ -168,7 +168,7 @@ export class AudioGraph {
     }
 
     applyEffectParameters(effectParams) {
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         this.reverb.wet.value = effectParams.reverbWet;
         this.reverb.decay = effectParams.reverbDecay;
         this.delay.wet.value = effectParams.delayWet;
@@ -193,7 +193,7 @@ export class AudioGraph {
     
     buildAudioGraph() {
         console.log("Building audio graph")
-        this.setParametreInStore('graphIsBuilt', false);
+        this.setParametreInStore('isGraphBuilt', false);
         this.setMainSequencerCurrentStep(-1);
 
         // Setteja el bpm al valor guardat
@@ -233,7 +233,7 @@ export class AudioGraph {
         })
         
         // Marca el graph com a construït
-        this.setParametreInStore('graphIsBuilt', true);
+        this.setParametreInStore('isGraphBuilt', true);
 
         // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
@@ -253,12 +253,12 @@ export class AudioGraph {
     }
 
     transportStart() {
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         console.log("Transport start")
-        this.setParametreInStore('playing', true);
+        this.setParametreInStore('isPlaying', true);
 
         // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
-        if (this.isMasterAudioEngine() || !this.audioEngineIsSyncedToRemote()){
+        if (this.isMasterAudioEngine() || !this.isAudioEngineSyncedToRemote()){
             this.setMainSequencerCurrentStep(0);
         } else {
             this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : 0);
@@ -273,9 +273,9 @@ export class AudioGraph {
     }
     
     transportStop() {
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         console.log("Transport stop")
-        this.setParametreInStore('playing', false);
+        this.setParametreInStore('isPlaying', false);
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             estacio.onTransportStop();
@@ -283,7 +283,7 @@ export class AudioGraph {
         Tone.Transport.stop()
         this.setMainSequencerCurrentStep(-1);
 
-        this.updateParametreAudioGraph('playingArranjement', false);
+        this.updateParametreAudioGraph('isPlayingArranjement', false);
     }
 
     onMainSequencerTick(time) {
@@ -366,7 +366,7 @@ export class AudioGraph {
     
     setMasterGain(gain) {
         this.setParametreInStore('masterGain', gain);
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         this.masterGainNode.volume.value = Tone.gainToDb(gain);
     }
 
@@ -376,7 +376,7 @@ export class AudioGraph {
 
     setMasterPan(pan){
         this.setParametreInStore('masterPan', pan);
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         this.masterGainNode.pan.setValueAtTime(pan, 0.05);
     }
     
@@ -386,7 +386,7 @@ export class AudioGraph {
     
     setBpm(bpm) {
         this.setParametreInStore('bpm', bpm);
-        if (!this.graphIsBuilt()) return;
+        if (!this.isGraphBuilt()) return;
         Tone.Transport.bpm.rampTo(bpm);
         this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
     }
@@ -460,7 +460,7 @@ export class AudioGraph {
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
         this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.audioEngineIsSyncedToRemote()){
+        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.isAudioEngineSyncedToRemote()){
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
