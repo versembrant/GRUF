@@ -75,6 +75,10 @@ export class AudioGraph {
         return this.store.getState().isPlayingArranjement;
     }
 
+    setIsPlayingArranjement(value) {
+        this.setParametreInStore('isPlayingArranjement', value);
+    }
+
     isPlayingLive() {
         return !this.isPlayingArranjement();
     }
