@@ -236,6 +236,9 @@ class Session(object):
         if update_data['accio'] == 'set_gains':
             for nom_estacio, valor in update_data['gains_estacions'].items():
                 self.data['live']['gainsEstacions'][nom_estacio] = valor
+        elif update_data['accio'] == 'set_pans':
+            for nom_estacio, valor in update_data['pans_estacions'].items():
+                self.data['live']['pansEstacions'][nom_estacio] = valor
         elif update_data['accio'] == 'set_mutes':
             for nom_estacio, valor in update_data['mutes_estacions'].items():
                 self.data['live']['mutesEstacions'][nom_estacio] = valor

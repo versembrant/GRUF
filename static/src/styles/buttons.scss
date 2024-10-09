@@ -1,86 +1,77 @@
-button {
+button, a {
+    cursor: pointer;
+    --text-color: #{white};
+
     font-family: Montserrat, sans-serif;
     font-optical-sizing: auto;
-    font-style: normal;
+
     font-weight: 600;
     font-size: 100%;
-    border: none;
+    color: var(--text-color);
+    text-wrap: nowrap;
+
     background-color: transparent;
-}
 
-.btn {
-    color: $white;
-    border: 1px solid $white;
+    border: 1px solid var(--text-color);
     border-radius: 10px;
+
     padding: 10px 40px;
-    font-weight: 600;
-    cursor: pointer;
-    min-width: 58px;
-    height: 42px;
-    
+
     &:hover {
-        border-color: $grey;
-        color: $grey;
+        --text-color: #{$grey};
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
 }
 
-button:disabled{
-    opacity: 0.5;
-    cursor: not-allowed;
+.no-border {
+    border: none;
 }
 
-
-.btn-menys-marge {
-    padding: 10px 20px;
+.navbar a, .footer a {
+    border: none;
+    padding: 0;
 }
 
 .btn-petit {
-    border-radius: 10px;
     padding: 5px 10px;
     font-weight: 500;
     height: 30px;
+    min-width: 58px;
+}
+
+.btn-gruf {
+    position: absolute;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .btn-verd {
-    color: $green;
-    border-color: $green;
-    
+    --text-color: #{$green};
+}
+
+.btn-gris {
+    --text-color: #{$grey};
+}
+
+.btn-black {
+    --text-color: #{$black};
+}
+
+.btn-verd, .btn-gris, .btn-black {
     &:hover {
-        border-color: $white;
-        color: $white;
+        --text-color: #{white};
     }
 }
 
 .btn-vermell {
-    color: $red;
-    border-color: $red;
-    
+    --text-color: #{$red};
     &:hover {
-        border-color: lighten($red, 10%);
-        color: lighten($red, 10%);
+    --text-color: #{lighten($red, 10%)};
     }
-}
-
-.btn-gris {
-    color: $grey;
-    border-color: $grey;
-   
-    &:hover {
-        border-color: $white;
-        color: $white;
-    }
-}
-
-.btn-black {
-    color: $black;
-    border-color: $black;
-   
-    &:hover {
-        border-color: $white;
-        color: $white;
-    }
-}
-
-.btn-no-border {
-    border: none;
 }
