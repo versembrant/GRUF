@@ -12,6 +12,23 @@ const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
 };
 
+const GuardarSessionWidget = () => {
+    const [isSaving, setIsSaving] = useState(false);
+    const [justSaved, setJustSaved] = useState(false);
+    return (<div>
+       {isSaving || justSaved ? <span className={isSaving ? "text-grey": "text-green"}>{isSaving ? "Guardant canvis...": "Canvis guardats!"}</span>: 
+        <button className="btn-petit no-border" style={{paddingLeft: 0}}  onClick={()=>{
+            setIsSaving(true);
+            getCurrentSession().saveDataInServerUsingPostRequest(() => {
+                setIsSaving(false);
+                setJustSaved(true);
+                setTimeout(() => {
+                    setJustSaved(false);
+                }, 2000);
+            });
+            }}>Guarda canvis al servidor</button>}
+    </div>)
+}
 
 const estacioEstaDisponible = (nomEstacio) => {
     // TODO: afegir una comprovació (potser amb el servidor) per veure si l'usuari pot accedir a l'estació
@@ -50,7 +67,7 @@ export const Sessio = () => {
                 <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
-                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
+                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
                         <div className="between">
                             <AudioTransportPlayStop/>
                         </div>
@@ -70,7 +87,10 @@ export const Sessio = () => {
                         </div>
                     </div>
                     <div className="footer between">
-                        <div><SessionConnectedUsers/></div>
+                        <div className="between">
+                            {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
+                            {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
+                        </div>
                         <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>
@@ -82,7 +102,7 @@ export const Sessio = () => {
                 <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
                 <div className="sessio">
                     <div className="header between">
-                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() } { getCurrentSession().localMode ? " (local)": ""}</div>
+                        <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
                         <div className="between">
                             {estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
                             {estacioSelected == "mixer" ?  <div className="estacio-mixer-logo"></div>: ""}
@@ -97,7 +117,10 @@ export const Sessio = () => {
                         {estacioSelected == "computer" ? <EstacioComputerUI setEstacioSelected={setEstacioSelected}/>: ""}
                     </div>
                     <div className="footer between">
-                        <div><SessionConnectedUsers/></div>
+                        <div className="between">
+                            {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
+                            {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
+                        </div>
                         <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
                     </div>
                 </div>

@@ -440,6 +440,28 @@ export class Session {
     saveDataInServer() {
         sendMessageToServer('save_session_data', {session_id: this.getID(), full_session_data: this.getSessionDataObject()});
     }
+
+    saveDataInServerUsingPostRequest(callback) {
+        // In local mode we don't have an active web sockets connection, therefore to save the session we can use a post request
+        const url = appPrefix + '/save_session_data';
+        fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                session_id: this.getID(), 
+                full_session_data: this.getSessionDataObject()
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => {
+            return response.json()
+        }).then(data => {
+            callback(data)
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
     
     updateParametreSessio(nomParametre, valor) {
         if (!this.localMode) {
