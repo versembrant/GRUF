@@ -10,9 +10,8 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
         
-            <GrufKnobPetit estacio={estacio} parameterName="attack" top="35%" left="5%" />
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%"/>
+            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.3%" left="52%" />
             
             <GrufKnobGran estacio={estacio} parameterName="portamento" top="8%" left="28%" />
