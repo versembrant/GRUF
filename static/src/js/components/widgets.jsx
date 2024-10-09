@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, createElement } from "react";
+import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
@@ -76,11 +76,12 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const angleMax = 145;
     const angle = normValue * (angleMax - angleMin) + angleMin;
 
+    const id = useId();
 
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper">
-                    <KnobHeadless className="knobctrl" style={{rotate: `${angle}deg`}}
+                    <KnobHeadless id={id} className="knobctrl" style={{rotate: `${angle}deg`}}
                         valueRaw={parameterValue}
                         valueMin={parameterDescription.min}
                         valueMax={parameterDescription.max}
@@ -93,7 +94,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
-                <label>{label || parameterDescription.label}</label>
+                <label for={id}>{label || parameterDescription.label}</label>
         </div>
     )
 };
