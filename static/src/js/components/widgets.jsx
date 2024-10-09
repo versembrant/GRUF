@@ -610,6 +610,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
+                    if (getAudioGraphInstance().isPlaying()) { return};  // Do not trigger notes if we are playing
                     sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);
