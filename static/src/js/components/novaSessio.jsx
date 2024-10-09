@@ -102,6 +102,7 @@ export const NovaSessio = () => {
                                 </div>
                             ))}
                         </div>
+                        <div className="selector-add-row"> 
                         <select
                             value={selectedOption}
                             onChange={(evt) => setSelectedOption(evt.target.value)}>
@@ -110,6 +111,7 @@ export const NovaSessio = () => {
                             ))}
                         </select>
                         <button className="add-btn" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+                        </div>
                     </div>
                     <div className="footer-controls">
                         <button className="primary-btn" onClick={handleSubmitForm}>Crear GRUF!</button>
