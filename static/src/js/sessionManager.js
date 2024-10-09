@@ -477,7 +477,11 @@ export class Session {
     }
 
     getLivePansEstacions() {
-        return this.store.getState().live.pansEstacions
+        return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+    }
+
+    getLivePanEstacio(nomEstacio) {
+        return this.getLivePansEstacions()[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
     }
 
     getLiveMutesEstacions() {
@@ -514,7 +518,7 @@ export class Session {
     liveSetPansEstacions(pansEstacions) {
         this.updateParametreLive({
             accio: 'set_pans',
-            pans_estacions: pansEstacions,
+            pans_estacions: pansEstacions || {},  // per compatibilitat amb sessins que no tenien pans
         })
     }
 
@@ -575,6 +579,9 @@ export class Session {
             })
         } else if (updateData.accio === 'set_pans'){
             Object.keys(updateData.pans_estacions).forEach(nomEstacio => {
+                if (liveActualitzat.pansEstacions === undefined){
+                    liveActualitzat.pansEstacions = {}  // Per compatibilitat amb sessions que no tenien pans, creem l'objecte si no existeix
+                }
                 liveActualitzat.pansEstacions[nomEstacio] = updateData.pans_estacions[nomEstacio];
                 // Update audio graph pans nodes
                 const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
