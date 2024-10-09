@@ -349,7 +349,7 @@ export class Session {
         this.useAudioEngine = true
         this.localMode = local
         this.performLocalUpdatesBeforeServerUpdates = true
-        this.continuousControlThrottleTime = 100
+        this.continuousControlThrottleTime = 50
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data
@@ -440,6 +440,28 @@ export class Session {
     saveDataInServer() {
         sendMessageToServer('save_session_data', {session_id: this.getID(), full_session_data: this.getSessionDataObject()});
     }
+
+    saveDataInServerUsingPostRequest(callback) {
+        // In local mode we don't have an active web sockets connection, therefore to save the session we can use a post request
+        const url = appPrefix + '/save_session_data';
+        fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                session_id: this.getID(), 
+                full_session_data: this.getSessionDataObject()
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => {
+            return response.json()
+        }).then(data => {
+            callback(data)
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
     
     updateParametreSessio(nomParametre, valor) {
         if (!this.localMode) {
@@ -476,6 +498,14 @@ export class Session {
         return this.store.getState().live.gainsEstacions
     }
 
+    getLivePansEstacions() {
+        return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+    }
+
+    getLivePanEstacio(nomEstacio) {
+        return this.getLivePansEstacions()[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+    }
+
     getLiveMutesEstacions() {
         return this.store.getState().live.mutesEstacions
     }
@@ -504,6 +534,13 @@ export class Session {
         this.updateParametreLive({
             accio: 'set_gains',
             gains_estacions: gainsEstacions,
+        })
+    }
+
+    liveSetPansEstacions(pansEstacions) {
+        this.updateParametreLive({
+            accio: 'set_pans',
+            pans_estacions: pansEstacions || {},  // per compatibilitat amb sessins que no tenien pans
         })
     }
 
@@ -561,6 +598,19 @@ export class Session {
                     channelNode.volume.value = volume;
                 }
                 this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
+            })
+        } else if (updateData.accio === 'set_pans'){
+            Object.keys(updateData.pans_estacions).forEach(nomEstacio => {
+                if (liveActualitzat.pansEstacions === undefined){
+                    liveActualitzat.pansEstacions = {}  // Per compatibilitat amb sessions que no tenien pans, creem l'objecte si no existeix
+                }
+                liveActualitzat.pansEstacions[nomEstacio] = updateData.pans_estacions[nomEstacio];
+                // Update audio graph pans nodes
+                const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+                if (channelNode !== undefined){
+                    const pan = updateData.pans_estacions[nomEstacio];
+                    channelNode.pan.setValueAtTime(pan, 0.01);
+                }
             })
         } else if (updateData.accio === 'set_mutes') {
             Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {

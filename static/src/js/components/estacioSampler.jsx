@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { subscribeToStoreChanges } from "../utils";
-import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel,GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufOnOffButton, GrufSliderVertical, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
+import { GrufPianoRoll, GrufKnobGran, GrufButtonNoBorder, GrufKnobGranDiscret, GrufKnobPetit, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSliderVertical, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     const [selectedPad, setSelectedPad] = useState(0);
 
@@ -37,7 +35,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
                 
                 <GrufLabel text="Delay" top="14%" left="82.3%" />
-                <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
+                <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
                 <GrufLabel text="Durada" top="29.6%" left="70.3%" />
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
                 <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 
