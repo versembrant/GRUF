@@ -849,36 +849,31 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
 }
 
 const ADSRGraph = ({a, d, s, r}) => {
-    const timeValues = [a, d, r];
-    const levelValues = [0, 1, s, 0];
+    const strokeWidthPx = 3;
 
-    const xPoints = timeValues.reduce((xPointArray, timeValue, index) => {
-        const normTimeValue = timeValue / 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
-        xPointArray.push(normTimeValue*100+xPointArray[index]);
-        return xPointArray;
-    },[0]);
-    const yPoints =  levelValues.map((levelValue)=>75-levelValue*50);
+    const timeValues = [a, d, r];
+    const levelValues = [1, s, 0];
+
+    const xPoints = timeValues.reduce((xPointsArray, timeValue, index) => {
+        const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+        const normTimeValue = timeValue / maxTime;
+        const xPointDiff = normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4; // we account for stroke width so that the line isn't clipped
+        xPointsArray.push(xPointDiff + (xPointsArray[index-1] || 0));
+        return xPointsArray;
+    }, []);
+
+    const yPoints = levelValues.map((levelValue) => {
+        return 75 - levelValue * 50;
+    });
+
+
     const xyPairs = xPoints.map((x, i) => [x, yPoints[i]]);
 
-    const adsrLineItems = xyPairs.slice(0, -1).map(([x1, y1], i) => {
-        // see https://issues.chromium.org/issues/41229159, straight lines with mask
-        let x2 = xyPairs[i+1][0];
-        let y2 = xyPairs[i+1][1];
-        // if (x2 === x1) x2 += 0.01;
-        // if (y2 == y1) y2 += 0.01;
-        return <line
-            key={`adsrLine-${i}`}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            vectorEffect="non-scaling-stroke"
-            mask="url(#clip-circles)"
-        />
-});
+    const adsrPathString = xyPairs.reduce((pathString, [x, y]) => {
+        return pathString + ` L ${x} ${y}`;
+    }, `M ${strokeWidthPx/4} 75`);
 
-
-    const adsrCircleItems = xyPairs.slice(1).map(([x, y], i) =>
+    const adsrCircleItems = xyPairs.map(([x, y], i) =>
         <circle key={`adsrCircle-${i}`} cx={x} cy={y} r="1" vectorEffect="non-scaling-stroke"/>
     );
 
@@ -908,8 +903,8 @@ const ADSRGraph = ({a, d, s, r}) => {
                     </mask>
                 </defs> */}
 
-                <g fill="none" stroke="var(--accent-color)" strokeWidth="3px" strokeLinecap="round">
-                    {adsrLineItems}
+                <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#clip-circles)"></path>
                     {/* {adsrCircleItems} */}
                 </g>
 
