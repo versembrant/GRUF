@@ -60,13 +60,6 @@ export class AudioGraph {
             }
         });
         this.store = createStore(combineReducers(reducers));
-
-        // Some parameters will override this method because they also affect the audio graph, others just go to the state (but
-        // are actually not likely to be set from the remote server)
-        propertiesInStore.forEach(propertyName => {
-            const methodName = `set${propertyName.charAt(0).toUpperCase() + propertyName.slice(1)}`;
-            this[methodName] = (valor) => this.setParametreInStore(propertyName, valor);
-        })
     }
 
 
@@ -403,12 +396,24 @@ export class AudioGraph {
         return this.store.getState().swing;
     }
 
+    setSwing(swing) {
+        this.setParametreInStore('swing', swing);
+    }
+
     getCompas(){
         return this.store.getState().compas;
     }
 
+    setCompas(compas) {
+        this.setParametreInStore('compas', compas);
+    }
+
     getTonality(){
         return this.store.getState().tonality;
+    }
+
+    setTonality(tonality) {
+        this.setParametreInStore('tonality', tonality);
     }
 
     getNumSteps (nCompassos = 2){
