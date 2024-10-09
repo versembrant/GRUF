@@ -845,15 +845,10 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
     const sustainParamName = `sustain${soundNumber}`;
     const releaseParamName = `release${soundNumber}`;
 
-    const a = estacio.getParameterValue(attackParamName, estacio.getCurrentLivePreset());
-    const d = estacio.getParameterValue(decayParamName, estacio.getCurrentLivePreset());
-    const s = estacio.getParameterValue(sustainParamName, estacio.getCurrentLivePreset());
-    const r = estacio.getParameterValue(releaseParamName, estacio.getCurrentLivePreset());
-
-     // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
+    // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
         <div className="gruf-adsr-widget" style={{top, left, height}}>
-            <ADSRGraph a={a} d={d} s={s} r={r}/>
+            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
                 <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack' position="static"/>
                 <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay' position="static"/>
@@ -864,7 +859,16 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
     )
 }
 
-const ADSRGraph = ({a, d, s, r}) => {
+const ADSRGraph = ({estacio, adsrParameterNames}) => {
+    for (let i = 0; i < adsrParameterNames.length; i++) {
+        subscribeToEstacioParameterChanges(estacio, adsrParameterNames[i]);
+    }
+
+    const a = estacio.getParameterValue(adsrParameterNames[0], estacio.getCurrentLivePreset());
+    const d = estacio.getParameterValue(adsrParameterNames[1], estacio.getCurrentLivePreset());
+    const s = estacio.getParameterValue(adsrParameterNames[2], estacio.getCurrentLivePreset());
+    const r = estacio.getParameterValue(adsrParameterNames[3], estacio.getCurrentLivePreset());
+
     const strokeWidthPx = 3;
 
     const timeValues = [a, d, r];
