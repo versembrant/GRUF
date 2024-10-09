@@ -95,6 +95,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                     />
                 </div>
                 <label for={id}>{label || parameterDescription.label}</label>
+                <output className="knoboutput" for={id}>{parameterValue.toFixed(2)}</output>
         </div>
     )
 };
