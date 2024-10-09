@@ -904,7 +904,7 @@ const ADSRGraph = ({a, d, s, r}) => {
                 </defs> */}
 
                 <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
-                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#clip-circles)"></path>
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#clip-circles)" strokeLinejoin="round"></path>
                     {/* {adsrCircleItems} */}
                 </g>
 
