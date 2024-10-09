@@ -9,20 +9,69 @@ function sample(array) {
 }
 
 function generateTitle() {
-    var name_prefixes = ["Master", "Mr.", "Professor", "Mrs.", "Princess", "Prince", "The Pauper's", "The", "Betsy", "Billy", "Johnny"];
-    var primary_nouns = ["Crystal", "Bugle", "Dreamer", "Dream", "Castle", "Moss", "Mountain", "Pit", "Bigfoot", "Dream maker", "Oathbreaker", "Bard", "X'arahan'tu", "Magic", "Acorn", "Sun", "Son", "Stump", "Arm"];
-    var adjectives = ["Lost", "Five", "Faded", "Ancient", "Blackened", "Den of", "Despairing", "Golden", "Many", "Merry", "Clever", "Wonderful", "Sullen", "Angry", "Little", "Cowardly", "Silver", "Lasting", "Heavy", "Festive", "Gleeful", "Enchanted", "Wise", "Wistful", "Dark", "Untold"];
-    var secondary_nouns = ["Hearts", "Stones", "Diamond Dogs", "Painted Toes", "Songs", "Tales", "Lords", "Promise", "Screams", "Plagues", "Dreams", "Roads", "Curses", "Spells", "Gloam", "Lands", "Marsh", "Hearts", "Rules", "Swamp", "Tale", "Apex", "Beggar"];
-    var name_prefix = sample(name_prefixes);
-    var primary_noun = sample(primary_nouns);
-    var adjective = sample(adjectives);
-    var secondary_noun = sample(secondary_nouns);
-    var title = "";
+    const name_prefixes_masculine = ["Mestre", "Sr.", "Professor", "Príncep", "El del Poble", "Guillem", "Joan", 'Senyor'];
+    const name_prefixes_feminine = ["Sra.", "Princesa", 'Professora', "La del Poble", "Bella", "Mestra", "Senyora"];
+
+    const primary_nouns_masculine = ["Cristall", "Somni", "Somniador", "Castell", "Forat", "Peu Gran", "Creador de Somnis", "Tronc", "Braç"];
+    const primary_nouns_feminine = ["Corneta", "Màgia", "Molsa", "Lluna", "Flor", "Muntanya", "Història", "Creadora de Somnis", 'Pluja', 'Boira', 'Tempesta'];
+
+    const secondary_nouns_masculine = ["Cors", "Gossos", "Dits", "Homes", "Crits", "Encantaments", "Camins", "Indrets", "Mosaics", "Primats"];
+    const secondary_nouns_feminine = ["Cançons", "Pedres", "Històries", "Promeses", "Plagues", "Plantes", "Boires", "Llàgrimes", "Veus", "Terres"];
+
+    const adjectives_plural_masculine = ["Perduts", "Antics", "Daurats", "Enfosquits", "Enfadats", "Feliços", "Festius", "Encantats", "Savis", "Somiadors", "Foscos"];
+    const adjectives_plural_feminine = ["Perdudes", "Antigues", "Daurades", "Enfosquides", "Enfadades", "Felices", "Festives", "Encantades", "Sàvies", "Somiadores", "Fosques"];
+
+    let primary_noun, gender_primary;
     if (Math.random() < 0.5) {
-      title = `${name_prefix} ${primary_noun} and the ${adjective} ${secondary_noun}`;
+        primary_noun = sample(primary_nouns_masculine);
+        gender_primary = 'masculine';
     } else {
-      title = `The ${adjective} ${secondary_noun} of ${name_prefix} ${primary_noun}`;
+        primary_noun = sample(primary_nouns_feminine);
+        gender_primary = 'feminine';
     }
+
+    let name_prefix;
+    if (gender_primary === 'masculine') {
+        name_prefix = sample(name_prefixes_masculine);
+    } else {
+        name_prefix = sample(name_prefixes_feminine);
+    }
+
+    let secondary_noun, gender_secondary;
+    if (Math.random() < 0.5) {
+        secondary_noun = sample(secondary_nouns_masculine);
+        gender_secondary = 'masculine';
+    } else {
+        secondary_noun = sample(secondary_nouns_feminine);
+        gender_secondary = 'feminine';
+    }
+
+    let adjective;
+    if (gender_secondary === 'masculine') {
+        adjective = sample(adjectives_plural_masculine);
+    } else {
+        adjective = sample(adjectives_plural_feminine);
+    }
+
+    let title;
+    if (Math.random() < 0.5) {
+        if (gender_secondary === 'masculine') {
+            title = `${name_prefix} ${primary_noun} i els ${secondary_noun} ${adjective}`;
+        } else {
+            title = `${name_prefix} ${primary_noun} i les ${secondary_noun} ${adjective}`;
+        }
+    } else {
+        if (gender_secondary === 'masculine' && gender_primary === 'masculine') {
+            title = `Els ${secondary_noun} ${adjective} del ${name_prefix} ${primary_noun}`;
+        } else if (gender_secondary === 'feminine' && gender_primary === 'feminine') {
+            title = `Les ${secondary_noun} ${adjective} de la ${name_prefix} ${primary_noun}`;
+        } else if (gender_secondary === 'masculine' && gender_primary === 'feminine') {
+            title = `Els ${secondary_noun} ${adjective} de la ${name_prefix} ${primary_noun}`;
+        } else {
+            title = `Les ${secondary_noun} ${adjective} del ${name_prefix} ${primary_noun}`;
+        }
+    }
+
     return title;
 }
 
