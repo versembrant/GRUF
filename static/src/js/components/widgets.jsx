@@ -81,14 +81,16 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper">
                     <KnobHeadless className="knobctrl" style={{rotate: `${angle}deg`}}
-                        valueRaw={normValue}
-                        valueMin={0.0}
-                        valueMax={1.0}
-                        onValueRawChange={throttle((val) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(val, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
+                        valueRaw={parameterValue}
+                        valueMin={parameterDescription.min}
+                        valueMax={parameterDescription.max}
+                        mapTo01={(x) => real2Norm(x, parameterDescription)}
+                        mapFrom01={(x) => norm2Real(x, parameterDescription)}
+                        onValueRawChange={throttle((val) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, val), getCurrentSession().continuousControlThrottleTime)}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
-                        valueRawDisplayFn={(value)=>value.toFixed(2)}
+                        valueRawDisplayFn={()=>true}
                         dragSensitivity="0.009"
-                        orientation='vertical' // quan
+                        orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
                 <label>{label || parameterDescription.label}</label>
