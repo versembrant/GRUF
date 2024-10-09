@@ -857,13 +857,16 @@ const ADSRGraph = ({a, d, s, r}) => {
     const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
     const timeValuesWithSustain = [a, d, sustainTime, r];
 
-    const adsrPoints = timeValuesWithSustain.reduce((pointsArray, timeValue, index) => {
-        const normTimeValue = timeValue / maxTime;
-        const pointXDiff = normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4; // we account for stroke width so that the line isn't clipped
-        const point = {x: pointXDiff + (pointsArray[index-1]?.x || 0)}
-        pointsArray.push(point);
-        return pointsArray;
+    const absoluteTimeValues = timeValuesWithSustain.reduce((absoluteValuesArray, timeValue, index) => {
+        const absoluteTimeValue = timeValue + (absoluteValuesArray[index-1] || 0);
+        absoluteValuesArray.push(absoluteTimeValue);
+        return absoluteValuesArray;
     }, []);
+
+    const adsrPoints = absoluteTimeValues.map((absTimeValue) => {
+        const normTimeValue = absTimeValue / maxTime;
+        return {x: normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4}; // we account for stroke width so that the line isn't clipped
+    });
 
     const levelValues = [1, s, s, 0];
 
