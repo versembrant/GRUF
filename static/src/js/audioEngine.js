@@ -3,6 +3,7 @@ import { createStore, combineReducers } from "redux";
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
+import { channel } from 'process';
 
 var audioContextIsReady = false;
 
@@ -22,6 +23,7 @@ export class AudioGraph {
             masterGain: 1.0,
             masterPan:0.0,
             gainsEstacions: {},
+            pansEstacions: {},
             mutesEstacions: {},
             solosEstacions: {},
             mainSequencerCurrentStep: -1,
@@ -241,8 +243,9 @@ export class AudioGraph {
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
 
-        // Carrega els volumns, mute i solo dels channels de cada estació ara que els objectes ha estan creats
+        // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+        getCurrentSession().liveSetPansEstacions(getCurrentSession().rawData.live.pansEstacions);
         getCurrentSession().liveSetMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
         getCurrentSession().liveSetSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
 

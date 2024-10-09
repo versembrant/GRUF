@@ -48,7 +48,7 @@ export const NovaSessio = () => {
         sessionData.swing = 0;
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
-        sessionData.live = {'gainsEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
+        sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
@@ -57,6 +57,7 @@ export const NovaSessio = () => {
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
             sessionData.live.gainsEstacions[nomEstacio] = 1.0;
+            sessionData.live.pansEstacions[nomEstacio] = 0.0;
             sessionData.live.mutesEstacions[nomEstacio] = false;
             sessionData.live.solosEstacions[nomEstacio] = false;
             sessionData.live.presetsEstacions[nomEstacio] = 0
@@ -95,18 +96,18 @@ export const NovaSessio = () => {
                     <br/>
                     Estacions triades:
                     <ul>
-                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
+                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
                     </ul>
                     <select
                         value={selectedOption}
                         onChange={(evt) => setSelectedOption(evt.target.value)}>
                         {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
                     </select>
-                    <button className="btn btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
+                    <button className="btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
                 </div>
                 <div className="enrere">
-                    <button className="btn btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
-                    <a href={appPrefix + "/"} className="btn">Torna enrere</a>
+                    <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
+                    <a href={appPrefix + "/"}>Torna enrere</a>
                 </div>
             </div>
         </div>

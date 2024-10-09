@@ -78,7 +78,7 @@ export const AudioTransportPlayStop = () => {
     // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "playing" si s'està fent play en mode live, no en mode arranjement
     return (
         <div>
-            <button disabled={!getAudioGraphInstance().graphIsBuilt()} className="btn btn-petit btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/stop_button.svg"): (appPrefix + "/static/src/img/stop_button_grid.svg")}/> : <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/play_button.svg"):(appPrefix + "/static/src/img/play_button_grid.svg")}/>}</button>
+            <button disabled={!getAudioGraphInstance().graphIsBuilt()} className="btn-petit" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/stop_button.svg"): (appPrefix + "/static/src/img/stop_button_grid.svg")}/> : <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/play_button.svg"):(appPrefix + "/static/src/img/play_button_grid.svg")}/>}</button>
         </div>
     )
 };
