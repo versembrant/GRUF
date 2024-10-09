@@ -5,7 +5,7 @@ import { getAudioGraphInstance } from './audioEngine';
 
 
 export const buildAudioGraphIfNotBuilt = async () => {  
-    if (!getAudioGraphInstance().graphIsBuilt()) {
+    if (!getAudioGraphInstance().isGraphBuilt()) {
         await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
         getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
     }

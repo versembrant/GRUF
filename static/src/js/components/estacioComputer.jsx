@@ -76,7 +76,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
             <div>
                 <div style={{position:"absolute", top:35, left: 45}}>
-                    <button disabled={!getAudioGraphInstance().graphIsBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
+                    <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
                 </div>
                 <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
