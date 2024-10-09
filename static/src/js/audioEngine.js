@@ -1,9 +1,9 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
+import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
-import { channel } from 'process';
 
 var audioContextIsReady = false;
 
@@ -58,7 +58,7 @@ export class AudioGraph {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setParametreInStore(nomParametre, valor) {

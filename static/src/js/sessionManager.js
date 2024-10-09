@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
+import { makePartial } from 'redux-partial';
 import { sendMessageToServer } from "./serverComs";
 import { ensureValidValue } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
@@ -99,7 +100,7 @@ export class EstacioBase {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setParametreInStore(nomParametre, valor, preset) {
@@ -378,7 +379,7 @@ export class Session {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setAudioOff() {
