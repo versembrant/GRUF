@@ -938,14 +938,19 @@
 }
 
 .gruf-adsr-widget {
+    background-color: $background-color;
     position: absolute;
     display: flex;
     flex-direction: column;
     width: 220px;
+    border: 1.5px solid $grey;
+    border-radius: 15px;
 
     .adsr-graph {
+        flex: 1;
+        overflow: hidden;
         display: flex;
-        height: 194px;
+        flex-direction: column;
     }
 
     .adsr-knobs {
@@ -954,5 +959,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+
+        border: 1.5px solid $grey;
+        border-radius: 15px;
     }
 }

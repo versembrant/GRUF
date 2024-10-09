@@ -839,19 +839,109 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     )
 }
 
-export const GrufADSRWidget = ({estacio, top, left}) => {
+export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
+    const attackParamName = `attack${soundNumber}`;
+    const decayParamName = `decay${soundNumber}`;
+    const sustainParamName = `sustain${soundNumber}`;
+    const releaseParamName = `release${soundNumber}`;
+
     // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
-        <div className="gruf-adsr-widget" style={{top, left}}>
-            <div className="adsr-graph">
-
-            </div>
+        <div className="gruf-adsr-widget" style={{top, left, height}}>
+            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName="attack" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="decay" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="sustain" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="release" position="static" />
+                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release' position="static" />
             </div>
+        </div>
+    )
+}
+
+const ADSRGraph = ({estacio, adsrParameterNames}) => {
+    for (let i = 0; i < adsrParameterNames.length; i++) {
+        subscribeToEstacioParameterChanges(estacio, adsrParameterNames[i]);
+    }
+
+    const a = estacio.getParameterValue(adsrParameterNames[0], estacio.getCurrentLivePreset());
+    const d = estacio.getParameterValue(adsrParameterNames[1], estacio.getCurrentLivePreset());
+    const s = estacio.getParameterValue(adsrParameterNames[2], estacio.getCurrentLivePreset());
+    const r = estacio.getParameterValue(adsrParameterNames[3], estacio.getCurrentLivePreset());
+
+    const strokeWidthPx = 3;
+
+    const timeValues = [a, d, r];
+
+    const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+    const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
+    const timeValuesWithSustain = [a, d, sustainTime, r];
+
+    const absoluteTimeValues = timeValuesWithSustain.reduce((absoluteValuesArray, timeValue, index) => {
+        const absoluteTimeValue = timeValue + (absoluteValuesArray[index-1] || 0);
+        absoluteValuesArray.push(absoluteTimeValue);
+        return absoluteValuesArray;
+    }, []);
+
+    const adsrPoints = absoluteTimeValues.map((absTimeValue) => {
+        const normTimeValue = absTimeValue / maxTime;
+        return {x: normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4}; // we account for stroke width so that the line isn't clipped
+    });
+
+    const levelValues = [1, s, s, 0];
+
+    levelValues.forEach((levelValue, index) => {
+        adsrPoints[index].y = 75 - levelValue * 50;
+    });
+
+    const sustainPoints = { x1: adsrPoints[1].x, x2: adsrPoints[2].x, y1: adsrPoints[1].y, y2: adsrPoints[2].y };
+
+    const adsrPathString = adsrPoints.reduce((pathString, point) => {
+        return pathString + ` L ${point.x} ${point.y}`;
+    }, `M ${strokeWidthPx/4} 75`);
+
+    const gridSize = 4;
+    let bgLineItems = [];
+    for (let i = 1; i < gridSize; i++) {
+        const crossAxisPos = i / (gridSize) * 100;
+        const hLine = <line key={`bgHLine-${i}`} x1='0' x2='100' y1={crossAxisPos} y2={crossAxisPos} vectorEffect="non-scaling-stroke"/>
+        const vLine = <line key={`bgVLine-${i}`} x1={crossAxisPos} x2={crossAxisPos} y1='100' y2='0' vectorEffect="non-scaling-stroke"/>
+        bgLineItems.push(hLine, vLine);
+    }
+
+
+    return (
+        <div className="adsr-graph">
+            <svg viewBox={"0 0 100 100"} preserveAspectRatio="none">
+                <g stroke="#555" strokeDasharray="1 4" strokeLinecap="round">
+                    {bgLineItems}
+                </g>
+
+                <defs>
+                    <mask id="adsr-mask">
+                        <rect x="0" y="0" width="100" height="100" fill="white"/>
+                        <g fill="black" stroke="black">
+                            <line
+                            x1={sustainPoints.x1} x2={sustainPoints.x2}
+                            y1={sustainPoints.y1} y2={sustainPoints.y2}
+                            vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                            strokeLinecap="round" />
+                            <g fill="white" stroke="white">
+                                <line
+                                    x1={sustainPoints.x1} x2={sustainPoints.x2}
+                                    y1={sustainPoints.y1} y2={sustainPoints.y2}
+                                    vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                                    strokeLinecap="round" strokeDasharray="8"/>
+                            </g>
+                        </g>
+                    </mask>
+                </defs>
+
+                <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#adsr-mask)" strokeLinejoin="round"></path>
+                </g>
+
+            </svg>
         </div>
     )
 }
