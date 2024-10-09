@@ -415,16 +415,6 @@ export class AudioGraph {
         else if (compas === '4/4') {
             return 16 * nCompassos;
         }
-    } 
-
-    getPanForEstacio(nomEstacio) {
-        return this.estacionsMasterChannelNodes[nomEstacio]?.pan?.value || 0; // Retorna el valor del panning o 0 si no està definit
-    }
-
-    setPanForEstacio(nomEstacio, panValue) {
-        const channelNode = this.estacionsMasterChannelNodes[nomEstacio];
-        if (!channelNode) return;
-        channelNode.pan.value = panValue; // Ajusta el panning
     }
 
     updateParametreAudioGraph(nomParametre, valor) {
