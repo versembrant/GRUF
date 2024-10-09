@@ -1,11 +1,7 @@
-import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
 import { GrufKnobGran, GrufLabel, GrufReverbTime, GrufSlider, GrufButtonNoBorder, GrufPianoRoll } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
-
 export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main">

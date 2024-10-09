@@ -26,6 +26,7 @@ const onSessionDataLoaded = () => {
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
     }
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
+    getCurrentSession().liveSetPansEstacions(currentSession.rawData.live.pansEstacions);
     getCurrentSession().liveSetMutesEstacions(currentSession.rawData.live.mutesEstacions);
     getCurrentSession().liveSetSolosEstacions(currentSession.rawData.live.solosEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
