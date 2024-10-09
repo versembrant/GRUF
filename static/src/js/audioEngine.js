@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
+import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
@@ -22,6 +23,7 @@ export class AudioGraph {
             masterGain: 1.0,
             masterPan:0.0,
             gainsEstacions: {},
+            pansEstacions: {},
             mutesEstacions: {},
             solosEstacions: {},
             mainSequencerCurrentStep: -1,
@@ -56,7 +58,7 @@ export class AudioGraph {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setParametreInStore(nomParametre, valor) {
@@ -241,8 +243,9 @@ export class AudioGraph {
         // Marca el graph com a construït
         this.setParametreInStore('graphIsBuilt', true);
 
-        // Carrega els volumns, mute i solo dels channels de cada estació ara que els objectes ha estan creats
+        // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+        getCurrentSession().liveSetPansEstacions(getCurrentSession().rawData.live.pansEstacions);
         getCurrentSession().liveSetMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
         getCurrentSession().liveSetSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
 
@@ -433,17 +436,6 @@ export class AudioGraph {
         }
         else if (compas === '4/4') {
             return 16 * nCompassos;
-        }
-    } 
-
-    getPanForEstacio(nomEstacio) {
-        return this.estacionsMasterChannelNodes[nomEstacio]?.pan?.value || 0; // Retorna el valor del panning o 0 si no està definit
-    }
-
-    setPanForEstacio(nomEstacio, panValue) {
-        const channelNode = this.estacionsMasterChannelNodes[nomEstacio];
-        if (channelNode) {
-            channelNode.pan.value = panValue; // Ajusta el panning
         }
     }
 

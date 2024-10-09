@@ -1,10 +1,7 @@
-import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical, GrufSelectorPatronsGrid } from "./widgets";
+import { GrufKnobGran, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufBpmCounter, GrufButtonNoBorder, GrufKnobPetit, GrufKnobPetitDiscret, GrufKnobGranGlobal, GrufLabelPetit, GrufSliderVertical, GrufSelectorPatronsGrid } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
@@ -22,7 +19,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
             
             <GrufLabel text="Delay" top="14.1%" left="82.5%" />
-            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
+            <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
             <GrufLabel text="EQ" top="29.6%" left="51.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />
             <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label = 'Mid' /> 

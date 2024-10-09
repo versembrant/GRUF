@@ -12,7 +12,7 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
-import { subscribeToStoreChanges } from "../utils";
+import { subscribeToStoreChanges, subscribeToEstacioParameterChanges, subscribeToPartialStoreChanges } from "../utils";
 import throttle from 'lodash.throttle'
 
 
@@ -57,7 +57,7 @@ export const GrufLabelEstacio = ({ estacio, className }) => {
 
 export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     return (
-        <button className="gruf-button-no-border" onClick={onClick} style={{top: top, left: left}}>
+        <button className="btn-gruf no-border" onClick={onClick} style={{top: top, left: left}}>
             {text}
         </button>
     )
@@ -66,6 +66,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
 export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -135,6 +136,7 @@ export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label, 
 };
 
 export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label, position="absolute" }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -166,21 +168,21 @@ export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label,
 };
 
 export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, position="absolute" }) => {
-    const [parameterValue, setParameterValue] = useState(0); 
-
-    useEffect(() => {
-        if (parameterName === 'swing') {
-            setParameterValue(getAudioGraphInstance().getSwing());
-        } else if (parameterName === 'bpm') {
-            setParameterValue(getAudioGraphInstance().getBpm());
-        } else if (parameterName === 'volume') {
-            setParameterValue(getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0);
-        }
-    }, [parameterName, estacio]);
+    
+    var parameterValue;
+    if (parameterName === 'swing') {
+        subscribeToPartialStoreChanges(getAudioGraphInstance(), 'swing');
+        parameterValue = getAudioGraphInstance().getSwing();
+    } else if (parameterName === 'bpm') {
+        subscribeToPartialStoreChanges(getAudioGraphInstance(), 'bpm');
+        parameterValue = getAudioGraphInstance().getBpm();
+    } else if (parameterName === 'volume') {
+        subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+        parameterValue = getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0;
+        
+    }
 
     const handleKnobChange = (value) => {
-        setParameterValue(value);
-
         if (parameterName === 'swing') {
             getAudioGraphInstance().updateParametreAudioGraph('swing', value);
         } else if (parameterName === 'bpm') {
@@ -211,6 +213,7 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, p
 };
 
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -233,6 +236,7 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
     
@@ -258,6 +262,7 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft, labelRight}) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -293,6 +298,7 @@ export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft,
 };
 
 export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, labelBottom, labelTop, fons }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -333,6 +339,7 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
 };
 
 export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio = estacio.nom;
@@ -359,10 +366,11 @@ export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height })
 };
 
 export const GrufBpmCounter = ({ top, left }) => {
+    subscribeToPartialStoreChanges(getAudioGraphInstance(), 'bpm');
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
 
     const handleBpmChange = (newBpm) => {
-        getAudioGraphInstance().setBpm(newBpm);
+        getAudioGraphInstance().updateParametreAudioGraph('bpm', newBpm);
     };
 
     return (
@@ -426,7 +434,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     return (
         <div className="gruf-pad">
             <Button
-                className={ (isClicked ? 'selected': '') + ' ' + (isSelected ? 'pad-selected': '') } 
+                className={ isClicked || isSelected ? 'selected': '' }
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseOut={handleMouseUp}
@@ -453,7 +461,9 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
     );
 };
 
-export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
+export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
+
     // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const parameterValueOnOff = parameterValue === valueOn;
@@ -465,20 +475,21 @@ export const GrufOnOffButton = ({ estacio, parameterName, top, left, valueOn = 1
     };
 
     return (
-        <div className="gruf-select-button" style={{ top: top, left: left }}>
+        <div className="gruf-toggle" style={{ top: top, left: left }}>
             <div
-                className={`p-selectbutton ${parameterValueOnOff ? 'on' : 'off'}`}
+                className={`p-toggle ${parameterValueOnOff ? 'on' : 'off'}`}
                 onClick={handleClick}
             >
                 <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
             </div>
-            <div className="select-button-label select-button-label-on">{labelOn}</div>
-            <div className="select-button-label select-button-label-off">{labelOff}</div>
+            <div className="toggle-label toggle-label-off">{labelOff}</div>
+            <div className="toggle-label toggle-label-on">{labelOn}</div>
         </div>
     );
 };
 
 export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
@@ -568,6 +579,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 }
 
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
@@ -590,6 +602,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
+                    if (getAudioGraphInstance().isPlaying()) { return};  // Do not trigger notes if we are playing
                     sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);
@@ -749,6 +762,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 };
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
+    subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
@@ -817,19 +831,109 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     )
 }
 
-export const GrufADSRWidget = ({estacio, top, left}) => {
+export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
+    const attackParamName = `attack${soundNumber}`;
+    const decayParamName = `decay${soundNumber}`;
+    const sustainParamName = `sustain${soundNumber}`;
+    const releaseParamName = `release${soundNumber}`;
+
     // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
-        <div className="gruf-adsr-widget" style={{top, left}}>
-            <div className="adsr-graph">
-
-            </div>
+        <div className="gruf-adsr-widget" style={{top, left, height}}>
+            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName="attack" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="decay" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="sustain" position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName="release" position="static" />
+                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain' position="static"/>
+                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release' position="static" />
             </div>
+        </div>
+    )
+}
+
+const ADSRGraph = ({estacio, adsrParameterNames}) => {
+    for (let i = 0; i < adsrParameterNames.length; i++) {
+        subscribeToEstacioParameterChanges(estacio, adsrParameterNames[i]);
+    }
+
+    const a = estacio.getParameterValue(adsrParameterNames[0], estacio.getCurrentLivePreset());
+    const d = estacio.getParameterValue(adsrParameterNames[1], estacio.getCurrentLivePreset());
+    const s = estacio.getParameterValue(adsrParameterNames[2], estacio.getCurrentLivePreset());
+    const r = estacio.getParameterValue(adsrParameterNames[3], estacio.getCurrentLivePreset());
+
+    const strokeWidthPx = 3;
+
+    const timeValues = [a, d, r];
+
+    const maxTime = 9; // knowing that the sum of the max values for attack, decay and release is 9. maybe it could get it automatically?
+    const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
+    const timeValuesWithSustain = [a, d, sustainTime, r];
+
+    const absoluteTimeValues = timeValuesWithSustain.reduce((absoluteValuesArray, timeValue, index) => {
+        const absoluteTimeValue = timeValue + (absoluteValuesArray[index-1] || 0);
+        absoluteValuesArray.push(absoluteTimeValue);
+        return absoluteValuesArray;
+    }, []);
+
+    const adsrPoints = absoluteTimeValues.map((absTimeValue) => {
+        const normTimeValue = absTimeValue / maxTime;
+        return {x: normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4}; // we account for stroke width so that the line isn't clipped
+    });
+
+    const levelValues = [1, s, s, 0];
+
+    levelValues.forEach((levelValue, index) => {
+        adsrPoints[index].y = 75 - levelValue * 50;
+    });
+
+    const sustainPoints = { x1: adsrPoints[1].x, x2: adsrPoints[2].x, y1: adsrPoints[1].y, y2: adsrPoints[2].y };
+
+    const adsrPathString = adsrPoints.reduce((pathString, point) => {
+        return pathString + ` L ${point.x} ${point.y}`;
+    }, `M ${strokeWidthPx/4} 75`);
+
+    const gridSize = 4;
+    let bgLineItems = [];
+    for (let i = 1; i < gridSize; i++) {
+        const crossAxisPos = i / (gridSize) * 100;
+        const hLine = <line key={`bgHLine-${i}`} x1='0' x2='100' y1={crossAxisPos} y2={crossAxisPos} vectorEffect="non-scaling-stroke"/>
+        const vLine = <line key={`bgVLine-${i}`} x1={crossAxisPos} x2={crossAxisPos} y1='100' y2='0' vectorEffect="non-scaling-stroke"/>
+        bgLineItems.push(hLine, vLine);
+    }
+
+
+    return (
+        <div className="adsr-graph">
+            <svg viewBox={"0 0 100 100"} preserveAspectRatio="none">
+                <g stroke="#555" strokeDasharray="1 4" strokeLinecap="round">
+                    {bgLineItems}
+                </g>
+
+                <defs>
+                    <mask id="adsr-mask">
+                        <rect x="0" y="0" width="100" height="100" fill="white"/>
+                        <g fill="black" stroke="black">
+                            <line
+                            x1={sustainPoints.x1} x2={sustainPoints.x2}
+                            y1={sustainPoints.y1} y2={sustainPoints.y2}
+                            vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                            strokeLinecap="round" />
+                            <g fill="white" stroke="white">
+                                <line
+                                    x1={sustainPoints.x1} x2={sustainPoints.x2}
+                                    y1={sustainPoints.y1} y2={sustainPoints.y2}
+                                    vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
+                                    strokeLinecap="round" strokeDasharray="8"/>
+                            </g>
+                        </g>
+                    </mask>
+                </defs>
+
+                <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#adsr-mask)" strokeLinejoin="round"></path>
+                </g>
+
+            </svg>
         </div>
     )
 }

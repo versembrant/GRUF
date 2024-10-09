@@ -2251,6 +2251,11 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
+redux-partial@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/redux-partial/-/redux-partial-0.1.1.tgz#31891d12afa519678939b3d06296fb7a61518113"
+  integrity sha512-goxxqXkwslhWm1HMOQi4vdtmvpF0kxHGtL/nENRdmwNaNjynJX4ZO1zCv23onAMVUr92mb2AFhSGIrWPFNanJg==
+
 redux@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/redux/-/redux-5.0.1.tgz#97fa26881ce5746500125585d5642c77b6e9447b"

@@ -1,19 +1,14 @@
-import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufOnOffButton, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
-
 export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
-    subscribeToStoreChanges(estacio);  // Subscriu als canvis de paràmetres de la pròpia estació
 
     return (<div key={estacio.nom} className="estacio estacio-synth_bass">
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
         
-            <GrufKnobPetit estacio={estacio} parameterName="attack" top="35%" left="5%" />
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%"/>
+            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.3%" left="52%" />
             
             <GrufKnobGran estacio={estacio} parameterName="portamento" top="8%" left="28%" />
@@ -34,7 +29,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="LPF" top="21.8%" left="43%" />
 
             <GrufLabel text="Delay" top="14%" left="82.3%" />
-            <GrufOnOffButton estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
+            <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
             <GrufLabel text="Durada" top="29.6%" left="70.3%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
             <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 

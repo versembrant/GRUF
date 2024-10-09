@@ -81,6 +81,34 @@
     }
 }
 
+.gruf-knob-gran-global {
+    position: absolute;
+    font-size: 14px;
+
+    .p-knob {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+}
+
+.gruf-knob-petit {
+    position: absolute;
+    font-size: 12px;
+
+    .p-knob {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+}
+
 .gruf-enum-2-columns {
     position: absolute;
     display: grid;
@@ -94,9 +122,9 @@
         background-color: $black;
         border: 1px solid $grey;
         border-radius: 6px;
+        padding: 0;
         width: 50px;
         height: 17px;
-        cursor: pointer;
     }
 
     .selected {
@@ -114,12 +142,12 @@
     font-size: 12px;
 
     button {
+        padding: 0;
         background-color: $grey;
-        border: 0px;
+        border: none;
         border-radius: 4px;
         height: 10px;
         margin-top: 2.5px;
-        cursor: pointer;
     }
 
     .selected {
@@ -172,33 +200,16 @@
     .p-button {
         width: 100%;
         height: 80%;
-        border-radius: 10px;
+        padding: 0;
         background-color: $dark-grey;
     }
 
     .p-button-label {
         font-size: 12px;
-        color: $font-color;
         font-family: "Montserrat", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-    }
-    
-    .selected { // S'utiliza per quan el pad s'apreta
-        background-color: $grey;
-
-        .p-button-label {
-            color: $white;
-        }
-    }
-
-    .pad-selected { // S'utilitza per quan el pad està se·leccionat i es modifiquen els seus paràmetres
-        background-color: $grey;
-
-        .p-button-label {
-            color: $white;
-        }
     }
 }
 
@@ -602,7 +613,7 @@
     }
 }
 
-.gruf-select-button {
+.gruf-toggle {
     position: absolute;
     width: 120px;  
     height: 30px;
@@ -613,50 +624,43 @@
     background-color: $background-color;
     border-radius: 12px;
 
-    .p-selectbutton {
+    .p-toggle {
         position: relative;
         width: 120%;
         height: 120%;
         border: none;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+        padding: 0 10px;
         background-color: transparent;
         overflow: hidden;
         cursor: pointer;
 
         .circle-icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             width: 16px;
             height: 16px;
             background-color: $dark-grey; 
             border-radius: 100px;
-            transition: left 0.3s ease;
+            transition: margin-left 0.3s ease;
         }
 
         &.on .circle-icon {
-            left: 10px;
-        }
-
-        &.off .circle-icon {
-            left: auto;
-            right: 10px;
+            margin-left: calc(100% - 16px); // el mateix que auto, però transicionable
         }
     }
 
-    .select-button-label {
+    .toggle-label {
         font-size: 12px;
     }
 
-    .select-button-label-on{
+    .toggle-label-off{
         position: absolute;
         top: 35px;
         left: 3px;
     }
 
-    .select-button-label-off{
+    .toggle-label-on{
         position: absolute;
         top: 35px;
         right: 3px;
@@ -687,10 +691,6 @@
             border-radius: 4px; 
             cursor: pointer;
             transition: background-color 0.2s ease;
-
-            &.selected {
-                background-color: $grey; 
-            }
 
             &.active {
                 border: 1px solid $grey;
@@ -758,16 +758,13 @@
         margin-top:8px;
 
         button {
-            font-family: "Montserrat", sans-serif;
+            padding: 1px 4px;
             border: none;
-            background-color: transparent;
             font-size: 14px;
             font-weight: 400;
-            color: $white;
-            cursor: pointer;
 
             &.recording {
-                color: $red;
+                --text-color: #{$red};
                 animation: blink 1s steps(7, start) infinite;
             }
         }
@@ -792,11 +789,6 @@
         vertical-align: middle;
         margin-right: 4px;
         cursor: hand;
-
-        &.selected {
-            background-color: $grey;
-            color: $white;
-        }
 
         &.active {
             border-color: $white;
@@ -903,14 +895,11 @@
     }
 
     button {
-        font-family: "Montserrat", sans-serif;
         border: none;
-        background-color: transparent;
         font-weight: 400;
-        color: $white;
-        cursor: pointer;
         margin-left: calc(100% + 5px);
         margin-top: -20px;
+        padding: 0;
 
         &.recording {
             color: $red;
@@ -957,8 +946,8 @@
             cursor: hand;
             border-radius: 5px;
             margin: 2px;
-            background-color: $pale-orange;
-            border: 1px solid $pale-orange;
+            background-color: var(--accent-color, $pale-orange);
+            border: 1px solid var(--accent-color, $pale-orange);
     
             &.filled {
                 background-color: $black!important;
@@ -1004,14 +993,19 @@
 }
 
 .gruf-adsr-widget {
+    background-color: $background-color;
     position: absolute;
     display: flex;
     flex-direction: column;
     width: 220px;
+    border: 1.5px solid $grey;
+    border-radius: 15px;
 
     .adsr-graph {
+        flex: 1;
+        overflow: hidden;
         display: flex;
-        height: 194px;
+        flex-direction: column;
     }
 
     .adsr-knobs {
@@ -1020,5 +1014,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+
+        border: 1.5px solid $grey;
+        border-radius: 15px;
     }
 }

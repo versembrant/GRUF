@@ -98,6 +98,23 @@ export const subscribeToStoreChanges = (objectWithStore) => {
     }, [setState]);
 }
 
+// Util function to subscribe a react component to partial changes of a store
+export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => {
+    const [_, setState] = useState(objectWithStore.store.getPartial(storeFilter).getState());
+    useEffect(() => {
+        const unsubscribe = objectWithStore.store.subscribe(() => {
+            setState(objectWithStore.store.getPartial(storeFilter).getState());
+        });
+        return () => unsubscribe();
+    }, [setState]);
+}
+
+// Util function to subscribe a react component to changes of a change of a parameter of a estacio
+export const subscribeToEstacioParameterChanges = (estacio, nomParametre) => {
+    return subscribeToPartialStoreChanges(estacio, nomParametre);
+}
+
+
 // Util function to render a react component in a DOM element
 export const renderReactComponentInElement = (reactComponent, elementID, props={}, reactRoot=undefined) => {
     let root = reactRoot
