@@ -841,15 +841,14 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
     const sustainParamName = `sustain${soundNumber}`;
     const releaseParamName = `release${soundNumber}`;
 
-    // TODO: en el futur, estaria be que tots el knobs tinguessin position="static"
     return (
         <div className="gruf-adsr-widget" style={{top, left, height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain' position="static"/>
-                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release' position="static" />
+                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack'/>
+                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay'/>
+                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain'/>
+                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release'/>
             </div>
         </div>
     )
