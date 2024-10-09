@@ -60,7 +60,15 @@ export class AudioGraph {
             }
         });
         this.store = createStore(combineReducers(reducers));
+
+        // Some parameters will override this method because they also affect the audio graph, others just go to the state (but
+        // are actually not likely to be set from the remote server)
+        propertiesInStore.forEach(propertyName => {
+            const methodName = `set${propertyName.charAt(0).toUpperCase() + propertyName.slice(1)}`;
+            this[methodName] = (valor) => this.setParametreInStore(propertyName, valor);
+        })
     }
+
 
     setParametreInStore(nomParametre, valor) {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
@@ -434,28 +442,8 @@ export class AudioGraph {
     }
 
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
-        this.setParametre(nomParametre, valor);
-    }
-
-    setParametre(nomParametre, valor) {
-        // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but 
-        // are actually not likely to be set from the remote server)
-        const effectKey = nomParametre.split('.')[1];
-        switch (nomParametre) {
-            case 'bpm':
-            this.setBpm(valor);
-            break;
-            case 'masterGain':
-            this.setMasterGain(valor);
-            case 'masterAudioEngine':
-            this.setMasterAudioEngine(valor);
-            break;
-            case 'effectParameters':
-            this.setEffectParameters(valor);
-            break;
-            default:
-            this.setParametreInStore(nomParametre, valor);
-        }
+        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
+        this[methodName](valor);
     }
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
