@@ -1,12 +1,7 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState } from "react";
 import { Navbar, Footer } from "./frontpage";
-import { capitalizeFirstLetter } from "../utils";
-
-function sample(array) {
-    const index = Math.floor(Math.random() * array.length);
-    return array[index];
-}
+import { capitalizeFirstLetter, capitalize, sample } from "../utils";
 
 const paraules = {
     "Mestre": { type: "name_prefix", gender: "masculine", number: "singular" },
@@ -52,25 +47,24 @@ const paraules = {
     "antigua": { type: "adjective", gender: "feminine", plural: "antigues" },
 };
 
-function sampleWordObjectByCriteria(criteria) {
+function sampleWordObjectByCriteria(criteria, objectCount=1) {
     const wordObjects = Object.entries(paraules)
     .filter(([singular, detalls]) => {
       return Object.entries(criteria).every(([criteri, valor]) => detalls[criteri] === valor);
     }).map(([singular, detalls]) => ({ ...detalls, singular }));
 
-    return wordObjects[Math.floor(Math.random() * wordObjects.length)];
+    return sample(wordObjects, objectCount);
 }
 
-function capitalize(str) {
-      return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
- }
-
 function generateTitle() {
-    const gender_primary = Math.random() < 0.5 ? 'masculine' : 'feminine';
-    const primary_noun = sampleWordObjectByCriteria({ type: "noun", gender: gender_primary }).singular;
+    const [primary_noun_object, secondary_noun_object] = sampleWordObjectByCriteria({ type: "noun" }, 2);
 
-    const gender_secondary = Math.random() < 0.5 ? 'masculine' : 'feminine';
-    const secondary_noun = sampleWordObjectByCriteria({ type: "noun", gender: gender_secondary }).plural;
+    const primary_noun = primary_noun_object.singular;
+    const gender_primary = primary_noun_object.gender;
+
+    const secondary_noun = secondary_noun_object.plural;
+    const gender_secondary = secondary_noun_object.gender;
+
     const adjective = sampleWordObjectByCriteria({ type: "adjective", gender: gender_secondary }).plural;
 
     let title;
