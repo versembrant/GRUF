@@ -305,6 +305,12 @@
     } 
 }
 
+.mixer-master-container{
+    display: flex;
+    flex: auto;
+    justify-content: right;
+}
+
 .estacio-mixer-master-columna {
     display: flex;
     flex-direction: column; 
