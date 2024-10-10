@@ -24,71 +24,64 @@ const paraules = {
     "Lady": { type: "name_prefix", gender: "feminine", number: "singular" },
     "L'estimat": { type: "name_prefix", gender: "masculine", number: "singular" },
     "L'estimada": { type: "name_prefix", gender: "feminine", number: "singular" },
-    "Cristall": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Somni": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Corneta": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Lluna": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Tronc": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Braç": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Peu Gran": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Forat": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Creador de Somnis": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Castell": { type: "primary_noun", gender: "masculine", number: "singular" },
-    "Molsa": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Flor": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Muntanya": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Història": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Creadora de Somnis": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Pluja": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Boira": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Tempesta": { type: "primary_noun", gender: "feminine", number: "singular" },
-    "Cors": { type: "secondary_noun", gender: "masculine", number: "plural" },
-    "Gossos": { type: "secondary_noun", gender: "masculine", number: "plural" },
-    "Cançons": { type: "secondary_noun", gender: "feminine", number: "plural" },
-    "Pedres": { type: "secondary_noun", gender: "feminine", number: "plural" },
-    "Perduts": { type: "adjective", gender: "masculine", number: "plural" },
-    "Antics": { type: "adjective", gender: "masculine", number: "plural" },
-    "Perdudes": { type: "adjective", gender: "feminine", number: "plural" },
-    "Antigues": { type: "adjective", gender: "feminine", number: "plural" },
+    "cristall": { type: "noun", gender: "masculine", plural: "cristalls" },
+    "somni": { type: "noun", gender: "masculine", plural: "somnis" },
+    "corneta": { type: "noun", gender: "feminine", plural: "cornetes" },
+    "lluna": { type: "noun", gender: "feminine", plural: "llunes" },
+    "tronc": { type: "noun", gender: "masculine", plural: "troncs" },
+    "braç": { type: "noun", gender: "masculine", plural: "braços" },
+    "peu gran": { type: "noun", gender: "masculine", plural: "peus grans" },
+    "forat": { type: "noun", gender: "masculine", plural: "forats" },
+    "creador de somnis": { type: "noun", gender: "masculine", plural: "creadors de somnis" },
+    "creadora de somnis": { type: "noun", gender: "feminine", plural: "creadores de somnis" },
+    "castell": { type: "noun", gender: "masculine", plural: "castells" },
+    "molsa": { type: "noun", gender: "feminine", plural: "molses" },
+    "flor": { type: "noun", gender: "feminine", plural: "flors" },
+    "muntanya": { type: "noun", gender: "feminine", plural: "muntanyes" },
+    "història": { type: "noun", gender: "feminine", plural: "històries" },
+    "pluja": { type: "noun", gender: "feminine", plural: "plujes" },
+    "boira": { type: "noun", gender: "feminine", plural: "boires" },
+    "tempesta": { type: "noun", gender: "feminine", plural: "tempestes" },
+    "cor": { type: "noun", gender: "masculine", plural: "cors" },
+    "gos": { type: "noun", gender: "masculine", plural: "gossos" },
+    "cancó": { type: "noun", gender: "feminine", plural: "cançons" },
+    "pedra": { type: "noun", gender: "feminine", plural: "pedres" },
+    "perdut": { type: "adjective", gender: "masculine", plural: "perduts" },
+    "perduda": { type: "adjective", gender: "feminine", plural: "perdudes" },
+    "antic": { type: "adjective", gender: "masculine", plural: "antics" },
+    "antigua": { type: "adjective", gender: "feminine", plural: "antigues" },
 };
 
-function sampleWordsByCriteria(criteria) {
-    const words = Object.keys(paraules).filter(key => {
-        return Object.entries(criteria).every(([property, value]) => {
-            return paraules[key][property] === value;
-        });
-    });
-    return words[Math.floor(Math.random() * words.length)];
+function sampleWordObjectByCriteria(criteria) {
+    const wordObjects = Object.entries(paraules)
+    .filter(([singular, detalls]) => {
+      return Object.entries(criteria).every(([criteri, valor]) => detalls[criteri] === valor);
+    }).map(([singular, detalls]) => ({ ...detalls, singular }));
+
+    return wordObjects[Math.floor(Math.random() * wordObjects.length)];
 }
+
+function capitalize(str) {
+      return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+ }
 
 function generateTitle() {
     const gender_primary = Math.random() < 0.5 ? 'masculine' : 'feminine';
-    const primary_noun = sampleWordsByCriteria({ type: "primary_noun", gender: gender_primary });
-    const name_prefix = sampleWordsByCriteria({ type: "name_prefix", gender: gender_primary });
+    const primary_noun = sampleWordObjectByCriteria({ type: "noun", gender: gender_primary }).singular;
 
     const gender_secondary = Math.random() < 0.5 ? 'masculine' : 'feminine';
-    const secondary_noun = sampleWordsByCriteria({ type: "secondary_noun", gender: gender_secondary, number: "plural" });
-    const adjective = sampleWordsByCriteria({ type: "adjective", gender: gender_secondary, number: "plural" });
+    const secondary_noun = sampleWordObjectByCriteria({ type: "noun", gender: gender_secondary }).plural;
+    const adjective = sampleWordObjectByCriteria({ type: "adjective", gender: gender_secondary }).plural;
 
     let title;
+    const secondary_noun_determinant = gender_secondary === 'masculine' ? 'els' : 'les';
     if (Math.random() < 0.5) {
-        if (gender_secondary === 'masculine') {
-            title = `${name_prefix} ${primary_noun} i els ${secondary_noun} ${adjective}`;
-        } else {
-            title = `${name_prefix} ${primary_noun} i les ${secondary_noun} ${adjective}`;
-        }
+        const name_prefix = sampleWordObjectByCriteria({ type: "name_prefix", gender: gender_primary }).singular;
+        title = [name_prefix, capitalize(primary_noun), 'i', secondary_noun_determinant, secondary_noun, adjective].join(" ");
     } else {
-        if (gender_secondary === 'masculine' && gender_primary === 'masculine') {
-            title = `Els ${secondary_noun} ${adjective} del ${primary_noun}`;
-        } else if (gender_secondary === 'feminine' && gender_primary === 'feminine') {
-            title = `Les ${secondary_noun} ${adjective} de la ${primary_noun}`;
-        } else if (gender_secondary === 'masculine' && gender_primary === 'feminine') {
-            title = `Els ${secondary_noun} ${adjective} de la ${primary_noun}`;
-        } else {
-            title = `Les ${secondary_noun} ${adjective} del ${primary_noun}`;
-        }
+        const possessive_determinant = gender_primary === 'masculine' ? 'del' : 'de la';
+        title = [capitalize(secondary_noun_determinant), secondary_noun, adjective, possessive_determinant, primary_noun].join(" ");
     }
-
     return title;
 }
 
