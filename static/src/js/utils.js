@@ -10,8 +10,28 @@ export const buildAudioGraphIfNotBuilt = async () => {
     }
 }
 
+export const capitalize = (string) => {
+    return string.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
 export const  capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export const sample = (arr, sampleSize=1) => {
+    if (sampleSize > arr.length) {
+        throw new Error("Sample size cannot be larger than the array size");
+    }
+
+    const sampledItems = new Set();
+    
+    while (sampledItems.size < sampleSize) {
+        const randomIndex = Math.floor(Math.random() * arr.length);
+        sampledItems.add(arr[randomIndex]);
+    }
+    
+    if (sampleSize === 1) return [...sampledItems][0];
+    return [...sampledItems];
 }
 
 // Make sure numeric value is within min/max boundaries
