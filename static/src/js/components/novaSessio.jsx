@@ -39,7 +39,7 @@ const paraules = {
     "tempesta": { type: "noun", gender: "feminine", plural: "tempestes" },
     "cor": { type: "noun", gender: "masculine", plural: "cors" },
     "gos": { type: "noun", gender: "masculine", plural: "gossos" },
-    "cancó": { type: "noun", gender: "feminine", plural: "cançons" },
+    "cançó": { type: "noun", gender: "feminine", plural: "cançons" },
     "pedra": { type: "noun", gender: "feminine", plural: "pedres" },
     "perdut": { type: "adjective", gender: "masculine", plural: "perduts" },
     "perduda": { type: "adjective", gender: "feminine", plural: "perdudes" },
