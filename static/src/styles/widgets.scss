@@ -948,22 +948,61 @@
 
 .tonality-selector {
     position: absolute;
-    width: 250px; 
+    font-size: 14px;
+    width: 100px; 
     margin-bottom: 10px;
-
+    border: solid 2px $grey;
+    border-radius: 12px;
+    padding: 10px;
+    
     .p-dropdown {
-        width: 100%; 
+        width: 100%;
+        color: $white;
+
         .p-dropdown-label {
             font-size: 14px;  
+            color: $white; 
         }
 
-        .p-dropdown-item {
-            font-size: 12px;  
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-            &:hover {
-                background-color: yellowgreen;  
+        .p-dropdown-trigger {
+            color: $white; 
+            margin-left: auto; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .p-dropdown-items-wrapper {
+            background-color: $dark-grey!important;
+            padding: 5px;
+            max-height: 300px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+
+            .p-dropdown-item {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                cursor: pointer;
+                transition: background-color 0.2s ease-in-out;
+
+                .p-dropdown-item-label {
+                    color: $white;
+                }
+
+                &:hover {
+                    background-color: yellowgreen;  
+                }
             }
+        }
+
+        .p-placeholder {
+            color: $dark-grey;
+        }
+
+        .p-dropdown-clear-icon {
+            color: $dark-grey;
+            margin-left: 85%;
         }
     }
 }

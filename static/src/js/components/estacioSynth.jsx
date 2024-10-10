@@ -39,7 +39,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
-            <GrufSelectorTonalitat top="50.3%" left="80.6%" />
+            <GrufSelectorTonalitat top="50.3%" left="81.4%" />
        
             <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="30%" left="36.5%"  />
     
