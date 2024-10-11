@@ -27,13 +27,14 @@ export class AudioGraph {
             mutesEstacions: {},
             solosEstacions: {},
             mainSequencerCurrentStep: -1,
-            graphIsBuilt: false,
+            isGraphBuilt: false,
             isMasterAudioEngine: true,
-            audioEngineSyncedToRemote: true,
-            playing: false,
-            playingArranjement: false,
+            isAudioEngineSyncedToRemote: true,
+            isPlaying: false,
+            isPlayingArranjement: false,
             swing: 0,
             compas: '4/4',
+            tonality : 'cmajor',
             effectParameters: {
                 reverbWet:0,
                 reverbDecay: 0.1,
@@ -44,7 +45,7 @@ export class AudioGraph {
                 eq3HighGain: 0,
                 eq3MidGain: 0,
                 eq3LowGain: 0,
-            }
+            },
         }
         const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
         const reducers = {};
@@ -61,24 +62,98 @@ export class AudioGraph {
         this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
+
     setParametreInStore(nomParametre, valor) {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
     }
 
     isPlaying() {
-        return this.store.getState().playing;
+        return this.store.getState().isPlaying;
     }
 
     isPlayingArranjement() {
-        return this.store.getState().playingArranjement;
+        return this.store.getState().isPlayingArranjement;
+    }
+
+    setIsPlayingArranjement(value) {
+        this.setParametreInStore('isPlayingArranjement', value);
     }
 
     isPlayingLive() {
         return !this.isPlayingArranjement();
     }
 
-    graphIsBuilt() {
-        return this.store.getState().graphIsBuilt;
+    getMasterGain() {
+        return this.store.getState().masterGain;
+    }
+    
+    setMasterGain(gain) {
+        this.setParametreInStore('masterGain', gain);
+        if (!this.isGraphBuilt()) return;
+        this.masterGainNode.volume.value = Tone.gainToDb(gain);
+    }
+
+    getMasterPan(){
+        return this.store.getState().masterPan;
+    }
+
+    setMasterPan(pan){
+        this.setParametreInStore('masterPan', pan);
+        if (!this.isGraphBuilt()) return;
+        this.masterGainNode.pan.setValueAtTime(pan, 0.05);
+    }
+    
+    getBpm() {
+        return this.store.getState().bpm;
+    }
+    
+    setBpm(bpm) {
+        this.setParametreInStore('bpm', bpm);
+        if (!this.isGraphBuilt()) return;
+        Tone.Transport.bpm.rampTo(bpm);
+        this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
+    }
+
+    getSwing(){
+        return this.store.getState().swing;
+    }
+
+    setSwing(swing) {
+        this.setParametreInStore('swing', swing);
+    }
+
+    getCompas(){
+        return this.store.getState().compas;
+    }
+
+    setCompas(compas) {
+        this.setParametreInStore('compas', compas);
+    }
+
+    getTonality(){
+        return this.store.getState().tonality;
+    }
+
+    setTonality(tonality) {
+        this.setParametreInStore('tonality', tonality);
+    }
+
+    getNumSteps (nCompassos = 2){
+
+        const compas = this.getCompas();
+        if (compas === '2/4'){
+            return 8 * nCompassos;
+        } 
+        else if (compas === '3/4') {
+            return 12 * nCompassos;
+        }
+        else if (compas === '4/4') {
+            return 16 * nCompassos;
+        }
+    }
+
+    isGraphBuilt() {
+        return this.store.getState().isGraphBuilt;
     }
 
     isMasterAudioEngine() {
@@ -90,16 +165,14 @@ export class AudioGraph {
         console.log("Master audio engine: ", this.isMasterAudioEngine())
     }
 
-    audioEngineIsSyncedToRemote() {
-        return this.store.getState().audioEngineSyncedToRemote;
+    isAudioEngineSyncedToRemote() {
+        return this.store.getState().isAudioEngineSyncedToRemote;
     }
     
     setMainSequencerCurrentStep(currentStep) {
         this.mainSequencerCurrentStep = currentStep;
-        if (this.isMasterAudioEngine()) {
-            if (!getCurrentSession().localMode) {
-                sendMessageToServer('update_master_sequencer_current_step', {session_id: getCurrentSession().getID(), current_step: currentStep});
-            }
+        if (this.isMasterAudioEngine() && !getCurrentSession().localMode) {
+            sendMessageToServer('update_master_sequencer_current_step', {session_id: getCurrentSession().getID(), current_step: currentStep});
         }
         this.setParametreInStore('mainSequencerCurrentStep', this.mainSequencerCurrentStep);
     }
@@ -113,45 +186,39 @@ export class AudioGraph {
     }
 
     getCurrentLevelEstacio(nomEstacio) {
-        if (this.graphIsBuilt()) {
-            const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
-            const dBuLevel = dBFSLevel + 18;
-            const gainLevel = Tone.dbToGain(dBFSLevel)
-            return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
-        } else {
-            return {"db": -60, "gain": 0};
-        }
+        if (!this.isGraphBuilt()) return {"db": -60, "gain": 0};
+        const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
+        const dBuLevel = dBFSLevel + 18;
+        const gainLevel = Tone.dbToGain(dBFSLevel)
+        return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
     }
 
     getCurrentMasterLevelStereo() {
-        if (this.graphIsBuilt()) {
-            const levels = this.masterMeterNode.getValue();
-            const leftChannelLevel = levels[0];
-            const rightChannelLevel = levels[1]; 
-    
-            const dBuLeft = leftChannelLevel + 18;
-            const dBuRight = rightChannelLevel + 18;
-    
-            return {
-                left: {
-                    db: clamp(dBuLeft, -60, 6),
-                    gain: clamp(Tone.dbToGain(dBuLeft), 0, 1),
-                },
-                right: {
-                    db: clamp(dBuRight, -60, 6),
-                    gain: clamp(Tone.dbToGain(dBuRight), 0, 1),
-                }
-            };
-        } else {
-            return {
-                left: { db: -60, gain: 0 },
-                right: { db: -60, gain: 0 }
-            };
-        }
+        if (!this.isGraphBuilt()) return {
+            left: { db: -60, gain: 0 },
+            right: { db: -60, gain: 0 }
+        };
+        const levels = this.masterMeterNode.getValue();
+        const leftChannelLevel = levels[0];
+        const rightChannelLevel = levels[1];
+
+        const dBuLeft = leftChannelLevel + 18;
+        const dBuRight = rightChannelLevel + 18;
+
+        return {
+            left: {
+                db: clamp(dBuLeft, -60, 6),
+                gain: clamp(Tone.dbToGain(dBuLeft), 0, 1),
+            },
+            right: {
+                db: clamp(dBuRight, -60, 6),
+                gain: clamp(Tone.dbToGain(dBuRight), 0, 1),
+            }
+        };
     }
 
     isMutedEstacio(nomEstacio) {
-        if (!this.graphIsBuilt()) return false;
+        if (!this.isGraphBuilt()) return false;
         return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
     }
 
@@ -175,19 +242,18 @@ export class AudioGraph {
     }
 
     applyEffectParameters(effectParams) {
-        if (this.graphIsBuilt()){
-            this.reverb.wet.value = effectParams.reverbWet;
-            this.reverb.decay = effectParams.reverbDecay;
-            this.delay.wet.value = effectParams.delayWet;
-            this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
-            this.delay.feedback.value = effectParams.delayFeedback;
-            this.drive.distortion = effectParams.drive;
-            this.eq3.set({
-                low: effectParams.eq3LowGain,
-                mid: effectParams.eq3MidGain,
-                high: effectParams.eq3HighGain
-            });
-        }
+        if (!this.isGraphBuilt()) return;
+        this.reverb.wet.value = effectParams.reverbWet;
+        this.reverb.decay = effectParams.reverbDecay;
+        this.delay.wet.value = effectParams.delayWet;
+        this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
+        this.delay.feedback.value = effectParams.delayFeedback;
+        this.drive.distortion = effectParams.drive;
+        this.eq3.set({
+            low: effectParams.eq3LowGain,
+            mid: effectParams.eq3MidGain,
+            high: effectParams.eq3HighGain
+        });
     }
 
     setEffectParameters(newEffectParameters) {
@@ -201,7 +267,7 @@ export class AudioGraph {
     
     buildAudioGraph() {
         console.log("Building audio graph")
-        this.setParametreInStore('graphIsBuilt', false);
+        this.setParametreInStore('isGraphBuilt', false);
         this.setMainSequencerCurrentStep(-1);
 
         // Setteja el bpm al valor guardat
@@ -242,7 +308,7 @@ export class AudioGraph {
         })
         
         // Marca el graph com a construït
-        this.setParametreInStore('graphIsBuilt', true);
+        this.setParametreInStore('isGraphBuilt', true);
 
         // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
         getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
@@ -255,51 +321,44 @@ export class AudioGraph {
     }
     
     async startAudioContext() {
-        if (audioContextIsReady === false){
-            await Tone.start()
-            console.log("Audio context started")
-            audioContextIsReady = true;
-        }
+        if (audioContextIsReady) return;
+        await Tone.start()
+        console.log("Audio context started")
+        audioContextIsReady = true;
     }
 
     transportStart() {
-        if (this.graphIsBuilt()) {
-            console.log("Transport start")
-            this.setParametreInStore('playing', true);
-            
-            // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
-            if (this.isMasterAudioEngine()){
-                this.setMainSequencerCurrentStep(0);
-            } else {
-                if (this.audioEngineIsSyncedToRemote()){
-                    this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : 0);
-                } else {
-                    this.setMainSequencerCurrentStep(0);
-                }
-            }
-            
-            // Trigueja el transport start a totes les estacions i el transport general
-            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                const estacio = getCurrentSession().getEstacio(nomEstacio);
-                estacio.onTransportStart();
-            });
-            Tone.Transport.start()
+        if (!this.isGraphBuilt()) return;
+        console.log("Transport start")
+        this.setParametreInStore('isPlaying', true);
+
+        // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
+        if (this.isMasterAudioEngine() || !this.isAudioEngineSyncedToRemote()){
+            this.setMainSequencerCurrentStep(0);
+        } else {
+            this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : 0);
         }
+
+        // Trigueja el transport start a totes les estacions i el transport general
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+            const estacio = getCurrentSession().getEstacio(nomEstacio);
+            estacio.onTransportStart();
+        });
+        Tone.Transport.start();
     }
     
     transportStop() {
-        if (this.graphIsBuilt()) {
-            console.log("Transport stop")
-            this.setParametreInStore('playing', false);
-            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                const estacio = getCurrentSession().getEstacio(nomEstacio);
-                estacio.onTransportStop();
-            });
-            Tone.Transport.stop()
-            this.setMainSequencerCurrentStep(-1);
-            
-            this.updateParametreAudioGraph('playingArranjement', false)
-        }
+        if (!this.isGraphBuilt()) return;
+        console.log("Transport stop")
+        this.setParametreInStore('isPlaying', false);
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+            const estacio = getCurrentSession().getEstacio(nomEstacio);
+            estacio.onTransportStop();
+        });
+        Tone.Transport.stop()
+        this.setMainSequencerCurrentStep(-1);
+
+        this.updateParametreAudioGraph('isPlayingArranjement', false);
     }
 
     onMainSequencerTick(time) {
@@ -347,11 +406,10 @@ export class AudioGraph {
         // server and is sent to all clients (including the client who sent it). To avoid this problem, we ignore received note messages 
         // that originate from the same client (the same socket ID)
         getAudioGraphInstance().receiveMidiEventFromServer(nomEstacio, data);
-        if (!getCurrentSession().localMode && forwardToServer) {
-            data.origin_socket_id = getSocketID();
-            console.log("Sending MIDI event to server")
-            sendMessageToServer('midi_event', {session_id: getCurrentSession().getID(), nom_estacio: nomEstacio, midi_event_data: data});
-        }
+        if (getCurrentSession().localMode || !forwardToServer) return;
+        data.origin_socket_id = getSocketID();
+        console.log("Sending MIDI event to server")
+        sendMessageToServer('midi_event', {session_id: getCurrentSession().getID(), nom_estacio: nomEstacio, midi_event_data: data});
     }
 
     receiveMidiEventFromServer(nomEstacio, data) {
@@ -377,69 +435,6 @@ export class AudioGraph {
         }
     }
 
-    getMasterGain() {
-        return this.store.getState().masterGain;
-    }
-    
-    setMasterGain(gain) {
-        this.setParametreInStore('masterGain', gain);
-        if (this.graphIsBuilt()){
-            this.masterGainNode.volume.linearRampTo(Tone.gainToDb(gain), 0.01); 
-        }
-    }
-
-    getMasterPan(){
-        return this.store.getState().masterPan;
-    }
-
-    setMasterPan(pan){
-        this.setParametreInStore('masterPan', pan);
-        if (this.graphIsBuilt()){
-            this.masterGainNode.pan.linearRampTo(pan, 0.01);
-        }
-    }
-    
-    getBpm() {
-        return this.store.getState().bpm;
-    }
-    
-    setBpm(bpm) {
-        this.setParametreInStore('bpm', bpm);
-        if (this.graphIsBuilt()){
-            Tone.Transport.bpm.rampTo(bpm);
-            this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
-        }
-    }
-
-    getSwing(){
-        return this.store.getState().swing;
-    }
-
-    setSwing(swing){
-        this.setParametreInStore('swing', swing);
-    }
-
-    getCompas(){
-        return this.store.getState().compas;
-    }
-
-    setCompas(compas){
-        this.setParametreInStore('compas', compas);
-    }
-
-    getNumSteps (nCompassos = 2){
-        const compas = this.getCompas();
-        if (compas === '2/4'){
-            return 8 * nCompassos;
-        } 
-        else if (compas === '3/4') {
-            return 12 * nCompassos;
-        }
-        else if (compas === '4/4') {
-            return 16 * nCompassos;
-        }
-    }
-
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -457,28 +452,13 @@ export class AudioGraph {
     }
 
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
-        // Some parameters have specific methods to set them because they also affect the audio graph, others just go to the state (but 
-        // are actually not likely to be set from the remote server)
-        const effectKey = nomParametre.split('.')[1];
-        if (nomParametre === 'bpm') {
-            this.setBpm(valor);
-        } else if (nomParametre === 'masterGain') {
-            this.setMasterGain(valor);
-        } else if (nomParametre === 'swing'){
-            this.setSwing(valor);
-        } else if (nomParametre === 'effectParameters'){
-            this.setEffectParameters(valor);
-        } else if (nomParametre === 'compas'){
-            this.setCompas(valor);
-        }
-        else {
-            this.setParametreInStore(nomParametre, valor);
-        }
-    } 
+        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
+        this[methodName](valor);
+    }
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
         this.remoteMainSequencerCurrentStep = currentStep;
-        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.audioEngineIsSyncedToRemote()){
+        if (!this.isMasterAudioEngine() && !this.isPlaying() && this.isAudioEngineSyncedToRemote()){
             this.setParametreInStore('mainSequencerCurrentStep', this.remoteMainSequencerCurrentStep);
         }
     }
