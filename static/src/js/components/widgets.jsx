@@ -788,6 +788,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 }
 
 export const GrufSelectorTonalitat = ({ top, left }) => {
+    subscribeToPartialStoreChanges(getAudioGraphInstance(), 'tonality');
     const tonalityOptions = [
         { label: 'C Major', value: 'cmajor' },
         { label: 'C Minor', value: 'cminor' },
