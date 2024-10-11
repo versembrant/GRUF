@@ -1,8 +1,5 @@
-import { subscribeToStoreChanges } from "../utils";
-import { getAudioGraphInstance } from '../audioEngine';
 import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
-
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
 
@@ -11,7 +8,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             
             <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%"/>
+            <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.3%" left="52%" />
             <GrufKnobGran estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
             <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />

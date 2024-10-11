@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
-import { makePartial } from 'redux-partial';
 import { getAudioGraphInstance } from './audioEngine';
 
 
@@ -101,14 +100,15 @@ export const subscribeToStoreChanges = (objectWithStore) => {
 
 // Util function to subscribe a react component to partial changes of a store
 export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => {
-    const partialStore = makePartial(objectWithStore.store);
-    const [_, setState] = useState(partialStore.getPartial(storeFilter).getState());
+    const partialStore = objectWithStore.store.getPartial(storeFilter)
+    const [, setState] = useState(partialStore.getState());
     useEffect(() => {
         const unsubscribe = partialStore.subscribe(() => {
-            setState(partialStore.getPartial(storeFilter).getState());
+            setState(partialStore.getState());
         });
-        return () => unsubscribe();
-    }, [setState]);
+        return () => {
+            unsubscribe()};
+    }, [setState, storeFilter]);
 }
 
 // Util function to subscribe a react component to changes of a change of a parameter of a estacio

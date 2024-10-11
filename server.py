@@ -456,13 +456,25 @@ def on_request_session_data(data):  # session_id
     emit('set_session_data', s.get_full_data())
 
 
-@socketio.on('save_session_data')
-def on_save_session_data(data):  # session_id
+def _save_session_data_helper(data):
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     log(f'Saving session data for session {data['session_id']}')
     Session(data['full_session_data'])  # This will trigger saving the session to redis and overwriting exsiting one
+
+
+@socketio.on('save_session_data')
+def on_save_session_data(data):  # session_id
+    _save_session_data_helper(data)
+
+
+@bp.route('/save_session_data/', methods=['POST'])
+def save_session_data():
+    # This the HTTP version of the socketio 'save_session_data' event, used in local mode to save session data
+    data = request.get_json()
+    _save_session_data_helper(data)
+    return {'error': False}
 
 
 @socketio.on('leave_session')
