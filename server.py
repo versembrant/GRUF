@@ -98,6 +98,8 @@ class Session(object):
             data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
         if 'compas' not in data:
             data ['compas'] = '4/4'
+        if 'tonality' not in data:
+            data ['tonality'] = 'cmajor'
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
