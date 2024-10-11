@@ -79,6 +79,10 @@ function generateTitle() {
     return title;
 }
 
+function getNomEstacioFromTitle(estacioTipus, nExisting) {
+    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
+}
+
 export const NovaSessio = () => {
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
     const estacionsDefault = Object.keys(estacionsDisponibles);
@@ -104,7 +108,7 @@ export const NovaSessio = () => {
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-            const nomEstacio = `${capitalizeFirstLetter(estacioClassName.replaceAll("_", " "))} ${numEstacionsSameClassAlreadyExisting + 1}`;
+            const nomEstacio = getNomEstacioFromTitle(estacioClassName, numEstacionsSameClassAlreadyExisting);
             const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
@@ -147,12 +151,12 @@ export const NovaSessio = () => {
                         </div>
                     </div>
                     <div className="estacions-list">
-                        <h2>Estacions Triades:</h2>
+                        <h3>Estacions Triades:</h3>
                         <div className="selected-cards">
                             {estacionsSelected.map((tipusEstacio, i) => (
                                 <div className="card" key={tipusEstacio + '_' + i}>
-                                    <p>{tipusEstacio}</p>
-                                    <button className="delete-btn" onClick={() => handleRemoveStation(i)}>X</button>
+                                    {getNomEstacioFromTitle(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
+                                    <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
                                 </div>
                             ))}
                         </div>
@@ -161,15 +165,15 @@ export const NovaSessio = () => {
                             value={selectedOption}
                             onChange={(evt) => setSelectedOption(evt.target.value)}>
                             {Object.keys(estacionsDisponibles).map(tipusEstacio => (
-                                <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>
+                                <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
                             ))}
                         </select>
-                        <button className="add-btn" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+                        <button className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
                         </div>
                     </div>
                     <div className="footer-controls">
-                        <button className="primary-btn" onClick={handleSubmitForm}>Crear GRUF!</button>
-                        <a href={appPrefix + "/"} className="secondary-btn">Torna Enrere</a>
+                        <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <a href={appPrefix + "/"} className="btn">Torna Enrere</a>
                     </div>
                 </div>
             </div>
