@@ -1,9 +1,9 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
+import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
-import { channel } from 'process';
 
 var audioContextIsReady = false;
 
@@ -59,7 +59,7 @@ export class AudioGraph {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
 
@@ -151,7 +151,6 @@ export class AudioGraph {
             return 16 * nCompassos;
         }
     }
-
 
     isGraphBuilt() {
         return this.store.getState().isGraphBuilt;
@@ -275,10 +274,10 @@ export class AudioGraph {
         Tone.Transport.bpm.value = this.getBpm();
 
         // Crea els nodes master  (per tenir un controls general)
-        this.masterMeterNode = new Tone.Meter({ channels:2 });
+        this.masterMeterNode = new Tone.Meter({ channels:2, channelCount: 2 });
         this.masterLimiter = new Tone.Limiter(-1).toDestination();
-        //this.masterPanNode = new Tone.Panner().connect(this.masterLimiter);
         this.masterGainNode = new Tone.Channel({
+            channelCount: 2,
             volume: this.getMasterGain(),
             pan: this.getMasterPan(),
         }).chain(this.masterMeterNode, this.masterLimiter);
@@ -297,9 +296,10 @@ export class AudioGraph {
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
-            const estacioMasterChannel = new Tone.Channel().connect(this.masterGainNode);
-            const estacioPremuteChannel = new Tone.Gain().connect(estacioMasterChannel);
+            const estacioMasterChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
+            const estacioPremuteChannel = new Tone.Channel();
             const estacioMeterNode = new Tone.Meter();
+            estacioPremuteChannel.connect(estacioMasterChannel);
             estacioPremuteChannel.connect(estacioMeterNode);
             estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
@@ -434,7 +434,6 @@ export class AudioGraph {
             document.dispatchEvent(event);
         }
     }
-
 
     updateParametreAudioGraph(nomParametre, valor) {
         if (!getCurrentSession().localMode) {
