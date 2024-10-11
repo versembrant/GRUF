@@ -842,7 +842,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     const selectedSoundName = estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset());
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
-        [...getCurrentSession().getRecordedFiles().map(item => ({'label': item, 'value': item})),
+        [...getCurrentSession().getRecordedFiles().map((item, i) => ({'label': 'Gravació usuari ' + (i + 1), 'value': item})),
         ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
     ];
     const optionNames = options.map(item => item.value);
