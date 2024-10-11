@@ -12,14 +12,14 @@ const handlePlayButton = async () => {
 
 export const handlePlayArranjementButton = async () => {  
     if (!getAudioGraphInstance().isPlaying()){
-        getAudioGraphInstance().updateParametreAudioGraph('playingArranjement', true)
+        getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjement', true)
         setTimeout(() => {
-            // Give it some time make sure playingArranjement is updated
+            // Give it some time make sure isPlayingArranjement is updated
             getAudioGraphInstance().transportStart();
         }, 100)
     } else {
         getAudioGraphInstance().transportStop();
-        // No need to set playingArranjement to false here as this is done automatically when hitting transportStop
+        // No need to set isPlayingArranjement to false here as this is done automatically when hitting transportStop
     }
 }
 
@@ -35,13 +35,13 @@ const handleCompasChange = (e) => {
 
 export const AudioTransportControls = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
-    if (!getAudioGraphInstance().graphIsBuilt()){return (<div></div>);}// If graph is not built, don't show the play/stop button
+    if (!getAudioGraphInstance().isGraphBuilt()){return (<div></div>);}// If graph is not built, don't show the play/stop button
     return (
         <div>
             <div>
                 <button onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? 'Stop' : 'Play'}</button>
                 <label>
-                    <input type="checkbox" checked={getAudioGraphInstance().isPlayingArranjement()} onChange={() => getAudioGraphInstance().updateParametreAudioGraph('playingArranjement', !getAudioGraphInstance().isPlayingArranjement())}/> Play arranjement
+                    <input type="checkbox" checked={getAudioGraphInstance().isPlayingArranjement()} onChange={() => getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjement', !getAudioGraphInstance().isPlayingArranjement())}/> Play arranjement
                 </label>
             </div>
             <div>
@@ -75,10 +75,10 @@ export const AudioTransportControls = () => {
 
 export const AudioTransportPlayStop = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
-    // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "playing" si s'està fent play en mode live, no en mode arranjement
+    // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "isPlaying" si s'està fent play en mode live, no en mode arranjement
     return (
         <div>
-            <button disabled={!getAudioGraphInstance().graphIsBuilt()} className="btn btn-petit btn-menys-marge" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/stop_button.svg"): (appPrefix + "/static/src/img/stop_button_grid.svg")}/> : <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/play_button.svg"):(appPrefix + "/static/src/img/play_button_grid.svg")}/>}</button>
+            <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" onClick={handlePlayButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/stop_button.svg"): (appPrefix + "/static/src/img/stop_button_grid.svg")}/> : <img height="16px" src={getAudioGraphInstance().isPlayingLive() ? (appPrefix + "/static/src/img/play_button.svg"):(appPrefix + "/static/src/img/play_button_grid.svg")}/>}</button>
         </div>
     )
 };

@@ -136,8 +136,8 @@ export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
 
     if (ui === "minimal") {
         return (<div>
-            {!isRecButtonDisabled ? <button className="btn btn-petit btn-vermell sampler-record-btn" id="startRecording" onClick={handleRecButton}>Rec</button>:""}
-            {!isStopButtonDisabled ? <button className="btn btn-petit btn-vermell sampler-recording-btn" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
+            {!isRecButtonDisabled ? <button className="btn-petit btn-vermell sampler-record-btn" id="startRecording" onClick={handleRecButton}>Rec</button>:""}
+            {!isStopButtonDisabled ? <button className="btn-petit btn-vermell sampler-recording-btn" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
             <div id="inputMeterInner" style={{width:'0%', height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
             <div style={{display:"none"}}>
                 <span id="recordingLength"></span>

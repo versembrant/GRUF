@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
+import { makePartial } from 'redux-partial';
 import { sendMessageToServer } from "./serverComs";
 import { ensureValidValue } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
@@ -99,7 +100,7 @@ export class EstacioBase {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setParametreInStore(nomParametre, valor, preset) {
@@ -166,7 +167,7 @@ export class EstacioBase {
         this.setParametreInStore(nomParametre, valor, preset);
 
         // Triguejem canvi a l'audio graph
-        if (getAudioGraphInstance().graphIsBuilt()){
+        if (getAudioGraphInstance().isGraphBuilt()){
             this.updateAudioGraphParameter(nomParametre, preset)
         }
     }
@@ -293,7 +294,7 @@ export class EstacioBase {
 
     setCurrentPreset(preset) {
         this.currentPreset = preset
-        if (getAudioGraphInstance().graphIsBuilt()){
+        if (getAudioGraphInstance().isGraphBuilt()){
             this.updateAudioGraphFromState(preset)
         }
     }
@@ -349,7 +350,7 @@ export class Session {
         this.useAudioEngine = true
         this.localMode = local
         this.performLocalUpdatesBeforeServerUpdates = true
-        this.continuousControlThrottleTime = 100
+        this.continuousControlThrottleTime = 50
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data
@@ -378,7 +379,7 @@ export class Session {
                 }
             }
         });
-        this.store = createStore(combineReducers(reducers));
+        this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
     setAudioOff() {
@@ -433,12 +434,35 @@ export class Session {
         data.bpm = getAudioGraphInstance().getBpm();
         data.swing = getAudioGraphInstance().getSwing();
         data.compas = getAudioGraphInstance().getCompas();
+        data.tonality = getAudioGraphInstance().getTonality();
         data.effectParameters = getAudioGraphInstance().getEffectParameters();
         return data
     }
 
     saveDataInServer() {
         sendMessageToServer('save_session_data', {session_id: this.getID(), full_session_data: this.getSessionDataObject()});
+    }
+
+    saveDataInServerUsingPostRequest(callback) {
+        // In local mode we don't have an active web sockets connection, therefore to save the session we can use a post request
+        const url = appPrefix + '/save_session_data';
+        fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                session_id: this.getID(), 
+                full_session_data: this.getSessionDataObject()
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => {
+            return response.json()
+        }).then(data => {
+            callback(data)
+        })
+        .catch(error => {
+            console.error(error);
+        });
     }
     
     updateParametreSessio(nomParametre, valor) {
@@ -476,6 +500,14 @@ export class Session {
         return this.store.getState().live.gainsEstacions
     }
 
+    getLivePansEstacions() {
+        return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+    }
+
+    getLivePanEstacio(nomEstacio) {
+        return this.getLivePansEstacions()[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+    }
+
     getLiveMutesEstacions() {
         return this.store.getState().live.mutesEstacions
     }
@@ -504,6 +536,13 @@ export class Session {
         this.updateParametreLive({
             accio: 'set_gains',
             gains_estacions: gainsEstacions,
+        })
+    }
+
+    liveSetPansEstacions(pansEstacions) {
+        this.updateParametreLive({
+            accio: 'set_pans',
+            pans_estacions: pansEstacions || {},  // per compatibilitat amb sessins que no tenien pans
         })
     }
 
@@ -538,7 +577,7 @@ export class Session {
     }
 
     setEstacionsMutesAndSolosInChannelNodes(mutes, solos) {
-        if (!getAudioGraphInstance().graphIsBuilt()){ return; };
+        if (!getAudioGraphInstance().isGraphBuilt()){ return; };
         const someAreSoloed = Object.values(solos).some(solo => solo === true);
         Object.keys(mutes).forEach(nomEstacio => {
             const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
@@ -558,9 +597,22 @@ export class Session {
                 const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
                 if (channelNode !== undefined){
                     const volume = Tone.gainToDb(updateData.gains_estacions[nomEstacio]);
-                    channelNode.volume.value = volume;
+                    channelNode.volume.linearRampTo(volume, 0.01);
                 }
                 this.setEstacionsMutesAndSolosInChannelNodes(liveActualitzat.mutesEstacions, liveActualitzat.solosEstacions);
+            })
+        } else if (updateData.accio === 'set_pans'){
+            if (liveActualitzat.pansEstacions === undefined){
+                liveActualitzat.pansEstacions = {}  // Per compatibilitat amb sessions que no tenien pans, creem l'objecte si no existeix
+            }
+            Object.keys(updateData.pans_estacions).forEach(nomEstacio => {
+                liveActualitzat.pansEstacions[nomEstacio] = updateData.pans_estacions[nomEstacio];
+                // Update audio graph pans nodes
+                const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+                if (channelNode !== undefined){
+                    const pan = updateData.pans_estacions[nomEstacio];
+                    channelNode.pan.linearRampTo(pan, 0.01);
+                }
             })
         } else if (updateData.accio === 'set_mutes') {
             Object.keys(updateData.mutes_estacions).forEach(nomEstacio => {
