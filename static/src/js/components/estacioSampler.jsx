@@ -59,7 +59,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <div style={{position:"absolute", top:"263px", left:"295px"}}>
                     <AudioRecorder ui="minimal" onRecordUploadedCallback={(data) => {
                         console.log("Sound uploaded to server: ", data.url);
-                        estacio.updateParametreEstacio('selecetdSoundName', data.url.split("/").slice(-1)[0])
+                        estacio.updateParametreEstacio('selectedSoundName', data.url.split("/").slice(-1)[0])
                     }} />
                 </div>
             </div>

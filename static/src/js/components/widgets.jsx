@@ -834,8 +834,8 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
 };
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToEstacioParameterChanges(estacio, 'selecetdSoundName');
-    const selectedSoundName = estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset());
+    subscribeToEstacioParameterChanges(estacio, 'selectedSoundName');
+    const selectedSoundName = estacio.getParameterValue('selectedSoundName', estacio.getCurrentLivePreset());
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
         [...getCurrentSession().getRecordedFiles().map(item => ({'label': item, 'value': item})),
@@ -864,7 +864,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                         if (selectedOptionIndex >= filteredOptionNames.length) {
                             selectedOptionIndex = filteredOptionNames.length - 1;
                         }
-                        estacio.updateParametreEstacio('selecetdSoundName', filteredOptionNames[selectedOptionIndex])
+                        estacio.updateParametreEstacio('selectedSoundName', filteredOptionNames[selectedOptionIndex])
                     }
                 }
             });
@@ -876,7 +876,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             <Dropdown 
                 value={selectedSoundName}
                 onChange={(evt) => {
-                    estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
+                    estacio.updateParametreEstacio('selectedSoundName', evt.target.value)
                 }} 
                 options={options}
                 placeholder="Cap"

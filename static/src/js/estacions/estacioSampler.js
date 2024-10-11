@@ -77,7 +77,7 @@ export class EstacioSampler extends EstacioBase {
                 initial: '0'
             }
         }), {}),
-        selecetdSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
+        selectedSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
 
         lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 20, max: 3000, initial: 20, logarithmic: true},
@@ -225,7 +225,7 @@ export class EstacioSampler extends EstacioBase {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
         }
 
-        if (name === 'selecetdSoundName') {
+        if (name === 'selectedSoundName') {
             setTimeout( () => {
                 // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
                 this.carregaSoDeLaLlibreria(value);
