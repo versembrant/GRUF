@@ -763,7 +763,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
                 { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
                 { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
-                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 8} left={width.replace('px', '') - 100} height="23px"/>
+                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
             </div>
         </div>
     )
