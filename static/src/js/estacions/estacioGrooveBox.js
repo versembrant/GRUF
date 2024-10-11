@@ -76,6 +76,7 @@ export class EstacioGrooveBox extends EstacioBase {
         atack4: {type: 'enum', label: 'Atack4', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
         release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
         reverbSend4:{type: 'float', label: 'KickReverb ', min: -30, max: 6, initial: -30},
+        cutoff: {type: 'float', label: 'Cutoff', min: 1200, max: 12000, initial: 12000, logarithmic: true},
 
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
@@ -117,9 +118,11 @@ export class EstacioGrooveBox extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
+        const cutoff = new Tone.Filter(500, 'lowpass', -24);
+
         const mainChannel = new Tone.Channel({
             volume: 0
-        })
+        }).connect(cutoff);
 
         const channels = {
             kick: new Tone.Channel(),
@@ -156,8 +159,9 @@ export class EstacioGrooveBox extends EstacioBase {
             sendReverbGainNode3: channels.snare.send("grooveBoxReverb", -100),
             sendReverbGainNode4: channels.kick.send("grooveBoxReverb", -100),
             mainChannel: mainChannel,
+            cutoff: cutoff
         }
-        this.addEffectChainNodes(mainChannel, estacioMasterChannel);
+        this.addEffectChainNodes(cutoff, estacioMasterChannel);
     }
 
     setParameterInAudioGraph(name, value, preset) {
@@ -165,6 +169,8 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.kick.set({
                 'playbackRate': Math.pow(2,(value/12)),
             });
+        } else if (name == 'cutoff'){
+            this.audioNodes.cutoff.frequency.rampTo(value, 0.01);
         } else if (name =='volume4'){
             this.audioNodes.kick.set({
                 'volume': value > -30 ? value: -100,
