@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession, updateParametreEstacio } from "../sessionManager";
-import { indexOfArrayMatchingObject, clamp, necessitaSwing, getNomPatroOCap, hasPatronsPredefinits} from '../utils';
+import { indexOfArrayMatchingObject, clamp, necessitaSwing, getNomPatroOCap, hasPatronsPredefinits, units} from '../utils';
 import { AudioGraph, getAudioGraphInstance } from '../audioEngine';
 import { EstacioGrooveBoxUI } from "../components/estacioGrooveBox";
 import { sampleLibrary} from "../sampleLibrary";
@@ -49,7 +49,7 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
 
-        volume: {type: 'float', label: 'Volume', min: -30, max: 6, initial: 0},
+        volume: {type: 'float', label: 'Volume', unit: units.decibel, min: -30, max: 6, initial: 0},
 
         ...Object.fromEntries(
             sounds.flatMap((sound, index) => {
@@ -57,27 +57,27 @@ export class EstacioGrooveBox extends EstacioBase {
                 return [
                     [`sound${i}URL`, { type: 'text', label: sound, initial: getSoundURL(i, 'Hip Hop Classic 1') }],
                     [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
-                    [`tone${i}`, { type: 'enum', label: `${sound}Tone`, options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0' }],
-                    [`volume${i}`, { type: 'float', label: `${sound}Volume`, min: -30, max: 6, initial: 0 }],
-                    [`attack${i}`, { type: 'enum', label: `${sound}Attack`, options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'], initial: '0' }],
-                    [`release${i}`, { type: 'enum', label: `${sound}Release`, options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0' }],
-                    [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, min: -30, max: 6, initial: -30 }]
+                    [`tone${i}`, { type: 'enum', label: `${sound}Tone`, unit: units.decibel, options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0' }],
+                    [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: 0 }],
+                    [`attack${i}`, { type: 'enum', label: `${sound}Attack`, unit: units.second, options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'], initial: '0' }],
+                    [`release${i}`, { type: 'enum', label: `${sound}Release`, unit: units.second, options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0' }],
+                    [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, unit: units.decibel, min: -30, max: 6, initial: -30 }]
                 ]
             })
         ),
 
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
-        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
         fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
         fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1, initial: 0.0},
         fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
         fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
         fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
-        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
-        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+        fxLow:{type: 'float', label:'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label:'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label:'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
     }
 
     getNumSteps (){
