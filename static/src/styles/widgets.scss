@@ -53,12 +53,10 @@
         position: absolute;
         inset: 50%;
         text-align: center;
-        border: 1px solid $font-color;
-        width: 4ch; // TODO: make it change depending on how much info is there
-        height: fit-content;
         text-wrap: nowrap; // should fit in a single line, useful for debugging
+        height: fit-content;
+        border: 1px solid $font-color;
         border-radius: 5px;
-        padding: 0 0.7em;
         background-color: $background-color;
         visibility: hidden;
     }
