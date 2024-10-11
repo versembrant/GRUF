@@ -76,12 +76,16 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const angleMin = -145;
     const angleMax = 145;
     const angle = normValue * (angleMax - angleMin) + angleMin;
-
+    
+    const valueRawDisplayFn = (value) => {
+        const THINSPACE = " ";
+        const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
+        return value.toFixed(2) + unitInfo;
+    }
+    const maxChWidth = Math.max(valueRawDisplayFn(parameterDescription.min).length, valueRawDisplayFn(parameterDescription.max).length);
+    const outputWidth = `${maxChWidth}ch`; // TODO: improve algorithm, remove jittering
+    
     const knobctrlId = useId();
-
-    const THINSPACE = " ";
-    const outputText = parameterValue.toFixed(2) + (parameterDescription.unit ? THINSPACE + parameterDescription.unit : "");
-
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper">
@@ -93,13 +97,13 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                         mapFrom01={(x) => norm2Real(x, parameterDescription)}
                         onValueRawChange={throttle((val) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, val), getCurrentSession().continuousControlThrottleTime)}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
-                        valueRawDisplayFn={()=>true}
+                        valueRawDisplayFn={valueRawDisplayFn}
                         dragSensitivity="0.009"
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
                 <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
-                <output htmlFor={knobctrlId}>{outputText}</output>
+                <output htmlFor={knobctrlId} style={{width: outputWidth}}>{valueRawDisplayFn(parameterValue)}</output>
         </div>
     )
 };
