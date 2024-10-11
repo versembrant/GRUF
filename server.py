@@ -98,6 +98,8 @@ class Session(object):
             data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
         if 'compas' not in data:
             data ['compas'] = '4/4'
+        if 'tonality' not in data:
+            data ['tonality'] = 'cmajor'
 
         # Transform old grid saved data to new object-based format
         for estacio_nom, estacio in data['estacions'].items():
@@ -236,6 +238,11 @@ class Session(object):
         if update_data['accio'] == 'set_gains':
             for nom_estacio, valor in update_data['gains_estacions'].items():
                 self.data['live']['gainsEstacions'][nom_estacio] = valor
+        elif update_data['accio'] == 'set_pans':
+            for nom_estacio, valor in update_data['pans_estacions'].items():
+                if 'pansEstacions' not in self.data['live']:
+                    self.data['live']['pansEstacions'] = {}  # Per compatibilitat amb sessions antigues que no tenien pans
+                self.data['live']['pansEstacions'][nom_estacio] = valor
         elif update_data['accio'] == 'set_mutes':
             for nom_estacio, valor in update_data['mutes_estacions'].items():
                 self.data['live']['mutesEstacions'][nom_estacio] = valor
@@ -449,13 +456,25 @@ def on_request_session_data(data):  # session_id
     emit('set_session_data', s.get_full_data())
 
 
-@socketio.on('save_session_data')
-def on_save_session_data(data):  # session_id
+def _save_session_data_helper(data):
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
     log(f'Saving session data for session {data['session_id']}')
     Session(data['full_session_data'])  # This will trigger saving the session to redis and overwriting exsiting one
+
+
+@socketio.on('save_session_data')
+def on_save_session_data(data):  # session_id
+    _save_session_data_helper(data)
+
+
+@bp.route('/save_session_data/', methods=['POST'])
+def save_session_data():
+    # This the HTTP version of the socketio 'save_session_data' event, used in local mode to save session data
+    data = request.get_json()
+    _save_session_data_helper(data)
+    return {'error': False}
 
 
 @socketio.on('leave_session')

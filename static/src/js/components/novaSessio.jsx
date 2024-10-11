@@ -100,7 +100,7 @@ export const NovaSessio = () => {
         sessionData.swing = 0;
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
-        sessionData.live = {'gainsEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
+        sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
@@ -109,6 +109,7 @@ export const NovaSessio = () => {
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
             sessionData.live.gainsEstacions[nomEstacio] = 1.0;
+            sessionData.live.pansEstacions[nomEstacio] = 0.0;
             sessionData.live.mutesEstacions[nomEstacio] = false;
             sessionData.live.solosEstacions[nomEstacio] = false;
             sessionData.live.presetsEstacions[nomEstacio] = 0

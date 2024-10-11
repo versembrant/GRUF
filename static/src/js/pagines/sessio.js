@@ -21,15 +21,19 @@ const onSessionDataLoaded = () => {
     getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
     getAudioGraphInstance().setSwing(currentSession.rawData.swing);
     getAudioGraphInstance().setCompas(currentSession.rawData.compas);
+    getAudioGraphInstance().setTonality(currentSession.rawData.tonality);
+
+
     if (currentSession.rawData.effectParameters) { 
         // Only set parameters in store if there are any in the session. This is for compatibility with older sessions
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
     }
     getCurrentSession().liveSetGainsEstacions(currentSession.rawData.live.gainsEstacions);
+    getCurrentSession().liveSetPansEstacions(currentSession.rawData.live.pansEstacions);
     getCurrentSession().liveSetMutesEstacions(currentSession.rawData.live.mutesEstacions);
     getCurrentSession().liveSetSolosEstacions(currentSession.rawData.live.solosEstacions);
     getCurrentSession().liveSetPresetsEstacions(currentSession.rawData.live.presetsEstacions);
-    if (getAudioGraphInstance().graphIsBuilt()) {
+    if (getAudioGraphInstance().isGraphBuilt()) {
         // Si el graph ja està construït, vol dir que estem rebent info nova d'una sessió que
         // ja està carregada. El que fem és re-carregar l'estat a l'audio graph
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {

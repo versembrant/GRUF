@@ -4,7 +4,7 @@ import { getAudioGraphInstance } from './audioEngine';
 
 
 export const buildAudioGraphIfNotBuilt = async () => {  
-    if (!getAudioGraphInstance().graphIsBuilt()) {
+    if (!getAudioGraphInstance().isGraphBuilt()) {
         await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
         getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
     }
@@ -117,6 +117,25 @@ export const subscribeToStoreChanges = (objectWithStore) => {
         return () => unsubscribe();
     }, [setState]);
 }
+
+// Util function to subscribe a react component to partial changes of a store
+export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => {
+    const partialStore = objectWithStore.store.getPartial(storeFilter)
+    const [, setState] = useState(partialStore.getState());
+    useEffect(() => {
+        const unsubscribe = partialStore.subscribe(() => {
+            setState(partialStore.getState());
+        });
+        return () => {
+            unsubscribe()};
+    }, [setState, storeFilter]);
+}
+
+// Util function to subscribe a react component to changes of a change of a parameter of a estacio
+export const subscribeToEstacioParameterChanges = (estacio, nomParametre) => {
+    return subscribeToPartialStoreChanges(estacio, nomParametre);
+}
+
 
 // Util function to render a react component in a DOM element
 export const renderReactComponentInElement = (reactComponent, elementID, props={}, reactRoot=undefined) => {

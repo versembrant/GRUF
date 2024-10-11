@@ -95,6 +95,14 @@ export class MonoSynth extends EstacioBase {
         } 
     }
 
+    adjustNoteForWaveform(note) {
+        const waveform = this.getParameterValue('waveform', this.currentPreset);
+        if (waveform === 'sine' || waveform === 'triangle') {
+            return note + 12; 
+        }
+        return note;
+    }
+
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
@@ -108,7 +116,8 @@ export class MonoSynth extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(note.n, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
+                const ajustedNote = this.adjustNoteForWaveform(note.n);
+                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(ajustedNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
             }
         }
     }
@@ -121,7 +130,7 @@ export class MonoSynth extends EstacioBase {
     lastNoteOnBeats = {}
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
 
         const notes = this.getParameterDescription('notes');
         if (notes.hasOwnProperty('rangDeNotesPermeses')){
@@ -131,7 +140,8 @@ export class MonoSynth extends EstacioBase {
 
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
-            this.audioNodes.synth.triggerAttack(Tone.Frequency(midiNoteNumber, "midi").toNote(), Tone.now());
+            const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
+            this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
             if (recEnabled){
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
