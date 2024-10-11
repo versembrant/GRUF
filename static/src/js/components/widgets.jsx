@@ -886,6 +886,8 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     )
 }
 
+
+// TODO: position: relative should be default for knobs
 export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
     const attackParamName = `attack${soundNumber}`;
     const decayParamName = `decay${soundNumber}`;
@@ -896,10 +898,10 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
         <div className="gruf-adsr-widget" style={{top, left, height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} label='Attack'/>
-                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} label='Decay'/>
-                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} label='Sustain'/>
-                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} label='Release'/>
+                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
+                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
+                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
+                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
             </div>
         </div>
     )
