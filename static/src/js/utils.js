@@ -224,3 +224,10 @@ export const removeURLParam = (paramName) => {
         window.history.replaceState(null, null, newUrl)
     }    
 }
+
+export const units = {
+    second: 's',
+    hertz: 'Hz',
+    decibel: 'dB',
+    percent: '%'
+}
