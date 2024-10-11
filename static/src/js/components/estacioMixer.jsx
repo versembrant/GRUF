@@ -337,7 +337,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
             <div className="estacio-main">
-                <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => { setEstacioSelected(undefined); }} />
+                <GrufButtonNoBorder text="Canvia estació" top="44px" left="830px" onClick={() => { setEstacioSelected(undefined); }} />
                 <div className="estacio-mixer-container">
                     <div className="estacio-mixer-normal-tracks">
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
