@@ -220,6 +220,12 @@
     }
 }
 
+.estacio-mixer-normal-tracks{
+    display: flex;
+    flex: auto;
+    overflow-x: auto;
+}
+
 @property --meter-level {
     syntax: "<percentage>";
     inherits: false;
@@ -303,12 +309,6 @@
         position: absolute;
         bottom: -25px;
     } 
-}
-
-.mixer-master-container{
-    display: flex;
-    flex: auto;
-    justify-content: right;
 }
 
 .estacio-mixer-master-columna {

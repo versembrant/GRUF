@@ -339,6 +339,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
             <div className="estacio-main">
                 <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => { setEstacioSelected(undefined); }} />
                 <div className="estacio-mixer-container">
+                    <div className="estacio-mixer-normal-tracks">
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
@@ -352,15 +353,14 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             />
                         );
                     })}
-                    <div className="mixer-master-container">
-                        <div className="estacio-mixer-master-columna">
-                            <GrufMasterPanKnob/>
-                            <div className="slider-wrapper">
-                            <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                            <GrufMasterMeter showLevelMeters={showLevelMeters} />
-                            </div>
-                            <div className="master-label">Master</div>
+                    </div>
+                    <div className="estacio-mixer-master-columna">
+                        <GrufMasterPanKnob/>
+                        <div className="slider-wrapper">
+                        <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                        <GrufMasterMeter showLevelMeters={showLevelMeters} />
                         </div>
+                        <div className="master-label">Master</div>
                     </div>
                 </div>
             </div>
