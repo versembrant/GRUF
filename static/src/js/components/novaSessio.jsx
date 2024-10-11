@@ -103,7 +103,7 @@ export const NovaSessio = () => {
         sessionData.bpm = 120;
         sessionData.swing = 0;
         sessionData.modBars = 4;
-        sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
+        sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
