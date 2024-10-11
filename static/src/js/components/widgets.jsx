@@ -82,8 +82,6 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
         const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
         return value.toFixed(2) + unitInfo;
     }
-    const maxChWidth = Math.max(valueRawDisplayFn(parameterDescription.min).length, valueRawDisplayFn(parameterDescription.max).length);
-    const outputWidth = `${maxChWidth}ch`; // TODO: improve algorithm, remove jittering
     
     const knobctrlId = useId();
     return (
@@ -103,7 +101,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                     />
                 </div>
                 <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
-                <output htmlFor={knobctrlId} style={{width: outputWidth}}>{valueRawDisplayFn(parameterValue)}</output>
+                <output htmlFor={knobctrlId}>{valueRawDisplayFn(parameterValue)}</output>
         </div>
     )
 };
