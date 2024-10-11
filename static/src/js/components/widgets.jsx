@@ -77,7 +77,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const angleMax = 145;
     const angle = normValue * (angleMax - angleMin) + angleMin;
 
-    const id = useId();
+    const knobctrlId = useId();
 
     const THINSPACE = " ";
     const outputText = parameterValue.toFixed(2) + (parameterDescription.unit ? THINSPACE + parameterDescription.unit : "");
@@ -85,7 +85,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper">
-                    <KnobHeadless id={id} className="knobctrl" style={{rotate: `${angle}deg`}}
+                    <KnobHeadless id={knobctrlId} className="knobctrl" style={{rotate: `${angle}deg`}}
                         valueRaw={parameterValue}
                         valueMin={parameterDescription.min}
                         valueMax={parameterDescription.max}
@@ -98,8 +98,8 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
-                <label for={id}>{label || parameterDescription.label}</label>
-                <output className="knoboutput" for={id}>{outputText}</output>
+                <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
+                <output htmlFor={knobctrlId}>{outputText}</output>
         </div>
     )
 };
