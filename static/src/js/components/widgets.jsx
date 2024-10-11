@@ -4,6 +4,7 @@ import { getAudioGraphInstance } from '../audioEngine';
 import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
@@ -424,7 +425,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     };
 
     const playSample = async (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.playSoundFromPlayer(playerIndex, Tone.now());
@@ -432,7 +433,7 @@ export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) =>
     }; 
 
     const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().graphIsBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()){return;}
         const estacio = getCurrentSession().getEstacio(nomEstacio);
         if (estacio && estacio.playSoundFromPlayer) {
             estacio.stopSoundFromPlayer(playerIndex, Tone.now());
@@ -610,7 +611,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    if (getAudioGraphInstance().isPlaying()) { return};  // Do not trigger notes if we are playing
                     sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
                         sendNoteOff(evt.detail.midiNote, 0);
@@ -786,6 +786,56 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
         </div>
     )
 }
+
+export const GrufSelectorTonalitat = ({ top, left }) => {
+    subscribeToPartialStoreChanges(getAudioGraphInstance(), 'tonality');
+    const tonalityOptions = [
+        { label: 'C Major', value: 'cmajor' },
+        { label: 'C Minor', value: 'cminor' },
+        { label: 'C# Major', value: 'c#major' },
+        { label: 'C# Minor', value: 'c#minor' },
+        { label: 'D Major', value: 'dmajor' },
+        { label: 'D Minor', value: 'dminor' },
+        { label: 'E♭ Major', value: 'ebmajor' },
+        { label: 'E♭ Minor', value: 'ebminor' },
+        { label: 'E Major', value: 'emajor' },
+        { label: 'E Minor', value: 'eminor' },
+        { label: 'F Major', value: 'fmajor' },
+        { label: 'F Minor', value: 'fminor' },
+        { label: 'F# Major', value: 'f#major' },
+        { label: 'F# Minor', value: 'f#minor' },
+        { label: 'G Major', value: 'gmajor' },
+        { label: 'G Minor', value: 'gminor' },
+        { label: 'A♭ Major', value: 'abmajor' },
+        { label: 'A♭ Minor', value: 'abminor' },
+        { label: 'A Major', value: 'amajor' },
+        { label: 'A Minor', value: 'aminor' },
+        { label: 'B♭ Major', value: 'bbmajor' },
+        { label: 'B♭ Minor', value: 'bbminor' },
+        { label: 'B Major', value: 'bmajor' },
+        { label: 'B Minor', value: 'bminor' }
+    ];
+    
+    const currentTonality = getAudioGraphInstance().getTonality();
+
+    const handleTonalityChange = (event) => {
+        const selectedTonality = event.target.value;
+        getAudioGraphInstance().updateParametreAudioGraph('tonality', selectedTonality);
+    };
+
+    return (
+        <div className="tonality-selector" style={{ position: 'absolute', top: top, left: left }}>
+            <Dropdown
+                value={currentTonality}  
+                options={tonalityOptions}  
+                onChange={handleTonalityChange} 
+                placeholder="Selecciona Tonalitat"  
+                scrollHeight="200px"  
+                className="small-font-dropdown"  
+            />
+        </div>
+    );
+};
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     subscribeToEstacioParameterChanges(estacio, 'selecetdSoundName');
