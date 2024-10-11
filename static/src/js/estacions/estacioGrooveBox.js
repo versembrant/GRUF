@@ -29,6 +29,7 @@ const getSoundURL = (soundNumber, presetname) => {
     }
 }
 
+const sounds = ['OpHat', 'CHat', 'Snare', 'Kick'];
 
 export class EstacioGrooveBox extends EstacioBase {
     
@@ -47,35 +48,23 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Trap 2', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":15},{"i":1,"j":4},{"i":3,"j":4},{"i":1,"j":9},{"i":3,"j":15}]},
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
-        sound1URL: {type: 'text', label: 'OpHat', initial: getSoundURL(1, 'Hip Hop Classic 1')}, // OpHat
+
         volume: {type: 'float', label: 'Volume', min: -30, max: 6, initial: 0},
-        swing1: {type: 'float', label: 'Swing1', min: 0, max: 1, initial: 0, followsPreset: true},
-        tone1: {type: 'enum', label: 'Tone1', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
-        volume1: {type: 'float', label: 'OpHatVolume', min: -30, max: 6, initial: 0},
-        atack1: {type: 'enum', label: 'Atack1', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
-        release1: {type: 'enum', label: 'Release1', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
-        reverbSend1:{type: 'float', label: 'OpHatReverb ', min: -30, max: 6, initial: -30},
-        sound2URL: {type: 'text', label: 'CHat', initial: getSoundURL(2, 'Hip Hop Classic 1')}, // CHat
-        swing2: {type: 'float', label: 'Swing2', min: 0, max: 1, initial: 0, followsPreset: true},
-        tone2: {type: 'enum', label: 'Tone2', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
-        volume2: {type: 'float', label: 'CHatVolume', min: -30, max: 6, initial: 0},
-        atack2: {type: 'enum', label: 'Atack2', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
-        release2: {type: 'enum', label: 'Release2', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
-        reverbSend2:{type: 'float', label: 'CHatReverb ', min: -30, max: 6, initial: -30},
-        sound3URL: {type: 'text', label: 'Snare', initial: getSoundURL(3, 'Hip Hop Classic 1')}, // Snare
-        swing3: {type: 'float', label: 'Swing3', min: 0, max: 1, initial: 0, followsPreset: true},
-        tone3: {type: 'enum', label: 'Tone3', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
-        volume3: {type: 'float', label: 'SnareVolume', min: -30, max: 6, initial: 0},
-        atack3: {type: 'enum', label: 'Atack3', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
-        release3: {type: 'enum', label: 'Release3', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
-        reverbSend3:{type: 'float', label: 'SnareReverb ', min: -30, max: 6, initial: -30},
-        sound4URL: {type: 'text', label: 'Kick', initial: getSoundURL(4, 'Hip Hop Classic 1')}, // Kick
-        swing4: {type: 'float', label: 'Swing4', min: 0, max: 1, initial: 0, followsPreset: true},
-        tone4: {type: 'enum', label: 'Tone4', options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0'},
-        volume4: {type: 'float', label: 'KickVolume', min: -30, max: 6, initial: 0},
-        atack4: {type: 'enum', label: 'Atack4', options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9', '1'], initial: '0'},
-        release4: {type: 'enum', label: 'Release4', options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0'},
-        reverbSend4:{type: 'float', label: 'KickReverb ', min: -30, max: 6, initial: -30},
+
+        ...Object.fromEntries(
+            sounds.flatMap((sound, index) => {
+                const i = index + 1;
+                return [
+                    [`sound${i}URL`, { type: 'text', label: sound, initial: getSoundURL(i, 'Hip Hop Classic 1') }],
+                    [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
+                    [`tone${i}`, { type: 'enum', label: `${sound}Tone`, options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0' }],
+                    [`volume${i}`, { type: 'float', label: `${sound}Volume`, min: -30, max: 6, initial: 0 }],
+                    [`attack${i}`, { type: 'enum', label: `${sound}Attack`, options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'], initial: '0' }],
+                    [`release${i}`, { type: 'enum', label: `${sound}Release`, options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0' }],
+                    [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, min: -30, max: 6, initial: -30 }]
+                ]
+            })
+        ),
 
         // FX
         fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},

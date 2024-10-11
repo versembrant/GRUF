@@ -45,22 +45,22 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnobPetit estacio={estacio} parameterName="volume4" top="85.0%" left="5%" label = 'Vol' />
             <GrufKnobPetitDiscret estacio={estacio} parameterName="tone4" top="85.0%" left="9%" label = 'Tone' />
 
-            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack1" top="48.5%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="attack1" top="48.5%" left="77%" label = 'Attack' />
             <GrufKnobPetitDiscret estacio={estacio} parameterName="release1" top="48.5%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend1" top="48.5%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing1" top="48.5%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack2" top="61%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="attack2" top="61%" left="77%" label = 'Attack' />
             <GrufKnobPetitDiscret estacio={estacio} parameterName="release2" top="61%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend2" top="61%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing2" top="61%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack3" top="72.5%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="attack3" top="72.5%" left="77%" label = 'Attack' />
             <GrufKnobPetitDiscret estacio={estacio} parameterName="release3" top="72.5%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend3" top="72.5%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing3" top="72.5%" left="93%" label = 'Swing' />
 
-            <GrufKnobPetitDiscret estacio={estacio} parameterName="atack4" top="85%" left="77%" label = 'Attack' />
+            <GrufKnobPetitDiscret estacio={estacio} parameterName="attack4" top="85%" left="77%" label = 'Attack' />
             <GrufKnobPetitDiscret estacio={estacio} parameterName="release4" top="85%" left="82%" label = 'Release' />
             <GrufKnobPetit estacio={estacio} parameterName="reverbSend4" top="85%" left="87.5%" label = 'Reverb' />
             <GrufKnobPetit estacio={estacio} parameterName="swing4" top="85%" left="93%" label = 'Swing' />
