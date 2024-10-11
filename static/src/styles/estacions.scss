@@ -11,6 +11,7 @@
 
 .tria-estacions {
     height: 690px;
+    overflow: scroll;
 
     h3 {
         color: $white;
@@ -196,7 +197,6 @@
 
 .estacio-mixer-container {
     display: flex; 
-    overflow: scroll;
     flex-direction: row; 
     justify-content: start; 
     align-items: start; 
@@ -223,7 +223,7 @@
 .estacio-mixer-normal-tracks{
     display: flex;
     flex: auto;
-    overflow-x: auto;
+    overflow-x: scroll;
 }
 
 @property --meter-level {
@@ -239,12 +239,13 @@
     justify-content: end; 
     margin: 10px;
     margin-right: 0px;
+    margin-bottom: 30px;
     width: 50px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid var(--accent-color,#{$light-grey});
     height: 100%;
-    margin-top: 75px;
+    margin-top: 68px;
     position: relative;
 
     .slider-wrapper {
@@ -317,13 +318,13 @@
     align-items: center;
     justify-content: end; 
     margin: 10px;
-    margin-right: 0px;
+    margin-right: 10px;
     width: 50px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid $light-grey; 
     height: 100%;
-    margin-top: 75px;
+    margin-top: 68px;
     position: relative;
     .slider-wrapper {
         display: flex;
