@@ -1,4 +1,4 @@
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
@@ -36,8 +36,10 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
             <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
             
+            <GrufSelectorTonalitat top="50.3%" left="81.4%" />
+       
             <GrufSliderDiscret estacio={estacio} parameterName="waveform" top="30%" left="36.5%"  />
-            
+    
             <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="358px" colorNotes="#d43b5d" colorNotesDissalowed="#50121f" allowedNotes={[]}/>
         </div>
     </div>)
