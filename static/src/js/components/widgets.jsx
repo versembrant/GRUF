@@ -885,7 +885,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                 options={options}
                 placeholder="Cap"
             />
-            {showTrashOption ? <button style={{width: "28px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+            {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
         </div>
     )
 }

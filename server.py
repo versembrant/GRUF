@@ -95,7 +95,9 @@ class Session(object):
         if 'swing' not in data:
             data ['swing'] = 0
         if 'arranjament' not in data:
-            data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
+            data['arranjament'] = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
+        else:
+            data['arranjament']['beatsPerStep'] = 32  # Some old sessions had 16 here, force it to be 32 form now on
         if 'compas' not in data:
             data ['compas'] = '4/4'
         if 'tonality' not in data:
