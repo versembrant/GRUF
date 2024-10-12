@@ -764,7 +764,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
                 { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
                 { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
-                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 22} left={width.replace('px', '') - 100} height="23px"/>
+                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
             </div>
         </div>
     )
@@ -843,7 +843,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     const selectedSoundName = estacio.getParameterValue('selectedSoundName', estacio.getCurrentLivePreset());
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
-        [...getCurrentSession().getRecordedFiles().map(item => ({'label': item, 'value': item})),
+        [...getCurrentSession().getRecordedFiles().map((item, i) => ({'label': 'Gravació usuari ' + (i + 1), 'value': item})),
         ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
     ];
     const optionNames = options.map(item => item.value);
@@ -886,7 +886,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                 options={options}
                 placeholder="Cap"
             />
-            {showTrashOption ? <button style={{width: "28px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+            {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
         </div>
     )
 }
