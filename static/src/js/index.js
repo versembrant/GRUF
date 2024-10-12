@@ -8,6 +8,9 @@ import './3rd_party/gruf-pianoroll'
 // CSS
 import '../styles/index.scss'
 
+// favicon
+import '../img/favicon.svg'
+
 
 // Estacions (per afegir noves estacions, s'ha d'importar la classe aquí i registrar-la amb "registerEstacioDisponible")
 import {registerEstacioDisponible} from './sessionManager'
