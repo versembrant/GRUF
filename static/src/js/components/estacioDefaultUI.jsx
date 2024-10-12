@@ -2,7 +2,7 @@ import { createElement, useState, useEffect } from "react";
 import { subscribeToStoreChanges } from "../utils";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, real2Norm, norm2Real, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
+import { indexOfArrayMatchingObject, num2Norm, norm2Num, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom} from "../utils";
 import isequal from 'lodash.isequal'
 
 const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomEstacio}) => {
@@ -14,8 +14,8 @@ const FloatParameterDefaultWidget = ({parameterDescription, parameterValue, nomE
                 min={0.0}
                 max={1.0}
                 step={0.01}
-                value= {real2Norm(parameterValue, parameterDescription)} 
-                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Real(evt.target.value, parameterDescription))}/> 
+                value= {num2Norm(parameterValue, parameterDescription)}
+                onInput={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, norm2Num(evt.target.value, parameterDescription))}/>
                 </div>
     )
 };

@@ -152,19 +152,63 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
 // Parameter range conversions
 const exponent = 2;
 
-export const norm2Real = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow(x, exponent)*(parameterDescription.max-parameterDescription.min)+parameterDescription.min;
-    }else{
-        return x * (parameterDescription.max-parameterDescription.min) + parameterDescription.min;
+export const norm2Num = (normValue, parameterDescription) => {
+    const numMin = getParameterNumericMin(parameterDescription);
+    const numMax = getParameterNumericMax(parameterDescription);
+
+    if(!parameterDescription.logarithmic) return normValue * (numMax-numMin) + numMin;
+    return Math.pow(normValue, exponent)*(numMax-numMin)+numMin;
+}
+
+export const num2Norm = (numValue, parameterDescription) => {
+    const numMin = getParameterNumericMin(parameterDescription);
+    const numMax = getParameterNumericMax(parameterDescription);
+
+    if(!parameterDescription.logarithmic) return (numValue - numMin)/(numMax-numMin);
+    return Math.pow((numValue - numMin)/(numMax-numMin), 1/exponent);
+}
+
+export const real2Num = (realValue, parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return realValue;
+        case 'enum':
+            return parameterDescription.options.indexOf(realValue);
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
 }
 
-export const real2Norm = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow((x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min), 1/exponent);
-    }else{
-        return (x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min);
+export const num2Real = (numValue, parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return numValue;
+        case 'enum':
+            return parameterDescription.options[Math.round(numValue)];
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const getParameterNumericMin = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.min;
+        case 'enum':
+            return 0;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const getParameterNumericMax = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.max;
+        case 'enum':
+            return parameterDescription.options.length - 1;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
 }
 
