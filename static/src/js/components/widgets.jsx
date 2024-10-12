@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
 import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -67,37 +67,49 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
 export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
+    const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToEstacioParameterChanges(estacio, parameterName);
-    const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     const nomEstacio=estacio.nom;
-
-    const normValue = real2Norm(parameterValue, parameterDescription);
+    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const realValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    
+    const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
     const angleMax = 145;
     const angle = normValue * (angleMax - angleMin) + angleMin;
     
-    const valueRawDisplayFn = (value) => {
-        const valueTenExponent = Math.floor(value) === 0 ? 1 : Math.floor(Math.log10(Math.abs(value))) + 1; // the number of digits of the integer
-        const precision = 4; // but integers can have more ciphers
-        const maxDecimals = 2;
-        const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
+    const numValue = real2Num(realValue, parameterDescription) + discreteOffset;
+    const valueRawDisplayFn = (numValue) => {
+        const realValue = num2Real(numValue, parameterDescription);
+        let displayValue;
+        if (parameterDescription.type === 'float') {
+            const valueTenExponent = Math.floor(realValue) === 0 ? 1 : Math.floor(Math.log10(Math.abs(realValue))) + 1; // the number of digits of the integer
+            const precision = 4; // but integers can have more ciphers
+            const maxDecimals = 2;
+            const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
+            displayValue = realValue.toFixed(decimals);
+        } else displayValue = realValue;
+        
         const THINSPACE = " ";
         const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
-        return value.toFixed(decimals) + unitInfo;
+        return displayValue + unitInfo;
     }
-    
+
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper">
                     <KnobHeadless id={knobctrlId} className="knobctrl" style={{rotate: `${angle}deg`}}
-                        valueRaw={parameterValue}
-                        valueMin={parameterDescription.min}
-                        valueMax={parameterDescription.max}
-                        mapTo01={(x) => real2Norm(x, parameterDescription)}
-                        mapFrom01={(x) => norm2Real(x, parameterDescription)}
-                        onValueRawChange={throttle((val) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, val), getCurrentSession().continuousControlThrottleTime)}
+                        valueRaw={numValue}
+                        valueMin={getParameterNumericMin(parameterDescription)}
+                        valueMax={getParameterNumericMax(parameterDescription)}
+                        mapTo01={(x) => num2Norm(x, parameterDescription)}
+                        mapFrom01={(x) => norm2Num(x, parameterDescription)}
+                        onValueRawChange={throttle((newNumValue) => {
+                                const newRealValue = num2Real(newNumValue, parameterDescription);
+                                setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
+                                getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, newRealValue);
+                            }, getCurrentSession().continuousControlThrottleTime)}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
                         valueRawDisplayFn={valueRawDisplayFn}
                         dragSensitivity="0.009"
@@ -105,7 +117,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                     />
                 </div>
                 <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
-                <output htmlFor={knobctrlId}>{valueRawDisplayFn(parameterValue)}</output>
+                <output htmlFor={knobctrlId}>{valueRawDisplayFn(numValue)}</output>
         </div>
     )
 };
@@ -118,67 +130,12 @@ export const GrufKnobPetit = (props) => {
     return <GrufKnob {...props} mida="petit"/>
 };
 
-export const GrufKnobGranDiscret = ({ estacio, parameterName, top, left, label, position="absolute" }) => {
-    const parameterDescription = estacio.getParameterDescription(parameterName);
-    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio = estacio.nom;
-    const options = parameterDescription.options;
-    const optionCount = options.length;
-
-    const currentOptionIndex = options.indexOf(parameterValue);
-
-    return (
-        <div className="knob knob-gran" style={{ top, left, position }}>
-            <Knob
-                value={currentOptionIndex}
-                min={0}
-                max={optionCount - 1}
-                step={1}
-                size={60}
-                onChange={(evt) => {
-                    const selectedIndex = evt.value;
-                    const selectedOption = options[selectedIndex];
-                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, selectedOption);
-                }}
-                valueTemplate=""
-                valueColor={cssVariables.white}
-                rangeColor={cssVariables.grey}
-            />
-            <div>{label || parameterDescription.label}</div>
-        </div>
-    );
+export const GrufKnobGranDiscret = (props) => {
+    return <GrufKnobGran {...props}/>
 };
 
-export const GrufKnobPetitDiscret = ({ estacio, parameterName, top, left, label, position="absolute" }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
-    const parameterDescription = estacio.getParameterDescription(parameterName);
-    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio = estacio.nom;
-    const options = parameterDescription.options;
-    const optionCount = options.length;
-
-    const currentOptionIndex = options.indexOf(parameterValue);
-
-    return (
-        <div className="knob knob-petit" style={{ top, left, position }}>
-            <Knob
-                value={currentOptionIndex}
-                min={0}
-                max={optionCount - 1}
-                step={1}
-                size={25}
-                onChange={(evt) => {
-                    const selectedIndex = evt.value;
-                    const selectedOption = options[selectedIndex];
-                    getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, selectedOption);
-                }}
-                valueTemplate=""
-                valueColor={cssVariables.white}
-                rangeColor={cssVariables.grey}
-            />
-            <div>{label || parameterDescription.label}</div>
-        </div>
-    );
+export const GrufKnobPetitDiscret = (props) => {
+    return <GrufKnobPetit {...props}/>
 };
 
 export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, position="absolute" }) => {
@@ -300,12 +257,12 @@ export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft,
     return (
         <div className="gruf-slider" style={style}>
             <Slider 
-                value={real2Norm(parameterValue, parameterDescription)}
+                value={num2Norm(parameterValue, parameterDescription)}
                 step={0.01}
                 min={0.0}
                 max={1.0}
                 marks={marks}
-                onChange={(evt) => throttle(getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
+                onChange={(evt) => throttle(getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Num(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
             />
         </div>
     )
@@ -341,12 +298,12 @@ export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, 
         <div className={"gruf-slider-vertical " + classeFons} style={style}>
             <Slider
                 orientation="vertical"
-                value={real2Norm(parameterValue, parameterDescription)}
+                value={num2Norm(parameterValue, parameterDescription)}
                 step={0.01}
                 min={0.0}
                 max={1.0}
                 marks={marks} 
-                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
+                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Num(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
             />
         </div>
     )
