@@ -78,9 +78,13 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const angle = normValue * (angleMax - angleMin) + angleMin;
     
     const valueRawDisplayFn = (value) => {
+        const valueTenExponent = Math.floor(value) === 0 ? 1 : Math.floor(Math.log10(Math.abs(value))) + 1; // the number of digits of the integer
+        const precision = 4; // but integers can have more ciphers
+        const maxDecimals = 2;
+        const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
         const THINSPACE = " ";
         const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
-        return value.toFixed(2) + unitInfo;
+        return value.toFixed(decimals) + unitInfo;
     }
     
     const knobctrlId = useId();
