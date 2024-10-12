@@ -1,30 +1,87 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState } from "react";
 import { Navbar, Footer } from "./frontpage";
-import { capitalizeFirstLetter } from "../utils";
+import { capitalizeFirstLetter, capitalize, sample } from "../utils";
 
-function sample(array) {
-    const index = Math.floor(Math.random() * array.length);
-    return array[index];
-  }
+const paraules = {
+    "Mestre": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "Mestressa": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "Sr.": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "Sra.": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "Professor": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "Professora": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "Príncep": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "Princesa": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "El del Poble": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "La del Poble": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "Bella": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "Lord": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "Lady": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "L'estimat": { type: "name_prefix", gender: "masculine", number: "singular" },
+    "L'estimada": { type: "name_prefix", gender: "feminine", number: "singular" },
+    "cristall": { type: "noun", gender: "masculine", plural: "cristalls" },
+    "somni": { type: "noun", gender: "masculine", plural: "somnis" },
+    "corneta": { type: "noun", gender: "feminine", plural: "cornetes" },
+    "lluna": { type: "noun", gender: "feminine", plural: "llunes" },
+    "tronc": { type: "noun", gender: "masculine", plural: "troncs" },
+    "braç": { type: "noun", gender: "masculine", plural: "braços" },
+    "peu gran": { type: "noun", gender: "masculine", plural: "peus grans" },
+    "forat": { type: "noun", gender: "masculine", plural: "forats" },
+    "creador de somnis": { type: "noun", gender: "masculine", plural: "creadors de somnis" },
+    "creadora de somnis": { type: "noun", gender: "feminine", plural: "creadores de somnis" },
+    "castell": { type: "noun", gender: "masculine", plural: "castells" },
+    "molsa": { type: "noun", gender: "feminine", plural: "molses" },
+    "flor": { type: "noun", gender: "feminine", plural: "flors" },
+    "muntanya": { type: "noun", gender: "feminine", plural: "muntanyes" },
+    "història": { type: "noun", gender: "feminine", plural: "històries" },
+    "pluja": { type: "noun", gender: "feminine", plural: "plujes" },
+    "boira": { type: "noun", gender: "feminine", plural: "boires" },
+    "tempesta": { type: "noun", gender: "feminine", plural: "tempestes" },
+    "cor": { type: "noun", gender: "masculine", plural: "cors" },
+    "gos": { type: "noun", gender: "masculine", plural: "gossos" },
+    "cançó": { type: "noun", gender: "feminine", plural: "cançons" },
+    "pedra": { type: "noun", gender: "feminine", plural: "pedres" },
+    "perdut": { type: "adjective", gender: "masculine", plural: "perduts" },
+    "perduda": { type: "adjective", gender: "feminine", plural: "perdudes" },
+    "antic": { type: "adjective", gender: "masculine", plural: "antics" },
+    "antigua": { type: "adjective", gender: "feminine", plural: "antigues" },
+};
+
+function sampleWordObjectByCriteria(criteria, objectCount=1) {
+    const wordObjects = Object.entries(paraules)
+    .filter(([singular, detalls]) => {
+      return Object.entries(criteria).every(([criteri, valor]) => detalls[criteri] === valor);
+    }).map(([singular, detalls]) => ({ ...detalls, singular }));
+
+    return sample(wordObjects, objectCount);
+}
 
 function generateTitle() {
-    var name_prefixes = ["Master", "Mr.", "Professor", "Mrs.", "Princess", "Prince", "The Pauper's", "The", "Betsy", "Billy", "Johnny"];
-    var primary_nouns = ["Crystal", "Bugle", "Dreamer", "Dream", "Castle", "Moss", "Mountain", "Pit", "Bigfoot", "Dream maker", "Oathbreaker", "Bard", "X'arahan'tu", "Magic", "Acorn", "Sun", "Son", "Stump", "Arm"];
-    var adjectives = ["Lost", "Five", "Faded", "Ancient", "Blackened", "Den of", "Despairing", "Golden", "Many", "Merry", "Clever", "Wonderful", "Sullen", "Angry", "Little", "Cowardly", "Silver", "Lasting", "Heavy", "Festive", "Gleeful", "Enchanted", "Wise", "Wistful", "Dark", "Untold"];
-    var secondary_nouns = ["Hearts", "Stones", "Diamond Dogs", "Painted Toes", "Songs", "Tales", "Lords", "Promise", "Screams", "Plagues", "Dreams", "Roads", "Curses", "Spells", "Gloam", "Lands", "Marsh", "Hearts", "Rules", "Swamp", "Tale", "Apex", "Beggar"];
-    var name_prefix = sample(name_prefixes);
-    var primary_noun = sample(primary_nouns);
-    var adjective = sample(adjectives);
-    var secondary_noun = sample(secondary_nouns);
-    var title = "";
+    const [primary_noun_object, secondary_noun_object] = sampleWordObjectByCriteria({ type: "noun" }, 2);
+
+    const primary_noun = primary_noun_object.singular;
+    const gender_primary = primary_noun_object.gender;
+
+    const secondary_noun = secondary_noun_object.plural;
+    const gender_secondary = secondary_noun_object.gender;
+
+    const adjective = sampleWordObjectByCriteria({ type: "adjective", gender: gender_secondary }).plural;
+
+    let title;
+    const secondary_noun_determinant = gender_secondary === 'masculine' ? 'els' : 'les';
     if (Math.random() < 0.5) {
-      title = `${name_prefix} ${primary_noun} and the ${adjective} ${secondary_noun}`;
+        const name_prefix = sampleWordObjectByCriteria({ type: "name_prefix", gender: gender_primary }).singular;
+        title = [name_prefix, capitalize(primary_noun), 'i', secondary_noun_determinant, secondary_noun, adjective].join(" ");
     } else {
-      title = `The ${adjective} ${secondary_noun} of ${name_prefix} ${primary_noun}`;
+        const possessive_determinant = gender_primary === 'masculine' ? 'del' : 'de la';
+        title = [capitalize(secondary_noun_determinant), secondary_noun, adjective, possessive_determinant, primary_noun].join(" ");
     }
     return title;
-  }
+}
+
+function getNomEstacioFromTitle(estacioTipus, nExisting) {
+    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
+}
 
 export const NovaSessio = () => {
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
@@ -41,18 +98,17 @@ export const NovaSessio = () => {
     }
 
     const handleSubmitForm = (evt) => {
-        // Create session data object
         const sessionData = {}
         sessionData.creation_timestamp = new Date().getTime();
         sessionData.bpm = 120;
         sessionData.swing = 0;
         sessionData.modBars = 4;
-        sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 16, 'clips': []}
+        sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
             const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-            const nomEstacio = `${capitalizeFirstLetter(estacioClassName.replaceAll("_", " "))} ${numEstacionsSameClassAlreadyExisting + 1}`;
+            const nomEstacio = getNomEstacioFromTitle(estacioClassName, numEstacionsSameClassAlreadyExisting);
             const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
@@ -63,7 +119,6 @@ export const NovaSessio = () => {
             sessionData.live.presetsEstacions[nomEstacio] = 0
         })
         
-        // Create HTML form with the data and submit it
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '.';
@@ -83,33 +138,46 @@ export const NovaSessio = () => {
     return(
         <div>
             <Navbar/>
-            <div className="nou-gruf">
-                <h1>Nou GRUF</h1>
-                <div>
-                    Nom:<input
-                        style={{width:"300px"}}
-                        value={nomSessio}
-                        onChange={e => setNomSessio(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <br/>
-                    Estacions triades:
-                    <ul>
-                        {estacionsSelected.map((tipusEstacio, i) => <li key={tipusEstacio + '_' + i}>{tipusEstacio} - <button className="btn-petit btn-vermell" onClick={() => handleRemoveStation(i)}>eliminar</button></li>)}
-                    </ul>
-                    <select
-                        value={selectedOption}
-                        onChange={(evt) => setSelectedOption(evt.target.value)}>
-                        {Object.keys(estacionsDisponibles).map(tipusEstacio => <option key={tipusEstacio} value={tipusEstacio}>{tipusEstacio}</option>)}
-                    </select>
-                    <button className="btn-petit" onClick={(evt) => handleAddStation(selectedOption)}>Afegeix estació</button>
-                </div>
-                <div className="enrere">
-                    <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>&nbsp;
-                    <a href={appPrefix + "/"}>Torna enrere</a>
+            <div className="nova-sessio-container">
+                <div className="nova-sessio-wrapper">
+                    <div className="sessio-header">
+                        <h1>Nou GRUF</h1>
+                        <div className="input-title">
+                            <input
+                                value={nomSessio}
+                                onChange={e => setNomSessio(e.target.value)}
+                                placeholder="Nom de la Sessió"
+                            />
+                        </div>
+                    </div>
+                    <div className="estacions-list">
+                        <h3>Estacions Triades:</h3>
+                        <div className="selected-cards">
+                            {estacionsSelected.map((tipusEstacio, i) => (
+                                <div className="card" key={tipusEstacio + '_' + i}>
+                                    {getNomEstacioFromTitle(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
+                                    <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="selector-add-row"> 
+                        <select
+                            value={selectedOption}
+                            onChange={(evt) => setSelectedOption(evt.target.value)}>
+                            {Object.keys(estacionsDisponibles).map(tipusEstacio => (
+                                <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
+                            ))}
+                        </select>
+                        <button className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+                        </div>
+                    </div>
+                    <div className="footer-controls">
+                        <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <a href={appPrefix + "/"} className="btn">Torna Enrere</a>
+                    </div>
                 </div>
             </div>
+            <Footer/>
         </div>
     )
 };

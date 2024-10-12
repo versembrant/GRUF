@@ -6,19 +6,19 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-            <GrufButtonNoBorder text="Canvia estació" top="43px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="8%" left="6.3%" label="Vol" />
             <GrufKnobGranGlobal estacio={estacio} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
-            <GrufKnobGranGlobal estacio={estacio} parameterName="bpm" top="8%" left="29.0%" label = 'Tempo' />
+            <GrufKnobGran estacio={estacio} parameterName="cutoff" top="8%" left="29.0%" label = 'Cutoff' />
             <GrufBpmCounter top="8%" left="39.6%" />
             <GrufLabel text="bpm" top="17.3%" left="41%" />
             
-            <GrufLabel text="Reverb" top="7.3%" left="51.7%" />
+            <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
             <GrufLabel text="Durada" top="12.7%" left="51.7%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
             <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
             
-            <GrufLabel text="Delay" top="14.1%" left="82.5%" />
+            <GrufLabel text="Delay" top="14.2%" left="82.5%" />
             <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
             <GrufLabel text="EQ" top="29.6%" left="51.7%" />
             <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />

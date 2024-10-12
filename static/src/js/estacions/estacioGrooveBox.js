@@ -50,6 +50,7 @@ export class EstacioGrooveBox extends EstacioBase {
         ], followsPreset: true},
 
         volume: {type: 'float', label: 'Volume', unit: units.decibel, min: -30, max: 6, initial: 0},
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
 
         ...Object.fromEntries(
             sounds.flatMap((sound, index) => {
@@ -106,9 +107,11 @@ export class EstacioGrooveBox extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
+        const cutoff = new Tone.Filter(500, 'lowpass', -24);
+
         const mainChannel = new Tone.Channel({
             volume: 0
-        })
+        }).connect(cutoff);
 
         const channels = {
             kick: new Tone.Channel(),
@@ -145,8 +148,9 @@ export class EstacioGrooveBox extends EstacioBase {
             sendReverbGainNode3: channels.snare.send("grooveBoxReverb", -100),
             sendReverbGainNode4: channels.kick.send("grooveBoxReverb", -100),
             mainChannel: mainChannel,
+            cutoff: cutoff
         }
-        this.addEffectChainNodes(mainChannel, estacioMasterChannel);
+        this.addEffectChainNodes(cutoff, estacioMasterChannel);
     }
 
     setParameterInAudioGraph(name, value, preset) {
@@ -154,6 +158,8 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.kick.set({
                 'playbackRate': Math.pow(2,(value/12)),
             });
+        } else if (name == 'cutoff'){
+            this.audioNodes.cutoff.frequency.rampTo(value, 0.01);
         } else if (name =='volume4'){
             this.audioNodes.kick.set({
                 'volume': value > -30 ? value: -100,

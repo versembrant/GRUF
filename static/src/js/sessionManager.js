@@ -407,7 +407,7 @@ export class Session {
     }
 
     getRecordedFiles() {
-        return this.store.getState().recorded_files
+        return this.store.getState().recorded_files.sort()
     }
 
     getNomsEstacions() {
