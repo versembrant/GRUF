@@ -74,7 +74,10 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     else subscribeToEstacioParameterChanges(estacio, parameterName);
 
     const nomEstacio=estacio.nom;
-    const parameterDescription=estacio.getParameterDescription(parameterName);
+    const parameterDescription =
+    (parameterName === 'volume') ?  {type: 'float', min: 0, max: 1} : // TODO: DON'T HARDCODE!!!
+    (parameterName === 'swing') ? getAudioGraphInstance().getParameterDescription(parameterName) :
+    estacio.getParameterDescription(parameterName);
 
     const realValue = 
     (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
@@ -103,6 +106,22 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
         return displayValue + unitInfo;
     }
 
+    const handleKnobChange = (newNumValue) => {
+        const newRealValue = num2Real(newNumValue, parameterDescription);
+        setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
+        setNewRealValue(newRealValue);
+    }
+
+    const setNewRealValue = (newRealValue) => {
+        if (parameterName === 'volume') {
+            const currentGains = getCurrentSession().getLiveGainsEstacions();
+            currentGains[estacio.nom] = parseFloat(newRealValue, 10);
+            getCurrentSession().liveSetGainsEstacions(currentGains);
+        }
+        else if (parameterName === 'swing') getAudioGraphInstance().updateParametreAudioGraph(parameterName, newRealValue);
+        else getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, newRealValue);
+    }
+
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
@@ -113,11 +132,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                         valueMax={getParameterNumericMax(parameterDescription)}
                         mapTo01={(x) => num2Norm(x, parameterDescription)}
                         mapFrom01={(x) => norm2Num(x, parameterDescription)}
-                        onValueRawChange={throttle((newNumValue) => {
-                                const newRealValue = num2Real(newNumValue, parameterDescription);
-                                setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
-                                getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, newRealValue);
-                            }, getCurrentSession().continuousControlThrottleTime)}
+                        onValueRawChange={throttle(newNumValue => handleKnobChange(newNumValue), getCurrentSession().continuousControlThrottleTime)}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
                         valueRawDisplayFn={valueRawDisplayFn}
                         dragSensitivity="0.009"
@@ -146,44 +161,8 @@ export const GrufKnobPetitDiscret = (props) => {
     return <GrufKnobPetit {...props}/>
 };
 
-export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, position="absolute" }) => {
-    
-    var parameterValue;
-    if (parameterName === 'swing') {
-        subscribeToPartialStoreChanges(getAudioGraphInstance(), parameterName);
-        parameterValue = getAudioGraphInstance().getSwing();
-    } else if (parameterName === 'volume') {
-        subscribeToPartialStoreChanges(getCurrentSession(), 'live');
-        parameterValue = getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0;
-        
-    }
-
-    const handleKnobChange = (value) => {
-        if (parameterName === 'swing') {
-            getAudioGraphInstance().updateParametreAudioGraph(parameterName, value);
-        } else if (parameterName === 'volume') {
-            const currentGains = getCurrentSession().getLiveGainsEstacions();
-            currentGains[estacio.nom] = parseFloat(value, 10);
-            getCurrentSession().liveSetGainsEstacions(currentGains);  
-        }
-    };
-
-    return (
-        <div className="knob knob-gran" style={{ top: top, left: left, position }}>
-            <Knob
-                value={parameterValue}
-                min={0}
-                max={1}
-                step={0.01}
-                size={60}
-                onChange={throttle((e) => handleKnobChange(e.value), getCurrentSession().continuousControlThrottleTime)}
-                valueTemplate={""}
-                valueColor={cssVariables.white}
-                rangeColor={cssVariables.grey}            
-            />
-            <div>{label || parameterName}</div>
-        </div>
-    );
+export const GrufKnobGranGlobal = (props) => {
+    return <GrufKnobGran {...props}/>
 };
 
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
