@@ -142,11 +142,8 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, p
     
     var parameterValue;
     if (parameterName === 'swing') {
-        subscribeToPartialStoreChanges(getAudioGraphInstance(), 'swing');
+        subscribeToPartialStoreChanges(getAudioGraphInstance(), parameterName);
         parameterValue = getAudioGraphInstance().getSwing();
-    } else if (parameterName === 'bpm') {
-        subscribeToPartialStoreChanges(getAudioGraphInstance(), 'bpm');
-        parameterValue = getAudioGraphInstance().getBpm();
     } else if (parameterName === 'volume') {
         subscribeToPartialStoreChanges(getCurrentSession(), 'live');
         parameterValue = getCurrentSession().getLiveGainsEstacions()[estacio.nom] || 0;
@@ -155,9 +152,7 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, p
 
     const handleKnobChange = (value) => {
         if (parameterName === 'swing') {
-            getAudioGraphInstance().updateParametreAudioGraph('swing', value);
-        } else if (parameterName === 'bpm') {
-            getAudioGraphInstance().updateParametreAudioGraph('bpm', value);
+            getAudioGraphInstance().updateParametreAudioGraph(parameterName, value);
         } else if (parameterName === 'volume') {
             const currentGains = getCurrentSession().getLiveGainsEstacions();
             currentGains[estacio.nom] = parseFloat(value, 10);
@@ -169,9 +164,9 @@ export const GrufKnobGranGlobal = ({ parameterName, estacio, top, left, label, p
         <div className="knob knob-gran" style={{ top: top, left: left, position }}>
             <Knob
                 value={parameterValue}
-                min={parameterName === 'bpm' ? 40 : 0} 
-                max={parameterName === 'bpm' ? 300 : 1}
-                step={parameterName === 'bpm' ? 1 : 0.01}
+                min={0}
+                max={1}
+                step={0.01}
                 size={60}
                 onChange={throttle((e) => handleKnobChange(e.value), getCurrentSession().continuousControlThrottleTime)}
                 valueTemplate={""}
