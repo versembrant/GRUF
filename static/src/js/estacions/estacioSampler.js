@@ -70,12 +70,7 @@ export class EstacioSampler extends EstacioBase {
             [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, unit: units.second, min: 0, max: 4, initial: 0.01},
             [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
-            [`pitch${i + 1}`]: {
-                type: 'enum', 
-                label: `Pitch${i + 1}`, 
-                options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0','1','2','3','4','5','6','7','8','9','10','11','12'], 
-                initial: '0'
-            }
+            [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0}
         }), {}),
         selectedSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
 
