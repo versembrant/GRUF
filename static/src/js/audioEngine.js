@@ -95,7 +95,7 @@ export class AudioGraph {
     getParameterValue(nomParametre) {
         const methodName =  nomParametre.startsWith('is') ? nomParametre : // for booleans
         `get${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`; // for the rest
-        this[methodName]();
+        return this[methodName]();
     }
 
     isPlaying() {
