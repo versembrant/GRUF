@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalize } from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter } from "../utils";
 import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -756,8 +756,11 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
     subscribeToPartialStoreChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
         const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
+        const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
+        const catRoot = root.split('').map(char => rootTranslations[char] || char).join('');
         const mode = option.slice(-5);
-        return {label: capitalize(`${root} ${mode}`), value: option}
+        const catMode = mode.replace('minor', 'menor');
+        return {label: capitalizeFirstLetter(`${catRoot} ${catMode}`), value: option}
     });
     
     const currentTonality = getAudioGraphInstance().getTonality();
