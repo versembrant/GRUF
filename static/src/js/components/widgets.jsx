@@ -13,7 +13,7 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
-import { subscribeToStoreChanges, subscribeToEstacioParameterChanges, subscribeToPartialStoreChanges } from "../utils";
+import { subscribeToStoreChanges, subscribeToEstacioParameterChanges, subscribeToPartialStoreChanges, clamp } from "../utils";
 import throttle from 'lodash.throttle'
 
 
@@ -342,9 +342,11 @@ export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height })
 export const GrufBpmCounter = ({ top, left }) => {
     subscribeToPartialStoreChanges(getAudioGraphInstance(), 'bpm');
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
+    const minBpm = getAudioGraphInstance().getParameterDescription('bpm').min;
+    const maxBpm = getAudioGraphInstance().getParameterDescription('bpm').max;
 
     const handleBpmChange = (newBpm) => {
-        getAudioGraphInstance().updateParametreAudioGraph('bpm', newBpm);
+        getAudioGraphInstance().updateParametreAudioGraph('bpm', clamp(newBpm, minBpm, maxBpm));
     };
 
     return (
@@ -353,8 +355,8 @@ export const GrufBpmCounter = ({ top, left }) => {
                 <InputNumber 
                     value={currentBpm} 
                     onValueChange={(e) => handleBpmChange(e.value)} 
-                    min={40} 
-                    max={300} 
+                    min={minBpm}
+                    max={maxBpm}
                     showButtons={false} 
                     className="p-inputnumber"
                 />
