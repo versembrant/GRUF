@@ -34,6 +34,11 @@ export const sample = (arr, sampleSize=1) => {
     return [...sampledItems];
 }
 
+export const roundToStep = (value, step) => {
+    if (step === undefined || step === 0) return value;
+    return Math.round(value / step) * step;
+}
+
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -180,11 +185,12 @@ export const real2Num = (realValue, parameterDescription) => {
 }
 
 export const num2Real = (numValue, parameterDescription) => {
+    const discreteValue = roundToStep(numValue, getParameterStep(parameterDescription));
     switch(parameterDescription.type) {
         case 'float':
-            return numValue;
+            return discreteValue;
         case 'enum':
-            return parameterDescription.options[Math.round(numValue)];
+            return parameterDescription.options[discreteValue];
         default:
             throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
@@ -207,6 +213,17 @@ export const getParameterNumericMax = (parameterDescription) => {
             return parameterDescription.max;
         case 'enum':
             return parameterDescription.options.length - 1;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const getParameterStep = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.step;
+        case 'enum':
+            return 1;
         default:
             throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
