@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter } from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter } from "../utils";
 import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -96,8 +96,10 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
         let displayValue;
         if (parameterDescription.type === 'float') {
             const valueTenExponent = Math.floor(realValue) === 0 ? 1 : Math.floor(Math.log10(Math.abs(realValue))) + 1; // the number of digits of the integer
+            const stepSize = getParameterStep(parameterDescription);
+            const stepDecimals = stepSize ? stepSize.toString().split('.')[1]?.length || 0 : undefined;
             const precision = 4; // but integers can have more ciphers
-            const maxDecimals = 2;
+            const maxDecimals = stepSize ? stepDecimals : 2; // for continous values, we show a maximum of 2 decimals. for stepped ones, the ones corresponding to the step size.
             const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
             displayValue = realValue.toFixed(decimals);
         } else displayValue = realValue;
