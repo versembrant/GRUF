@@ -58,10 +58,10 @@ export class EstacioGrooveBox extends EstacioBase {
                 return [
                     [`sound${i}URL`, { type: 'text', label: sound, initial: getSoundURL(i, 'Hip Hop Classic 1') }],
                     [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
-                    [`tone${i}`, { type: 'enum', label: `${sound}Tone`, unit: units.decibel, options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0', '1','2','3','4','5','6','7','8','9','10','11','12'], initial: '0' }],
+                    [`tone${i}`, { type: 'float', label: `${sound}Tone`, unit: units.decibel, min: -12, max: 12, step: 1, initial: 0 }],
                     [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: 0 }],
-                    [`attack${i}`, { type: 'enum', label: `${sound}Attack`, unit: units.second, options: ['0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'], initial: '0' }],
-                    [`release${i}`, { type: 'enum', label: `${sound}Release`, unit: units.second, options: ['1','0.9','0.8','0.7','0.6','0.5','0.4','0.3','0.2','0.1','0'], initial: '0' }],
+                    [`attack${i}`, { type: 'float', label: `${sound}Attack`, unit: units.second, min: 0, max: 1, step: 0.1, initial: 0 }],
+                    [`release${i}`, { type: 'float', label: `${sound}Release`, unit: units.second, min: 0, max: 1, step: 0.1, initial: 0 }],
                     [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, unit: units.decibel, min: -30, max: 6, initial: -30 }]
                 ]
             })
