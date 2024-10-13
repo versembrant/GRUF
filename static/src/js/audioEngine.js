@@ -32,7 +32,7 @@ export class AudioGraph {
             isPlaying: {type: 'bool', initial: false},
             isPlayingArranjemenet: {type: 'bool', initial: false},
             swing: {type: 'float', min: 0.0, max: 1.0, initial: 0.0},
-            compas: {type: 'enum', initial: '4/4'},
+            compas: {type: 'enum', options: ['2/4', '3/4', '4/4'], initial: '4/4'},
             tonality: {
                 type: 'enum',
                 options:['cmajor', 'cminor',
