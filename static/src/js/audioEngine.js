@@ -17,7 +17,7 @@ export class AudioGraph {
         this.estacionsMasterChannelNodes = {};
         this.estacionsMeterNodes = {};
 
-        const parametersDescription = {
+        this.parametersDescription = {
             bpm: {type: 'float', min: 40, max: 300, initial: 120},
             masterGain: {type: 'float', min: 0.0, max: 1.0, initial: 1.0},
             masterPan: {type: 'float', min: -1.0, max: 1.0, initial: 0.0},
@@ -64,10 +64,10 @@ export class AudioGraph {
         }
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
-        const propertiesInStore = Object.keys(parametersDescription);
+        const propertiesInStore = Object.keys(this.parametersDescription);
         const reducers = {};
         propertiesInStore.forEach(propertyName => {
-            reducers[propertyName] = (state = parametersDescription[propertyName].initial, action) => {
+            reducers[propertyName] = (state = this.parametersDescription[propertyName].initial, action) => {
                 switch (action.type) {
                     case 'SET_' + propertyName:
                     return action.value;
@@ -79,6 +79,9 @@ export class AudioGraph {
         this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
+    getParameterDescription(parameterName) {
+        return this.parametersDescription[parameterName]
+    }
 
     setParametreInStore(nomParametre, valor) {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
