@@ -36,6 +36,7 @@ const handleCompasChange = (e) => {
 export const AudioTransportControls = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
     if (!getAudioGraphInstance().isGraphBuilt()){return (<div></div>);}// If graph is not built, don't show the play/stop button
+    const compasOptions = getAudioGraphInstance().getParameterDescription('compas').options.map(compasOption=> <option value={compasOption}>{compasOption}</option>)
     return (
         <div>
             <div>
@@ -59,9 +60,7 @@ export const AudioTransportControls = () => {
             <div>
                 Compàs:
                 <select value={getAudioGraphInstance().getCompas()} onChange={handleCompasChange}>
-                    <option value="2/4">2/4</option>
-                    <option value="3/4">3/4</option>
-                    <option value="4/4">4/4</option>
+                    {compasOptions}
                 </select>
             </div>
             <div>
