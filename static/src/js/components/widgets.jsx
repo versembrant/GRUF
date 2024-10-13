@@ -145,26 +145,6 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     )
 };
 
-export const GrufKnobGran = (props) => {
-    return <GrufKnob {...props} mida="gran"/>
-};
-
-export const GrufKnobPetit = (props) => {
-    return <GrufKnob {...props} mida="petit"/>
-};
-
-export const GrufKnobGranDiscret = (props) => {
-    return <GrufKnobGran {...props}/>
-};
-
-export const GrufKnobPetitDiscret = (props) => {
-    return <GrufKnobPetit {...props}/>
-};
-
-export const GrufKnobGranGlobal = (props) => {
-    return <GrufKnobGran {...props}/>
-};
-
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
@@ -830,10 +810,10 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
         <div className="gruf-adsr-widget" style={{top, left, height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnobPetit estacio={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
-                <GrufKnobPetit estacio={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
-                <GrufKnobPetit estacio={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
-                <GrufKnobPetit estacio={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
+                <GrufKnob mida="petit" estacio={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
+                <GrufKnob mida="petit" estacio={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
+                <GrufKnob mida="petit" estacio={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
+                <GrufKnob mida="petit" estacio={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
             </div>
         </div>
     )
