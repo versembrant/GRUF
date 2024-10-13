@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalize } from "../utils";
 import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -754,32 +754,11 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 
 export const GrufSelectorTonalitat = ({ top, left }) => {
     subscribeToPartialStoreChanges(getAudioGraphInstance(), 'tonality');
-    const tonalityOptions = [
-        { label: 'C Major', value: 'cmajor' },
-        { label: 'C Minor', value: 'cminor' },
-        { label: 'C# Major', value: 'c#major' },
-        { label: 'C# Minor', value: 'c#minor' },
-        { label: 'D Major', value: 'dmajor' },
-        { label: 'D Minor', value: 'dminor' },
-        { label: 'E♭ Major', value: 'ebmajor' },
-        { label: 'E♭ Minor', value: 'ebminor' },
-        { label: 'E Major', value: 'emajor' },
-        { label: 'E Minor', value: 'eminor' },
-        { label: 'F Major', value: 'fmajor' },
-        { label: 'F Minor', value: 'fminor' },
-        { label: 'F# Major', value: 'f#major' },
-        { label: 'F# Minor', value: 'f#minor' },
-        { label: 'G Major', value: 'gmajor' },
-        { label: 'G Minor', value: 'gminor' },
-        { label: 'A♭ Major', value: 'abmajor' },
-        { label: 'A♭ Minor', value: 'abminor' },
-        { label: 'A Major', value: 'amajor' },
-        { label: 'A Minor', value: 'aminor' },
-        { label: 'B♭ Major', value: 'bbmajor' },
-        { label: 'B♭ Minor', value: 'bbminor' },
-        { label: 'B Major', value: 'bmajor' },
-        { label: 'B Minor', value: 'bminor' }
-    ];
+    const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
+        const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
+        const mode = option.slice(-5);
+        return {label: capitalize(`${root} ${mode}`), value: option}
+    });
     
     const currentTonality = getAudioGraphInstance().getTonality();
 
@@ -792,8 +771,8 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
         <div className="tonality-selector" style={{ position: 'absolute', top: top, left: left }}>
             <Dropdown
                 value={currentTonality}  
-                options={tonalityOptions}  
-                onChange={handleTonalityChange} 
+                options={dropdownOptions}
+                onChange={handleTonalityChange}
                 placeholder="Selecciona Tonalitat"  
                 scrollHeight="200px"  
                 className="small-font-dropdown"  
