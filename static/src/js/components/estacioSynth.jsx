@@ -1,4 +1,4 @@
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat } from "./widgets";
+import { GrufKnob, GrufLabelPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
@@ -10,17 +10,17 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
             <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.6%" left="52%" />
-            <GrufKnobGran estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
-            <GrufKnobGran estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
+            <GrufKnob mida="gran" estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
+            <GrufKnob mida="gran" estacio={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
             <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
             <GrufLabel text="Durada" top="12.7%" left="51.7%" />
             <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnobGran estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
+            <GrufKnob mida="gran" estacio={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
             
-            <GrufKnobPetit estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />
-            <GrufKnobPetit estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
-            <GrufKnobPetit estacio={estacio} parameterName="fxHigh" top="35%" left="60.9%" />
+            <GrufKnob mida="petit" estacio={estacio} parameterName="fxLow" top="35%" left="51.5%" />
+            <GrufKnob mida="petit" estacio={estacio} parameterName="fxMid" top="35%" left="56.4%" />
+            <GrufKnob mida="petit" estacio={estacio} parameterName="fxHigh" top="35%" left="60.9%" />
             
             <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="38.2%"  fons="linies" />
             <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="43%"  fons="linies" />
