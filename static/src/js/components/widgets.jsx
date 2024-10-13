@@ -69,20 +69,21 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
 
+    const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
+
     if (parameterName === 'volume') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
-    else if (parameterName === 'swing') subscribeToPartialStoreChanges(getAudioGraphInstance(), parameterName);
-    else subscribeToEstacioParameterChanges(estacio, parameterName);
+    else if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
+    else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
     const nomEstacio=estacio.nom;
     const parameterDescription =
     (parameterName === 'volume') ?  {type: 'float', min: 0, max: 1} : // TODO: DON'T HARDCODE!!!
-    (parameterName === 'swing') ? getAudioGraphInstance().getParameterDescription(parameterName) :
-    estacio.getParameterDescription(parameterName);
+    parameterParent.getParameterDescription(parameterName);
 
     const realValue = 
     (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
-    (parameterName === 'swing') ? getAudioGraphInstance().getParameterValue(parameterName) :
-    estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    (parameterName === 'swing') ? parameterParent.getParameterValue(parameterName) :
+    parameterParent.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     
     const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
@@ -118,8 +119,8 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
             currentGains[estacio.nom] = parseFloat(newRealValue, 10);
             getCurrentSession().liveSetGainsEstacions(currentGains);
         }
-        else if (parameterName === 'swing') getAudioGraphInstance().updateParametreAudioGraph(parameterName, newRealValue);
-        else getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, newRealValue);
+        else if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
+        else parameterParent.updateParametreEstacio(parameterName, newRealValue);
     }
 
     const knobctrlId = useId();
