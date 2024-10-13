@@ -84,6 +84,17 @@ export class AudioGraph {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
     }
 
+    setParameterValue(nomParametre, valor) {
+        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
+        this[methodName](valor);
+    }
+
+    getParameterValue(nomParametre) {
+        const methodName =  nomParametre.startsWith('is') ? nomParametre : // for booleans
+        `get${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`; // for the rest
+        this[methodName]();
+    }
+
     isPlaying() {
         return this.store.getState().isPlaying;
     }
@@ -469,8 +480,7 @@ export class AudioGraph {
     }
 
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
-        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
-        this[methodName](valor);
+        this.setParameterValue(nomParametre, valor);
     }
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
