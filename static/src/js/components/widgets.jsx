@@ -68,10 +68,18 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
 export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+
+    if (parameterName === 'volume') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+    else if (parameterName === 'swing') subscribeToPartialStoreChanges(getAudioGraphInstance(), parameterName);
+    else subscribeToEstacioParameterChanges(estacio, parameterName);
+
     const nomEstacio=estacio.nom;
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const realValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+
+    const realValue = 
+    (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
+    (parameterName === 'swing') ? getAudioGraphInstance().getParameterValue(parameterName) :
+    estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     
     const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
