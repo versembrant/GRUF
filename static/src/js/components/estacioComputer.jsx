@@ -2,7 +2,7 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
 import { handlePlayArranjementButton } from "../components/audioTransport";
-import { GrufButtonNoBorder } from "../components/widgets";
+import { GrufButtonNoBorder, SpectrumGraph } from "../components/widgets";
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -79,12 +79,13 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                 </div>
                 <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
-            <div>
+            <div className="computer-widgets">
                 <div className="grid-computer" style={{top:90, left: 150}}>
                     {stepsElementsPerEstacio.map(function(stepsElements, i){
                         return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
                     })}
                 </div>
+                <SpectrumGraph />
             </div>
         </div>
     </div>)

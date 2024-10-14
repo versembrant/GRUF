@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, clamp} from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -992,6 +992,55 @@ const ADSRGraph = ({estacio, adsrParameterNames}) => {
                     <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#adsr-mask)" strokeLinejoin="round"></path>
                 </g>
 
+            </svg>
+        </div>
+    )
+}
+
+export const SpectrumGraph = () => {
+    const [spectrumData, setSpectrumData] = useState(getAudioGraphInstance().getMasterSpectrumData());
+    const columns = spectrumData.length;
+    const rows = 32;
+
+    const fgLineItems = [];
+    for (let xPos = 0; xPos <= columns; xPos++) {
+        const vLine = <line key={`fgVLine-${xPos}`} x1={xPos} x2={xPos} y1={rows} y2='0' vectorEffect="non-scaling-stroke"/>
+        fgLineItems.push(vLine);
+    }
+    for (let yPos = 0; yPos <= rows; yPos++) {
+        const hLine = <line key={`fgHLine-${yPos}`} x1='0' x2={columns} y1={yPos} y2={yPos} vectorEffect="non-scaling-stroke"/>
+        fgLineItems.push(hLine);
+    }
+
+    const levelRectangles = Array.from(spectrumData).map((sampleValue, index) => {
+        const minDb = -100;
+        const maxDb = 0;
+        const normSampleValue = (clamp(sampleValue, minDb, maxDb)-minDb)/(maxDb-minDb);
+        const height = Math.round(normSampleValue * rows); // rounded to half the grid square
+
+        return <rect key={`levelRect-${index}`} x={index} width='1' y={(rows-height)/2} height={height} />
+    });
+
+    useEffect(() => {
+            document.spectrumInterval = setInterval(() => {
+                const spectrumData = getAudioGraphInstance().getMasterSpectrumData();
+                setSpectrumData(spectrumData);
+            }, 100);
+    
+            return () => {
+                clearInterval(document.spectrumInterval);
+            };
+    });
+
+    return (
+        <div className="spectrum-graph">
+            <svg width='100%' height='100%' viewBox={`0 0 ${columns} ${rows}`} preserveAspectRatio="none">
+                <g fill="var(--accent-color)">
+                    {levelRectangles}
+                </g>
+                <g stroke="#555">
+                    {fgLineItems}
+                </g>
             </svg>
         </div>
     )
