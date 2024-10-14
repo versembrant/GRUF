@@ -103,6 +103,10 @@ export class AudioGraph {
         this.masterGainNode.pan.setValueAtTime(pan, 0.05);
     }
     
+    getMasterSpectrumData() {
+        return this.masterSpectrum.getValue();
+    }
+
     getBpm() {
         return this.store.getState().bpm;
     }
@@ -217,6 +221,7 @@ export class AudioGraph {
         };
     }
 
+
     isMutedEstacio(nomEstacio) {
         if (!this.isGraphBuilt()) return false;
         return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
@@ -281,6 +286,9 @@ export class AudioGraph {
             volume: this.getMasterGain(),
             pan: this.getMasterPan(),
         }).chain(this.masterMeterNode, this.masterLimiter);
+
+        this.masterSpectrum = new Tone.Analyser('fft', 64);
+        this.masterLimiter.connect(this.masterSpectrum);
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
