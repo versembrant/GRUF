@@ -1,4 +1,4 @@
-import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat } from "./widgets";
+import { GrufKnobGran, GrufLabelPetit, GrufKnobPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSliderVertical, GrufPianoRoll, GrufSliderDiscret, GrufADSRWidget, GrufSelectorTonalitat, GrufKnobGranGlobal } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
@@ -8,6 +8,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
         
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="80%" left="85%" label="Vol" />
             <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.6%" left="52%" />
             
