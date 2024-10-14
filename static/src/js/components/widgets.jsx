@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter } from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter } from "../utils";
 import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -91,23 +91,6 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const angle = normValue * (angleMax - angleMin) + angleMin;
     
     const numValue = real2Num(realValue, parameterDescription) + discreteOffset;
-    const valueRawDisplayFn = (numValue) => {
-        const realValue = num2Real(numValue, parameterDescription);
-        let displayValue;
-        if (parameterDescription.type === 'float') {
-            const valueTenExponent = Math.floor(realValue) === 0 ? 1 : Math.floor(Math.log10(Math.abs(realValue))) + 1; // the number of digits of the integer
-            const stepSize = getParameterStep(parameterDescription);
-            const stepDecimals = stepSize ? stepSize.toString().split('.')[1]?.length || 0 : undefined;
-            const precision = 4; // but integers can have more ciphers
-            const maxDecimals = stepSize ? stepDecimals : 2; // for continous values, we show a maximum of 2 decimals. for stepped ones, the ones corresponding to the step size.
-            const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
-            displayValue = realValue.toFixed(decimals);
-        } else displayValue = realValue;
-        
-        const THINSPACE = " ";
-        const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
-        return displayValue + unitInfo;
-    }
 
     const handleKnobChange = (newNumValue) => {
         const newRealValue = num2Real(newNumValue, parameterDescription);
@@ -137,13 +120,13 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
                         mapFrom01={(x) => norm2Num(x, parameterDescription)}
                         onValueRawChange={throttle(newNumValue => handleKnobChange(newNumValue), getCurrentSession().continuousControlThrottleTime)}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
-                        valueRawDisplayFn={valueRawDisplayFn}
+                        valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
                         dragSensitivity="0.009"
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
                 <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
-                <output htmlFor={knobctrlId}>{valueRawDisplayFn(numValue)}</output>
+                <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>
         </div>
     )
 };
@@ -201,8 +184,7 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const realValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    console.log("grufslider", parameterName, "value", realValue, "min", getParameterNumericMin(parameterDescription))
-    
+
     const nomEstacio = estacio.nom;
     const marks = []
 
@@ -213,17 +195,20 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
     if (orientation==='vertical') style.height = size || '80px';
     if (orientation==='horizontal') style.width = size || '200px';
 
+    const sliderId = useId();
     return (
         <div className={`gruf-slider ${orientation} ${fons === 'linies' ? "gruf-slider-background-ratllat" : ""}`} style={style}>
             <Slider
+                id={sliderId}
                 orientation={orientation}
                 value={real2Num(realValue, parameterDescription)}
-                step={getParameterStep(parameterDescription)}
+                step={getParameterStep(parameterDescription) || 0.001 } // MuiSlider needs a step size, so returning small if it's undefined
                 min={getParameterNumericMin(parameterDescription)}
                 max={getParameterNumericMax(parameterDescription)}
                 marks={marks} 
                 onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, num2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
             />
+            <output htmlFor={sliderId}>{real2String(realValue, parameterDescription)}</output>
         </div>
     )
 };

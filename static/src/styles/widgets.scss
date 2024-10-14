@@ -23,6 +23,28 @@
     cursor: pointer;
 }
 
+.knob, .gruf-slider {
+    output {
+        position: absolute;
+        z-index: 1;
+        inset: 50%;
+        font-feature-settings: "tnum"; // tabular (monospaced) numerals to avoid jitter
+        text-align: center;
+        text-wrap: nowrap;
+        padding: 0 0.7em;
+        width: fit-content;
+        height: fit-content;
+        border: 1px solid $font-color;
+        border-radius: 5px;
+        background-color: $background-color;
+        visibility: hidden;
+    }
+
+    &:active output {
+        visibility: visible;
+    }
+}
+
 .knob {
     position: relative;
     display: flex;
@@ -48,26 +70,6 @@
             transform: translate(-50%, -50%);
         }
     } 
-
-    output {
-        position: absolute;
-        z-index: 1;
-        inset: 50%;
-        font-feature-settings: "tnum"; // tabular (monospaced) numerals to avoid jitter
-        text-align: center;
-        text-wrap: nowrap;
-        padding: 0 0.7em;
-        width: fit-content;
-        height: fit-content;
-        border: 1px solid $font-color;
-        border-radius: 5px;
-        background-color: $background-color;
-        visibility: hidden;
-    }
-
-    &:active output {
-        visibility: visible;
-    }
 
     &.knob-gran {
         font-size: 14px;
@@ -105,6 +107,129 @@
         }
     }
 }
+
+.gruf-slider {
+    position: absolute;
+    font-size: 14px;
+    
+    display: flex;
+    justify-content: center;
+
+    &.gruf-slider-background-ratllat {
+        background-image: url("../img/slider_bg.svg");
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .p-slider {
+        cursor: pointer;
+    }
+
+    div {
+        text-align: center;
+        padding-top: 3px;
+    }
+
+    .MuiSlider-thumb {
+        color: $white;
+        &:hover {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            animation: none;
+        }
+    }
+
+    &:has(.Mui-active) output {
+        visibility: visible;
+    }
+
+    &.horizontal {
+        .MuiSlider-thumb {
+            border-radius: 5px;
+            height: 27px;
+            width: 10px;
+            
+        }
+        .MuiSlider-mark {
+            height: 0px;
+        }
+        .MuiSlider-track {
+            height: 8px;
+        }
+        .MuiSlider-markLabel {
+            font-size: 12px;
+        }
+        .MuiSlider-rail {
+            height: 10px;
+        }
+        output {
+            transform: translate(-50%, 150%);
+        }
+    }
+
+    &.vertical {
+        .MuiSlider-vertical {
+            margin-right: 0px!important;
+        }
+        .MuiSlider-thumb {
+            border-radius: 2px;
+            height: 5px; 
+            width: 16px;
+        }
+        .MuiSlider-mark {
+            width: 0px;
+        }
+        .MuiSlider-track {
+            width: 1px;
+        }
+        .MuiSlider-markLabel {
+            font-size: 10px;
+            margin-left: -10px;
+        }
+        .MuiSlider-rail {
+            width: 5px; /* reduced size by 1/3 */
+        }
+        output {
+            inset: 100% 50%;
+            transform: translate(-50%, 30px);
+        }
+    }
+    
+    .Mui-focusVisible {
+        -webkit-box-shadow: none!important;
+        box-shadow: none!important;
+        animation: none;
+    }
+    .MuiSlider-mark {
+        color: $grey;
+    }
+
+    .MuiSlider-markLabel {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        color: $font-color;
+    }
+
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+
+    .MuiSlider-root {
+        border-radius: 5px;
+    }
+    .MuiSlider-track {
+        color: $grey;
+    }
+    
+    .MuiSlider-rail {
+        color: $grey;
+        border-radius: 5px;
+        opacity: 0.5;
+    }
+}
+
 
 .gruf-enum-2-columns {
     position: absolute;
@@ -207,117 +332,6 @@
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-    }
-}
-
-.gruf-slider {
-    position: absolute;
-    font-size: 14px;
-    
-    display: flex;
-    justify-content: center;
-
-    &.gruf-slider-background-ratllat {
-        background-image: url("../img/slider_bg.svg");
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
-
-    .p-slider {
-        cursor: pointer;
-    }
-
-    div {
-        text-align: center;
-        padding-top: 3px;
-    }
-
-    .MuiSlider-thumb {
-        color: $white;
-        &:hover {
-            -webkit-box-shadow: none;
-            box-shadow: none;
-            animation: none;
-        }
-    }
-
-    &.horizontal {
-        .MuiSlider-thumb {
-            border-radius: 5px;
-            height: 27px;
-            width: 10px;
-            
-        }
-        .MuiSlider-mark {
-            height: 0px;
-        }
-        .MuiSlider-track {
-            height: 8px;
-        }
-        .MuiSlider-markLabel {
-            font-size: 12px;
-        }
-        .MuiSlider-rail {
-            height: 10px;
-        }
-    }
-
-    &.vertical {
-        .MuiSlider-vertical {
-            margin-right: 0px!important;
-        }
-        .MuiSlider-thumb {
-            border-radius: 2px;
-            height: 5px; 
-            width: 16px;
-        }
-        .MuiSlider-mark {
-            width: 0px;
-        }
-        .MuiSlider-track {
-            width: 1px;
-        }
-        .MuiSlider-markLabel {
-            font-size: 10px;
-            margin-left: -10px;
-        }
-        .MuiSlider-rail {
-            width: 5px; /* reduced size by 1/3 */
-        }
-    }
-    
-    .Mui-focusVisible {
-        -webkit-box-shadow: none!important;
-        box-shadow: none!important;
-        animation: none;
-    }
-    .MuiSlider-mark {
-        color: $grey;
-    }
-
-    .MuiSlider-markLabel {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        color: $font-color;
-    }
-
-    .MuiSlider-dragging {
-        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
-    }
-
-    .MuiSlider-root {
-        border-radius: 5px;
-    }
-    .MuiSlider-track {
-        color: $grey;
-    }
-    
-    .MuiSlider-rail {
-        color: $grey;
-        border-radius: 5px;
-        opacity: 0.5;
     }
 }
 
