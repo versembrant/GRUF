@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSliderVertical, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -23,8 +23,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnob mida="petit" estacio={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label='Mid' /> 
                 <GrufKnob mida="petit" estacio={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label='High' />
 
-                <GrufSliderVertical estacio={estacio} parameterName="hpf" top="8.5%" left="29%" height="126px" fons="linies" />
-                <GrufSliderVertical estacio={estacio} parameterName="lpf" top="8.5%" left="33.8%" height="126px" fons="linies" />
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" top="8.5%" left="29%" height="126px" fons="linies" />
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" top="8.5%" left="33.8%" height="126px" fons="linies" />
                 <GrufLabel text="HPF" top="28.2%" left="29%" />
                 <GrufLabel text="LPF" top="28.2%" left="33.8%" />
                 
@@ -37,8 +37,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
                 <GrufLabel text="Durada" top="29.6%" left="70.3%" />
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-                <GrufSliderVertical estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelBottom="0%" labelTop="100%" /> 
-                <GrufSliderVertical estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelBottom="0%" labelTop="100%" /> 
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelStart="0%" labelEnd="100%" /> 
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelStart="0%" labelEnd="100%" /> 
                 <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
                 <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
 

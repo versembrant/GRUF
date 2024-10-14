@@ -213,68 +213,7 @@
 .gruf-slider {
     position: absolute;
     font-size: 14px;
-    width: 200px; /* default width */
-
-    .p-slider {
-        cursor: pointer;
-    }
-
-    div {
-        text-align: center;
-        padding-top: 3px;
-    }
-    .MuiSlider-thumb {
-        border-radius: 5px;
-        height: 27px;
-        width: 10px;
-        color: $white;
-
-        &:hover {
-            -webkit-box-shadow: none;
-            box-shadow: none;
-            animation: none;
-        }
-    }
-    .Mui-focusVisible {
-        -webkit-box-shadow: none!important;
-        box-shadow: none!important;
-        animation: none;
-    }
-    .MuiSlider-mark {
-        color: $grey;
-        height: 0px;
-    }
-
-    .MuiSlider-markLabel {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        color: $font-color;
-        font-size: 12px;
-    }
-
-    .MuiSlider-root {
-        border-radius: 5px;
-        
-    }
-    .MuiSlider-track {
-        color: $grey;
-        height: 8px;
-    }
     
-    .MuiSlider-rail {
-        color: $grey;
-        height: 10px;
-        border-radius: 5px;
-        opacity: 0.5;
-    }
-}
-
-.gruf-slider-vertical{
-    position: absolute;
-    font-size: 14px;
-    height: 80px; 
     display: flex;
     justify-content: center;
 
@@ -293,25 +232,58 @@
         padding-top: 3px;
     }
 
-    .MuiSlider-vertical {
-        margin-right: 0px!important;
-    }
-   
     .MuiSlider-thumb {
-        border-radius: 2px;
-        height: 5px; 
-        width: 16px;
         color: $white;
-
         &:hover {
             -webkit-box-shadow: none;
             box-shadow: none;
             animation: none;
         }
     }
-   
-    .MuiSlider-dragging {
-        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+
+    &.horizontal {
+        .MuiSlider-thumb {
+            border-radius: 5px;
+            height: 27px;
+            width: 10px;
+            
+        }
+        .MuiSlider-mark {
+            height: 0px;
+        }
+        .MuiSlider-track {
+            height: 8px;
+        }
+        .MuiSlider-markLabel {
+            font-size: 12px;
+        }
+        .MuiSlider-rail {
+            height: 10px;
+        }
+    }
+
+    &.vertical {
+        .MuiSlider-vertical {
+            margin-right: 0px!important;
+        }
+        .MuiSlider-thumb {
+            border-radius: 2px;
+            height: 5px; 
+            width: 16px;
+        }
+        .MuiSlider-mark {
+            width: 0px;
+        }
+        .MuiSlider-track {
+            width: 1px;
+        }
+        .MuiSlider-markLabel {
+            font-size: 10px;
+            margin-left: -10px;
+        }
+        .MuiSlider-rail {
+            width: 5px; /* reduced size by 1/3 */
+        }
     }
     
     .Mui-focusVisible {
@@ -319,10 +291,8 @@
         box-shadow: none!important;
         animation: none;
     }
-    
     .MuiSlider-mark {
         color: $grey;
-        width: 0px;
     }
 
     .MuiSlider-markLabel {
@@ -331,22 +301,21 @@
         font-weight: 400;
         font-style: normal;
         color: $font-color;
-        font-size: 10px;
-        margin-left: -10px;
     }
-    
+
+    .MuiSlider-dragging {
+        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+
     .MuiSlider-root {
         border-radius: 5px;
     }
-
     .MuiSlider-track {
         color: $grey;
-        width: 1px;
     }
-
+    
     .MuiSlider-rail {
         color: $grey;
-        width: 5px; /* reduced size by 1/3 */
         border-radius: 5px;
         opacity: 0.5;
     }
