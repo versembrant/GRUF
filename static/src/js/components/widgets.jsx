@@ -197,105 +197,32 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({estacio, parameterName, top, left, width, labelLeft, labelRight}) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
-    const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio=estacio.nom;
-    const marks = []
-    if (labelLeft !== undefined) {
-        marks.push({
-            value: 0,
-            label: labelLeft
-        });
-    }
-    if (labelRight !== undefined) {
-        marks.push({
-            value: 1,
-            label: labelRight
-        });
-    }
-    const style = {top: top, left: left};
-    if (width !== undefined) { 
-        style.width = width;
-    }
-    return (
-        <div className="gruf-slider" style={style}>
-            <Slider 
-                value={num2Norm(parameterValue, parameterDescription)}
-                step={0.01}
-                min={0.0}
-                max={1.0}
-                marks={marks}
-                onChange={(evt) => throttle(getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Num(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)} 
-            />
-        </div>
-    )
-};
-
-export const GrufSliderVertical = ({ estacio, parameterName, top, left, height, labelBottom, labelTop, fons }) => {
+export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, labelStart, labelEnd, fons }) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
-    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const realValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    console.log("grufslider", parameterName, "value", realValue, "min", getParameterNumericMin(parameterDescription))
+    
     const nomEstacio = estacio.nom;
     const marks = []
-    if (labelBottom !== undefined) {
-        marks.push({
-            value: 0,
-            label: labelBottom
-        });
-    }
-    if (labelTop !== undefined) {
-        marks.push({
-            value: 1,
-            label: labelTop
-        });
-    }
+
+    if (labelStart !== undefined) marks.push({ value: 0, label: labelStart});
+    if (labelEnd !== undefined) marks.push({ value: 1, label: labelEnd});
+    
     const style = { top: top, left: left };
-    if (height !== undefined) {
-        style.height = height;
-    }
-    let classeFons = "";
-    if (fons === "linies") {
-        classeFons = "gruf-slider-background-ratllat";
-    }
+    if (orientation==='vertical') style.height = size || '80px';
+    if (orientation==='horizontal') style.width = size || '200px';
+
     return (
-        <div className={"gruf-slider-vertical " + classeFons} style={style}>
+        <div className={`gruf-slider ${orientation} ${fons === 'linies' ? "gruf-slider-background-ratllat" : ""}`} style={style}>
             <Slider
-                orientation="vertical"
-                value={num2Norm(parameterValue, parameterDescription)}
-                step={0.01}
-                min={0.0}
-                max={1.0}
+                orientation={orientation}
+                value={real2Num(realValue, parameterDescription)}
+                step={getParameterStep(parameterDescription)}
+                min={getParameterNumericMin(parameterDescription)}
+                max={getParameterNumericMax(parameterDescription)}
                 marks={marks} 
-                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, norm2Num(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
-            />
-        </div>
-    )
-};
-
-export const GrufSliderDiscret = ({ estacio, parameterName, top, left, height }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
-    const parameterDescription = estacio.getParameterDescription(parameterName);
-    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
-    const nomEstacio = estacio.nom;
-    const options = parameterDescription.options;
-    const style = { top: top, left: left };
-    //const num2String();
-    if (height !== undefined) {
-        style.height = height;
-    }
-    return (
-        <div className={"gruf-slider-vertical"} style={style}>
-            <Slider
-                sx={{ height: 56}}
-                orientation="vertical"
-                value={options.indexOf(parameterValue)}
-                step={1.0}
-                min={0.0}
-                max={options.length -1}
-                marks 
-                onChange={(evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, options[evt.target.value])}
+                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, num2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
             />
         </div>
     )
