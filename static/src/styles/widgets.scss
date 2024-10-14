@@ -51,6 +51,7 @@
 
     output {
         position: absolute;
+        z-index: 1;
         inset: 50%;
         font-feature-settings: "tnum"; // tabular (monospaced) numerals to avoid jitter
         text-align: center;
