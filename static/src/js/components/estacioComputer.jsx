@@ -79,8 +79,8 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                 </div>
                 <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
             </div>
-            <div className="computer-widgets">
-                <div className="grid-computer" style={{top:90, left: 150}}>
+            <div className="computer-widgets" style={{position:"absolute", top:95, right: 47}}>
+                <div className="grid-computer">
                     {stepsElementsPerEstacio.map(function(stepsElements, i){
                         return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
                     })}
