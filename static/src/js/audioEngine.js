@@ -16,6 +16,7 @@ export class AudioGraph {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
         this.estacionsMasterChannelNodes = {};
         this.estacionsMeterNodes = {};
+        this.spectrumSize = 64;
 
         // Inicialitza un redux store amb les propietats relacionades amb audio
         const defaultsForPropertiesInStore = {
@@ -102,9 +103,13 @@ export class AudioGraph {
         if (!this.isGraphBuilt()) return;
         this.masterGainNode.pan.setValueAtTime(pan, 0.05);
     }
+
+    getMasterSpectrumSize() {
+        return this.spectrumSize;
+    }
     
     getMasterSpectrumData() {
-        return this.masterSpectrum.getValue();
+        return this.masterSpectrum?.getValue(); // returns undefined if audiograph is not built
     }
 
     getBpm() {
@@ -287,7 +292,7 @@ export class AudioGraph {
             pan: this.getMasterPan(),
         }).chain(this.masterMeterNode, this.masterLimiter);
 
-        this.masterSpectrum = new Tone.Analyser('fft', 64);
+        this.masterSpectrum = new Tone.Analyser('fft', this.spectrumSize);
         this.masterLimiter.connect(this.masterSpectrum);
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador

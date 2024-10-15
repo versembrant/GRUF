@@ -999,7 +999,7 @@ const ADSRGraph = ({estacio, adsrParameterNames}) => {
 
 export const SpectrumGraph = () => {
     const [spectrumData, setSpectrumData] = useState(getAudioGraphInstance().getMasterSpectrumData());
-    const columns = spectrumData.length;
+    const columns = getAudioGraphInstance().getMasterSpectrumSize();
     const rows = 32;
 
     const fgLineItems = [];
@@ -1012,7 +1012,8 @@ export const SpectrumGraph = () => {
         fgLineItems.push(hLine);
     }
 
-    const levelRectangles = Array.from(spectrumData).map((sampleValue, index) => {
+    // if spectrumdata is undefined, we do it with an empty array, which will later evaluate to false
+    const levelRectangles = Array.from(spectrumData || []).map((sampleValue, index) => {
         const minDb = -100;
         const maxDb = 0;
         const normSampleValue = (clamp(sampleValue, minDb, maxDb)-minDb)/(maxDb-minDb);
@@ -1020,6 +1021,7 @@ export const SpectrumGraph = () => {
 
         return <rect key={`levelRect-${index}`} x={index} width='1' y={(rows-height)/2} height={height} />
     });
+    
 
     useEffect(() => {
             document.spectrumInterval = setInterval(() => {
@@ -1036,7 +1038,7 @@ export const SpectrumGraph = () => {
         <div className="spectrum-graph">
             <svg width='100%' height='100%' viewBox={`0 0 ${columns} ${rows}`} preserveAspectRatio="none">
                 <g fill="var(--accent-color)">
-                    {levelRectangles}
+                    {levelRectangles && levelRectangles}
                 </g>
                 <g stroke="#555">
                     {fgLineItems}
