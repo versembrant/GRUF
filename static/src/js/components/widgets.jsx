@@ -999,6 +999,15 @@ const ADSRGraph = ({estacio, adsrParameterNames}) => {
 
 export const SpectrumGraph = () => {
     const [spectrumData, setSpectrumData] = useState(getAudioGraphInstance().getMasterSpectrumData());
+    useEffect(() => {
+        document.spectrumInterval = setInterval(() => {
+            const newSpectrumData = getAudioGraphInstance().getMasterSpectrumData();
+            if (newSpectrumData) setSpectrumData(new Float32Array(newSpectrumData));
+        }, 100);
+
+        return () => clearInterval(document.spectrumInterval);
+    });
+
     const columns = getAudioGraphInstance().getMasterSpectrumSize();
     const rows = 32;
 
@@ -1020,18 +1029,6 @@ export const SpectrumGraph = () => {
         const height = Math.round(normSampleValue * rows); // rounded to half the grid square
 
         return <rect key={`levelRect-${index}`} x={index} width='1' y={(rows-height)/2} height={height} />
-    });
-    
-
-    useEffect(() => {
-            document.spectrumInterval = setInterval(() => {
-                const spectrumData = getAudioGraphInstance().getMasterSpectrumData();
-                setSpectrumData(spectrumData);
-            }, 100);
-    
-            return () => {
-                clearInterval(document.spectrumInterval);
-            };
     });
 
     return (

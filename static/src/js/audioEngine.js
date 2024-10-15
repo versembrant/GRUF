@@ -293,7 +293,7 @@ export class AudioGraph {
         }).chain(this.masterMeterNode, this.masterLimiter);
 
         this.masterSpectrum = new Tone.Analyser('fft', this.spectrumSize);
-        this.masterLimiter.connect(this.masterSpectrum);
+        this.masterGainNode.connect(this.masterSpectrum);
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
