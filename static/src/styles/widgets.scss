@@ -874,11 +874,11 @@
 
 .estacio-computer {
     .computer-widgets {
-        margin-top: 90px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 50px;
+        gap: 25px;
+        height: 565px;
     }
 }
 
@@ -924,16 +924,14 @@
             position: absolute;
             left: -135px;
         }
-    
-        
     }
 }
 
 
 .spectrum-graph {
-    width: 778px;
-    height: 350px;
-    border: 1px solid $grey;
+    width: 800px;
+    height: 100%;
+    border: 1px solid $light-grey;
     border-radius: 10px;
     padding: 0;
     overflow: hidden;
