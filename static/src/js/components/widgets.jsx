@@ -874,10 +874,13 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             });
         })
     }
+    const tonalitat = getAudioGraphInstance().getTonality();
+    //const tonalitat_sample = aquí és on s'ha d'agafar la tonalitat del sample
 
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
+                className= {tonalitat == tonalitat_sample ? "sample-correcte": "sample-incorrecte"}
                 value={selectedSoundName}
                 onChange={(evt) => {
                     estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
