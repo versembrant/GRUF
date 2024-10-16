@@ -72,20 +72,24 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
 
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
-            <GrufButtonNoBorder text="Canvia estació" top="42px" left="822px" onClick={() => {setEstacioSelected(undefined)}} />
-            <div>
-                <div style={{position:"absolute", top:35, left: 45}}>
-                    <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
+            <div className="estacio-computer-container">
+                <div className="computer-header">
+                    <GrufButtonNoBorder text="Canvia estació" top="44px" left="824px" onClick={() => {setEstacioSelected(undefined)}} />
+                    <div>
+                        <div style={{position:"absolute", top:35, left: 45}}>
+                            <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
+                        </div>
+                        <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
+                    </div>
                 </div>
-                <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
-            </div>
-            <div className="computer-widgets" style={{position:"absolute", top:95, right: 47}}>
-                <div className="grid-computer">
-                    {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
-                    })}
+                <div className="computer-widgets">
+                    <div className="grid-computer">
+                        {stepsElementsPerEstacio.map(function(stepsElements, i){
+                            return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
+                        })}
+                    </div>
+                    <SpectrumGraph />
                 </div>
-                <SpectrumGraph />
             </div>
         </div>
     </div>)
