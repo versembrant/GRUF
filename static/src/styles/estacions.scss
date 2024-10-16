@@ -385,6 +385,37 @@
     }
 }
 
+.estacio-computer-container {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: start; 
+    align-items: center; 
+    max-height: 75vh;
+    padding-top: 10px;
+    padding-bottom: 30px;
+
+    scrollbar-width: thin;  
+    scrollbar-color: transparent transparent; 
+
+    // Webkit browsers (Chrome, Safari, Edge)
+    &::-webkit-scrollbar {
+        width: 8px; 
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent; 
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent; 
+    }
+}
+
+.computer-header{
+    display: flex;
+    flex: auto;
+}
+
 .estacio-computer-logo {
     background-image: url("../img/computer_logo.svg");
     background-size: auto 30px;
