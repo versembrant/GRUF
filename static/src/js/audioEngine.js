@@ -31,7 +31,7 @@ export class AudioGraph {
             isMasterAudioEngine: {type: 'bool', initial: true},
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
             isPlaying: {type: 'bool', initial: false},
-            isPlayingArranjemenet: {type: 'bool', initial: false},
+            isPlayingArranjement: {type: 'bool', initial: false},
             swing: {type: 'float', min: 0.0, max: 1.0, initial: 0.0},
             compas: {type: 'enum', options: ['2/4', '3/4', '4/4'], initial: '4/4'},
             tonality: {
