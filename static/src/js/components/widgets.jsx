@@ -165,8 +165,8 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
     const nomEstacio = estacio.nom;
     const marks = []
 
-    if (markStart !== undefined) marks.push({ value: 0, label: markStart});
-    if (markEnd !== undefined) marks.push({ value: 1, label: markEnd});
+    if (markStart !== undefined) marks.push({ value: getParameterNumericMin(parameterDescription), label: markStart});
+    if (markEnd !== undefined) marks.push({ value: getParameterNumericMax(parameterDescription), label: markEnd});
     
     const style = { top: top, left: left };
     if (orientation==='vertical') style.height = size || '80px';
