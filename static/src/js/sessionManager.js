@@ -145,7 +145,7 @@ export class EstacioBase {
         return this.getParameterDescription(parameterName).followsPreset === true;
     }
 
-    getParameterValue(parameterName, preset) {
+    getParameterValue(parameterName, preset=this.currentPreset) {
         if (this.parameterFollowsPreset(parameterName)) {
             return this.store.getState()[parameterName][preset];
         } else {

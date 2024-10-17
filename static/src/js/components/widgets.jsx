@@ -76,16 +76,12 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
     const nomEstacio=estacio.nom;
-    const parameterDescription =
-    (parameterName === 'volume') ?  {type: 'float', min: 0, max: 1} : // TODO: DON'T HARDCODE!!!
-    (parameterName === 'pan') ?  {type: 'float', min: -1, max: 1, label: 'Pan'} : // TODO: DON'T HARDCODE!!!
-    parameterParent.getParameterDescription(parameterName);
+    const parameterDescription = parameterParent.getParameterDescription(parameterName);
 
     const realValue = 
     (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
     (parameterName === 'pan') ? getCurrentSession().getLivePansEstacions()[nomEstacio] || 0 :
-    (parameterName === 'swing') ? parameterParent.getParameterValue(parameterName) :
-    parameterParent.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    parameterParent.getParameterValue(parameterName);
     
     const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
@@ -140,7 +136,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
     const enumOptions=parameterDescription.options;
     return (
@@ -162,7 +158,7 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
     
     return (
@@ -189,7 +185,7 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
 export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, labelStart, labelEnd, fons }) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
-    const realValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const realValue = estacio.getParameterValue(parameterName);
 
     const nomEstacio = estacio.nom;
     const marks = []
@@ -321,7 +317,7 @@ export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, val
     subscribeToEstacioParameterChanges(estacio, parameterName);
 
     // Primer obtenim el valor actual
-    const parameterValue = estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue = estacio.getParameterValue(parameterName);
     const parameterValueOnOff = parameterValue === valueOn;
 
     const handleClick = () => {
@@ -349,7 +345,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue=estacio.getParameterValue(parameterName);
     const numRows = parameterDescription.numRows;
     const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
@@ -439,7 +435,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue=estacio.getParameterValue(parameterName);
     const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
@@ -619,7 +615,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
+    const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:width}}>
@@ -668,7 +664,7 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     subscribeToEstacioParameterChanges(estacio, 'selectedSoundName');
-    const selectedSoundName = estacio.getParameterValue('selectedSoundName', estacio.getCurrentLivePreset());
+    const selectedSoundName = estacio.getParameterValue('selectedSoundName');
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({'label': 'Gravació usuari ' + (i + 1), 'value': item})),
@@ -743,10 +739,10 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
 const ADSRGraph = ({estacio, adsrParameterNames}) => {
     adsrParameterNames.forEach(parameterName => subscribeToEstacioParameterChanges(estacio, parameterName));
 
-    const a = estacio.getParameterValue(adsrParameterNames[0], estacio.getCurrentLivePreset());
-    const d = estacio.getParameterValue(adsrParameterNames[1], estacio.getCurrentLivePreset());
-    const s = estacio.getParameterValue(adsrParameterNames[2], estacio.getCurrentLivePreset());
-    const r = estacio.getParameterValue(adsrParameterNames[3], estacio.getCurrentLivePreset());
+    const a = estacio.getParameterValue(adsrParameterNames[0]);
+    const d = estacio.getParameterValue(adsrParameterNames[1]);
+    const s = estacio.getParameterValue(adsrParameterNames[2]);
+    const r = estacio.getParameterValue(adsrParameterNames[3]);
 
     const strokeWidthPx = 3;
 

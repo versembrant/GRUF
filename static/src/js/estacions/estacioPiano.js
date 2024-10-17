@@ -44,7 +44,7 @@ export class EstacioPiano extends EstacioBase {
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
-        const notes = this.getParameterValue('notes', this.currentPreset);
+        const notes = this.getParameterValue('notes');
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
             const maxBeat = currentStep + 1;
@@ -90,7 +90,7 @@ export class EstacioPiano extends EstacioBase {
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        const notes = this.getParameterValue('notes');
                         notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }

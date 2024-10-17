@@ -218,8 +218,8 @@ export class EstacioSampler extends EstacioBase {
 
     playSoundFromPlayer(playerIndex, time) {
         const buffer = this.audioBuffers[playerIndex];
-        const start = this.getParameterValue(`start${playerIndex + 1}`, this.currentPreset);
-        const end = this.getParameterValue(`end${playerIndex + 1}`, this.currentPreset);
+        const start = this.getParameterValue(`start${playerIndex + 1}`);
+        const end = this.getParameterValue(`end${playerIndex + 1}`);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
         if (player && buffer && envelope) {
@@ -236,7 +236,7 @@ export class EstacioSampler extends EstacioBase {
             // amb el player reproduïnt sons multiples vegades (?). Com que fem servir un envelope per l'amplitud, deixarem
             // el player funcionant "sempre" i d'aquesta manera evitem els problemes. Això vol dir que consumirà més recursos,
             // però tampoc sabem si és significatiu. 
-            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`));
             envelope.triggerRelease(time);
         }
     }
@@ -244,7 +244,7 @@ export class EstacioSampler extends EstacioBase {
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
-        const notes = this.getParameterValue('notes', this.currentPreset);
+        const notes = this.getParameterValue('notes');
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
             const maxBeat = currentStep + 1;
@@ -269,7 +269,7 @@ export class EstacioSampler extends EstacioBase {
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % this.getNumSteps();
-                const pattern = this.getParameterValue('pattern', this.currentPreset);
+                const pattern = this.getParameterValue('pattern');
                 const index = indexOfArrayMatchingObject(pattern, {'i': playerIndex, 'j': currentStep});
                 if (index === -1) {
                     pattern.push({'i': playerIndex, 'j': currentStep});
@@ -308,7 +308,7 @@ export class EstacioSampler extends EstacioBase {
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        const notes = this.getParameterValue('notes');
                         notes.push({'n': reducedMidiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }
