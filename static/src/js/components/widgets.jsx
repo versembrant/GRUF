@@ -71,17 +71,19 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
 
     const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
 
-    if (parameterName === 'volume') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+    if (parameterName === 'volume' || parameterName === 'pan') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
     else if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
     else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
     const nomEstacio=estacio.nom;
     const parameterDescription =
     (parameterName === 'volume') ?  {type: 'float', min: 0, max: 1} : // TODO: DON'T HARDCODE!!!
+    (parameterName === 'pan') ?  {type: 'float', min: -1, max: 1, label: 'Pan'} : // TODO: DON'T HARDCODE!!!
     parameterParent.getParameterDescription(parameterName);
 
     const realValue = 
     (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
+    (parameterName === 'pan') ? getCurrentSession().getLivePansEstacions()[nomEstacio] || 0 :
     (parameterName === 'swing') ? parameterParent.getParameterValue(parameterName) :
     parameterParent.getParameterValue(parameterName, estacio.getCurrentLivePreset());
     
@@ -103,6 +105,10 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
             const currentGains = getCurrentSession().getLiveGainsEstacions();
             currentGains[estacio.nom] = parseFloat(newRealValue, 10);
             getCurrentSession().liveSetGainsEstacions(currentGains);
+        } else if (parameterName === 'pan') {
+            const currentPans = getCurrentSession().getLivePansEstacions();
+            currentPans[estacio.nom] = parseFloat(newRealValue, 10);
+            getCurrentSession().liveSetPansEstacions(currentPans);
         }
         else if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
         else parameterParent.updateParametreEstacio(parameterName, newRealValue);

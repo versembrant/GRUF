@@ -2,36 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
+import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
 import { Knob } from 'primereact/knob';
-
-export const GrufPanKnob = ({ estacio }) => {
-    const parameterValue = getCurrentSession().getLivePanEstacio(estacio.nom)
-
-    const handlePanChange = (newValue) => {
-        const currentPans = getCurrentSession().getLivePansEstacions();
-        currentPans[estacio.nom] = parseFloat(newValue, 10);
-        getCurrentSession().liveSetPansEstacions(currentPans);
-    };
-
-    return (
-        <div className="gruf-pan-knob">
-            <Knob 
-                value={parameterValue}
-                min={-1} 
-                max={1} 
-                step={0.01} 
-                onChange={(e) => handlePanChange(e.value)}
-                size={50}
-                valueColor="#FFFFFF"
-                rangeColor="#AAAAAA"
-                showValue={false}
-            />
-            <div style={{display:"flex", justifyItems:"center", justifyContent:'center', fontSize: '12px', border: '5px'}}>PAN</div>
-        </div>
-    );
-};
 
 export const GrufMasterPanKnob = () => {
     const masterPan = getAudioGraphInstance().getMasterPan();
@@ -269,9 +242,10 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     }
 
     const isIndirectMute = isAnySolo && !isSolo;
+    // TODO: remove position relative from grufknob in future
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufPanKnob estacio={estacio} />
+            <GrufKnob estacio={estacio} parameterName='pan' mida='gran' position='relative'/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
