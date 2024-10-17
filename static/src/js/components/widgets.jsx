@@ -71,11 +71,11 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
 
     const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
 
-    if (parameterName === 'gain' || parameterName === 'pan') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
-    else if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
-    else subscribeToEstacioParameterChanges(parameterParent, parameterName);
-
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
+
+    if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
+    else if (parameterDescription.live) subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+    else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
     const realValue =  parameterParent.getParameterValue(parameterName);
     
