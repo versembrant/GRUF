@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, clamp} from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, clamp, transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -725,7 +725,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
-            <div style={{overflow:"scroll"}}>
+            <div>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
@@ -842,8 +842,16 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     const selectedSoundName = estacio.getParameterValue('selecetdSoundName', estacio.getCurrentLivePreset());
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
-        [...getCurrentSession().getRecordedFiles().map((item, i) => ({'label': 'Gravació usuari ' + (i + 1), 'value': item})),
-        ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
+        [...getCurrentSession().getRecordedFiles().map((item, i) => ({
+            'label': 'Gravació usuari ' + (i + 1), 
+            'value': item,
+            'tonality': undefined
+        })),
+        ...sampleLibrary.sampler.map(item => ({
+            'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
+            'value': item.name,
+            'tonality': item.tonality
+        }))
     ];
     const optionNames = options.map(item => item.value);
 
@@ -874,10 +882,22 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             });
         })
     }
+    const tonalitat = getAudioGraphInstance().getTonality();
+    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
+
+    const optionTemplate = (option) => {
+        const tonalitatSampleLlista = option.tonality
+        console.log(tonalitatSampleLlista)
+        return (
+            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
+        );
+    };
 
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
+                className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                itemTemplate={optionTemplate}
                 value={selectedSoundName}
                 onChange={(evt) => {
                     estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
