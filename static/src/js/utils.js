@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
 import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
+import { sampleLibrary} from "./sampleLibrary";
 
 
 export const buildAudioGraphIfNotBuilt = async () => {  
@@ -346,4 +347,26 @@ export const units = {
     hertz: 'Hz',
     decibel: 'dB',
     percent: '%'
+}
+
+// Tonalitat
+export const transformaNomTonalitat = (nomTonalitat) => {
+    let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
+    nomActualitzat = nomActualitzat.replace("minor", " Minor");
+    nomActualitzat = nomActualitzat.replace("major", " Major");
+    nomActualitzat = nomActualitzat.replace("b ", "♭ ");
+    return nomActualitzat;
+}
+
+
+export const getTonalityForSamplerLibrarySample = (soundName) => {
+    let tonalityFound = undefined;
+    sampleLibrary.sampler.forEach((sound) => {
+        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
+            if (sound.hasOwnProperty('tonality')) {
+                tonalityFound = sound.tonality;
+            }
+        }
+    });
+    return tonalityFound;
 }
