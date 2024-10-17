@@ -2,61 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
+import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
-import { Knob } from 'primereact/knob';
-
-export const GrufPanKnob = ({ estacio }) => {
-    const parameterValue = getCurrentSession().getLivePanEstacio(estacio.nom)
-
-    const handlePanChange = (newValue) => {
-        const currentPans = getCurrentSession().getLivePansEstacions();
-        currentPans[estacio.nom] = parseFloat(newValue, 10);
-        getCurrentSession().liveSetPansEstacions(currentPans);
-    };
-
-    return (
-        <div className="gruf-pan-knob">
-            <Knob 
-                value={parameterValue}
-                min={-1} 
-                max={1} 
-                step={0.01} 
-                onChange={(e) => handlePanChange(e.value)}
-                size={50}
-                valueColor="#FFFFFF"
-                rangeColor="#AAAAAA"
-                showValue={false}
-            />
-            <div style={{display:"flex", justifyItems:"center", justifyContent:'center', fontSize: '12px', border: '5px'}}>PAN</div>
-        </div>
-    );
-};
-
-export const GrufMasterPanKnob = () => {
-    const masterPan = getAudioGraphInstance().getMasterPan();
-
-    const handlePanChange = (newValue) => {
-        getAudioGraphInstance().setMasterPan(newValue);
-    };
-
-    return (
-        <div className="gruf-pan-knob">
-            <Knob 
-                value={masterPan}
-                min={-1}
-                max={1}
-                step={0.01}
-                onChange={(e) => handlePanChange(e.value)}
-                size={50}
-                valueColor="#FFFFFF"
-                rangeColor="#AAAAAA"
-                showValue={false}
-            />
-            <div style={{ display: "flex", justifyItems: "center", justifyContent: "center", fontSize: "12px" }}> PAN </div>
-        </div>
-    );
-};
 
 export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
@@ -64,7 +11,7 @@ export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
     const handleMuteToggle = (evt) => {
         const currentMutes = getCurrentSession().getLiveMutesEstacions();
         currentMutes[estacio.nom] = evt.target.checked;
-        getCurrentSession().liveSetMutesEstacions(currentMutes);
+        getCurrentSession().setLiveMutesEstacions(currentMutes);
     };
 
     
@@ -90,7 +37,7 @@ export const GrufSoloCheckbox = ({ estacio, changeSoloState }) => {
         const isSolo = evt.target.checked;
         const currentSolos = getCurrentSession().getLiveSolosEstacions();
         currentSolos[estacio.nom] = isSolo;
-        getCurrentSession().liveSetSolosEstacions(currentSolos);
+        getCurrentSession().setLiveSolosEstacions(currentSolos);
         changeSoloState(isSolo);
     };
 
@@ -121,7 +68,7 @@ export const GrufGainSlider = ({ estacio }) => {
                 onInput={(evt) => {
                     const currentGains = getCurrentSession().getLiveGainsEstacions();
                     currentGains[estacio.nom] = parseFloat(evt.target.value, 10);
-                    getCurrentSession().liveSetGainsEstacions(currentGains);
+                    getCurrentSession().setLiveGainsEstacions(currentGains);
                 }}
             />
             {estacio.nom}
@@ -147,7 +94,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     const handleGainChange = (evt, value) => {
         const currentGains = getCurrentSession().getLiveGainsEstacions();
         currentGains[nomEstacio] = parseFloat(value, 10);
-        getCurrentSession().liveSetGainsEstacions(currentGains);
+        getCurrentSession().setLiveGainsEstacions(currentGains);
     };
 
     return (
@@ -269,9 +216,10 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     }
 
     const isIndirectMute = isAnySolo && !isSolo;
+    // TODO: remove position relative from grufknob in future
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufPanKnob estacio={estacio} />
+            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' position='relative' noOutput="true" customWidth="50px" customHeight="50px"/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
@@ -355,7 +303,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     </div>
                     <div className="estacio-mixer-master-columna">
-                        <GrufMasterPanKnob/>
+                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" position="relative" noOutput="true" customWidth="50px" customHeight="50px"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
                         <GrufMasterMeter showLevelMeters={showLevelMeters} />

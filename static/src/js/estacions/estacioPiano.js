@@ -3,26 +3,17 @@ import { EstacioBase } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { Piano } from '@tonejs/piano'
 import { EstacioPianoUI } from "../components/estacioPiano";
+import { units } from "../utils"
 
 export class EstacioPiano extends EstacioBase {
 
     tipus = 'piano'
     versio = '0.1'
     parametersDescription = {
+        ...EstacioBase.parametersDescription,
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, permetScrollVertical: true},
-        timbre: {type: 'float', label: 'Timbre', min: 1200, max: 12000, initial: 12000, logarithmic: true},
-        // FX
-        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.5},
-        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
-        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 0.5, initial: 0.0},
-        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
-        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
-        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
-        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+        timbre: {type: 'float', label: 'Timbre', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
+        fxReverbWet: {...EstacioBase.parametersDescription.fxReverbWet, initial: 0.5},
     }
 
     getUserInterfaceComponent() {
@@ -53,7 +44,7 @@ export class EstacioPiano extends EstacioBase {
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
-        const notes = this.getParameterValue('notes', this.currentPreset);
+        const notes = this.getParameterValue('notes');
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
             const maxBeat = currentStep + 1;
@@ -99,7 +90,7 @@ export class EstacioPiano extends EstacioBase {
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        const notes = this.getParameterValue('notes');
                         notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }

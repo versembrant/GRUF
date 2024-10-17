@@ -2,7 +2,7 @@ import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { makePartial } from 'redux-partial';
 import { sendMessageToServer } from "./serverComs";
-import { ensureValidValue } from "./utils";
+import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 import { EstacioDefaultUI } from "./components/estacioDefaultUI";
 
@@ -54,7 +54,23 @@ export class EstacioBase {
 
     tipus = 'base'
     versio = '0.0'
-    parametersDescription = {}
+    static parametersDescription = {
+        gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1, initial: 1},
+        pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
+
+        // FX
+        fxReverbWet: {type: 'float', label: 'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
+        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
+        fxDelayWet: {type: 'float', label: 'Delay Wet', min: 0.0, max: 1, initial: 0.0},
+        fxDelayFeedback:{type: 'float', label: 'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
+        fxDelayTime:{type: 'enum', label: 'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
+        fxDrive:{type: 'float', label: 'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
+        fxLow:{type: 'float', label: 'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+    }
     store = undefined
     audioNodes = {}
     volatileState = {}
@@ -129,12 +145,19 @@ export class EstacioBase {
         return this.getParameterDescription(parameterName).followsPreset === true;
     }
 
-    getParameterValue(parameterName, preset) {
+    getParameterValue(parameterName, preset=this.currentPreset) {
+        if (this.getParameterDescription(parameterName) === undefined) {
+            throw new Error(`Parameter ${parameterName} doesn't exist!`);
+        }
+
+        if (this.getParameterDescription(parameterName).live) {
+            return getCurrentSession().getLiveParameterEstacio(this.nom, parameterName)
+        }
+
         if (this.parameterFollowsPreset(parameterName)) {
             return this.store.getState()[parameterName][preset];
-        } else {
-            return this.store.getState()[parameterName][0];  // For parameters that don't follow presets, we always return the value of the first preset
         }
+        return this.store.getState()[parameterName][0];  // For parameters that don't follow presets, we always return the value of the first preset
     }
 
     getNumSteps() {
@@ -146,6 +169,13 @@ export class EstacioBase {
     }
 
     updateParametreEstacio(nomParametre, valor) {
+
+        if (this.getParameterDescription(nomParametre).live) {
+            const parsedValue = parseFloat(valor, 10);
+            getCurrentSession().setLiveParameterEstacio(this.nom, nomParametre, parsedValue);
+            return;
+        }
+
         const preset = this.parameterFollowsPreset(nomParametre) ? this.getCurrentLivePreset() : 0;  // For parameters that don't follow presets, allways update preset 0
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -492,68 +522,95 @@ export class Session {
         return this.store.getState().live
     }
 
+    getLiveParametersEstacions(parameterName) {
+        switch (parameterName) {
+            case 'preset':
+                return this.store.getState().live.presetsEstacions;
+            case 'gain':
+                return this.store.getState().live.gainsEstacions;
+            case 'pan':
+                return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+            case 'mute':
+                return this.store.getState().live.mutesEstacions;
+            case 'solo':
+                return this.store.getState().live.solosEstacions;
+            default:
+                throw new Error(`Unknown parameter: ${parameterName}`);
+        }
+    }
+
+    getLiveParameterEstacio(nomEstacio, parameterName) {
+        return this.getLiveParametersEstacions(parameterName)[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+    }
+
     getLivePresetsEstacions() {
-        return this.store.getState().live.presetsEstacions
+        return this.getLiveParametersEstacions('preset');
     }
 
     getLiveGainsEstacions() {
-        return this.store.getState().live.gainsEstacions
+        return this.getLiveParametersEstacions('gain');
     }
 
     getLivePansEstacions() {
-        return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+        return this.getLiveParametersEstacions('pan');
     }
 
     getLivePanEstacio(nomEstacio) {
-        return this.getLivePansEstacions()[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+        return this.getLiveParameterEstacio(nomEstacio, 'pan');
     }
 
     getLiveMutesEstacions() {
-        return this.store.getState().live.mutesEstacions
+        return this.getLiveParametersEstacions('mute');
     }
 
     getLiveSolosEstacions() {
-        return this.store.getState().live.solosEstacions
+        return this.getLiveParametersEstacions('solo');
     }
 
-    liveSetPresetForEstacio(nomEstacio, preset) {
+    setLiveParameterEstacio(nomEstacio, parameterName, parameterValue) {
+        const parametersEstacions = {[nomEstacio]: parameterValue}
+        this.updateParametreLive({
+            accio: `set_${parameterName}s`,
+            [`${parameterName}s_estacions`]: parametersEstacions,
+        });
+        
+    }
+
+    setLivePresetForEstacio(nomEstacio, preset) {
         const presets_estacions = {}
         presets_estacions[nomEstacio] = preset
-        this.updateParametreLive({
-            accio: 'set_presets',
-            presets_estacions: presets_estacions,
-        })
+        this.setLivePresetsEstacions(presets_estacions);
     }
 
-    liveSetPresetsEstacions(presetsEstacions) {
+    setLivePresetsEstacions(presetsEstacions) {
         this.updateParametreLive({
             accio: 'set_presets',
             presets_estacions: presetsEstacions,
         })
     }
 
-    liveSetGainsEstacions(gainsEstacions) {
+    setLiveGainsEstacions(gainsEstacions) {
         this.updateParametreLive({
             accio: 'set_gains',
             gains_estacions: gainsEstacions,
         })
     }
 
-    liveSetPansEstacions(pansEstacions) {
+    setLivePansEstacions(pansEstacions) {
         this.updateParametreLive({
             accio: 'set_pans',
             pans_estacions: pansEstacions || {},  // per compatibilitat amb sessins que no tenien pans
         })
     }
 
-    liveSetMutesEstacions(mutesEstacions) {
+    setLiveMutesEstacions(mutesEstacions) {
         this.updateParametreLive({
             accio: 'set_mutes',
             mutes_estacions: mutesEstacions,
         })
     }
 
-    liveSetSolosEstacions(solosEstacions) {
+    setLiveSolosEstacions(solosEstacions) {
         this.updateParametreLive({
             accio: 'set_solos',
             solos_estacions: solosEstacions,

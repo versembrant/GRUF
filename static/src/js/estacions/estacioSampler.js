@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { EstacioBase, getCurrentSession } from "../sessionManager";
-import { indexOfArrayMatchingObject} from '../utils';
+import { indexOfArrayMatchingObject, units } from '../utils';
 import { getAudioGraphInstance } from '../audioEngine';
 import { EstacioSamplerUI } from "../components/estacioSampler";
 import { sampleLibrary} from "../sampleLibrary";
@@ -53,6 +53,7 @@ export class EstacioSampler extends EstacioBase {
     tipus = 'sampler'
     versio = '0.1'
     parametersDescription = {
+        ...EstacioBase.parametersDescription,
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
             followsPreset: true, 
             notaMesBaixaPermesa: 0,
@@ -64,36 +65,18 @@ export class EstacioSampler extends EstacioBase {
             [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl()},
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
             [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
-            [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, min: 0, max: 2, initial: 0.01},
-            [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, min: 0, max: 1, initial: 0.1},
+            [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, unit: units.second, min: 0, max: 2, initial: 0.01},
+            [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, unit: units.second, min: 0, max: 1, initial: 0.1},
             [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 1.0},
-            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, min: 0, max: 4, initial: 0.01},
-            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, min: -60, max: 6, initial: 0},
+            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, unit: units.second, min: 0, max: 4, initial: 0.01},
+            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
-            [`pitch${i + 1}`]: {
-                type: 'enum', 
-                label: `Pitch${i + 1}`, 
-                options: ['-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','0','1','2','3','4','5','6','7','8','9','10','11','12'], 
-                initial: '0'
-            }
+            [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0}
         }), {}),
-        selecetdSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
+        selectedSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
 
-        lpf: {type: 'float', label: 'LPF', min: 100, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', min: 20, max: 3000, initial: 20, logarithmic: true},
-
-        // FX
-        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
-        fxReverbDecay: {type: 'float', label:'Reverb Decay', min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
-        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1.0, initial: 1.0},
-        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
-        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
-        fxLow:{type: 'float', label:'Low', min: -12, max: 12, initial: 0.0},
-        fxMid:{type: 'float', label:'Mid', min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', min: -12, max: 12, initial: 0.0},
+        lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
+        hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 20, max: 3000, initial: 20, logarithmic: true},
     }
 
     getTempsBeat = () => {
@@ -225,7 +208,7 @@ export class EstacioSampler extends EstacioBase {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
         }
 
-        if (name === 'selecetdSoundName') {
+        if (name === 'selectedSoundName') {
             setTimeout( () => {
                 // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
                 this.carregaSoDeLaLlibreria(value);
@@ -235,8 +218,8 @@ export class EstacioSampler extends EstacioBase {
 
     playSoundFromPlayer(playerIndex, time) {
         const buffer = this.audioBuffers[playerIndex];
-        const start = this.getParameterValue(`start${playerIndex + 1}`, this.currentPreset);
-        const end = this.getParameterValue(`end${playerIndex + 1}`, this.currentPreset);
+        const start = this.getParameterValue(`start${playerIndex + 1}`);
+        const end = this.getParameterValue(`end${playerIndex + 1}`);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
         if (player && buffer && envelope) {
@@ -253,7 +236,7 @@ export class EstacioSampler extends EstacioBase {
             // amb el player reproduïnt sons multiples vegades (?). Com que fem servir un envelope per l'amplitud, deixarem
             // el player funcionant "sempre" i d'aquesta manera evitem els problemes. Això vol dir que consumirà més recursos,
             // però tampoc sabem si és significatiu. 
-            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`, this.currentPreset));
+            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`));
             envelope.triggerRelease(time);
         }
     }
@@ -261,7 +244,7 @@ export class EstacioSampler extends EstacioBase {
     onSequencerTick(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
-        const notes = this.getParameterValue('notes', this.currentPreset);
+        const notes = this.getParameterValue('notes');
         for (let i = 0; i < notes.length; i++) {
             const minBeat = currentStep;
             const maxBeat = currentStep + 1;
@@ -286,7 +269,7 @@ export class EstacioSampler extends EstacioBase {
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % this.getNumSteps();
-                const pattern = this.getParameterValue('pattern', this.currentPreset);
+                const pattern = this.getParameterValue('pattern');
                 const index = indexOfArrayMatchingObject(pattern, {'i': playerIndex, 'j': currentStep});
                 if (index === -1) {
                     pattern.push({'i': playerIndex, 'j': currentStep});
@@ -325,7 +308,7 @@ export class EstacioSampler extends EstacioBase {
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes', this.currentPreset);
+                        const notes = this.getParameterValue('notes');
                         notes.push({'n': reducedMidiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }
