@@ -230,7 +230,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
 // Util function to create UI widgets for the default UIs
 const creaUIWidgetPerParametre = (estacio, nomParametre) => {
     const parameterDescription = estacio.getParameterDescription(nomParametre);
-    const parametreValorState = estacio.getParameterValue(nomParametre, estacio.getCurrentLivePreset());
+    const parametreValorState = estacio.getParameterValue(nomParametre);
     const widgetUIClassParameterType = {
         float: FloatParameterDefaultWidget,
         enum: EnumParameterDefaultWidget,
