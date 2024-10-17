@@ -169,6 +169,13 @@ export class EstacioBase {
     }
 
     updateParametreEstacio(nomParametre, valor) {
+
+        if (this.getParameterDescription(nomParametre).live) {
+            const parsedValue = parseFloat(valor, 10);
+            getCurrentSession().setLiveParameterEstacio(this.nom, nomParametre, parsedValue);
+            return;
+        }
+
         const preset = this.parameterFollowsPreset(nomParametre) ? this.getCurrentLivePreset() : 0;  // For parameters that don't follow presets, allways update preset 0
         if (!getCurrentSession().localMode) {
             // In remote mode, we send parameter update to the server and the server will send it back
@@ -560,13 +567,19 @@ export class Session {
         return this.getLiveParametersEstacions('solo');
     }
 
+    setLiveParameterEstacio(nomEstacio, parameterName, parameterValue) {
+        const parametersEstacions = {[nomEstacio]: parameterValue}
+        this.updateParametreLive({
+            accio: `set_${parameterName}s`,
+            [`${parameterName}s_estacions`]: parametersEstacions,
+        });
+        
+    }
+
     setLivePresetForEstacio(nomEstacio, preset) {
         const presets_estacions = {}
         presets_estacions[nomEstacio] = preset
-        this.updateParametreLive({
-            accio: 'set_presets',
-            presets_estacions: presets_estacions,
-        })
+        this.setLivePresetsEstacions(presets_estacions);
     }
 
     setLivePresetsEstacions(presetsEstacions) {
