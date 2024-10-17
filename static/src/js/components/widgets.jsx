@@ -65,7 +65,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false }) => {
+export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
@@ -88,7 +88,7 @@ export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mid
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
-                <div className="knobctrl-wrapper">
+                <div className="knobctrl-wrapper" style={(customWidth !== undefined && customHeight !== undefined)?{width:customWidth, height:customHeight}:{}}>
                     <KnobHeadless id={knobctrlId} className="knobctrl" style={{rotate: `${angle}deg`}}
                         valueRaw={numValue}
                         valueMin={getParameterNumericMin(parameterDescription)}
