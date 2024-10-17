@@ -4,32 +4,6 @@ import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
 import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
-import { Knob } from 'primereact/knob';
-
-export const GrufMasterPanKnob = () => {
-    const masterPan = getAudioGraphInstance().getMasterPan();
-
-    const handlePanChange = (newValue) => {
-        getAudioGraphInstance().setMasterPan(newValue);
-    };
-
-    return (
-        <div className="gruf-pan-knob">
-            <Knob 
-                value={masterPan}
-                min={-1}
-                max={1}
-                step={0.01}
-                onChange={(e) => handlePanChange(e.value)}
-                size={50}
-                valueColor="#FFFFFF"
-                rangeColor="#AAAAAA"
-                showValue={false}
-            />
-            <div style={{ display: "flex", justifyItems: "center", justifyContent: "center", fontSize: "12px" }}> PAN </div>
-        </div>
-    );
-};
 
 export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
@@ -329,7 +303,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     </div>
                     <div className="estacio-mixer-master-columna">
-                        <GrufMasterPanKnob/>
+                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" position="relative" noOutput="true"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
                         <GrufMasterMeter showLevelMeters={showLevelMeters} />
