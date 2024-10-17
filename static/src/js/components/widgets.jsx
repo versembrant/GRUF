@@ -93,16 +93,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     }
 
     const setNewRealValue = (newRealValue) => {
-        if (parameterName === 'gain') {
-            const currentGains = getCurrentSession().getLiveGainsEstacions();
-            currentGains[estacio.nom] = parseFloat(newRealValue, 10);
-            getCurrentSession().setLiveGainsEstacions(currentGains);
-        } else if (parameterName === 'pan') {
-            const currentPans = getCurrentSession().getLivePansEstacions();
-            currentPans[estacio.nom] = parseFloat(newRealValue, 10);
-            getCurrentSession().setLivePansEstacions(currentPans);
-        }
-        else if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
+        if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
         else parameterParent.updateParametreEstacio(parameterName, newRealValue);
     }
 
