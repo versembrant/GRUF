@@ -151,7 +151,7 @@ export class EstacioBase {
         }
 
         if (this.getParameterDescription(parameterName).live) {
-            return getCurrentSession().getLiveParameterEstacio(parameterName, this.nom)
+            return getCurrentSession().getLiveParameterEstacio(this.nom, parameterName)
         }
 
         if (this.parameterFollowsPreset(parameterName)) {
@@ -539,7 +539,7 @@ export class Session {
         }
     }
 
-    getLiveParameterEstacio(parameterName, nomEstacio) {
+    getLiveParameterEstacio(nomEstacio, parameterName) {
         return this.getLiveParametersEstacions(parameterName)[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
     }
 
@@ -556,7 +556,7 @@ export class Session {
     }
 
     getLivePanEstacio(nomEstacio) {
-        return this.getLiveParameterEstacio('pan', nomEstacio); 
+        return this.getLiveParameterEstacio(nomEstacio, 'pan');
     }
 
     getLiveMutesEstacions() {
