@@ -96,11 +96,11 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
         if (parameterName === 'gain') {
             const currentGains = getCurrentSession().getLiveGainsEstacions();
             currentGains[estacio.nom] = parseFloat(newRealValue, 10);
-            getCurrentSession().liveSetGainsEstacions(currentGains);
+            getCurrentSession().setLiveGainsEstacions(currentGains);
         } else if (parameterName === 'pan') {
             const currentPans = getCurrentSession().getLivePansEstacions();
             currentPans[estacio.nom] = parseFloat(newRealValue, 10);
-            getCurrentSession().liveSetPansEstacions(currentPans);
+            getCurrentSession().setLivePansEstacions(currentPans);
         }
         else if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
         else parameterParent.updateParametreEstacio(parameterName, newRealValue);
@@ -418,7 +418,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
             {[...Array(estacio.numPresets).keys()].map(i => 
             <div key={"preset_" + i}
                 className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
-                onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
+                onClick={(evt) => {getCurrentSession().setLivePresetForEstacio(estacio.nom, i)}}>
                     {i + 1}
             </div>
             )}

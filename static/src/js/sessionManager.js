@@ -560,7 +560,7 @@ export class Session {
         return this.getLiveParametersEstacions('solo');
     }
 
-    liveSetPresetForEstacio(nomEstacio, preset) {
+    setLivePresetForEstacio(nomEstacio, preset) {
         const presets_estacions = {}
         presets_estacions[nomEstacio] = preset
         this.updateParametreLive({
@@ -569,35 +569,35 @@ export class Session {
         })
     }
 
-    liveSetPresetsEstacions(presetsEstacions) {
+    setLivePresetsEstacions(presetsEstacions) {
         this.updateParametreLive({
             accio: 'set_presets',
             presets_estacions: presetsEstacions,
         })
     }
 
-    liveSetGainsEstacions(gainsEstacions) {
+    setLiveGainsEstacions(gainsEstacions) {
         this.updateParametreLive({
             accio: 'set_gains',
             gains_estacions: gainsEstacions,
         })
     }
 
-    liveSetPansEstacions(pansEstacions) {
+    setLivePansEstacions(pansEstacions) {
         this.updateParametreLive({
             accio: 'set_pans',
             pans_estacions: pansEstacions || {},  // per compatibilitat amb sessins que no tenien pans
         })
     }
 
-    liveSetMutesEstacions(mutesEstacions) {
+    setLiveMutesEstacions(mutesEstacions) {
         this.updateParametreLive({
             accio: 'set_mutes',
             mutes_estacions: mutesEstacions,
         })
     }
 
-    liveSetSolosEstacions(solosEstacions) {
+    setLiveSolosEstacions(solosEstacions) {
         this.updateParametreLive({
             accio: 'set_solos',
             solos_estacions: solosEstacions,

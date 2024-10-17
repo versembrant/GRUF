@@ -348,10 +348,10 @@ export class AudioGraph {
         this.setParametreInStore('isGraphBuilt', true);
 
         // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-        getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
-        getCurrentSession().liveSetPansEstacions(getCurrentSession().rawData.live.pansEstacions);
-        getCurrentSession().liveSetMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
-        getCurrentSession().liveSetSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
+        getCurrentSession().setLiveGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+        getCurrentSession().setLivePansEstacions(getCurrentSession().rawData.live.pansEstacions);
+        getCurrentSession().setLiveMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
+        getCurrentSession().setLiveSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
 
         // Carrega els paràmetres dels efectes
         this.applyEffectParameters(this.getEffectParameters());

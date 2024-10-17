@@ -37,7 +37,7 @@ export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
     const handleMuteToggle = (evt) => {
         const currentMutes = getCurrentSession().getLiveMutesEstacions();
         currentMutes[estacio.nom] = evt.target.checked;
-        getCurrentSession().liveSetMutesEstacions(currentMutes);
+        getCurrentSession().setLiveMutesEstacions(currentMutes);
     };
 
     
@@ -63,7 +63,7 @@ export const GrufSoloCheckbox = ({ estacio, changeSoloState }) => {
         const isSolo = evt.target.checked;
         const currentSolos = getCurrentSession().getLiveSolosEstacions();
         currentSolos[estacio.nom] = isSolo;
-        getCurrentSession().liveSetSolosEstacions(currentSolos);
+        getCurrentSession().setLiveSolosEstacions(currentSolos);
         changeSoloState(isSolo);
     };
 
@@ -94,7 +94,7 @@ export const GrufGainSlider = ({ estacio }) => {
                 onInput={(evt) => {
                     const currentGains = getCurrentSession().getLiveGainsEstacions();
                     currentGains[estacio.nom] = parseFloat(evt.target.value, 10);
-                    getCurrentSession().liveSetGainsEstacions(currentGains);
+                    getCurrentSession().setLiveGainsEstacions(currentGains);
                 }}
             />
             {estacio.nom}
@@ -120,7 +120,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     const handleGainChange = (evt, value) => {
         const currentGains = getCurrentSession().getLiveGainsEstacions();
         currentGains[nomEstacio] = parseFloat(value, 10);
-        getCurrentSession().liveSetGainsEstacions(currentGains);
+        getCurrentSession().setLiveGainsEstacions(currentGains);
     };
 
     return (
