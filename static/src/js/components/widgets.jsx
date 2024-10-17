@@ -876,7 +876,6 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     }
     const tonalitat = getAudioGraphInstance().getTonality();
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
-    console.log(tonalitat, tonalitatSample)
 
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
