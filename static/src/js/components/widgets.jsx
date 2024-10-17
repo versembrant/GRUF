@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom } from "../utils";
+import { real2Norm, norm2Real, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, transformaNomTonalitat, getTonalityForSamplerLibrarySample } from "../utils";
 import { Knob } from 'primereact/knob';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -843,7 +843,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({'label': 'Gravació usuari ' + (i + 1), 'value': item})),
-        ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + item.tonality + ')', 'value': item.name}))
+        ...sampleLibrary.sampler.map(item => ({'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 'value': item.name}))
     ];
     const optionNames = options.map(item => item.value);
 
@@ -875,12 +875,13 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
         })
     }
     const tonalitat = getAudioGraphInstance().getTonality();
-    //const tonalitat_sample = aquí és on s'ha d'agafar la tonalitat del sample
+    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
+    console.log(tonalitat, tonalitatSample)
 
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
-                className= {tonalitat == tonalitat_sample ? "sample-correcte": "sample-incorrecte"}
+                className= {((tonalitatSample !== undefined) && (tonalitat == tonalitatSample)) ? "": "text-red"}
                 value={selectedSoundName}
                 onChange={(evt) => {
                     estacio.updateParametreEstacio('selecetdSoundName', evt.target.value)
