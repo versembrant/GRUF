@@ -916,6 +916,11 @@
         gap: 25px;
         overflow: scroll;
 
+        &::-webkit-scrollbar {
+            display: none; // Webkit
+        }  
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */ 
     }
 }
 
@@ -962,13 +967,11 @@
             position: relative;
             //left: -135px;
         }
-    
-        
     }
 }
 
 .spectrum-graph {
-    width: 778px;
+    width: 885px;
     height: 350px;
     border: 1px solid $grey;
     border-radius: 10px;
