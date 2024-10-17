@@ -245,7 +245,7 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     // TODO: remove position relative from grufknob in future
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufKnob estacio={estacio} parameterName='pan' mida='gran' position='relative'/>
+            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' position='relative'/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
