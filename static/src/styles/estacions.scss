@@ -230,6 +230,12 @@
     display: flex;
     flex: auto;
     overflow-x: scroll;
+
+    &::-webkit-scrollbar {
+        display: none; // Webkit
+    }  
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */ 
 }
 
 @property --meter-level {
