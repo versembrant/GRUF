@@ -907,15 +907,27 @@
     }
 }
 
+.estacio-computer {
+    .computer-widgets {
+        margin-top: 90px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        overflow: scroll;
+
+    }
+}
+
 .grid-computer {
     user-select: none;
-    position: absolute;
     padding: 15px; 
     border-radius: 10px; 
-    border: 1px solid $light-grey; 
+    border: 1px solid $light-grey;
     
     .grid-row-computer {
         display: flex;
+        justify-content: center;
         
         .step {
             height: 18px;
@@ -945,15 +957,24 @@
             font-size: 12px;
             margin-right: 10px;
             line-height: 25px;
-            width: 120px;
+            width: 80px;
             text-align: right;
-            position: absolute;
-            left: -135px;
+            position: relative;
+            //left: -135px;
         }
     
         
     }
 }
+
+.spectrum-graph {
+    width: 778px;
+    height: 350px;
+    border: 1px solid $grey;
+    border-radius: 10px;
+    padding: 0;
+}
+
 
 .tonality-selector {
     position: absolute;
