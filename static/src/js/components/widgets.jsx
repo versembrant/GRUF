@@ -71,17 +71,13 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
 
     const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
 
-    if (parameterName === 'volume' || parameterName === 'pan') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+    if (parameterName === 'gain' || parameterName === 'pan') subscribeToPartialStoreChanges(getCurrentSession(), 'live');
     else if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
     else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
-    const nomEstacio=estacio.nom;
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
 
-    const realValue = 
-    (parameterName === 'volume') ? getCurrentSession().getLiveGainsEstacions()[nomEstacio] || 0 :
-    (parameterName === 'pan') ? getCurrentSession().getLivePansEstacions()[nomEstacio] || 0 :
-    parameterParent.getParameterValue(parameterName);
+    const realValue =  parameterParent.getParameterValue(parameterName);
     
     const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
@@ -97,7 +93,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     }
 
     const setNewRealValue = (newRealValue) => {
-        if (parameterName === 'volume') {
+        if (parameterName === 'gain') {
             const currentGains = getCurrentSession().getLiveGainsEstacions();
             currentGains[estacio.nom] = parseFloat(newRealValue, 10);
             getCurrentSession().liveSetGainsEstacions(currentGains);

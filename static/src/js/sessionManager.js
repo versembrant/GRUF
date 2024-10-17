@@ -55,8 +55,8 @@ export class EstacioBase {
     tipus = 'base'
     versio = '0.0'
     static parametersDescription = {
-        volume: {type: 'float', label: 'Volume', min: 0, max: 1, initial: 1},
-        pan: {type: 'float', label: 'Pan', min: -1, max: 1, initial: 0},
+        gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1, initial: 1},
+        pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
 
         // FX
         fxReverbWet: {type: 'float', label: 'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
@@ -146,11 +146,18 @@ export class EstacioBase {
     }
 
     getParameterValue(parameterName, preset=this.currentPreset) {
+        if (this.getParameterDescription(parameterName) === undefined) {
+            throw new Error(`Parameter ${parameterName} doesn't exist!`);
+        }
+
+        if (this.getParameterDescription(parameterName).live) {
+            return getCurrentSession().getLiveParameterEstacio(parameterName, this.nom)
+        }
+
         if (this.parameterFollowsPreset(parameterName)) {
             return this.store.getState()[parameterName][preset];
-        } else {
-            return this.store.getState()[parameterName][0];  // For parameters that don't follow presets, we always return the value of the first preset
         }
+        return this.store.getState()[parameterName][0];  // For parameters that don't follow presets, we always return the value of the first preset
     }
 
     getNumSteps() {
@@ -508,28 +515,49 @@ export class Session {
         return this.store.getState().live
     }
 
+    getLiveParametersEstacions(parameterName) {
+        switch (parameterName) {
+            case 'preset':
+                return this.store.getState().live.presetsEstacions;
+            case 'gain':
+                return this.store.getState().live.gainsEstacions;
+            case 'pan':
+                return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+            case 'mute':
+                return this.store.getState().live.mutesEstacions;
+            case 'solo':
+                return this.store.getState().live.solosEstacions;
+            default:
+                throw new Error(`Unknown parameter: ${parameterName}`);
+        }
+    }
+
+    getLiveParameterEstacio(parameterName, nomEstacio) {
+        return this.getLiveParametersEstacions(parameterName)[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+    }
+
     getLivePresetsEstacions() {
-        return this.store.getState().live.presetsEstacions
+        return this.getLiveParametersEstacions('preset');
     }
 
     getLiveGainsEstacions() {
-        return this.store.getState().live.gainsEstacions
+        return this.getLiveParametersEstacions('gain');
     }
 
     getLivePansEstacions() {
-        return this.store.getState().live.pansEstacions ?? {}  // per compatibilitat amb sessions que no tenien pans
+        return this.getLiveParametersEstacions('pan');
     }
 
     getLivePanEstacio(nomEstacio) {
-        return this.getLivePansEstacions()[nomEstacio] ?? 0.0;  // per compatibilitat amb sessions que no tenien pans
+        return this.getLiveParameterEstacio('pan', nomEstacio); 
     }
 
     getLiveMutesEstacions() {
-        return this.store.getState().live.mutesEstacions
+        return this.getLiveParametersEstacions('mute');
     }
 
     getLiveSolosEstacions() {
-        return this.store.getState().live.solosEstacions
+        return this.getLiveParametersEstacions('solo');
     }
 
     liveSetPresetForEstacio(nomEstacio, preset) {
