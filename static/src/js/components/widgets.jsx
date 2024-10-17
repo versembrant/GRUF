@@ -66,16 +66,13 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
+export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute' }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
-    
-    const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
     subscribeToParameterChanges(parameterParent, parameterName);
 
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
 
     const realValue =  parameterParent.getParameterValue(parameterName);
-    
     const normValue = num2Norm(real2Num(realValue, parameterDescription), parameterDescription); // without discreteOffset for snapping when there are discrete options
     const angleMin = -145;
     const angleMax = 145;
@@ -706,10 +703,10 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
         <div className="gruf-adsr-widget" style={{top, left, height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnob mida="petit" estacio={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
-                <GrufKnob mida="petit" estacio={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
-                <GrufKnob mida="petit" estacio={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
-                <GrufKnob mida="petit" estacio={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
             </div>
         </div>
     )
