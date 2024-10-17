@@ -36,6 +36,9 @@ export class EstacioGrooveBox extends EstacioBase {
     tipus = 'groovebox'
     versio = '0.1'
     parametersDescription = {
+        ...EstacioBase.parametersDescription,
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
+        
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[
             {'nom': 'Hip Hop Classic 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}]}, 
             {'nom': 'Hip Hop classic 2' , 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}]},
@@ -48,9 +51,6 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Trap 2', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":1},{"i":1,"j":5},{"i":2,"j":8},{"i":1,"j":11},{"i":1,"j":13},{"i":1,"j":15},{"i":1,"j":4},{"i":3,"j":4},{"i":1,"j":9},{"i":3,"j":15}]},
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
-
-        volume: {type: 'float', label: 'Volume', unit: units.decibel, min: -30, max: 6, initial: 0},
-        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
 
         ...Object.fromEntries(
             sounds.flatMap((sound, index) => {
@@ -66,19 +66,6 @@ export class EstacioGrooveBox extends EstacioBase {
                 ]
             })
         ),
-
-        // FX
-        fxReverbWet: {type: 'float', label:'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
-        fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
-        fxDelayWet: {type: 'float', label:'Delay Wet', min: 0.0, max: 1, initial: 0.0},
-        fxDelayFeedback:{type: 'float', label:'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        fxDelayTime:{type: 'enum', label:'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
-        fxDrive:{type: 'float', label:'Drive', min: 0.0, max: 1.0, initial: 0.0},
-        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
-        fxLow:{type: 'float', label:'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
-        fxMid:{type: 'float', label:'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
-        fxHigh:{type: 'float', label:'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
     }
 
     getNumSteps (){

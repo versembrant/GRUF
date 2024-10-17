@@ -2,7 +2,7 @@ import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { makePartial } from 'redux-partial';
 import { sendMessageToServer } from "./serverComs";
-import { ensureValidValue } from "./utils";
+import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 import { EstacioDefaultUI } from "./components/estacioDefaultUI";
 
@@ -54,7 +54,23 @@ export class EstacioBase {
 
     tipus = 'base'
     versio = '0.0'
-    parametersDescription = {}
+    static parametersDescription = {
+        volume: {type: 'float', label: 'Volume', min: 0, max: 1, initial: 1},
+        pan: {type: 'float', label: 'Pan', min: -1, max: 1, initial: 0},
+
+        // FX
+        fxReverbWet: {type: 'float', label: 'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
+        fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
+        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
+        fxDelayWet: {type: 'float', label: 'Delay Wet', min: 0.0, max: 1, initial: 0.0},
+        fxDelayFeedback:{type: 'float', label: 'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
+        fxDelayTime:{type: 'enum', label: 'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
+        fxDrive:{type: 'float', label: 'Drive', min: 0.0, max: 1.0, initial: 0.0},
+        fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
+        fxLow:{type: 'float', label: 'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+    }
     store = undefined
     audioNodes = {}
     volatileState = {}
