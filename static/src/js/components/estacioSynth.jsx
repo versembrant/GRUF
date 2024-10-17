@@ -23,8 +23,8 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxMid" top="35%" left="56.4%" />
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxHigh" top="35%" left="60.9%" />
             
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="38.2%"  fons="linies" />
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="43%"  fons="linies" />
+            <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="38.2%" size="100px"  fons="linies" />
+            <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="43%" size="100px" fons="linies" />
 
             <GrufLabel text="Delay" top="14.2%" left="82.3%" />
             <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />

@@ -23,9 +23,9 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label='Mid' /> 
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label='High' />
 
-                <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="29%" height="126px" fons="linies" />
-                <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="33.8%" height="126px" fons="linies" />
-                
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="29%" size="150px" fons="linies" />
+                <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="33.8%" size="150px" fons="linies" />
+
                 <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
                 <GrufLabel text="Durada" top="12.7%" left="51.7%" />
                 <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
