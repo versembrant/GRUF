@@ -29,10 +29,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="Durada" top="29.6%" left="70.3%" />
             <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
             
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" top="28%" left="83.6%" labelStart="0%" labelEnd="100%" /> 
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" top="28%" left="88.9%" labelStart="0%" labelEnd="100%" /> 
-            <GrufLabelPetit text="Mix" top="40.3%" left="84%" />
-            <GrufLabelPetit text="Feedback" top="40.3%" left="87.6%" />
+            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" label="Mix" top="28%" left="83.6%" markStart="0%" markEnd="100%" /> 
+            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" label="Feedback" top="28%" left="88.9%" markStart="0%" markEnd="100%" /> 
            
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume1" top="48.5%" left="5%" label = 'Vol' />
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone1" top="48.5%" left="9%" label = 'Tone' />

@@ -158,7 +158,7 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, labelStart, labelEnd, fons }) => {
+export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, fons, noLabel=false, noOutput=false }) => {
     subscribeToParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const realValue = estacio.getParameterValue(parameterName);
@@ -166,8 +166,8 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
     const nomEstacio = estacio.nom;
     const marks = []
 
-    if (labelStart !== undefined) marks.push({ value: 0, label: labelStart});
-    if (labelEnd !== undefined) marks.push({ value: 1, label: labelEnd});
+    if (markStart !== undefined) marks.push({ value: 0, label: markStart});
+    if (markEnd !== undefined) marks.push({ value: 1, label: markEnd});
     
     const style = { top: top, left: left };
     if (orientation==='vertical') style.height = size || '80px';
@@ -186,7 +186,8 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
                 marks={marks} 
                 onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, num2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
             />
-            <output htmlFor={sliderId}>{real2String(realValue, parameterDescription)}</output>
+            {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescription.label}</label>}
+            {!noOutput && <output htmlFor={sliderId}>{real2String(realValue, parameterDescription)}</output>}
         </div>
     )
 };
