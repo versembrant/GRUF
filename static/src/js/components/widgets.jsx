@@ -66,7 +66,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute' }) => {
+export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput="false" }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
@@ -104,7 +104,7 @@ export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mid
                     />
                 </div>
                 <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
-                <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>
+                {!noOutput && <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>}
         </div>
     )
 };
