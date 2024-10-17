@@ -587,9 +587,9 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     subscribeToEstacioParameterChanges(estacio, parameterName);
-    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
+    subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName, estacio.getCurrentLivePreset());
@@ -647,6 +647,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     useEffect(() => {
         const jsElement = document.getElementById(uniqueId + "_id")
         if (jsElement.dataset.alreadyBinded === undefined){
+            jsElement.dataset.lastTonality = tonality;
+
             jsElement.addEventListener("pianoRollEdited", evt => {
                 const stringifiedData = JSON.stringify(evt.detail)
                 if (!isequal(stringifiedData, lastEditedData)) {
@@ -696,7 +698,13 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             })
             
             jsElement.dataset.alreadyBinded = true;
+        } else {
+            if (jsElement.dataset.lastTonality !== tonality) {
+                jsElement.setAllowedNotes(getAllowedNotesForTonality(tonality));
+                jsElement.dataset.lastTonality = tonality;
+            }
         }
+
         if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
             jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
             jsElement.redraw()
@@ -771,7 +779,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
         <div className="gruf-piano-roll" style={{ top: top, left: left}}>
-            <div>
+            <div style={{overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
