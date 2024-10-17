@@ -49,7 +49,7 @@ export const AudioTransportControls = () => {
                 Current step: {getAudioGraphInstance().getMainSequencerCurrentStep()}
             </div>
             <div>
-                Volume: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getMasterGain()} onChange={(e) => getAudioGraphInstance().setMasterGain(e.target.value)}/>
+                Gain: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getMasterGain()} onChange={(e) => getAudioGraphInstance().setMasterGain(e.target.value)}/>
             </div>
             <div>
                 BPM: <input type="range" min={getAudioGraphInstance().getParameterDescription('bpm').min} max={getAudioGraphInstance().getParameterDescription('bpm').max} step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}

@@ -7,7 +7,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufKnob estacio={estacio} parameterName="volume" top="80%" left="85%" label="Vol" />
+            <GrufKnob estacio={estacio} parameterName="gain" top="80%" left="85%" label="Vol" />
             <GrufLabel text="EQ" top="7.3%" left="6%" />
             <GrufKnob mida="gran" estacio={estacio} parameterName="fxLow" top="12%" left="5.8%" />
             <GrufKnob mida="gran" estacio={estacio} parameterName="fxMid" top="12%" left="15.5%" />
