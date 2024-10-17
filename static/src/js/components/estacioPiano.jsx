@@ -1,4 +1,4 @@
-import { GrufKnobGran, GrufLabel, GrufReverbTime, GrufSlider, GrufButtonNoBorder, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
+import { GrufKnobGran, GrufLabel, GrufReverbTime, GrufSlider, GrufButtonNoBorder, GrufPianoRoll, GrufSelectorTonalitat, GrufKnobGranGlobal } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
@@ -7,6 +7,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufKnobGranGlobal estacio={estacio} parameterName="volume" top="80%" left="85%" label="Vol" />
             <GrufLabel text="EQ" top="7.3%" left="6%" />
             <GrufKnobGran estacio={estacio} parameterName="fxLow" top="12%" left="5.8%" />
             <GrufKnobGran estacio={estacio} parameterName="fxMid" top="12%" left="15.5%" />
