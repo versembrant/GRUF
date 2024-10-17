@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
 import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
-import { Knob } from 'primereact/knob';
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -66,7 +65,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 
 
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput="false" }) => {
+export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
