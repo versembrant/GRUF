@@ -168,6 +168,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.locate=function(tick){
             this.cursor=tick;
         };
+        this.setAllowedNotes=function(allowednotes){
+            this.allowednotes=allowednotes;
+            this.redraw();
+        };
+
         this.updateTimer=function(){
             this.tick2time=4*60/this.tempo/this.timebase;
         };
