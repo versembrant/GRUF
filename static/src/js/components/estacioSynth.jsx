@@ -8,6 +8,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufKnob estacio={estacio} parameterName="volume" top="80%" left="85%" label="Vol" />
             <GrufADSRWidget estacio={estacio} top="4.8%" left="3.7%" height="276px"/>
             <GrufLabel text="EQ" top="29.6%" left="52%" />
             <GrufKnob mida="gran" estacio={estacio} parameterName="fxDrive" top="8%" left="28%" />
