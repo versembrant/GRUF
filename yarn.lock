@@ -59,6 +59,11 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@dsp-ts/math@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@dsp-ts/math/-/math-0.1.0.tgz#2f7e2d0cda5927daaa0c67ec1c56c9b54383f265"
+  integrity sha512-NDjfx30t9IPqbSKKYyjro0QXX4m6dgW4pnuAbNMI442ePKyn0xG/L2rTBYM5NoT3IP0Y2EA0hCPhXlVNvRb7Vg==
+
 "@emotion/babel-plugin@^11.11.0":
   version "11.11.0"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.11.0.tgz#c2d872b6a7767a9d176d007f5b31f7d504bb5d6c"
@@ -1173,6 +1178,18 @@
   resolved "https://registry.yarnpkg.com/@types/webmidi/-/webmidi-2.0.10.tgz#1e0caf9997cb06cdf38a03c2a958d8c5129bbcf0"
   integrity sha512-4RmTFMB6mN2h8XbJa1x3cOs9IOkXvFyHGcPUpUvWfmATuKg/J+dsFiMVgCE2EkpS+/8a8AP2tE3rQT1mLG7vEg==
 
+"@use-gesture/core@10.3.1":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@use-gesture/core/-/core-10.3.1.tgz#976c9421e905f0079d49822cfd5c2e56b808fc56"
+  integrity sha512-WcINiDt8WjqBdUXye25anHiNxPc0VOrlT8F6LLkU6cycrOGUDyY/yyFmsg3k8i5OLvv25llc0QC45GhR/C8llw==
+
+"@use-gesture/react@^10.3.0":
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/@use-gesture/react/-/react-10.3.1.tgz#17a743a894d9bd9a0d1980c618f37f0164469867"
+  integrity sha512-Yy19y6O2GJq8f7CHf7L0nxL8bf4PZCPaVOCgJrusOeFHY1LvHgYXnmnXg6N5iwAnbgbZCDjo60SiM6IPJi9C5g==
+  dependencies:
+    "@use-gesture/core" "10.3.1"
+
 abortcontroller-polyfill@^1.1.9:
   version "1.7.5"
   resolved "https://registry.yarnpkg.com/abortcontroller-polyfill/-/abortcontroller-polyfill-1.7.5.tgz#6738495f4e901fbb57b6c0611d0c75f76c485bed"
@@ -1898,6 +1915,11 @@ mdn-data@2.0.14:
   resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.14.tgz#7113fc4281917d63ce29b43446f701e68c25ba50"
   integrity sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==
 
+merge-props@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/merge-props/-/merge-props-6.0.0.tgz#4bd64f2718c30ef957612c79f5770b99e07df2d3"
+  integrity sha512-ORZFZMGKE5PuAi7YfVCfPz3jiS9V0t2XXE2AGYiwMrcudRuj0hkXKEzsl17pUF07r+Digf9YlTzteX2LFE6vAQ==
+
 micromatch@^4.0.5:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-4.0.5.tgz#bc8999a7cbbf77cdc89f132f6e467051b49090c6"
@@ -2190,6 +2212,15 @@ react-is@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
+
+react-knob-headless@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-knob-headless/-/react-knob-headless-0.3.0.tgz#cbdfb855e09d11e5dd29bcfe7d026b4c735e1101"
+  integrity sha512-YrqH2VMcrJLqlnvlnY0Yi+nJFWlDck75VxNik2gkyw9OYxil3YqXn0tJRJxRxsQGmTmBK02iiNOMsQJFPwGe3Q==
+  dependencies:
+    "@dsp-ts/math" "^0.1.0"
+    "@use-gesture/react" "^10.3.0"
+    merge-props "^6.0.0"
 
 react-refresh@^0.9.0:
   version "0.9.0"

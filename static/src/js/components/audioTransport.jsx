@@ -36,6 +36,7 @@ const handleCompasChange = (e) => {
 export const AudioTransportControls = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
     if (!getAudioGraphInstance().isGraphBuilt()){return (<div></div>);}// If graph is not built, don't show the play/stop button
+    const compasOptions = getAudioGraphInstance().getParameterDescription('compas').options.map(compasOption=> <option value={compasOption}>{compasOption}</option>)
     return (
         <div>
             <div>
@@ -48,10 +49,10 @@ export const AudioTransportControls = () => {
                 Current step: {getAudioGraphInstance().getMainSequencerCurrentStep()}
             </div>
             <div>
-                Volume: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getMasterGain()} onChange={(e) => getAudioGraphInstance().setMasterGain(e.target.value)}/>
+                Gain: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getMasterGain()} onChange={(e) => getAudioGraphInstance().setMasterGain(e.target.value)}/>
             </div>
             <div>
-                BPM: <input type="range" min="40" max="300" step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}
+                BPM: <input type="range" min={getAudioGraphInstance().getParameterDescription('bpm').min} max={getAudioGraphInstance().getParameterDescription('bpm').max} step="1" value={getAudioGraphInstance().getBpm()} onChange={(e) => handleSetBpm(e)}/> {getAudioGraphInstance().getBpm()}
             </div>
             <div>
                 Swing: <input type="range" min="0" max="1" step="0.01" value={getAudioGraphInstance().getSwing()} onChange={(e) => handleSetSwing(e)}/> {getAudioGraphInstance().getSwing()}
@@ -59,9 +60,7 @@ export const AudioTransportControls = () => {
             <div>
                 Compàs:
                 <select value={getAudioGraphInstance().getCompas()} onChange={handleCompasChange}>
-                    <option value="2/4">2/4</option>
-                    <option value="3/4">3/4</option>
-                    <option value="4/4">4/4</option>
+                    {compasOptions}
                 </select>
             </div>
             <div>

@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
+import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
 import { sampleLibrary} from "./sampleLibrary";
 
@@ -33,6 +34,11 @@ export const sample = (arr, sampleSize=1) => {
     
     if (sampleSize === 1) return [...sampledItems][0];
     return [...sampledItems];
+}
+
+export const roundToStep = (value, step) => {
+    if (step === undefined || step === 0) return value;
+    return Math.round(value / step) * step;
 }
 
 // Make sure numeric value is within min/max boundaries
@@ -134,7 +140,23 @@ export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => 
 
 // Util function to subscribe a react component to changes of a change of a parameter of a estacio
 export const subscribeToEstacioParameterChanges = (estacio, nomParametre) => {
+    if (estacio.getParameterDescription(nomParametre).live) return subscribeToPartialStoreChanges(getCurrentSession(), 'live');
     return subscribeToPartialStoreChanges(estacio, nomParametre);
+}
+
+export const subscribeToAudioGraphParameterChanges = (nomParametre) => {
+    return subscribeToPartialStoreChanges(getAudioGraphInstance(), nomParametre);
+}
+
+export const subscribeToParameterChanges = (parameterParent, nomParametre) => {
+    if (parameterParent === getAudioGraphInstance()) return subscribeToAudioGraphParameterChanges(nomParametre);
+    else return subscribeToEstacioParameterChanges(parameterParent, nomParametre)
+}
+
+// Function for widgets to have a single interface to update any parameter
+export const updateParametre = (parameterParent, parameterName, value) => {
+    if (parameterParent === getAudioGraphInstance()) parameterParent.updateParametreAudioGraph(parameterName, value);
+    else parameterParent.updateParametreEstacio(parameterName, value);
 }
 
 
@@ -153,19 +175,93 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
 // Parameter range conversions
 const exponent = 2;
 
-export const norm2Real = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow(x, exponent)*(parameterDescription.max-parameterDescription.min)+parameterDescription.min;
-    }else{
-        return x * (parameterDescription.max-parameterDescription.min) + parameterDescription.min;
+export const norm2Num = (normValue, parameterDescription) => {
+    const numMin = getParameterNumericMin(parameterDescription);
+    const numMax = getParameterNumericMax(parameterDescription);
+
+    if(!parameterDescription.logarithmic) return normValue * (numMax-numMin) + numMin;
+    return Math.pow(normValue, exponent)*(numMax-numMin)+numMin;
+}
+
+export const num2Norm = (numValue, parameterDescription) => {
+    const numMin = getParameterNumericMin(parameterDescription);
+    const numMax = getParameterNumericMax(parameterDescription);
+
+    if(!parameterDescription.logarithmic) return (numValue - numMin)/(numMax-numMin);
+    return Math.pow((numValue - numMin)/(numMax-numMin), 1/exponent);
+}
+
+export const real2Num = (realValue, parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return realValue;
+        case 'enum':
+            return parameterDescription.options.indexOf(realValue);
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
 }
 
-export const real2Norm = (x, parameterDescription) => {
-    if(parameterDescription.logarithmic){
-        return Math.pow((x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min), 1/exponent);
-    }else{
-        return (x - parameterDescription.min)/(parameterDescription.max-parameterDescription.min);
+export const num2Real = (numValue, parameterDescription) => {
+    const discreteValue = roundToStep(numValue, getParameterStep(parameterDescription));
+    switch(parameterDescription.type) {
+        case 'float':
+            return discreteValue;
+        case 'enum':
+            return parameterDescription.options[discreteValue];
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const getParameterNumericMin = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.min;
+        case 'enum':
+            return 0;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const getParameterNumericMax = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.max;
+        case 'enum':
+            return parameterDescription.options.length - 1;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+    }
+}
+
+export const real2String = (realValue, parameterDescription) => {
+    let displayValue = realValue;
+    
+    if (parameterDescription.type === 'float') {
+        const valueTenExponent = Math.floor(realValue) === 0 ? 1 : Math.floor(Math.log10(Math.abs(realValue))) + 1; // the number of digits of the integer
+        const stepSize = getParameterStep(parameterDescription);
+        const stepDecimals = stepSize ? stepSize.toString().split('.')[1]?.length || 0 : undefined;
+        const precision = 4; // but integers can have more ciphers
+        const maxDecimals = stepSize ? stepDecimals : 2; // for continous values, we show a maximum of 2 decimals. for stepped ones, the ones corresponding to the step size.
+        const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
+        displayValue = realValue.toFixed(decimals);
+    }
+        
+    const THINSPACE = " ";
+    const unitInfo = parameterDescription.unit ? THINSPACE + parameterDescription.unit : "";
+    return displayValue + unitInfo;
+}
+
+export const getParameterStep = (parameterDescription) => {
+    switch(parameterDescription.type) {
+        case 'float':
+            return parameterDescription.step;
+        case 'enum':
+            return 1;
+        default:
+            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
     }
 }
 
@@ -246,6 +342,12 @@ export const removeURLParam = (paramName) => {
     }    
 }
 
+export const units = {
+    second: 's',
+    hertz: 'Hz',
+    decibel: 'dB',
+    percent: '%'
+}
 
 // Tonalitat
 export const transformaNomTonalitat = (nomTonalitat) => {

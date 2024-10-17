@@ -18,40 +18,57 @@ export class AudioGraph {
         this.estacionsMeterNodes = {};
         this.spectrumSize = 64;
 
-        // Inicialitza un redux store amb les propietats relacionades amb audio
-        const defaultsForPropertiesInStore = {
-            bpm: 120,
-            masterGain: 1.0,
-            masterPan:0.0,
-            gainsEstacions: {},
-            pansEstacions: {},
-            mutesEstacions: {},
-            solosEstacions: {},
-            mainSequencerCurrentStep: -1,
-            isGraphBuilt: false,
-            isMasterAudioEngine: true,
-            isAudioEngineSyncedToRemote: true,
-            isPlaying: false,
-            isPlayingArranjement: false,
-            swing: 0,
-            compas: '4/4',
-            tonality : 'cmajor',
+        this.parametersDescription = {
+            bpm: {type: 'float', min: 40, max: 300, initial: 120},
+            masterGain: {type: 'float', min: 0.0, max: 1.0, initial: 1.0},
+            masterPan: {type: 'float', min: -1.0, max: 1.0, initial: 0.0, label: "Pan"},
+            gainsEstacions: {initial: {}},
+            pansEstacions: {initial: {}},
+            mutesEstacions: {initial: {}},
+            solosEstacions: {initial: {}},
+            mainSequencerCurrentStep: {type: 'int', initial: -1},
+            isGraphBuilt: {type: 'bool', initial: false},
+            isMasterAudioEngine: {type: 'bool', initial: true},
+            isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
+            isPlaying: {type: 'bool', initial: false},
+            isPlayingArranjement: {type: 'bool', initial: false},
+            swing: {type: 'float', min: 0.0, max: 1.0, initial: 0.0},
+            compas: {type: 'enum', options: ['2/4', '3/4', '4/4'], initial: '4/4'},
+            tonality: {
+                type: 'enum',
+                options:['cmajor', 'cminor',
+                    'c#major', 'c#minor',
+                    'dmajor', 'dminor',
+                    'ebmajor', 'ebminor',
+                    'emajor', 'eminor',
+                    'fmajor', 'fminor',
+                    'f#major', 'f#minor',
+                    'gmajor', 'gminor',
+                    'abmajor', 'abminor',
+                    'amajor', 'aminor',
+                    'bbmajor', 'bbminor',
+                    'bmajor', 'bminor'],
+                initial: 'cmajor'},
             effectParameters: {
-                reverbWet:0,
-                reverbDecay: 0.1,
-                delayWet: 0,
-                delayTime: 1,
-                delayFeedback:0,
-                drive: 0,
-                eq3HighGain: 0,
-                eq3MidGain: 0,
-                eq3LowGain: 0,
-            },
+                initial: {
+                    reverbWet:0,
+                    reverbDecay: 0.1,
+                    delayWet: 0,
+                    delayTime: 1,
+                    delayFeedback:0,
+                    drive: 0,
+                    eq3HighGain: 0,
+                    eq3MidGain: 0,
+                    eq3LowGain: 0,
+                }
+            }
         }
-        const propertiesInStore = Object.keys(defaultsForPropertiesInStore);
+
+        // Inicialitza un redux store amb les propietats relacionades amb audio
+        const propertiesInStore = Object.keys(this.parametersDescription);
         const reducers = {};
         propertiesInStore.forEach(propertyName => {
-            reducers[propertyName] = (state = defaultsForPropertiesInStore[propertyName], action) => {
+            reducers[propertyName] = (state = this.parametersDescription[propertyName].initial, action) => {
                 switch (action.type) {
                     case 'SET_' + propertyName:
                     return action.value;
@@ -63,9 +80,23 @@ export class AudioGraph {
         this.store = makePartial(createStore(combineReducers(reducers)));
     }
 
+    getParameterDescription(parameterName) {
+        return this.parametersDescription[parameterName]
+    }
 
     setParametreInStore(nomParametre, valor) {
         this.store.dispatch({ type: `SET_${nomParametre}`, value: valor });
+    }
+
+    setParameterValue(nomParametre, valor) {
+        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
+        this[methodName](valor);
+    }
+
+    getParameterValue(nomParametre) {
+        const methodName =  nomParametre.startsWith('is') ? nomParametre : // for booleans
+        `get${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`; // for the rest
+        return this[methodName]();
     }
 
     isPlaying() {
@@ -148,17 +179,10 @@ export class AudioGraph {
     }
 
     getNumSteps (nCompassos = 2){
-
         const compas = this.getCompas();
-        if (compas === '2/4'){
-            return 8 * nCompassos;
-        } 
-        else if (compas === '3/4') {
-            return 12 * nCompassos;
-        }
-        else if (compas === '4/4') {
-            return 16 * nCompassos;
-        }
+        const beatsPerBar = parseInt(compas.slice(0,1));
+        const stepsPerBeat = 4;
+        return beatsPerBar * stepsPerBeat * nCompassos;
     }
 
     isGraphBuilt() {
@@ -324,10 +348,10 @@ export class AudioGraph {
         this.setParametreInStore('isGraphBuilt', true);
 
         // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-        getCurrentSession().liveSetGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
-        getCurrentSession().liveSetPansEstacions(getCurrentSession().rawData.live.pansEstacions);
-        getCurrentSession().liveSetMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
-        getCurrentSession().liveSetSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
+        getCurrentSession().setLiveGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
+        getCurrentSession().setLivePansEstacions(getCurrentSession().rawData.live.pansEstacions);
+        getCurrentSession().setLiveMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
+        getCurrentSession().setLiveSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
 
         // Carrega els paràmetres dels efectes
         this.applyEffectParameters(this.getEffectParameters());
@@ -465,8 +489,7 @@ export class AudioGraph {
     }
 
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
-        const methodName = `set${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`;
-        this[methodName](valor);
+        this.setParameterValue(nomParametre, valor);
     }
 
     receiveRemoteMainSequencerCurrentStep(currentStep) {
