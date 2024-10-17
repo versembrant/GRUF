@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
+import { getCurrentSession } from './sessionManager';
 import { getAudioGraphInstance } from './audioEngine';
 
 
@@ -138,7 +139,23 @@ export const subscribeToPartialStoreChanges = (objectWithStore, storeFilter) => 
 
 // Util function to subscribe a react component to changes of a change of a parameter of a estacio
 export const subscribeToEstacioParameterChanges = (estacio, nomParametre) => {
+    if (estacio.getParameterDescription(nomParametre).live) return subscribeToPartialStoreChanges(getCurrentSession(), 'live');
     return subscribeToPartialStoreChanges(estacio, nomParametre);
+}
+
+export const subscribeToAudioGraphParameterChanges = (nomParametre) => {
+    return subscribeToPartialStoreChanges(getAudioGraphInstance(), nomParametre);
+}
+
+export const subscribeToParameterChanges = (parameterParent, nomParametre) => {
+    if (parameterParent === getAudioGraphInstance()) return subscribeToAudioGraphParameterChanges(nomParametre);
+    else return subscribeToEstacioParameterChanges(parameterParent, nomParametre)
+}
+
+// Function for widgets to have a single interface to update any parameter
+export const updateParametre = (parameterParent, parameterName, value) => {
+    if (parameterParent === getAudioGraphInstance()) parameterParent.updateParametreAudioGraph(parameterName, value);
+    else parameterParent.updateParametreEstacio(parameterName, value);
 }
 
 

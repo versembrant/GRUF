@@ -13,7 +13,7 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
-import { subscribeToStoreChanges, subscribeToEstacioParameterChanges, subscribeToPartialStoreChanges, clamp } from "../utils";
+import { subscribeToStoreChanges, subscribeToParameterChanges, updateParametre } from "../utils";
 import throttle from 'lodash.throttle'
 
 
@@ -68,14 +68,11 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 // TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
 export const GrufKnob = ({estacio, parameterName, top, left, label, mida, position='absolute'} ) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
-
+    
     const parameterParent = (parameterName === 'swing' ? getAudioGraphInstance() : estacio);
+    subscribeToParameterChanges(parameterParent, parameterName);
 
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
-
-    if (parameterName === 'swing') subscribeToPartialStoreChanges(parameterParent, parameterName);
-    else if (parameterDescription.live) subscribeToPartialStoreChanges(getCurrentSession(), 'live');
-    else subscribeToEstacioParameterChanges(parameterParent, parameterName);
 
     const realValue =  parameterParent.getParameterValue(parameterName);
     
@@ -89,12 +86,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
     const handleKnobChange = (newNumValue) => {
         const newRealValue = num2Real(newNumValue, parameterDescription);
         setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
-        setNewRealValue(newRealValue);
-    }
-
-    const setNewRealValue = (newRealValue) => {
-        if (parameterName === 'swing') parameterParent.updateParametreAudioGraph(parameterName, newRealValue);
-        else parameterParent.updateParametreEstacio(parameterName, newRealValue);
+        updateParametre(parameterParent, parameterName, newRealValue);
     }
 
     const knobctrlId = useId();
@@ -121,7 +113,7 @@ export const GrufKnob = ({estacio, parameterName, top, left, label, mida, positi
 };
 
 export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
@@ -144,7 +136,7 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
     
@@ -170,7 +162,7 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
 }
 
 export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, labelStart, labelEnd, fons }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const realValue = estacio.getParameterValue(parameterName);
 
@@ -203,7 +195,7 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
 };
 
 export const GrufBpmCounter = ({ top, left }) => {
-    subscribeToPartialStoreChanges(getAudioGraphInstance(), 'bpm');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'bpm');
     const currentBpm = parseInt(getAudioGraphInstance().getBpm(), 10);
     const minBpm = getAudioGraphInstance().getParameterDescription('bpm').min;
     const maxBpm = getAudioGraphInstance().getParameterDescription('bpm').max;
@@ -301,7 +293,7 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
 };
 
 export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
 
     // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName);
@@ -328,7 +320,7 @@ export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, val
 };
 
 export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
@@ -418,7 +410,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 }
 
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, allowedNotes=[], colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
@@ -600,7 +592,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 };
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
-    subscribeToEstacioParameterChanges(estacio, parameterName);
+    subscribeToParameterChanges(estacio, parameterName);
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
@@ -618,7 +610,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 }
 
 export const GrufSelectorTonalitat = ({ top, left }) => {
-    subscribeToPartialStoreChanges(getAudioGraphInstance(), 'tonality');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
         const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
         const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
@@ -650,7 +642,7 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
 };
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToEstacioParameterChanges(estacio, 'selectedSoundName');
+    subscribeToParameterChanges(estacio, 'selectedSoundName');
     const selectedSoundName = estacio.getParameterValue('selectedSoundName');
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
@@ -724,7 +716,7 @@ export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => 
 }
 
 const ADSRGraph = ({estacio, adsrParameterNames}) => {
-    adsrParameterNames.forEach(parameterName => subscribeToEstacioParameterChanges(estacio, parameterName));
+    adsrParameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
 
     const a = estacio.getParameterValue(adsrParameterNames[0]);
     const d = estacio.getParameterValue(adsrParameterNames[1]);
