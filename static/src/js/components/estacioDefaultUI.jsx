@@ -272,7 +272,7 @@ export const EstacioDefaultUI = ({estacio, setEstacioSelected}) => {
                     {[...Array(estacio.numPresets).keys()].map(i => 
                     <div key={"preset_" + i}
                         className={"step" + (getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " filled": "")}
-                        onClick={(evt) => {getCurrentSession().liveSetPresetForEstacio(estacio.nom, i)}}>
+                        onClick={(evt) => {getCurrentSession().setLivePresetForEstacio(estacio.nom, i)}}>
                             {i}
                     </div>
                     )}
