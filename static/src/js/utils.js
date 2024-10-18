@@ -423,3 +423,37 @@ export const getTonalityForSamplerLibrarySample = (soundName) => {
     });
     return tonalityFound;
 }
+
+export const getScaleFromTonality = (tonality) => {
+    const midiNotesMap = {
+        'c': 0,  'c#': 1, 'db': 1,
+        'd': 2,  'd#': 3, 'eb': 3,
+        'e': 4,  'f': 5,  'f#': 6, 'gb': 6,
+        'g': 7,  'g#': 8, 'ab': 8,
+        'a': 9,  'a#': 10, 'bb': 10,
+        'b': 11
+    };
+
+    const parseTonality = (tonality) => {
+        const rootNote = tonality.slice(0, 1).toLowerCase(); 
+        const isMinor = tonality.toLowerCase().includes('minor'); 
+        
+        if (!midiNotesMap[rootNote]) {
+            throw new Error(`Root no vàlida: ${rootNote}`);
+        }
+
+        return {
+            rootMidi: midiNotesMap[rootNote], 
+            isMinor: isMinor                   
+        };
+    };
+
+    const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
+    const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
+
+    const { rootMidi, isMinor } = parseTonality(tonality);
+
+    const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
+
+    return scaleIntervals.map(interval=>interval+rootMidi);
+};
