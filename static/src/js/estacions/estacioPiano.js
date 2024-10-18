@@ -11,7 +11,7 @@ export class EstacioPiano extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         ...EstacioBase.parametersDescription,
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, notaMesBaixaTipica: 48},
         timbre: {type: 'float', label: 'Timbre', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
         fxReverbWet: {...EstacioBase.parametersDescription.fxReverbWet, initial: 0.5},
     }
