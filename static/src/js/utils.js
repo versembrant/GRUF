@@ -53,6 +53,50 @@ export const distanceToAbsolute = (distanceArray, startOffset=0) => {
     }, [startOffset])
 }
 
+export const absoluteToDistance = (absoluteArray) => {
+    return absoluteArray.slice(1).reduce((distanceArray, absoluteValue, index) => {
+        const distanceValue = absoluteValue - absoluteArray[index];
+        distanceArray.push(distanceValue);
+        return distanceArray;
+    }, []);
+}
+
+// the good old http://cgm.cs.mcgill.ca/~godfried/publications/banff.pdf
+export const euclid = (pulses, steps, offset=0) => {
+    if (pulses > steps) throw new Error(`More pulses (${pulses}) than steps (${steps})!`);
+
+    const bjorklundArray = Array(steps);
+	let lastTruncated = 0;
+	for (let i = 1; i <= steps; i++) {	
+		const truncatedValue = Math.floor((i * pulses)/steps);
+		const bjorklundValue = truncatedValue - lastTruncated;
+		lastTruncated = truncatedValue;
+		
+		const index = (i==steps) ? 0 : i;	// puts the last element first
+		bjorklundArray[index] = bjorklundValue;
+	}
+
+    const rotatedBjorklund = rotateArray(bjorklundArray, offset);
+    const euclidAbsolute = rotatedBjorklund.map((value, index)=>value == 1 ? value*index : undefined).filter(item=>item!==undefined);
+	const euclidArray = absoluteToDistance([...euclidAbsolute, steps]);
+	return euclidArray;
+}
+
+const rotateArray = (array, rotation) => {
+    const n = array.length;
+    const rotatedArray = Array(n);
+    
+    //	Check for sanity
+    rotation = (rotation % n + n) % n;
+    
+    for (let i = 0; i < n; i++) {
+        const element = array[i];
+        const newIndex = (i + rotation) % n;
+        rotatedArray[newIndex] = element;
+    }
+    return rotatedArray;
+}
+
 // Make sure enum value is within options
 export const ensureValueInOptions = (value, options, defaultValue) => {
     if (!options.includes(value)) {
