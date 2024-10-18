@@ -438,7 +438,7 @@ export const getScaleFromTonality = (tonality) => {
         const rootNote = tonality.slice(0, 1).toLowerCase(); 
         const isMinor = tonality.toLowerCase().includes('minor'); 
         
-        if (!midiNotesMap[rootNote]) {
+        if (!midiNotesMap.hasOwnProperty(rootNote)) {
             throw new Error(`Root no vàlida: ${rootNote}`);
         }
 
