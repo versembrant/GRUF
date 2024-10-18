@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -802,11 +802,7 @@ const ADSRGraph = ({estacio, adsrParameterNames}) => {
     const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
     const timeValuesWithSustain = [a, d, sustainTime, r];
 
-    const absoluteTimeValues = timeValuesWithSustain.reduce((absoluteValuesArray, timeValue, index) => {
-        const absoluteTimeValue = timeValue + (absoluteValuesArray[index-1] || 0);
-        absoluteValuesArray.push(absoluteTimeValue);
-        return absoluteValuesArray;
-    }, []);
+    const absoluteTimeValues = distanceToAbsolute(timeValuesWithSustain);
 
     const adsrPoints = absoluteTimeValues.map((absTimeValue) => {
         const normTimeValue = absTimeValue / maxTime;
