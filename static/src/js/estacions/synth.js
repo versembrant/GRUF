@@ -11,7 +11,7 @@ export class Synth extends EstacioBase {
     parametersDescription = {
         ...EstacioBase.parametersDescription,
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, permetScrollVertical: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         // Synth params
         attack: {type: 'float', label:'Attack', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
