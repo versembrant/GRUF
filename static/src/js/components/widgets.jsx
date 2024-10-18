@@ -643,6 +643,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 };
 
 export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
     const compassos = 2;
     const beatsPerCompas = 4;
     const stepsPerBeat = 4;
@@ -673,9 +675,9 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
         
         const newNotes = [];
         onsets.forEach((onset, index) => {
-            const pitchOffset = Math.floor(Math.random()*12);
+            const pitchClass = Math.floor(Math.random()*12);
             const duration = durations[index];
-            const pitch = 60 + pitchOffset;
+            const pitch = lowestNote - (lowestNote % 12) + pitchClass + (lowestNote % 12 <= pitchClass ? 0 : 12);
             const nota = {
                 b: onset,
                 d: duration,
