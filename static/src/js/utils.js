@@ -44,6 +44,15 @@ export const roundToStep = (value, step) => {
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+
+export const distanceToAbsolute = (distanceArray, startOffset=0) => {
+    return distanceArray.reduce((absoluteArray, distanceValue, index) => {
+        const absoluteValue = distanceValue + (absoluteArray[index-1] ?? startOffset);
+        absoluteArray.push(absoluteValue);
+        return absoluteArray;
+    }, [])
+}
+
 // Make sure enum value is within options
 export const ensureValueInOptions = (value, options, defaultValue) => {
     if (!options.includes(value)) {
