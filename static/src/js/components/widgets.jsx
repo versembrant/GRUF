@@ -649,17 +649,19 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
     const stepsPerBeat = 4;
     
     const generate = () => {
-        const pitch = Math.floor(Math.random()*12);
-
+        
         const durations = Array(compassos*beatsPerCompas).fill(stepsPerBeat);
-        const onsets = distanceToAbsolute(durations);
-
+        const onsets = distanceToAbsolute(durations).slice(0,-1);
+        
         const newNotes = [];
         onsets.forEach((onset, index) => {
+            const pitchOffset = Math.floor(Math.random()*12);
+            const duration = durations[index];
+            const pitch = 60 + pitchOffset;
             const nota = {
                 b: onset,
-                d: durations[index],
-                n: 60 + pitch,
+                d: duration,
+                n: pitch,
                 s: 0, // this means not selected
             }
             newNotes.push(nota);
