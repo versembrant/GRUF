@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -665,7 +665,11 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
 
     const generate = () => {
         
-        const durations = randomHalves(compassos*beatsPerCompas*stepsPerBeat, 2);
+        const parts = randomHalves(compassos*beatsPerCompas*stepsPerBeat, 2);
+        const durations = [];
+        parts.forEach(partDuration=>{
+            durations.push(...euclid(sample([2,3,4,5]), partDuration));
+        })
         const onsets = distanceToAbsolute(durations).slice(0,-1);
         
         const newNotes = [];
