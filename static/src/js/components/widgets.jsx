@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getScaleFromTonality}  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -416,52 +416,20 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
     let lastEditedData = "";
-    const getAllowedNotesForTonality = (tonality) => {
-        const midiNotesMap = {
-            'c': 60,  'c#': 61, 'db': 61,
-            'd': 62,  'd#': 63, 'eb': 63,
-            'e': 64,  'f': 65,  'f#': 66, 'gb': 66,
-            'g': 67,  'g#': 68, 'ab': 68,
-            'a': 69,  'a#': 70, 'bb': 70,
-            'b': 71
-        };
     
-        const parseTonality = (tonality) => {
-            const rootNote = tonality.slice(0, 1).toLowerCase(); 
-            const isMinor = tonality.toLowerCase().includes('minor'); 
-            
-            if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root no vàlida: ${rootNote}`);
-            }
-    
-            return {
-                rootMidi: midiNotesMap[rootNote], 
-                isMinor: isMinor                   
-            };
-        };
-    
-        const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
-        const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
-    
-        const { rootMidi, isMinor } = parseTonality(tonality);
-    
-        const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
-    
-        let allowedNotes = [];
-    
-        for (let octave = -2; octave <= 8; octave++) { 
-            const octaveOffset = octave * 12; 
-            scaleIntervals.forEach(interval => {
-                const note = rootMidi + interval + octaveOffset;
-                if (note >= 0 && note <= 127) {  // Midi range permitido
-                    allowedNotes.push(note);
-                }
-            });
-        }
-    
-        return allowedNotes;
-    };
     const tonality = getAudioGraphInstance().getTonality(); 
+    const tonalityScale = getScaleFromTonality(tonality);
+    const allowedNotes = [];
+
+    for (let octave = -2; octave <= 8; octave++) { 
+        const octaveOffset = octave * 12; 
+        tonalityScale.forEach(pitch => {
+            const note = pitch + octaveOffset;
+            if (note >= 0 && note <= 127) {  // Midi range permitido
+                allowedNotes.push(note);
+            }
+        });
+    }
     
     useEffect(() => {
         const jsElement = document.getElementById(uniqueId + "_id")
@@ -519,7 +487,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             jsElement.dataset.alreadyBinded = true;
         } else {
             if (jsElement.dataset.lastTonality !== tonality) {
-                jsElement.setAllowedNotes(getAllowedNotesForTonality(tonality));
+                jsElement.setAllowedNotes(allowedNotes);
                 jsElement.dataset.lastTonality = tonality;
             }
         }
@@ -602,7 +570,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={getAllowedNotesForTonality(tonality)}
+                    allowednotes={allowedNotes}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
