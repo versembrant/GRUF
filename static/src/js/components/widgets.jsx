@@ -604,15 +604,17 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
                 { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
                 <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
-                <NoteGenerator estacio={estacio} parameterName={parameterName} top={top} left="780px" />
+                <NoteGenerator estacio={estacio} parameterName={parameterName} tonality={tonality} top={top} left="780px" />
             </div>
         </div>
     )
 };
 
-export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
+export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
+    const tonalityScale = getScaleFromTonality(tonality);
+
     const compassos = 2;
     const beatsPerCompas = 4;
     const stepsPerBeat = 4;
@@ -643,7 +645,7 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
         
         const newNotes = [];
         onsets.forEach((onset, index) => {
-            const pitchClass = Math.floor(Math.random()*12);
+            const pitchClass = sample(tonalityScale); // actually in this implementation only the root is sure to be a pitchclass 
             const duration = durations[index];
             const pitch = lowestNote - (lowestNote % 12) + pitchClass + (lowestNote % 12 <= pitchClass ? 0 : 12);
             const nota = {
