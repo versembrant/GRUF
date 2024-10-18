@@ -637,10 +637,40 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
                 { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
                 <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
+                <NoteGenerator estacio={estacio} parameterName={parameterName} top={top} left="780px" />
             </div>
         </div>
     )
 };
+
+export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
+    const compassos = 2;
+    const beatsPerCompas = 4;
+    const stepsPerBeat = 4;
+    
+    const generate = () => {
+        const pitch = Math.floor(Math.random()*12);
+
+        const durations = Array(compassos*beatsPerCompas).fill(stepsPerBeat);
+        const onsets = distanceToAbsolute(durations);
+
+        const newNotes = [];
+        onsets.forEach((onset, index) => {
+            const nota = {
+                b: onset,
+                d: durations[index],
+                n: 60 + pitch,
+                s: 0, // this means not selected
+            }
+            newNotes.push(nota);
+        })
+        estacio.updateParametreEstacio(parameterName, newNotes);
+    }
+
+    return(
+        <button style={{position: "absolute", top, left}} onClick={generate}>Generar notes</button>
+    )
+}
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
