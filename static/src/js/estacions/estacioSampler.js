@@ -57,8 +57,7 @@ export class EstacioSampler extends EstacioBase {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
             followsPreset: true, 
             notaMesBaixaPermesa: 0,
-            rangDeNotesPermeses: 16, 
-            permetScrollVertical: false
+            rangDeNotesPermeses: 16,
         },
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,

@@ -563,11 +563,13 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         estacio.updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
+    const instrumentRange = parameterDescription.rangDeNotesPermeses ?? 127;
+    const maxYRange = 36;
+    const doesYScroll = instrumentRange > maxYRange;
+
     const getLowestNoteForYOffset = () => {
         // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
-        if (parameterDescription.permetScrollVertical === 0) {
-            return parameterDescription.notaMesBaixaPermesa;
-        }
+        if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
 
         let lowestNote = 127
         for (let i = 0; i < parameterValue.length; i++) {
@@ -608,13 +610,13 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
                     xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 36}
+                    yrange={Math.min(instrumentRange, maxYRange)}
                     yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
                     //cursoroffset={2500}  // make it dissapear
-                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    yscroll={doesYScroll ? 1 : 0} // only allow scroll when there is 'overflow'
                     //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
