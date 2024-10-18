@@ -839,13 +839,13 @@ const ADSRGraph = ({estacio, adsrParameterNames}) => {
         return {x: normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4}; // we account for stroke width so that the line isn't clipped
     });
 
-    const levelValues = [1, s, s, 0];
+    const levelValues = [0, 1, s, s, 0];
 
     levelValues.forEach((levelValue, index) => {
         adsrPoints[index].y = 75 - levelValue * 50;
     });
 
-    const sustainPoints = { x1: adsrPoints[1].x, x2: adsrPoints[2].x, y1: adsrPoints[1].y, y2: adsrPoints[2].y };
+    const sustainPoints = { x1: adsrPoints[2].x, x2: adsrPoints[3].x, y1: adsrPoints[2].y, y2: adsrPoints[3].y };
 
     const adsrPathString = adsrPoints.reduce((pathString, point) => {
         return pathString + ` L ${point.x} ${point.y}`;

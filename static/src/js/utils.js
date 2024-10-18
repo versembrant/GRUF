@@ -47,10 +47,10 @@ export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 export const distanceToAbsolute = (distanceArray, startOffset=0) => {
     return distanceArray.reduce((absoluteArray, distanceValue, index) => {
-        const absoluteValue = distanceValue + (absoluteArray[index-1] ?? startOffset);
+        const absoluteValue = distanceValue + (absoluteArray[index]);
         absoluteArray.push(absoluteValue);
         return absoluteArray;
-    }, [])
+    }, [startOffset])
 }
 
 // Make sure enum value is within options
