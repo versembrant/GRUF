@@ -647,10 +647,25 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
     const compassos = 2;
     const beatsPerCompas = 4;
     const stepsPerBeat = 4;
-    
+
+    const randomHalves = (array, iterations=0) => {
+        if (typeof array === "number") array = [array];
+        if (iterations === 0) return array;
+
+        const newArray = [];
+        array.forEach(element=> {
+            if (Math.random() < 0.5) {
+                newArray.push(element)
+            } else {
+                newArray.push(element/2, element/2);
+            }
+        });
+        return randomHalves(newArray, iterations - 1);
+    }
+
     const generate = () => {
         
-        const durations = Array(compassos*beatsPerCompas).fill(stepsPerBeat);
+        const durations = randomHalves(compassos*beatsPerCompas*stepsPerBeat, 2);
         const onsets = distanceToAbsolute(durations).slice(0,-1);
         
         const newNotes = [];
