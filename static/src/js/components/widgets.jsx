@@ -428,6 +428,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     
         const parseTonality = (tonality) => {
             let rootNote = tonality.slice(0, 2).toLowerCase();
+            //Comprova si la root té alteracions, sinó, torna a separar. 
             if (!midiNotesMap[rootNote]) {
                 rootNote = tonality.slice(0, 1).toLowerCase();
             }
@@ -435,7 +436,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
             const isMinor = tonality.toLowerCase().includes('minor');
     
             if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root note no válida: ${rootNote}`);
+                throw new Error(`Root note no vàlida: ${rootNote}`);
             }
     
             return {
