@@ -603,7 +603,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={getAllowedNotesForTonality(tonality)}
+                    allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
