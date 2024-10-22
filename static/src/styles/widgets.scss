@@ -690,7 +690,25 @@
         }
     }
 
-    button {
+    .gruf-grid-controls{
+        height: 30px;
+        overflow: hidden;
+        margin-top:10px;
+
+        button {
+            padding: 1px 4px;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+
+            &.recording {
+                --text-color: #{$red};
+                animation: blink 1s steps(7, start) infinite;
+            }
+        }
+    }
+
+    /* button {
         margin-top: 1rem;
         padding: 0.5rem 1rem;
         background-color: #444;
@@ -706,7 +724,7 @@
         &:active {
             background-color: #f3c871; 
         }
-    }
+    } */
 
     label {
         margin-left: 1rem;
