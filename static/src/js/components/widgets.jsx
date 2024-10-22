@@ -23,6 +23,23 @@ const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
 
+export const createRecordingHandler = (estacio, parameterDescription) => {
+    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+
+    const toggleRecording = (button) => {
+        const recordingInputElement = document.getElementById(recordingElementId);
+        if (recordingInputElement.checked) {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
+        } else {
+            recordingInputElement.checked = true;
+            button.classList.add('recording');
+        }
+    };
+
+    return { recordingElementId, toggleRecording };
+};
+
 export const GrufLabel = ({text, top, left}) => {
     return (
         <div className="gruf-label" style={{top: top, left: left}}>
@@ -361,18 +378,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
         }
     }
 
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    };
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
@@ -602,18 +608,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    }
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
