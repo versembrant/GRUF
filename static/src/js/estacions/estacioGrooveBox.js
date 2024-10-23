@@ -151,7 +151,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.kick.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack4'){
+        } else if (name =='attack4'){
             this.audioNodes.kick.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
@@ -167,12 +167,12 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.snare.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack3'){
+        } else if (name =='attack3'){
             this.audioNodes.snare.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
         } else if (name =='release3'){
-            this.audioNodes.closed_hat.set({
+            this.audioNodes.snare.set({
                 'fadeOut': value*this.getTempsBeat(),
             });
         } else if (name =='tone2'){
@@ -183,7 +183,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.closed_hat.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack2'){
+        } else if (name =='attack2'){
             this.audioNodes.closed_hat.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
@@ -199,7 +199,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.open_hat.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack1'){
+        } else if (name =='attack1'){
             this.audioNodes.open_hat.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
