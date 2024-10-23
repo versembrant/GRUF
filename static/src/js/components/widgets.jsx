@@ -431,6 +431,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         });
     }
     
+    const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
+
     useEffect(() => {
         const jsElement = document.getElementById(uniqueId + "_id")
         if (jsElement.dataset.alreadyBinded === undefined){
@@ -453,11 +455,13 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 });
             }
             document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
-                let noteNumber = evt.detail.note;                
-                if (parameterDescription.hasOwnProperty("rangDeNotesPermeses")) {
+                let noteNumber = evt.detail.note;       
+                console.log("noteNumber was", noteNumber);      
+                if (instrumentRange < 127) {
                     const notaMesBaixaPermesa = parameterDescription.notaMesBaixaPermesa || 0;
-                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % parameterDescription.rangDeNotesPermeses);   
+                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % instrumentRange);   
                 }
+                console.log("and now noteNumber is", noteNumber)
                 const noteHeight = jsElement.height/jsElement.yrange;
                 let bottomPosition = noteHeight * noteNumber;
                 const canvasOffset = jsElement.yoffset*noteHeight;
@@ -531,7 +535,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         estacio.updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
-    const instrumentRange = parameterDescription.rangDeNotesPermeses ?? 127;
+
     const maxYRange = 36;
     const doesYScroll = instrumentRange > maxYRange;
 

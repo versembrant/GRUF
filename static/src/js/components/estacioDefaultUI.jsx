@@ -183,7 +183,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
         getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
-    const instrumentRange = parameterDescription.rangDeNotesPermeses ?? 127;
+    const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
     const maxYRange = 36;
     const doesYScroll = instrumentRange > maxYRange;
 
