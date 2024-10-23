@@ -188,17 +188,16 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
     const doesYScroll = instrumentRange > maxYRange;
 
     const getLowestNoteForYOffset = () => {
-        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
+        // if the roll doesn't scroll, simply return the lowest roll
         if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
+
+        // else, return the lowest drawn note, if there are any notes drawn on the roll
+        if (parameterValue) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
+
+        // else, return a sensible default, if it exists
         if (parameterDescription.notaMesBaixaTipica) return parameterDescription.notaMesBaixaTipica;
 
-        let lowestNote = 127
-        for (let i = 0; i < parameterValue.length; i++) {
-            if (parameterValue[i].n < lowestNote) {
-                lowestNote = parameterValue[i].n
-            }
-        }
-        return lowestNote;
+        return 0;
     }
 
     return (
