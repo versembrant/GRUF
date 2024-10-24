@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample, subscribeToAudioGraphParameterChanges}  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -694,8 +694,12 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
 
 export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     subscribeToParameterChanges(estacio, 'selectedSoundName');
+    subscribeToAudioGraphParameterChanges('tonality');
+
     const selectedSoundName = estacio.getParameterValue('selectedSoundName');
+    const tonalitat = getAudioGraphInstance().getTonality();
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
             'label': 'Gravació usuari ' + (i + 1), 
@@ -706,10 +710,18 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        }))
+        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
-    const optionNames = options.map(item => item.value);
 
+    const optionTemplate = (option) => {
+        const tonalitatSampleLlista = option.tonality
+        console.log(tonalitatSampleLlista)
+        return (
+            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
+        );
+    };
+    
+    const optionNames = options.map(item => item.value);
     const handleRemoveFileButton = (soundName) => {
         const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
         var fd = new FormData();
@@ -737,17 +749,8 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             });
         })
     }
-    const tonalitat = getAudioGraphInstance().getTonality();
+
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
-
-    const optionTemplate = (option) => {
-        const tonalitatSampleLlista = option.tonality
-        console.log(tonalitatSampleLlista)
-        return (
-            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
-        );
-    };
-
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
