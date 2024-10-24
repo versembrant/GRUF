@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample, subscribeToPresetChanges }  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -393,6 +393,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
 };
 
 export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    subscribeToPresetChanges();
     return (
         <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
             {[...Array(estacio.numPresets).keys()].map(i => 
@@ -409,6 +410,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
+    subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
@@ -644,6 +646,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
+    subscribeToPresetChanges();
+    
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
