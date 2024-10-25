@@ -1,39 +1,39 @@
-// CSS reset for fieldset and legend
+// CSS reset for fieldset
 fieldset {
     margin: 0;
     padding: 0;
     border: none;
     display: block;
     width: fit-content;
-    legend {
-        display: contents;
-    }
 }
 
 
-fieldset.gruf-modul {
+.gruf-modul {
     background-color: $background-color;
     border: 1px solid $light-grey;
     border-radius: 15px;
+    padding: 10px;
 }
 
-.gruf-legend > * {
-        border: 1px solid $light-grey;
-        border-radius: 15px;
-        display: inline-block;
-        padding: 4px 10px;
-        min-width: 130px;
+.gruf-legend {
+    border: 1px solid $light-grey;
+    border-radius: 15px;
+    display: inline-block;
+    padding: 4px 10px;
+    min-width: 130px;
+    align-self: flex-start;
+
+    &.bare {
+        border: none;
+        padding: 0;
+    }
 }
 
 .gruf-modul-eq {
-    height: 120px;
-    padding: 10px 20px;
-    .gruf-legend > * {
-        margin-bottom: 10px;
-    }
+    height: 130px;
     width: 292px;
-    legend {
-        background-color: $background-color;
+    .gruf-legend {
+        margin-bottom: 10px;
     }
     > div {
         display: flex;
@@ -44,16 +44,19 @@ fieldset.gruf-modul {
 
 
 .gruf-modul-delay {
+    &, fieldset {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+.gruf-modul-delay {
     width: 153px;
     height: 226px;
-    padding: 10px 0;
-    &, & > fieldset {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    }
+    
     & > div {
         display: flex;
         justify-content: center;
@@ -62,4 +65,24 @@ fieldset.gruf-modul {
             flex: 1;
         }
     }
+}
+
+.gruf-modul-reverb {
+    width: 293px;
+    height: 136px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .knob {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+    }
+    
+    .reverb-knob-container {
+        float:right;
+    }
+
 }

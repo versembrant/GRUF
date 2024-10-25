@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLegend, GrufEnum2Columns, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufLegend, GrufLabel, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
 
 
 // TODO: position: relative should be default for knobs
@@ -48,5 +48,18 @@ export const GrufModulDelay = ({estacio, top, left}) => {
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" />
             </fieldset>
     </fieldset>
+    )
+}
+
+export const GrufModulReverb = ({estacio, top, left}) => {
+    return(
+        <fieldset className="gruf-modul gruf-modul-reverb" style={{position: "absolute", top, left}}>
+            <GrufLegend text="Reverb" />
+            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" label="Send" />
+            <fieldset>
+                <GrufLegend text="Durada" bare="true"></GrufLegend>
+                <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" />
+            </fieldset>
+        </fieldset>
     )
 }

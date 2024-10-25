@@ -1,5 +1,5 @@
 import { GrufKnob, GrufLabelPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
-import { GrufModulADSR, GrufModulEQ, GrufModulDelay } from "./moduls";
+import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
@@ -14,17 +14,13 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxDrive" top="8%" left="28%" />
             <GrufKnob mida="gran" parameterParent={estacio} parameterName="harmonicity" top="30%" left="28%" />
             
-            <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
-            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
-            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Mix" />
-            
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="38.2%" size="100px"  fons="linies" />
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="43%" size="100px" fons="linies" />
             
-            <GrufModulEQ estacio={estacio} top="26.9%" left="49.5%"/>
+            <GrufModulEQ estacio={estacio} top="25.4%" left="49.5%"/>
             <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
-            
+            <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
+
             <GrufSelectorTonalitat top="50.3%" left="81.4%" />
        
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" top="30%" left="36.5%" size="56px" noLabel="true" noOutput="true"/>
