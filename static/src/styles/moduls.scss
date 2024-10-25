@@ -13,6 +13,14 @@ fieldset {
     border: 1px solid $light-grey;
     border-radius: 15px;
     padding: 10px;
+
+    &, fieldset {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
 }
 
 .gruf-legend {
@@ -32,24 +40,25 @@ fieldset {
 .gruf-modul-eq {
     height: 130px;
     width: 292px;
-    .gruf-legend {
-        margin-bottom: 10px;
+
+    display: grid; // en lloc de flex per tenir a la mateixa llinea el legend i l'eq i no haver de wrappear legend (seria mala pràctica)
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "upleft upright"
+        "bottom bottom";
+    legend {
+        grid-area: upleft;
     }
+    .gruf-toggle {
+        grid-area: upright;
+    }
+
     > div {
+        grid-area: bottom;
         display: flex;
         justify-content: space-between;
         gap: 20px;
-    }
-}
-
-
-.gruf-modul-delay {
-    &, fieldset {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
     }
 }
 
@@ -70,19 +79,9 @@ fieldset {
 .gruf-modul-reverb {
     width: 293px;
     height: 136px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
     .knob {
         position: absolute;
         top: 10px;
         right: 20px;
     }
-    
-    .reverb-knob-container {
-        float:right;
-    }
-
 }

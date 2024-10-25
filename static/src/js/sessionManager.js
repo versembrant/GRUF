@@ -61,7 +61,6 @@ export class EstacioBase {
         // FX
         fxReverbWet: {type: 'float', label: 'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
         fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
-        fxDelayOnOff: {type : 'bool', label: 'Delay On/Off', initial: false},
         fxDelayWet: {type: 'float', label: 'Delay Wet', min: 0.0, max: 1, initial: 0.0},
         fxDelayFeedback:{type: 'float', label: 'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
         fxDelayTime:{type: 'enum', label: 'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
@@ -244,13 +243,7 @@ export class EstacioBase {
         } else if (name == "fxDelayFeedback"){
             this.audioNodes.effects['delay'].set({'feedback': value});
         } else if (name == "fxDelayWet"){
-            this.audioNodes.effects['delay'].set({'wet': this.getParameterValue("fxDelayOnOff", preset) ? value: 0});
-        } else if (name == "fxDelayOnOff"){
-            if (value) {
-                this.audioNodes.effects['delay'].set({'wet': this.getParameterValue("fxDelayWet", preset)});            
-            } else {
-                this.audioNodes.effects['delay'].set({'wet': 0});
-            }
+            this.audioNodes.effects['delay'].set({'wet': value});
         } else if (name == "fxDrive"){
             this.audioNodes.effects['drive'].set({'wet': 1.0});
             this.audioNodes.effects['drive'].set({'distortion': value});

@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLegend, GrufLabel, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufSlider, GrufToggle, GrufLegend, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
 
 
 // TODO: position: relative should be default for knobs
@@ -25,6 +25,7 @@ export const GrufModulEQ = ({estacio, top, left}) => {
     return (
         <fieldset className="gruf-modul gruf-modul-eq" style={{position: "absolute", top, left}}>
             <GrufLegend text="EQ" />
+            <GrufToggle estacio={estacio} parameterName="fxEqOnOff" valueOn={0.5} valueOff={0.0} />
             <div>
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxLow" position='relative'/>
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxMid" position='relative' />
