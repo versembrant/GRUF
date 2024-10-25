@@ -525,7 +525,6 @@
         border-radius: 15px;
         background-color: transparent;
         padding: 5px;
-        box-sizing: border-box;
 
         .p-inputnumber {
             display: flex;
@@ -676,10 +675,6 @@
 
             &.active {
                 border: 1px solid $grey;
-                -webkit-box-sizing:border-box;
-                -moz-box-sizing:border-box;
-                -ms-box-sizing:border-box;
-                box-sizing:border-box;
             }
 
             margin-right: 5px;
