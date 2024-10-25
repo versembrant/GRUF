@@ -23,9 +23,10 @@ const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
 
-export const GrufLegend = ({text}) => {
+export const GrufLegend = ({ text, bare=false }) => {
+    // we actually style the span element inside the legend element :)
     return (
-        <legend className="gruf-legend"><span>{text}</span></legend>
+        <legend style={{display: "contents"}}><span className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
     )
 }
 

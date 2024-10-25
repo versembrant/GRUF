@@ -1,5 +1,5 @@
 import { GrufKnob, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufBpmCounter, GrufButtonNoBorder, GrufLabelPetit, GrufSlider, GrufSelectorPatronsGrid } from "./widgets";
-import { GrufModulEQ, GrufModulDelay } from "./moduls";
+import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
 
@@ -14,15 +14,11 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff" top="8%" left="29.0%" label = 'Cutoff' />
             <GrufBpmCounter top="8%" left="39.6%" />
             <GrufLabel text="bpm" top="17.3%" left="41%" />
-            
-            <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
-            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
-            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
     
-            <GrufModulEQ estacio={estacio} top="26.9%" left="49.5%"/>
+            <GrufModulEQ estacio={estacio} top="25.4%" left="49.5%"/>
             <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
-           
+            <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
+
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume1" top="48.5%" left="5%" label = 'Vol' />
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone1" top="48.5%" left="9%" label = 'Tone' />
 

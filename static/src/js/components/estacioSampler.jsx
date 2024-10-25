@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler } from "./widgets";
-import { GrufModulADSR, GrufModulEQ, GrufModulDelay } from "./moduls";
+import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -21,14 +21,10 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
                 <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="29%" size="150px" fons="linies" />
                 <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="33.8%" size="150px" fons="linies" />
-
-                <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
-                <GrufLabel text="Durada" top="12.7%" left="51.7%" />
-                <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
                 
-                <GrufModulEQ estacio={estacio} top="26.9%" left="49.5%"/>
+                <GrufModulEQ estacio={estacio} top="25.4%" left="49.5%"/>
                 <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
+                <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
 
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} top="64.5%" left="5%" label='Pan' />
