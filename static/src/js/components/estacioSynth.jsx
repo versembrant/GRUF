@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLabelPetit, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
+import { GrufKnob, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
