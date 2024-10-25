@@ -26,9 +26,9 @@ export const GrufModulEQ = ({estacio, top, left}) => {
         <fieldset className="gruf-modul gruf-modul-eq" style={{position: "absolute", top, left}}>
             <GrufLegend text="EQ" />
             <div>
-                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxLow" position='relative'/>
-                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxMid" position='relative' />
-                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxHigh" position='relative' />
+                <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxLow" position='relative'/>
+                <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxMid" position='relative' />
+                <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxHigh" position='relative' />
             </div>
         </fieldset>
     )
