@@ -7,8 +7,8 @@ fieldset {
     width: fit-content;
 }
 
-
-.gruf-modul {
+// widgetgroups are fieldsets of related widgets that don't represent a synth module.
+.gruf-modul, .gruf-widgetgroup {
     background-color: $background-color;
     border: 1px solid $light-grey;
     border-radius: 15px;
@@ -21,6 +21,11 @@ fieldset {
         align-items: center;
         gap: 10px;
     }
+}
+
+.gruf-widgetgroup {
+    flex-direction: row;
+    padding: 10px 30px;
 }
 
 .gruf-legend {

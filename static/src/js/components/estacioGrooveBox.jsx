@@ -9,10 +9,13 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" top="8%" left="6.3%" label="Vol" />
-            <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff" top="8%" left="29.0%" label = 'Cutoff' />
-            <GrufBpmCounter top="8%" left="39.6%" />
+
+            <fieldset className="gruf-widgetgroup" style={{position: "absolute", top:"4.8%", left:"3.7%", width:"443px", height:"120px"}}>
+                <GrufKnob position="relative" mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
+                <GrufKnob position="relative" mida="gran" parameterParent={estacio} parameterName="cutoff"  label = 'Cutoff' />
+                <GrufKnob position="relative" mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" label = 'Swing' />
+                <GrufBpmCounter />
+            </fieldset>
     
             <GrufModulEQ estacio={estacio} top="25.4%" left="49.5%"/>
             <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
