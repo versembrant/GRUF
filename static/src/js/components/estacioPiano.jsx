@@ -17,7 +17,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufLabel text="Timbre" top="7.2%" left="68.2%" />
             <GrufSlider estacio={estacio} parameterName="timbre" top="110px" left="694px" width="225px" markStart="Soft" markEnd="Hard" noLabel="true"  />
             <GrufSelectorTonalitat top="40.3%" left="81.4%" />
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="208px" left="35px" width="740px" height="460px" colorNotes="rgb(255, 134, 56)"/>
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
         </div>
     </div>)
 };
