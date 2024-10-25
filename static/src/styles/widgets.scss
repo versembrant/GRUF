@@ -503,14 +503,25 @@
 
 .bpm-counter {
     position: absolute;
-    width: 60px; 
-    height: 60px; 
-    border: 2px solid $grey;
-    border-radius: 10px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: transparent;
+    gap: 8px;
+
+    .outer-square {
+        width: 60px; 
+        height: 60px; 
+        border: 2px solid $grey;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    label {
+        font-size: 14px;
+    }
 
     .inner-square {
         width: 80%; 
