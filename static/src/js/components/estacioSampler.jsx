@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler } from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler } from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
