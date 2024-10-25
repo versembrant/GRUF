@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSlider, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufSlider, GrufLabel, ADSRGraph } from "./widgets";
 
 
 // TODO: position: relative should be default for knobs
@@ -19,4 +19,18 @@ export const GrufModulADSR = ({estacio, soundNumber="", height, top, left}) => {
             </div>
         </div>
     )
+}
+
+export const GrufModulEQ = ({estacio, top, left}) => {
+    return (
+        <fieldset className="gruf-modul-eq" style={{position: "absolute", top, left}}>
+            <legend><span>EQ</span></legend>
+            <div>
+                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxLow" position='relative'/>
+                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxMid" position='relative' />
+                <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxHigh" position='relative' />
+            </div>
+        </fieldset>
+    )
+    
 }
