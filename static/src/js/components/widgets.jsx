@@ -210,20 +210,23 @@ export const GrufBpmCounter = ({ top, left }) => {
 
     return (
         <div className="bpm-counter" style={{ top: top, left: left }}>
-            <div className="inner-square">
-                <InputNumber 
-                    value={currentBpm} 
-                    onValueChange={(e) => handleBpmChange(e.value)} 
-                    min={minBpm}
-                    max={maxBpm}
-                    showButtons={false} 
-                    className="p-inputnumber"
-                />
-                <div className="bpm-buttons">
-                    <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
-                    <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+            <div className="outer-square">
+                <div className="inner-square">
+                    <InputNumber
+                        value={currentBpm}
+                        onValueChange={(e) => handleBpmChange(e.value)}
+                        min={minBpm}
+                        max={maxBpm}
+                        showButtons={false}
+                        className="p-inputnumber"
+                    />
+                    <div className="bpm-buttons">
+                        <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
+                        <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+                    </div>
                 </div>
             </div>
+            <label htmlFor="p-inputnumber">bpm</label>
         </div>
     );
 };
