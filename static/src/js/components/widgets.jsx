@@ -23,6 +23,12 @@ const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
 
+export const GrufLegend = ({text}) => {
+    return (
+        <legend className="gruf-legend"><span>{text}</span></legend>
+    )
+}
+
 export const GrufLabel = ({text, top, left}) => {
     return (
         <div className="gruf-label" style={{top: top, left: left}}>
