@@ -296,26 +296,22 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
     );
 };
 
-export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
+export const GrufToggle = ({ estacio, parameterName, top, left, labelOn="On", labelOff="Off" }) => {
     subscribeToParameterChanges(estacio, parameterName);
 
-    // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName);
-    const parameterValueOnOff = parameterValue === valueOn;
 
-    const handleClick = () => {
-        // En clicar, invertim el valor i l'actualitzem
-        const newValue = !parameterValueOnOff;
-        estacio.updateParametreEstacio(parameterName, newValue ? valueOn : valueOff);
+    const handleClick = () => { // En clicar, invertim el valor i l'actualitzem
+        estacio.updateParametreEstacio(parameterName, !parameterValue);
     };
 
     return (
         <div className="gruf-toggle" style={{ top: top, left: left }}>
             <div
-                className={`p-toggle ${parameterValueOnOff ? 'on' : 'off'}`}
+                className={`p-toggle ${parameterValue ? 'on' : 'off'}`}
                 onClick={handleClick}
             >
-                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
+                <div className={`circle-icon ${parameterValue ? 'selected' : ''}`}></div>
             </div>
             <div className="toggle-label toggle-label-off">{labelOff}</div>
             <div className="toggle-label toggle-label-on">{labelOn}</div>
