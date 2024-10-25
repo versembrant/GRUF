@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler } from "./widgets";
-import { GrufModulADSR, GrufModulDelay } from "./moduls";
+import { GrufModulADSR, GrufModulEQ, GrufModulDelay } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -18,11 +18,6 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
                 
                 <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
-                <GrufLabel text="EQ" top="29.6%" left="51.7%" />
-                
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label='Low' />
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label='Mid' /> 
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label='High' />
 
                 <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="29%" size="150px" fons="linies" />
                 <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="33.8%" size="150px" fons="linies" />
@@ -32,6 +27,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
                 
+                <GrufModulEQ estacio={estacio} top="26.9%" left="49.5%"/>
                 <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
 
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} top="50%" left="5%" label='Vol' />
