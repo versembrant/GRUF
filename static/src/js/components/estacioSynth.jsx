@@ -21,7 +21,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
             <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
             <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
 
-            <GrufSelectorTonalitat top="50.3%" left="81.4%" />
+            <GrufSelectorTonalitat position="absolute" top="50.3%" left="81.4%" />
        
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" top="30%" left="36.5%" size="56px" noLabel="true" noOutput="true"/>
     

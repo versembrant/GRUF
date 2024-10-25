@@ -24,7 +24,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
             
             <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="343px" colorNotes="#d98adc"/>
-            <GrufSelectorTonalitat top="55.4%" left="81.4%" />
+            <GrufSelectorTonalitat position="absolute" top="55.4%" left="81.4%" />
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" top="30%" left="36.5%" size="56px" noLabel="true" noOutput="true"/>
         </div>
     </div>)
