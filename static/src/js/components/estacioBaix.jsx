@@ -1,5 +1,5 @@
 import { GrufLabelPetit, GrufKnob, GrufLabel, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
-import { GrufModulADSR } from "./moduls";
+import { GrufModulADSR, GrufModulDelay } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
@@ -28,12 +28,7 @@ export const EstacioBaixUI = ({estacio, setEstacioSelected}) => {
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="hpf" labelSize="14px" top="8.5%" left="38.2%" size="100px" fons="linies" />
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="lpf" labelSize="14px" top="8.5%" left="43%" size="100px" fons="linies" />
 
-            <GrufLabel text="Delay" top="14.2%" left="82.3%" />
-            <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
-            <GrufLabel text="Durada" top="29.6%" left="70.3%" />
-            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" label="Mix" top="28%" left="83.6%" markStart="0%" markEnd="100%" /> 
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" label="Feedback" top="28%" left="88.9%" markStart="0%" markEnd="100%" /> 
+            <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
             
             <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="343px" colorNotes="#d98adc"/>
             <GrufSelectorTonalitat top="55.4%" left="81.4%" />

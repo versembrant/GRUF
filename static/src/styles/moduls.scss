@@ -1,6 +1,8 @@
 // CSS reset for fieldset and legend
 fieldset {
     margin: 0;
+    padding: 0;
+    border: none;
     display: block;
     width: fit-content;
     legend {
@@ -9,22 +11,25 @@ fieldset {
 }
 
 
-fieldset {
+fieldset.gruf-modul {
+    background-color: $background-color;
     border: 1px solid $light-grey;
     border-radius: 15px;
-    padding: 10px 20px;
-    legend * {
+}
+
+.gruf-legend > * {
         border: 1px solid $light-grey;
         border-radius: 15px;
         display: inline-block;
         padding: 4px 10px;
         min-width: 130px;
-        margin-bottom: 20px;
-    }
 }
 
 .gruf-modul-eq {
-    background-color: $background-color;
+    padding: 10px 20px;
+    .gruf-legend > * {
+        margin-bottom: 20px;
+    }
     width: 292px;
     legend {
         background-color: $background-color;
@@ -33,5 +38,27 @@ fieldset {
         display: flex;
         justify-content: space-between;
         gap: 20px;
+    }
+}
+
+
+.gruf-modul-delay {
+    width: 153px;
+    height: 226px;
+    padding: 10px 0;
+    &, & > fieldset {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    }
+    & > div {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        > * {
+            flex: 1;
+        }
     }
 }

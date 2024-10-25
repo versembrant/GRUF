@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSlider, GrufLabel, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufLegend, GrufEnum2Columns, ADSRGraph } from "./widgets";
 
 
 // TODO: position: relative should be default for knobs
@@ -23,8 +23,8 @@ export const GrufModulADSR = ({estacio, soundNumber="", height, top, left}) => {
 
 export const GrufModulEQ = ({estacio, top, left}) => {
     return (
-        <fieldset className="gruf-modul-eq" style={{position: "absolute", top, left}}>
-            <legend><span>EQ</span></legend>
+        <fieldset className="gruf-modul gruf-modul-eq" style={{position: "absolute", top, left}}>
+            <GrufLegend text="EQ" />
             <div>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxLow" position='relative'/>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxMid" position='relative' />
@@ -33,4 +33,20 @@ export const GrufModulEQ = ({estacio, top, left}) => {
         </fieldset>
     )
     
+}
+
+export const GrufModulDelay = ({estacio, top, left}) => {
+    return(
+        <fieldset className="gruf-modul gruf-modul-delay" style={{position: "absolute", top, left}}>
+            <GrufLegend text="Delay" />
+            <div>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayWet" label="Send" position="relative" /> 
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayFeedback" label="Feedback" position="relative" /> 
+            </div>
+            <fieldset>
+                <GrufLegend text="Durada" />
+                <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" />
+            </fieldset>
+    </fieldset>
+    )
 }
