@@ -327,6 +327,35 @@ class SamplePlayer {
             console.warn(`startTime (current: ${startTime}) must be less than endTime (current: ${endTime})`);
             return;
         }
-        this.tonePlayer.buffer = this.sourceBuffer.slice(startTime, endTime);
+        this.tonePlayer.buffer = this._applyFadeInOut(this.sourceBuffer.slice(startTime, endTime), 0.01, 0.01);
+    }
+
+    _applyFadeInOut(buffer, fadeInDuration, fadeOutDuration) {
+        // Get the buffer's raw audio data for each channel
+        const fadeInSamples = Math.floor(buffer.sampleRate * fadeInDuration);
+        const fadeOutSamples = Math.floor(buffer.sampleRate * fadeOutDuration);
+        const totalSamples = buffer.length;
+        const fadeOutStartSample = totalSamples - fadeOutSamples;
+    
+        const bufferArray = [];
+        for (let channel = 0; channel < buffer.numberOfChannels; channel++) bufferArray.push(buffer.getChannelData(channel));
+
+        // Apply fade-in
+        for (let i = 0; i < fadeInSamples; i++) {
+            const fadeFactor = i / fadeInSamples;
+            bufferArray.forEach((channel, channelIndex) => {
+                bufferArray[channelIndex][i] = channel[i] *= fadeFactor;
+            })
+        }
+    
+        // Apply fade-out
+        for (let i = fadeOutStartSample; i < totalSamples; i++) {
+            const fadeFactor = (totalSamples - i) / fadeOutSamples;
+            bufferArray.forEach((channel, channelIndex) => {
+                bufferArray[channelIndex][i] = channel[i] *= fadeFactor;
+            })
+        }
+        buffer.fromArray(bufferArray);
+        return buffer;
     }
 }
