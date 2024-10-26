@@ -86,38 +86,24 @@ export class EstacioSampler extends EstacioBase {
         if (!this.isGraphBuilt) {
             if (!this.soundsPendingLoading) this.soundsPendingLoading = [];
             if (this.soundsPendingLoading.includes(soundName)) return;
+            console.log(`Posant el so ${soundName} a la cua.`);
             this.soundsPendingLoading.push(soundName);
             return;
         }
 
         if (this.loadedSounds.hasOwnProperty(soundName)) {
-            console.log(`Els so ${soundName} ja estava carregat.`);
-            return;
+            console.log(`El so ${soundName} ja estava carregat.`);
+            return this.loadedSounds[soundName];
         }
         const url = getSoundURL(soundName);
         console.log("Carregant so de la llibreria: ", soundName, ", amb url:", url);
         const buffer = new Tone.Buffer(url);
         this.loadedSounds[soundName] = buffer;
+        return buffer;
     }
 
 
-    calculateSlicePoints(buffer, startPoint, endPoint) {
-        const duration = buffer.duration;
-        const start = startPoint * duration;
-        const end = endPoint * duration;
-        return { start, end };
-    }
-
-    triggerBufferSlice(player, buffer, startPoint, endPoint, time, duration=undefined) {
-        if (!buffer?.loaded) return;
-        const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
-        player.buffer = buffer;
-        player.loop = true;
-        player.loopStart = start;
-        player.loopEnd = end;
-        player.start(time, undefined, duration);
-
-    }
+    
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
@@ -129,15 +115,9 @@ export class EstacioSampler extends EstacioBase {
         this.soundsPendingLoading = []
 
         // Creem els nodes del graph
-        this.audioNodes = {
-            players: Array(16).fill(null),
-            envelopes: Array(16).fill(null),
-            channels: Array(16).fill(null),
-            pitchShifts: Array(16).fill(null),
-            lpf: lpf,
-            hpf: hpf,
-        };
+        this.audioNodes = {lpf: lpf, hpf: hpf};
 
+        this.samplePlayers = Array(16).fill(null).map(el=> new SamplePlayer());
         for (let i = 0; i < 16; i++) {
             const envelope = new Tone.AmplitudeEnvelope({
                 attack: this[`attack${i + 1}`] || 0.01,
@@ -157,19 +137,20 @@ export class EstacioSampler extends EstacioBase {
 
             const player = new Tone.Player().connect(channel);
             
-            this.audioNodes.players[i] = player;
-            this.audioNodes.envelopes[i] = envelope;
-            this.audioNodes.channels[i] = channel;
-            this.audioNodes.pitchShifts[i] = pitchShift;
+            this.samplePlayers[i].tonePlayer = player;
+            this.samplePlayers[i].envelope = envelope;
+            this.samplePlayers[i].channel = channel;
+            this.samplePlayers[i].pitchShift = pitchShift;
 
         }
         
         this.addEffectChainNodes(hpf, estacioMasterChannel);
         this.isGraphBuilt = true;
+        this.bufferLoadMap = new Map();
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        const parametersMatch = name.match(/^(start|end|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
+        const parametersMatch = name.match(/^(start|end|doesLoop|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
         if (parametersMatch) {
             const [_, type, indexStr] = parametersMatch;
             const index = parseInt(indexStr, 10) - 1;
@@ -177,10 +158,11 @@ export class EstacioSampler extends EstacioBase {
 
             // Actualitza els paràmetres de ADSR i Channel
             if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
-                const envelope = this.audioNodes.envelopes[index];
+                const envelope = this.samplePlayers[index].envelope;
                 envelope[type] = value;
+                if (type === 'release') this.samplePlayers[index].release = value;
             } else if (type === 'volume'|| type === 'pan') {
-                const channel = this.audioNodes.channels[index];
+                const channel = this.samplePlayers[index].channel;
                 if (type === 'volume'){
                     channel.volume.value = value;
                 }
@@ -188,8 +170,10 @@ export class EstacioSampler extends EstacioBase {
                     channel.pan.value = value;
                 }
             } else if (type === 'pitch') {
-                const pitchShift = this.audioNodes.pitchShifts[index];
+                const pitchShift = this.samplePlayers[index].pitchShift;
                 pitchShift.pitch = parseInt(value);
+            } else if (type === 'start' || type === 'end' || type === 'doesLoop') {
+                this.samplePlayers[index][type] = value;
             }
         }
 
@@ -200,33 +184,26 @@ export class EstacioSampler extends EstacioBase {
         }
 
         if (name.match(/^sound\d*$/)) {
-            this.carregaSoDeLaLlibreria(value);
+            const buffer = this.carregaSoDeLaLlibreria(value);
+            for (let i = 0; i < 16; i++) {
+                this.setBufferOnLoad(buffer, this.samplePlayers[i]);
+            }
+            
         }
     }
 
+    setBufferOnLoad(buffer, target) {
+        if (buffer.loaded) target.buffer = buffer;
 
-    triggerSoundFromPlayer(playerIndex, time, duration=undefined) {
-        const soundName = this.getParameterValue(`sound`); // `sound${playerIndex + 1}` for individual sounds, also would need to change in estacioSampler.jsx
-        const buffer = this.loadedSounds[soundName];
-        const start = this.getParameterValue(`start${playerIndex + 1}`);
-        const end = this.getParameterValue(`end${playerIndex + 1}`);
-        const doesLoop = this.getParameterValue(`doesLoop${playerIndex + 1}`);
-        const release = this.getParameterValue(`release${playerIndex + 1}`);
-        const player = this.audioNodes.players[playerIndex];
-        const envelope = this.audioNodes.envelopes[playerIndex];
-        if (!player || !buffer || !envelope) return;
-        if (duration) envelope.triggerAttackRelease(duration, time)
-        else envelope.triggerAttack(time);
-        if (doesLoop && duration) duration += release;  // when it's not one-shot, so that the note-off occurs alongside the end of the sustain phase
-        this.triggerBufferSlice(player, buffer, start, end, time, duration);
-    }
+        // treiem el valor si ja existia
+        for (const [buffer, targetArray] of this.bufferLoadMap.entries()) {
+            const index = targetArray.indexOf(target);
+            if (index !== -1) targetArray.splice(index, 1);
+        }
 
-    stopSoundFromPlayer(playerIndex, time) {
-        const player = this.audioNodes.players[playerIndex];
-        const envelope = this.audioNodes.envelopes[playerIndex];
-        if (!player || !envelope) return;
-        player.stop(time + this.getParameterValue(`release${playerIndex + 1}`));
-        envelope.triggerRelease(time);
+        if (this.bufferLoadMap.has(buffer)) this.bufferLoadMap.get(buffer).push(target);
+        else this.bufferLoadMap.set(buffer, [target]);
+        buffer.onload = (loadedBuffer) => this.bufferLoadMap.get(buffer).forEach(mapTarget => mapTarget.buffer = loadedBuffer);
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
@@ -243,14 +220,14 @@ export class EstacioSampler extends EstacioBase {
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const playerIndex = note.n
-                this.triggerSoundFromPlayer(playerIndex, time, note.d * Tone.Time("16n").toSeconds());
+                this.samplePlayers[playerIndex].trigger(time, note.d * Tone.Time("16n").toSeconds());
             }
         }
     }
 
     onTransportStop() {
         // Stop all notes that are still playing
-        this.audioNodes.players.forEach(player => player.stop());
+        this.samplePlayers.forEach(player => player.stop());
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
@@ -260,7 +237,7 @@ export class EstacioSampler extends EstacioBase {
         const reducedMidiNoteNumber = playerIndex;
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
-            this.triggerSoundFromPlayer(playerIndex, Tone.now());
+            this.samplePlayers[playerIndex].trigger(Tone.now());
             if (recEnabled){
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
@@ -269,7 +246,7 @@ export class EstacioSampler extends EstacioBase {
                 this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
             }
         } else {
-            this.stopSoundFromPlayer(playerIndex);
+            this.samplePlayers[playerIndex].stop();
             if (recEnabled){
                 // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
@@ -286,5 +263,70 @@ export class EstacioSampler extends EstacioBase {
                 }
             }
         }
+    }
+}
+
+class SamplePlayer {
+
+    constructor() {
+        this.normStart = 0;
+        this.normEnd = 1;
+    }
+
+    /**
+     * @param {number} newStart
+     * Normalized start (0-1)
+     */
+    set start(newNormStart) {
+        if (newNormStart === this.normStart) return;
+        this.normStart = newNormStart;
+        this._makeSlicedBuffer();
+    }
+
+    /**
+     * @param {number} newEnd
+     * Normalized end (0-1)
+     */
+    set end(newNormEnd) {
+        if (newNormEnd === this.normEnd) return;
+        this.normEnd = newNormEnd;
+        this._makeSlicedBuffer();
+    }
+
+
+    set buffer(newBuffer) {
+        this.sourceBuffer = newBuffer;
+        this._makeSlicedBuffer();
+    }
+
+
+    set doesLoop(newDoesLoop) {
+        this.tonePlayer.loop = newDoesLoop;
+    }
+
+    trigger(time, duration=undefined) {
+        if (!this.tonePlayer.buffer.loaded) return;
+
+        if (duration) this.envelope.triggerAttackRelease(duration, time)
+        else this.envelope.triggerAttack(time);
+        if (this.tonePlayer.loop && duration) duration += this.release;  // when it's not one-shot, so that the note-off occurs alongside the end of the sustain phase
+        this.tonePlayer.start(time, undefined, duration);
+    }
+
+    stop(time) {
+        if (!this.tonePlayer.buffer.loaded) return;
+        this.tonePlayer.stop(time + this.release);
+        this.envelope.triggerRelease(time);
+    }
+
+    _makeSlicedBuffer() {
+        if (!this.sourceBuffer) return;
+        const startTime = this.normStart*this.sourceBuffer.duration;
+        const endTime = this.normEnd*this.sourceBuffer.duration;
+        if (!(endTime > startTime)) {
+            console.warn(`startTime (current: ${startTime}) must be less than endTime (current: ${endTime})`);
+            return;
+        }
+        this.tonePlayer.buffer = this.sourceBuffer.slice(startTime, endTime);
     }
 }
