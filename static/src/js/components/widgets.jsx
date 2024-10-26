@@ -692,9 +692,9 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
     );
 };
 
-export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToParameterChanges(estacio, 'selectedSoundName');
-    const selectedSoundName = estacio.getParameterValue('selectedSoundName');
+export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
@@ -731,7 +731,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                         if (selectedOptionIndex >= filteredOptionNames.length) {
                             selectedOptionIndex = filteredOptionNames.length - 1;
                         }
-                        estacio.updateParametreEstacio('selectedSoundName', filteredOptionNames[selectedOptionIndex])
+                        estacio.updateParametreEstacio(parameterName, filteredOptionNames[selectedOptionIndex])
                     }
                 }
             });
@@ -742,7 +742,6 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
 
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
-        console.log(tonalitatSampleLlista)
         return (
             <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
         );
@@ -755,7 +754,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                 itemTemplate={optionTemplate}
                 value={selectedSoundName}
                 onChange={(evt) => {
-                    estacio.updateParametreEstacio('selectedSoundName', evt.target.value)
+                    estacio.updateParametreEstacio(parameterName, evt.target.value)
                 }} 
                 options={options}
                 placeholder="Cap"
