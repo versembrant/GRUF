@@ -27,14 +27,6 @@ const getSoundURL = (soundName) => {
 }
 
 
-const getInitialSoundUrl = () => {
-    return getSoundURL(getInitialSoundName());
-}
-
-const getInitialSoundName = () => {
-    return 'adagio strings';
-}
-
 const getInitialStartValue = (numSound) => {
     const totalSlices = 16;
     const sliceNum = numSound % totalSlices;
@@ -62,7 +54,7 @@ export class EstacioSampler extends EstacioBase {
         },
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
-            [`sound${i + 1}URL`]: {type: 'text', label: `Sample${i + 1}`, initial: getInitialSoundUrl()},
+            // [`sound${i + 1}`]: {type: 'text', label: `Sample${i + 1}`, initial: 'adagio strings'},
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
             [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
             [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, unit: units.second, min: 0, max: 2, initial: 0.01},
@@ -74,10 +66,11 @@ export class EstacioSampler extends EstacioBase {
             [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
             [`doesLoop${i + 1}`]: {type: 'bool', initial: true}
         }), {}),
-        selectedSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
 
         lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
         hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 20, max: 3000, initial: 20, logarithmic: true},
+
+        sound: {type: 'text', initial: 'adagio strings'}
     }
 
     getTempsBeat = () => {
@@ -89,22 +82,24 @@ export class EstacioSampler extends EstacioBase {
     }
 
     carregaSoDeLaLlibreria(soundName) {
-        const url = getSoundURL(soundName);
-        console.log("Carregant so de la llibreria: ", url);
-        for (let i = 0; i < 16; i++) {
-            this.updateParametreEstacio(`sound${i + 1}URL`, url);
-        }
-    }
-
-    loadSoundInBuffer(bufferIndex, url) {
-        const buffer = this.audioBuffers[bufferIndex];
-        if (buffer && buffer.url === url) {
-            console.log(`El Buffer ${bufferIndex + 1} ja té la URL ${url} carregada.`);
+        // si l'àudio no està construit, deixem el so en una cua perquè es carregui quan es construeix
+        if (!this.isGraphBuilt) {
+            if (!this.soundsPendingLoading) this.soundsPendingLoading = [];
+            if (this.soundsPendingLoading.includes(soundName)) return;
+            this.soundsPendingLoading.push(soundName);
             return;
         }
-        const newBuffer = new Tone.Buffer(url);
-        this.audioBuffers[bufferIndex] = newBuffer;
+
+        if (this.loadedSounds.hasOwnProperty(soundName)) {
+            console.log(`Els so ${soundName} ja estava carregat.`);
+            return;
+        }
+        const url = getSoundURL(soundName);
+        console.log("Carregant so de la llibreria: ", soundName, ", amb url:", url);
+        const buffer = new Tone.Buffer(url);
+        this.loadedSounds[soundName] = buffer;
     }
+
 
     calculateSlicePoints(buffer, startPoint, endPoint) {
         const duration = buffer.duration;
@@ -129,7 +124,9 @@ export class EstacioSampler extends EstacioBase {
         const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
 
-        this.audioBuffers = Array(16).fill(null);
+        this.loadedSounds = {}
+        if (this.soundsPendingLoading) this.soundsPendingLoading.forEach(sound => this.carregaSoDeLaLlibreria(sound));
+        this.soundsPendingLoading = []
 
         // Creem els nodes del graph
         this.audioNodes = {
@@ -168,16 +165,10 @@ export class EstacioSampler extends EstacioBase {
         }
         
         this.addEffectChainNodes(hpf, estacioMasterChannel);
+        this.isGraphBuilt = true;
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        const match = name.match(/^sound(\d+)URL$/);
-        if (match) {
-            if (!getAudioGraphInstance().isGraphBuilt()) { return; }
-            const index = parseInt(match[1], 10) - 1;
-            this.loadSoundInBuffer(index, value);
-        }
-
         const parametersMatch = name.match(/^(start|end|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
         if (parametersMatch) {
             const [_, type, indexStr] = parametersMatch;
@@ -208,17 +199,15 @@ export class EstacioSampler extends EstacioBase {
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
         }
 
-        if (name === 'selectedSoundName') {
-            setTimeout( () => {
-                // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
-                this.carregaSoDeLaLlibreria(value);
-            }, 50)
+        if (name.match(/^sound\d*$/)) {
+            this.carregaSoDeLaLlibreria(value);
         }
     }
 
 
     triggerSoundFromPlayer(playerIndex, time, duration=undefined) {
-        const buffer = this.audioBuffers[playerIndex];
+        const soundName = this.getParameterValue(`sound`); // `sound${playerIndex + 1}` for individual sounds, also would need to change in estacioSampler.jsx
+        const buffer = this.loadedSounds[soundName];
         const start = this.getParameterValue(`start${playerIndex + 1}`);
         const end = this.getParameterValue(`end${playerIndex + 1}`);
         const doesLoop = this.getParameterValue(`doesLoop${playerIndex + 1}`);
