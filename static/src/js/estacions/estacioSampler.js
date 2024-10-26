@@ -71,7 +71,8 @@ export class EstacioSampler extends EstacioBase {
             [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, unit: units.second, min: 0, max: 4, initial: 0.01},
             [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
-            [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0}
+            [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
+            [`doesLoop${i + 1}`]: {type: 'bool', initial: true}
         }), {}),
         selectedSoundName: {type: 'text', label: 'Selected Sound name', initial: getInitialSoundName()},
 
@@ -112,16 +113,15 @@ export class EstacioSampler extends EstacioBase {
         return { start, end };
     }
 
-    playBufferSlice(player, buffer, startPoint, endPoint, time) {
-        
-        if (buffer && buffer.loaded) {
-            const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
-            player.buffer = buffer;
-            player.loop = true;
-            player.loopStart = start;
-            player.loopEnd = end;
-            player.start(time, start, end - start);
-        }
+    triggerBufferSlice(player, buffer, startPoint, endPoint, time, duration=undefined) {
+        if (!buffer?.loaded) return;
+        const { start, end } = this.calculateSlicePoints(buffer, startPoint, endPoint);
+        player.buffer = buffer;
+        player.loop = true;
+        player.loopStart = start;
+        player.loopEnd = end;
+        player.start(time, undefined, duration);
+
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -216,29 +216,28 @@ export class EstacioSampler extends EstacioBase {
         }
     }
 
-    playSoundFromPlayer(playerIndex, time) {
+
+    triggerSoundFromPlayer(playerIndex, time, duration=undefined) {
         const buffer = this.audioBuffers[playerIndex];
         const start = this.getParameterValue(`start${playerIndex + 1}`);
         const end = this.getParameterValue(`end${playerIndex + 1}`);
+        const doesLoop = this.getParameterValue(`doesLoop${playerIndex + 1}`);
+        const release = this.getParameterValue(`release${playerIndex + 1}`);
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        if (player && buffer && envelope) {
-            this.playBufferSlice(player, buffer, start, end, time);
-            envelope.triggerAttack(time);
-        }
+        if (!player || !buffer || !envelope) return;
+        if (duration) envelope.triggerAttackRelease(duration, time)
+        else envelope.triggerAttack(time);
+        if (doesLoop && duration) duration += release;  // when it's not one-shot, so that the note-off occurs alongside the end of the sustain phase
+        this.triggerBufferSlice(player, buffer, start, end, time, duration);
     }
 
     stopSoundFromPlayer(playerIndex, time) {
         const player = this.audioNodes.players[playerIndex];
         const envelope = this.audioNodes.envelopes[playerIndex];
-        if (player && envelope) {
-            // Per algun motiu incomprensible, si es programa un stop per "al cap d'una estona" hi poden haver problemes
-            // amb el player reproduïnt sons multiples vegades (?). Com que fem servir un envelope per l'amplitud, deixarem
-            // el player funcionant "sempre" i d'aquesta manera evitem els problemes. Això vol dir que consumirà més recursos,
-            // però tampoc sabem si és significatiu. 
-            //player.stop(time + this.getParameterValue(`release${playerIndex + 1}`));
-            envelope.triggerRelease(time);
-        }
+        if (!player || !envelope) return;
+        player.stop(time + this.getParameterValue(`release${playerIndex + 1}`));
+        envelope.triggerRelease(time);
     }
 
     onSequencerTick(currentMainSequencerStep, time) {
@@ -255,32 +254,14 @@ export class EstacioSampler extends EstacioBase {
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const playerIndex = note.n
-                this.playSoundFromPlayer(playerIndex, time);
-                this.stopSoundFromPlayer(playerIndex, time + note.d * Tone.Time("16n").toSeconds());
+                this.triggerSoundFromPlayer(playerIndex, time, note.d * Tone.Time("16n").toSeconds());
             }
         }
     }
 
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        const playerIndex = midiNoteNumber % 16;
-
-        if (!noteOff) {
-            const recEnabled = this.recEnabled('notes') && !skipRecording;
-            if (recEnabled) {   
-                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % this.getNumSteps();
-                const pattern = this.getParameterValue('pattern');
-                const index = indexOfArrayMatchingObject(pattern, {'i': playerIndex, 'j': currentStep});
-                if (index === -1) {
-                    pattern.push({'i': playerIndex, 'j': currentStep});
-                    this.updateParametreEstacio('pattern', pattern);
-                }
-            } else {
-                this.playSoundFromPlayer(playerIndex, Tone.now());
-            }
-        } else {
-            this.stopSoundFromPlayer(playerIndex);
-        }
+    onTransportStop() {
+        // Stop all notes that are still playing
+        this.audioNodes.players.forEach(player => player.stop());
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
@@ -290,7 +271,7 @@ export class EstacioSampler extends EstacioBase {
         const reducedMidiNoteNumber = playerIndex;
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
-            this.playSoundFromPlayer(playerIndex, Tone.now());
+            this.triggerSoundFromPlayer(playerIndex, Tone.now());
             if (recEnabled){
                 // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
                 // the note on time to save it
