@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getScaleFromTonality}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch}  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -418,13 +418,13 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     let lastEditedData = "";
     
     const tonality = getAudioGraphInstance().getTonality(); 
-    const tonalityScale = getScaleFromTonality(tonality);
+    const tonalityPCs = getPCsFromScaleName(tonality);
     const allowedNotes = [];
 
     for (let octave = -2; octave <= 8; octave++) { 
         const octaveOffset = octave * 12; 
-        tonalityScale.forEach(pitch => {
-            const note = pitch + octaveOffset;
+        tonalityPCs.forEach(pitchclass => {
+            const note = pitchclass + octaveOffset;
             if (note >= 0 && note <= 127) {  // Midi range permitido
                 allowedNotes.push(note);
             }
@@ -544,7 +544,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
 
         // else, return the lowest drawn note, if there are any notes drawn on the roll
-        if (parameterValue) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
+        // if (parameterValue && parameterValue.map(note => note.n)) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
 
         // else, return a sensible default, if it exists
         if (parameterDescription.notaMesBaixaTipica) return parameterDescription.notaMesBaixaTipica;
@@ -616,7 +616,19 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
-    const tonalityScale = getScaleFromTonality(tonality);
+    const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
+    const scalePCs = getPCsFromScaleName(tonality);
+    const possibleNotes = {};
+    
+    scalePCs.forEach((scalePC, i) => {
+        const degree = i + 1;
+        let octavedPC = getNextPitchClassAfterPitch(scalePC, lowestNote);
+        while (octavedPC <= highestNote) {
+            possibleNotes[octavedPC] = {degree: degree}
+            octavedPC += 12;
+        }
+    });
+
 
     const compassos = 2;
     const beatsPerCompas = 4;
@@ -648,9 +660,8 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
         
         const newNotes = [];
         onsets.forEach((onset, index) => {
-            const pitchClass = sample(tonalityScale); // actually in this implementation only the root is sure to be a pitchclass 
             const duration = durations[index];
-            const pitch = lowestNote - (lowestNote % 12) + pitchClass + (lowestNote % 12 <= pitchClass ? 0 : 12);
+            const pitch = parseInt(sample(Object.entries(possibleNotes))[0])
             const nota = {
                 b: onset,
                 d: duration,
