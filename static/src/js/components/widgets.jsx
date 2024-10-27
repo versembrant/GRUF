@@ -692,6 +692,21 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
     );
 };
 
+export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const parameterValue = estacio.getParameterValue(parameterName);
+    const inputs = loopModeOptions.map((loopModeOption, i)=> {
+        return <input type="radio" key={i} name={parameterName}
+        value={loopModeOption} checked={loopModeOption===parameterValue}
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+    })
+    return(
+        <fieldset>{inputs}</fieldset>
+    )
+    
+}
+
 export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
     const selectedSoundName = estacio.getParameterValue(parameterName);

@@ -64,7 +64,7 @@ export class EstacioSampler extends EstacioBase {
             [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
             [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
-            [`doesLoop${i + 1}`]: {type: 'bool', initial: true}
+            [`loopMode${i + 1}`]: {type: 'enum', options: ['forward', 'noLoop',], initial: 'forward'}
         }), {}),
 
         lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
@@ -150,7 +150,7 @@ export class EstacioSampler extends EstacioBase {
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        const parametersMatch = name.match(/^(start|end|doesLoop|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
+        const parametersMatch = name.match(/^(start|end|loopMode|attack|decay|sustain|release|volume|pan|pitch)(\d+)$/);
         if (parametersMatch) {
             const [_, type, indexStr] = parametersMatch;
             const index = parseInt(indexStr, 10) - 1;
@@ -160,7 +160,7 @@ export class EstacioSampler extends EstacioBase {
             if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
                 const envelope = this.samplePlayers[index].envelope;
                 envelope[type] = value;
-                if (type === 'release') this.samplePlayers[index].release = value;
+                if (type !== 'sustain') this.samplePlayers[index][type] = value;
             } else if (type === 'volume'|| type === 'pan') {
                 const channel = this.samplePlayers[index].channel;
                 if (type === 'volume'){
@@ -172,7 +172,7 @@ export class EstacioSampler extends EstacioBase {
             } else if (type === 'pitch') {
                 const pitchShift = this.samplePlayers[index].pitchShift;
                 pitchShift.pitch = parseInt(value);
-            } else if (type === 'start' || type === 'end' || type === 'doesLoop') {
+            } else if (type === 'start' || type === 'end' || type === 'loopMode') {
                 this.samplePlayers[index][type] = value;
             }
         }
@@ -300,17 +300,23 @@ class SamplePlayer {
     }
 
 
-    set doesLoop(newDoesLoop) {
-        this.tonePlayer.loop = newDoesLoop;
+    set loopMode(newLoopMode) {
+        this.tonePlayer.loop = newLoopMode !== 'noLoop';
     }
 
     trigger(time, duration=undefined) {
         if (!this.tonePlayer.buffer.loaded) return;
 
-        if (duration) this.envelope.triggerAttackRelease(duration, time)
-        else this.envelope.triggerAttack(time);
-        if (this.tonePlayer.loop && duration) duration += this.release;  // when it's not one-shot, so that the note-off occurs alongside the end of the sustain phase
-        this.tonePlayer.start(time, undefined, duration);
+        if (!duration) {
+            this.envelope.triggerAttack(time);
+            this.tonePlayer.start(time);
+            return;
+        }
+        if (!this.tonePlayer.loop) duration = Math.min(duration, this.tonePlayer.buffer.duration) // capping it on one-shot
+        const sampleDuration = this.tonePlayer.loop ? duration + this.release : duration; // when it's not one-shot, so that the note-off occurs alongside the end of the sustain phase
+        const sustainDuration = sampleDuration - this.attack - this.decay - this.release;
+        this.envelope.triggerAttackRelease(sustainDuration, time);
+        this.tonePlayer.start(time, undefined, sampleDuration);
     }
 
     stop(time) {
