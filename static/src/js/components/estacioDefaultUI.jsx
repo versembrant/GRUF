@@ -192,7 +192,7 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
         if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
 
         // else, return the lowest drawn note, if there are any notes drawn on the roll
-        if (parameterValue) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
+        // if (parameterValue && parameterValue.map(note => note.n)) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
 
         // else, return a sensible default, if it exists
         if (parameterDescription.notaMesBaixaTipica) return parameterDescription.notaMesBaixaTipica;

@@ -424,7 +424,9 @@ export const getTonalityForSamplerLibrarySample = (soundName) => {
     return tonalityFound;
 }
 
-export const getScaleFromTonality = (tonality) => {
+// returns an array with the index corresponding to the position on the scale
+// and the number corresponding to the Pitch Class
+export const getPCsFromScaleName = (scale) => {
     const midiNotesMap = {
         'c': 0,  'c#': 1, 'db': 1,
         'd': 2,  'd#': 3, 'eb': 3,
@@ -434,9 +436,9 @@ export const getScaleFromTonality = (tonality) => {
         'b': 11
     };
 
-    const parseTonality = (tonality) => {
-        const rootNote = tonality.slice(0, 1).toLowerCase(); 
-        const isMinor = tonality.toLowerCase().includes('minor'); 
+    const parseScale = (scale) => {
+        const rootNote = scale.slice(0, -5).toLowerCase(); 
+        const isMinor = scale.toLowerCase().includes('minor'); 
         
         if (!midiNotesMap.hasOwnProperty(rootNote)) {
             throw new Error(`Root no vàlida: ${rootNote}`);
@@ -451,9 +453,13 @@ export const getScaleFromTonality = (tonality) => {
     const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
     const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
 
-    const { rootMidi, isMinor } = parseTonality(tonality);
+    const { rootMidi, isMinor } = parseScale(scale);
 
     const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
 
-    return scaleIntervals.map(interval=>interval+rootMidi);
+    return scaleIntervals.map(interval=>(interval+rootMidi)%12);
 };
+
+export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
+    return midiPitch - (midiPitch % 12) + pitchClass + (midiPitch % 12 <= pitchClass ? 0 : 12);
+}
