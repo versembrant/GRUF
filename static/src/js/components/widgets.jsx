@@ -702,7 +702,7 @@ export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
         onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
     })
     return(
-        <fieldset>{inputs}</fieldset>
+        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
     )
     
 }
