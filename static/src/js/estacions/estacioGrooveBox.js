@@ -37,7 +37,7 @@ export class EstacioGrooveBox extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         ...EstacioBase.parametersDescription,
-        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 1200, max: 12000, initial: 12000, logarithmic: true},
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 12000, initial: 12000, logarithmic: true},
         
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[
             {'nom': 'Hip Hop Classic 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}]}, 
@@ -151,7 +151,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.kick.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack4'){
+        } else if (name =='attack4'){
             this.audioNodes.kick.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
@@ -167,12 +167,12 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.snare.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack3'){
+        } else if (name =='attack3'){
             this.audioNodes.snare.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
         } else if (name =='release3'){
-            this.audioNodes.closed_hat.set({
+            this.audioNodes.snare.set({
                 'fadeOut': value*this.getTempsBeat(),
             });
         } else if (name =='tone2'){
@@ -183,7 +183,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.closed_hat.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack2'){
+        } else if (name =='attack2'){
             this.audioNodes.closed_hat.set({
                 'fadeIn': value*this.getTempsBeat(),
             });
@@ -199,7 +199,7 @@ export class EstacioGrooveBox extends EstacioBase {
             this.audioNodes.open_hat.set({
                 'volume': value > -30 ? value: -100,
             });
-        } else if (name =='atack1'){
+        } else if (name =='attack1'){
             this.audioNodes.open_hat.set({
                 'fadeIn': value*this.getTempsBeat(),
             });

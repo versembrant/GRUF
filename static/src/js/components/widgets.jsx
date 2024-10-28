@@ -427,16 +427,21 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         };
     
         const parseTonality = (tonality) => {
-            const rootNote = tonality.slice(0, 1).toLowerCase(); 
-            const isMinor = tonality.toLowerCase().includes('minor'); 
-            
+            let rootNote = tonality.slice(0, 2).toLowerCase();
+            //Comprova si la root té alteracions, sinó, torna a separar. 
             if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root no vàlida: ${rootNote}`);
+                rootNote = tonality.slice(0, 1).toLowerCase();
+            }
+    
+            const isMinor = tonality.toLowerCase().includes('minor');
+    
+            if (!midiNotesMap[rootNote]) {
+                throw new Error(`Root note no vàlida: ${rootNote}`);
             }
     
             return {
-                rootMidi: midiNotesMap[rootNote], 
-                isMinor: isMinor                   
+                rootMidi: midiNotesMap[rootNote],  
+                isMinor: isMinor                  
             };
         };
     
@@ -603,7 +608,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={getAllowedNotesForTonality(tonality)}
+                    allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
