@@ -2,7 +2,7 @@ node_modules
 .parcel-cache
 static/dist
 __pycache__/
-versembrant_bruixit.sock
+versembrant_gruf.sock
 redis-data
 uploads
 .DS_Store
