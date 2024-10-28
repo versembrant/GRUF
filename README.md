@@ -1,4 +1,4 @@
-# versembrant-bruixit
+# versembrant-gruf
 
 ## Installation instructions
 
@@ -7,8 +7,8 @@ You need [Docker](https://www.docker.com/products/docker-desktop/) to be running
 1. Clone and `cd` to repo
 
 ```shell
-git clone git@github.com:ffont/versembrant-bruixit.git
-cd versembrant-bruixit/
+git clone git@github.com:ffont/versembrant-gruf.git
+cd versembrant-gruf/
 ```
 
 2. Build Docker images:
