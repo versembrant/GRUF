@@ -158,7 +158,10 @@ export class EstacioSampler extends EstacioBase {
                 pan: this[`pan${i + 1}`] || 0,
             }).connect(pitchShift);
 
-            const player = new Tone.Player().connect(channel);
+            const player = new Tone.Player({
+                fadeIn: 0.01,
+                fadeOut: 0.01
+            }).connect(channel);
             
             this.audioNodes.players[i] = player;
             this.audioNodes.envelopes[i] = envelope;
