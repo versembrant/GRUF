@@ -12,8 +12,8 @@ docker-compose run --rm server fab deploy
 docker-compose run --rm server fab deploy-nginx-conf
 """
 
-code_dir = "/home/versembrant/versembrant-bruixit/"
-code_dir_test = "/home/versembrant/test/versembrant-bruixit/"
+code_dir = "/home/versembrant/versembrant-gruf/"
+code_dir_test = "/home/versembrant/test/versembrant-gruf/"
 host = "versembrant@cl2024011711001.dnssw.net"
 host_root = "root@cl2024011711001.dnssw.net"
 pem_file = "/ssh/id_rsa"
