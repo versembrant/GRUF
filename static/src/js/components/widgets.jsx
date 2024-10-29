@@ -299,7 +299,7 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
     );
 };
 
-export const GrufToggle = ({ estacio, parameterName, top, left, labelOn="On", labelOff="Off" }) => {
+export const GrufToggle = ({ estacio, parameterName, top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
 
     const parameterValue = estacio.getParameterValue(parameterName);
