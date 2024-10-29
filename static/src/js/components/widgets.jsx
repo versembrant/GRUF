@@ -316,8 +316,6 @@ export const GrufToggle = ({ estacio, parameterName, top, left, labelOn="On", la
             >
                 <div className={`circle-icon ${parameterValue ? 'selected' : ''}`}></div>
             </div>
-            <div className="toggle-label toggle-label-off">{labelOff}</div>
-            <div className="toggle-label toggle-label-on">{labelOn}</div>
         </div>
     );
 };
