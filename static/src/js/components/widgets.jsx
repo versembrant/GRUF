@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges }  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -14,6 +14,7 @@ import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import { subscribeToStoreChanges, subscribeToParameterChanges, updateParametre } from "../utils";
 import throttle from 'lodash.throttle'
+import { AudioRecorder } from "../components/audioRecorder";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -22,6 +23,23 @@ import { circularProgressClasses } from "@mui/material";
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
+
+export const createRecordingHandler = (estacio, parameterDescription) => {
+    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+
+    const toggleRecording = (button) => {
+        const recordingInputElement = document.getElementById(recordingElementId);
+        if (recordingInputElement.checked) {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
+        } else {
+            recordingInputElement.checked = true;
+            button.classList.add('recording');
+        }
+    };
+
+    return { recordingElementId, toggleRecording };
+};
 
 export const GrufLegend = ({ text, bare=false }) => {
     // we actually style the span element inside the legend element :)
@@ -71,8 +89,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 }
 
 
-// TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
@@ -92,6 +109,7 @@ export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mid
         updateParametre(parameterParent, parameterName, newRealValue);
     }
 
+    position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
@@ -364,6 +382,8 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
             transformOrigin: 'left'
         }
     }
+
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
@@ -372,11 +392,18 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
+            <div className="gruf-grid-controls" style={{ position: 'fixed', top: '245px', left: '465px' }}>
+                { parameterDescription.showRecButton && (
+                    <>
+                        <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
+                        <button onMouseDown={(evt) => toggleRecording(evt.target)} style={{ marginBottom: '8px' }}>Rec</button>
+                    </>
+                )}
+            </div>
             <div style={{display:"none"}}>
-                <button onMouseDown={(evt)=>
+                {/* <button onMouseDown={(evt)=>
                     estacio.updateParametreEstacio(parameterDescription.nom, [])
-                }>Clear</button>
-                { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+                }>Clear</button> */}
                 {hasPatronsPredefinits(parameterDescription) &&
                     (
                     <div>
@@ -397,6 +424,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
 };
 
 export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    subscribeToPresetChanges();
     return (
         <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
             {[...Array(estacio.numPresets).keys()].map(i => 
@@ -413,6 +441,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
+    subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
@@ -431,16 +460,21 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         };
     
         const parseTonality = (tonality) => {
-            const rootNote = tonality.slice(0, 1).toLowerCase(); 
-            const isMinor = tonality.toLowerCase().includes('minor'); 
-            
+            let rootNote = tonality.slice(0, 2).toLowerCase();
+            //Comprova si la root té alteracions, sinó, torna a separar. 
             if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root no vàlida: ${rootNote}`);
+                rootNote = tonality.slice(0, 1).toLowerCase();
+            }
+    
+            const isMinor = tonality.toLowerCase().includes('minor');
+    
+            if (!midiNotesMap[rootNote]) {
+                throw new Error(`Root note no vàlida: ${rootNote}`);
             }
     
             return {
-                rootMidi: midiNotesMap[rootNote], 
-                isMinor: isMinor                   
+                rootMidi: midiNotesMap[rootNote],  
+                isMinor: isMinor                  
             };
         };
     
@@ -586,28 +620,18 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    }
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
+    const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return (
-        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
+        <div className="gruf-piano-roll" style={{ position, top, left}}>
             <div style={{overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={getAllowedNotesForTonality(tonality)}
+                    allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
@@ -648,6 +672,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
+    subscribeToPresetChanges();
+    
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
@@ -698,10 +724,30 @@ export const GrufSelectorTonalitat = ({ position="relative", top, left, label="T
     );
 };
 
-export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToParameterChanges(estacio, 'selectedSoundName');
-    const selectedSoundName = estacio.getParameterValue('selectedSoundName');
+export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const parameterValue = estacio.getParameterValue(parameterName);
+    const inputs = loopModeOptions.map((loopModeOption, i)=> {
+        return <input type="radio" key={i} name={parameterName}
+        value={loopModeOption} checked={loopModeOption===parameterValue}
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+    })
+    return(
+        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
+    )
+    
+}
+
+export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    subscribeToAudioGraphParameterChanges('tonality');
+    [inputMeterPercent, setInputMeterPercent] = useState(0);
+
+    const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+    const tonalitat = getAudioGraphInstance().getTonality();
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
             'label': 'Gravació usuari ' + (i + 1), 
@@ -712,10 +758,10 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        }))
+        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
+    
     const optionNames = options.map(item => item.value);
-
     const handleRemoveFileButton = (soundName) => {
         const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
         var fd = new FormData();
@@ -737,36 +783,43 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                         if (selectedOptionIndex >= filteredOptionNames.length) {
                             selectedOptionIndex = filteredOptionNames.length - 1;
                         }
-                        estacio.updateParametreEstacio('selectedSoundName', filteredOptionNames[selectedOptionIndex])
+                        estacio.updateParametreEstacio(parameterName, filteredOptionNames[selectedOptionIndex])
                     }
                 }
             });
         })
     }
-    const tonalitat = getAudioGraphInstance().getTonality();
-    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
 
+    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
-        console.log(tonalitatSampleLlista)
         return (
             <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
         );
     };
 
     return (
-        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
-            <Dropdown 
-                className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
-                itemTemplate={optionTemplate}
-                value={selectedSoundName}
-                onChange={(evt) => {
-                    estacio.updateParametreEstacio('selectedSoundName', evt.target.value)
-                }} 
-                options={options}
-                placeholder="Cap"
-            />
-            {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+        <div>
+            <div className="flex">
+                <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
+                    <Dropdown
+                        className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                        itemTemplate={optionTemplate}
+                        value={selectedSoundName}
+                        onChange={(evt) => {
+                            estacio.updateParametreEstacio(parameterName, evt.target.value)
+                        }}
+                        options={options}
+                        placeholder="Cap"
+                    />
+                    {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+                </div>
+                <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
+                    console.log("Sound uploaded to server: ", data.url);
+                    estacio.updateParametreEstacio('selectedSoundName', data.url.split("/").slice(-1)[0])
+                }} />
+            </div>
+            <div id="inputMeterInner" style={{width: inputMeterPercent + "%", height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
         </div>
     )
 }

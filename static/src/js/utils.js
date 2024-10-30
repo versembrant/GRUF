@@ -153,6 +153,10 @@ export const subscribeToParameterChanges = (parameterParent, nomParametre) => {
     else return subscribeToEstacioParameterChanges(parameterParent, nomParametre)
 }
 
+export const subscribeToPresetChanges = () => {
+    subscribeToPartialStoreChanges(getCurrentSession(), 'live');
+}
+
 // Function for widgets to have a single interface to update any parameter
 export const updateParametre = (parameterParent, parameterName, value) => {
     if (parameterParent === getAudioGraphInstance()) parameterParent.updateParametreAudioGraph(parameterName, value);
