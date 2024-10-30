@@ -686,7 +686,7 @@ export const GrufSelectorTonalitat = ({ position="relative", top, left, label="T
     return (
         <div className="tonality-selector" style={{ position, top, left }}>
             <label htmlFor={tonalitatctrlId}>{label || parameterDescription.label}</label>
-            <Dropdown
+            <Dropdown id={tonalitatctrlId}
                 value={currentTonality}  
                 options={dropdownOptions}
                 onChange={handleTonalityChange}
