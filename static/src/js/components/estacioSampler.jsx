@@ -27,9 +27,12 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 </div>
 
                 <div className="modul-border modul-bg flex flex-col gap-10" style={{position: "absolute", top: "25.7%", left: "3.6%", width: 220}}>
-                    <div className="flex justify-between">
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`start${selectedPad + 1}`} label='Start' />
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`end${selectedPad + 1}`} label='End' />
+                    <div>
+                        <GrufSlider estacio={estacio} parameterName={[`start${selectedPad + 1}`, `end${selectedPad + 1}`]} noLabel noOutput />
+                        <div className="flex justify-between text-12" aria-hidden>
+                            <span>Start</span>
+                            <span>End</span>
+                        </div>
                     </div>
                     <div className="flex justify-between">
                         {/* <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} label='Vol' /> */}
