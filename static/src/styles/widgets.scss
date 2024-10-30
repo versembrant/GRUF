@@ -857,6 +857,61 @@
     }
 }
 
+.gruf-selector-loopmode {
+    position: absolute; //TODO: remove
+    bottom: 0; //TODO: remove
+    left: 200; //TODO: remove
+    padding: 0;
+    margin: 0;
+    background-color: $background-color;
+    display: inline-flex;
+    width: 120px;
+    height: 60px;
+    border: 1px solid $light-grey;
+    border-radius: 15px;
+    overflow: hidden;
+
+    input {
+        margin: 0;
+        appearance: none;
+        flex: 1;
+
+        &:first-child {
+            border-right: 1px solid $light-grey;
+        }
+
+        &[value=forward]::after {
+            mask-image: url(../img/icona-forward_loop.svg);
+        }
+        &[value=noLoop]::after {
+            mask-image: url(../img/icona-oneshot.svg);
+        }
+
+        &:hover:not(:checked) {
+            background-color: $dark-grey;
+            cursor: pointer;
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            padding: 0 5px;
+            height: 100%;
+            background-color: $light-grey;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            mask-origin: content-box;
+        }
+
+        &:checked {
+            background-color: var(--accent-color);
+            &::after {
+                background-color: $white;
+            }
+        }
+    }
+}
+
 .gruf-selector-patrons-grid {
     position: absolute;
     font-size: 14px;

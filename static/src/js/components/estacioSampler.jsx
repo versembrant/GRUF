@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler, GrufADSRWidget } from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufButtonNoBorder, GrufLabel, GrufLabelPetit, GrufEnum2Columns, GrufReverbTime, GrufPadGrid, GrufToggle, GrufSlider, GrufSelectorSonsSampler, GrufSelectorLoopMode, GrufADSRWidget } from "./widgets";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -47,7 +47,9 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName={`start${selectedPad + 1}`} top="7.3%" left="41.3%" label='Start' />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName={`end${selectedPad + 1}`} top="21%" left="41.3%" label='End' />
 
-                <GrufSelectorSonsSampler estacio={estacio} top="268px" left="60px" width="220" />
+                <GrufSelectorLoopMode estacio={estacio} parameterName={`loopMode${selectedPad + 1}`} />
+
+                 <GrufSelectorSonsSampler estacio={estacio} parameterName={`sound`} top="268px" left="60px" width="220" />  {/* sound${selectedPad + 1} if we wanted to control them individually, also need to change estacioSampler.js*/}
 
                 <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
                 <GrufPianoRoll estacio={estacio} parameterName="notes" top="328px" left="405px" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
