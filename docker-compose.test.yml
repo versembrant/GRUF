@@ -5,7 +5,7 @@ services:
     server-test:
         build: .
         init: true
-        command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_bruixit.sock
+        command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_gruf.sock
         ports:
             - "${PORT}:${PORT}"
         restart: always
