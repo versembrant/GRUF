@@ -54,17 +54,19 @@
     .knobctrl-wrapper {
         position: relative;
         display: flex;
+        justify-content: center;
+        align-items: center;
         .knobctrl {
             cursor: pointer;
             outline: none;
             background-position: center;
             background-repeat: no-repeat;
-            width: 100%;
-            height: 100%;
+            width: 77%;
+            height: 77%;
         }
         &::before {
-            width: 130%;
-            height: 130%;
+            width: 100%;
+            height: 100%;
             position: absolute;
             inset: 50%;
             transform: translate(-50%, -50%);
