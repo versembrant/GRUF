@@ -313,13 +313,6 @@ export class EstacioBase {
         return EstacioDefaultUI  // If not overriden, use the default UI
     }
 
-    forceUpdateUIComponents() {
-        // Re-setejem el primer paràmetre per provocar un "redraw" dels components UI vinculats a aquesta estacio
-        // TODO: hi ha una manera millor de fer-ho?
-        const nomPrimerParametre = this.getParameterNames()[0]
-        this.setParametreInStore(nomPrimerParametre, this.getParameterValue(nomPrimerParametre, 0), 0)
-    }
-
     // AUDIO stuff
 
     setCurrentPreset(preset) {
@@ -688,7 +681,6 @@ export class Session {
                 const estacio = this.getEstacio(nomEstacio)
                 if (estacio.currentPreset != updateData.presets_estacions[nomEstacio]){
                     estacio.setCurrentPreset(updateData.presets_estacions[nomEstacio])
-                    estacio.forceUpdateUIComponents()
                 }
             })
         }
