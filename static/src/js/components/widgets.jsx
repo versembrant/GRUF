@@ -23,6 +23,23 @@ const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
 
+export const createRecordingHandler = (estacio, parameterDescription) => {
+    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+
+    const toggleRecording = (button) => {
+        const recordingInputElement = document.getElementById(recordingElementId);
+        if (recordingInputElement.checked) {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
+        } else {
+            recordingInputElement.checked = true;
+            button.classList.add('recording');
+        }
+    };
+
+    return { recordingElementId, toggleRecording };
+};
+
 export const GrufLabel = ({text, top, left}) => {
     return (
         <div className="gruf-label" style={{top: top, left: left}}>
@@ -360,6 +377,8 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
             transformOrigin: 'left'
         }
     }
+
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
@@ -368,11 +387,18 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
+            <div className="gruf-grid-controls" style={{ position: 'fixed', top: '245px', left: '465px' }}>
+                { parameterDescription.showRecButton && (
+                    <>
+                        <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
+                        <button onMouseDown={(evt) => toggleRecording(evt.target)} style={{ marginBottom: '8px' }}>Rec</button>
+                    </>
+                )}
+            </div>
             <div style={{display:"none"}}>
-                <button onMouseDown={(evt)=>
+                {/* <button onMouseDown={(evt)=>
                     estacio.updateParametreEstacio(parameterDescription.nom, [])
-                }>Clear</button>
-                { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+                }>Clear</button> */}
                 {hasPatronsPredefinits(parameterDescription) &&
                     (
                     <div>
@@ -589,18 +615,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    }
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     return (
