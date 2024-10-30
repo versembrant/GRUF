@@ -622,8 +622,9 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
+    const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return (
-        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
+        <div className="gruf-piano-roll" style={{ position, top, left}}>
             <div style={{overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}

@@ -39,9 +39,11 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
                  <GrufSelectorSonsSampler estacio={estacio} parameterName={`sound`} top="268px" left="60px" width="220" />  {/* sound${selectedPad + 1} if we wanted to control them individually, also need to change estacioSampler.js*/}
 
-                <GrufPadGrid estacio={estacio} top="338px" left="155px" width="218px" height="312px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
-                <GrufPianoRoll estacio={estacio} parameterName="notes" top="328px" left="405px" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
-
+                <div className="flex gap-10" style={{position:"absolute", top:"327px", left:"38px"}}>
+                    <GrufPadGrid estacio={estacio}  width="250px" height="333px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
+                    <GrufPianoRoll estacio={estacio} parameterName="notes" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
+                </div>
+                
                 <div style={{position:"absolute", top:"263px", left:"295px"}}>
                     <AudioRecorder ui="minimal" onRecordUploadedCallback={(data) => {
                         console.log("Sound uploaded to server: ", data.url);
