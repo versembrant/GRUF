@@ -109,14 +109,17 @@
 }
 
 .gruf-slider {
-    position: absolute;
     font-size: 14px;
     
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 6px; 
+    gap: 6px;
+
+    * {
+        transition: none !important; // treu les animacions que venen per defecte
+    }
 
     &.gruf-slider-background-ratllat .MuiSlider-root{
         background-image: url("../img/slider_bg.svg");
@@ -135,11 +138,7 @@
 
     .MuiSlider-thumb {
         color: $white;
-        &:hover {
-            -webkit-box-shadow: none;
-            box-shadow: none;
-            animation: none;
-        }
+        box-shadow: none !important;  // treu l'outline blau
     }
 
     &:has(.Mui-active) output {
@@ -155,19 +154,18 @@
             border-radius: 5px;
             height: 27px;
             width: 10px;
-            
         }
         .MuiSlider-mark {
             height: 0px;
         }
         .MuiSlider-track {
-            height: 8px;
+            color: var(--accent-color);
+        }
+        .MuiSlider-track, .MuiSlider-rail {
+            height: 10px;
         }
         .MuiSlider-markLabel {
             font-size: 12px;
-        }
-        .MuiSlider-rail {
-            height: 10px;
         }
     }
 
@@ -195,12 +193,8 @@
         }
 
     }
-    
-    .Mui-focusVisible {
-        -webkit-box-shadow: none!important;
-        box-shadow: none!important;
-        animation: none;
-    }
+
+
     .MuiSlider-mark {
         color: $grey;
     }
@@ -211,10 +205,6 @@
         font-weight: 400;
         font-style: normal;
         color: $font-color;
-    }
-
-    .MuiSlider-dragging {
-        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
     }
 
     .MuiSlider-root {
