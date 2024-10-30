@@ -881,17 +881,14 @@
 }
 
 .gruf-selector-loopmode {
-    position: absolute; //TODO: remove
-    bottom: 0; //TODO: remove
-    left: 200; //TODO: remove
     padding: 0;
     margin: 0;
     background-color: $background-color;
     display: inline-flex;
-    width: 120px;
-    height: 60px;
+    width: 100px;
+    height: 30px;
     border: 1px solid $light-grey;
-    border-radius: 15px;
+    border-radius: 8px;
     overflow: hidden;
 
     input {
@@ -936,7 +933,6 @@
 }
 
 .gruf-selector-patrons-grid {
-    position: absolute;
     font-size: 14px;
 
     .p-dropdown {
@@ -1120,22 +1116,29 @@
     }
 }
 
-.sampler-record-btn {
-    text-align: center;
-    width: 75px;
-}
-
 @keyframes blinker {
     50% {
       opacity: 0;
     }
   }
 
-.sampler-recording-btn {
-    text-align: center;
-    animation: blinker 1s linear infinite;
-    width: 75px;
+.sampler-record-widget {
+    border: 1px solid $light-grey;
+    border-radius: 5px;
+
+    .sampler-record-btn {
+        padding: 2 4;
+        border: none;
+        &.recording {
+            animation: blinker 1s linear infinite;
+        }
+        > img {
+            height: 14px;
+        }
+        
+    }
 }
+
 
 .gruf-adsr-widget {
     background-color: $background-color;

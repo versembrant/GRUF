@@ -46,6 +46,9 @@ export class EstacioSampler extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         ...EstacioBase.parametersDescription,
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 20000, initial: 20000, logarithmic: true},
+
+
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
             followsPreset: true, 
             notaMesBaixaPermesa: 0,

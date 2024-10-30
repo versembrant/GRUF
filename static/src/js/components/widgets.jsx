@@ -14,6 +14,7 @@ import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import { subscribeToStoreChanges, subscribeToParameterChanges, updateParametre } from "../utils";
 import throttle from 'lodash.throttle'
+import { AudioRecorder } from "../components/audioRecorder";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -88,8 +89,7 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
 }
 
 
-// TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
@@ -109,6 +109,7 @@ export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mid
         updateParametre(parameterParent, parameterName, newRealValue);
     }
 
+    position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
@@ -740,10 +741,10 @@ export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
 
 export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
-    const selectedSoundName = estacio.getParameterValue(parameterName);
-
     subscribeToAudioGraphParameterChanges('tonality');
+    [inputMeterPercent, setInputMeterPercent] = useState(0);
 
+    const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const tonalitat = getAudioGraphInstance().getTonality();
 
@@ -798,18 +799,27 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     };
 
     return (
-        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
-            <Dropdown 
-                className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
-                itemTemplate={optionTemplate}
-                value={selectedSoundName}
-                onChange={(evt) => {
-                    estacio.updateParametreEstacio(parameterName, evt.target.value)
-                }} 
-                options={options}
-                placeholder="Cap"
-            />
-            {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+        <div>
+            <div className="flex">
+                <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
+                    <Dropdown
+                        className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                        itemTemplate={optionTemplate}
+                        value={selectedSoundName}
+                        onChange={(evt) => {
+                            estacio.updateParametreEstacio(parameterName, evt.target.value)
+                        }}
+                        options={options}
+                        placeholder="Cap"
+                    />
+                    {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+                </div>
+                <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
+                    console.log("Sound uploaded to server: ", data.url);
+                    estacio.updateParametreEstacio('selectedSoundName', data.url.split("/").slice(-1)[0])
+                }} />
+            </div>
+            <div id="inputMeterInner" style={{width: inputMeterPercent + "%", height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
         </div>
     )
 }

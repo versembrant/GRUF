@@ -7,12 +7,28 @@ fieldset {
     width: fit-content;
 }
 
-// widgetgroups are fieldsets of related widgets that don't represent a synth module.
-.gruf-modul, .gruf-widgetgroup {
-    background-color: $background-color;
+@mixin gruf-border {
     border: 1px solid $light-grey;
     border-radius: 15px;
     padding: 10px;
+}
+
+@mixin gruf-bg {
+    background-color: $background-color;
+}
+
+.modul-border {
+    @include gruf-border;
+}
+
+.modul-bg {
+    @include gruf-bg;
+}
+
+// widgetgroups are fieldsets of related widgets that don't represent a synth module.
+.gruf-modul, .gruf-widgetgroup {
+    @include gruf-bg;
+    @include gruf-border;
 
     &, fieldset {
         display: flex;
