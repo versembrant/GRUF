@@ -664,7 +664,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const GrufSelectorTonalitat = ({ position="relative", top, left }) => {
+export const GrufSelectorTonalitat = ({ position="relative", top, left, label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
         const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
@@ -682,8 +682,10 @@ export const GrufSelectorTonalitat = ({ position="relative", top, left }) => {
         getAudioGraphInstance().updateParametreAudioGraph('tonality', selectedTonality);
     };
 
+    const tonalitatctrlId = useId();
     return (
         <div className="tonality-selector" style={{ position, top, left }}>
+            <label htmlFor={tonalitatctrlId}>{label || parameterDescription.label}</label>
             <Dropdown
                 value={currentTonality}  
                 options={dropdownOptions}
