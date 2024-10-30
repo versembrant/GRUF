@@ -4,6 +4,8 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { clamp } from '../utils';
 import { subscribeToStoreChanges } from "../utils";
+import mic_icon from "../../img/microphone.svg";
+import stop_icon from "../../img/stop_button.svg";
 
 const recorder = new Tone.Recorder();
 const meter = new Tone.Meter();
@@ -14,7 +16,7 @@ let meterInterval = null;
 let startedRecordingTime = undefined;
 let recording = undefined;
 
-export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
+export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) => {
 
     subscribeToStoreChanges(getCurrentSession());
     
@@ -26,10 +28,12 @@ export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
             micOpened = true;
             // print the incoming mic levels in decibels
             meterInterval = setInterval(() => {
-                //const valueForMeter = clamp(meter.getValue(), -100, 0);
-                valueForMeter = Math.random() * 100 - 100;
-                document.getElementById("inputMeterInner").style.width = `${valueForMeter + 100}%`;
-            }, 100);
+                const minDB = -60;
+                const maxDB = 0;
+                const meterValue = clamp(meter.getValue(), minDB, maxDB);
+                const meterPercent = (meterValue - minDB) / (maxDB - minDB) * 100;
+                setInputMeterPercent(meterPercent);
+            }, 10);
 
             // Start recording
             startedRecordingTime = Tone.now();
@@ -130,45 +134,22 @@ export const AudioRecorder = ({ui, onRecordUploadedCallback}) => {
         })
     }
 
+    const handleRecToggle = () => {
+        if (!isRecButtonDisabled) handleRecButton();
+        else handleStopAndUploadButton();
+    }
+
     const [isRecButtonDisabled, setRecButtonDisabled] = useState(false);
     const [isStopButtonDisabled, setStopButtonDisabled] = useState(true);
     const [isSendButtonDisabled, setSendButtonDisabled] = useState(true);
 
-    if (ui === "minimal") {
-        return (<div>
-            {!isRecButtonDisabled ? <button className="btn-petit sampler-record-btn" id="startRecording" onClick={handleRecButton}><img src={appPrefix + "/static/src/img/microphone.svg"} style={{height:14}}/> Rec</button>:""}
-            {!isStopButtonDisabled ? <button className="btn-petit sampler-recording-btn" id="stopRecording" onClick={handleStopAndUploadButton}>Stop</button>:""}
-            <div id="inputMeterInner" style={{width:'0%', height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
-            <div style={{display:"none"}}>
-                <span id="recordingLength"></span>
-                <span id="serverFileURL"></span>
-            </div>
-        </div>)
-    } else {
-        return (
-            <div>
-                <h2>MIC Recorder</h2>
-                <div>
-                    <button id="startRecording" onClick={handleRecButton} disabled={isRecButtonDisabled}>Record</button>
-                    <button id="stopRecording" onClick={handleStopButton} disabled={isStopButtonDisabled}>Stop recording</button>
-                </div>
-                <div style={{width:'100%', height: '20px', backgroundColor:'black'}}>
-                    <div id="inputMeterInner" style={{width:'0%', height: '100%', backgroundColor:'green'}}></div>
-                </div>
-                <div>
-                    <span id="recordingLength"></span>
-                    <button id="sendToServerButton" disabled={isSendButtonDisabled} onClick={handleSendToServerButton}>Send to server</button>
-                    <span id="serverFileURL"></span>
-                </div>
-                <div>{ getCurrentSession().getRecordedFiles().length } recorded files
-                <ul>
-                    { getCurrentSession().getRecordedFiles().map((file, index) => {
-                        return <li key={index}><a href={"/gruf/static/uploads/" + getCurrentSession().getID() + "/" + file} target="_blank">{ window.location.href.split("/gruf/")[0] + "/gruf/static/uploads/" + getCurrentSession().getID() + "/" + file}</a> <button data-filename={file} onClick={handleRemoveFileButton}>Delete</button></li>
-                    })}
-                </ul>
-                </div>
-                
-            </div>
-        )
-    }
+    return (<div className="sampler-record-widget">
+        <button className={`sampler-record-btn ${isRecButtonDisabled ? "recording" : ""}`} id="toggleRecording" onClick={handleRecToggle}>
+            <img src={(!isRecButtonDisabled) ? mic_icon : stop_icon}/>
+        </button>
+        <div style={{display:"none"}}>
+            <span id="recordingLength"></span>
+            <span id="serverFileURL"></span>
+        </div>
+    </div>)
 };

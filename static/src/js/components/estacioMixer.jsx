@@ -216,10 +216,9 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     }
 
     const isIndirectMute = isAnySolo && !isSolo;
-    // TODO: remove position relative from grufknob in future
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' position='relative' noOutput="true" customWidth="50px" customHeight="50px"/>
+            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
@@ -303,7 +302,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     </div>
                     <div className="estacio-mixer-master-columna">
-                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" position="relative" noOutput="true" customWidth="50px" customHeight="50px"/>
+                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
                         <GrufMasterMeter showLevelMeters={showLevelMeters} />

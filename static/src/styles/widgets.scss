@@ -307,11 +307,14 @@
 }
 
 .pad-grid {
-    position: absolute;
+    padding: 20px;
+    border: 1px solid $light-grey;
+    border-radius: 15px;
+    background-color: $background-color;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 0px 10px;
+    gap: 20px 10px;
 }
 
 .gruf-pad {
@@ -323,7 +326,7 @@
 
     .p-button {
         width: 100%;
-        height: 80%;
+        height: 100%;
         padding: 0;
         background-color: $dark-grey;
     }
@@ -695,7 +698,25 @@
         }
     }
 
-    button {
+    .gruf-grid-controls{
+        height: 30px;
+        overflow: hidden;
+        margin-top:10px;
+
+        button {
+            padding: 1px 4px;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+
+            &.recording {
+                --text-color: #{$red};
+                animation: blink 1s steps(7, start) infinite;
+            }
+        }
+    }
+
+    /* button {
         margin-top: 1rem;
         padding: 0.5rem 1rem;
         background-color: #444;
@@ -711,7 +732,7 @@
         &:active {
             background-color: #f3c871; 
         }
-    }
+    } */
 
     label {
         margin-left: 1rem;
@@ -730,7 +751,6 @@
 }
 
 .gruf-piano-roll {
-    position: absolute;
 
     @keyframes blink {
         50% {
@@ -862,8 +882,59 @@
     }
 }
 
+.gruf-selector-loopmode {
+    padding: 0;
+    margin: 0;
+    background-color: $background-color;
+    display: inline-flex;
+    width: 100px;
+    height: 30px;
+    border: 1px solid $light-grey;
+    border-radius: 8px;
+    overflow: hidden;
+
+    input {
+        margin: 0;
+        appearance: none;
+        flex: 1;
+
+        &:first-child {
+            border-right: 1px solid $light-grey;
+        }
+
+        &[value=forward]::after {
+            mask-image: url(../img/icona-forward_loop.svg);
+        }
+        &[value=noLoop]::after {
+            mask-image: url(../img/icona-oneshot.svg);
+        }
+
+        &:hover:not(:checked) {
+            background-color: $dark-grey;
+            cursor: pointer;
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            padding: 0 5px;
+            height: 100%;
+            background-color: $light-grey;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            mask-origin: content-box;
+        }
+
+        &:checked {
+            background-color: var(--accent-color);
+            &::after {
+                background-color: $white;
+            }
+        }
+    }
+}
+
 .gruf-selector-patrons-grid {
-    position: absolute;
     font-size: 14px;
 
     .p-dropdown {
@@ -1047,22 +1118,29 @@
     }
 }
 
-.sampler-record-btn {
-    text-align: center;
-    width: 75px;
-}
-
 @keyframes blinker {
     50% {
       opacity: 0;
     }
   }
 
-.sampler-recording-btn {
-    text-align: center;
-    animation: blinker 1s linear infinite;
-    width: 75px;
+.sampler-record-widget {
+    border: 1px solid $light-grey;
+    border-radius: 5px;
+
+    .sampler-record-btn {
+        padding: 2 4;
+        border: none;
+        &.recording {
+            animation: blinker 1s linear infinite;
+        }
+        > img {
+            height: 14px;
+        }
+        
+    }
 }
+
 
 .gruf-adsr-widget {
     background-color: $background-color;
