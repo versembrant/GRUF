@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample}  from "../utils";
+import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges }  from "../utils";
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -393,6 +393,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
 };
 
 export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+    subscribeToPresetChanges();
     return (
         <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
             {[...Array(estacio.numPresets).keys()].map(i => 
@@ -409,6 +410,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
+    subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
@@ -427,16 +429,21 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         };
     
         const parseTonality = (tonality) => {
-            const rootNote = tonality.slice(0, 1).toLowerCase(); 
-            const isMinor = tonality.toLowerCase().includes('minor'); 
-            
+            let rootNote = tonality.slice(0, 2).toLowerCase();
+            //Comprova si la root té alteracions, sinó, torna a separar. 
             if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root no vàlida: ${rootNote}`);
+                rootNote = tonality.slice(0, 1).toLowerCase();
+            }
+    
+            const isMinor = tonality.toLowerCase().includes('minor');
+    
+            if (!midiNotesMap[rootNote]) {
+                throw new Error(`Root note no vàlida: ${rootNote}`);
             }
     
             return {
-                rootMidi: midiNotesMap[rootNote], 
-                isMinor: isMinor                   
+                rootMidi: midiNotesMap[rootNote],  
+                isMinor: isMinor                  
             };
         };
     
@@ -603,7 +610,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={getAllowedNotesForTonality(tonality)}
+                    allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
@@ -644,6 +651,8 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
+    subscribeToPresetChanges();
+    
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
@@ -710,7 +719,12 @@ export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
 export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
     const selectedSoundName = estacio.getParameterValue(parameterName);
+
+    subscribeToAudioGraphParameterChanges('tonality');
+
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+    const tonalitat = getAudioGraphInstance().getTonality();
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
             'label': 'Gravació usuari ' + (i + 1), 
@@ -721,10 +735,10 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
             'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        }))
+        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
+    
     const optionNames = options.map(item => item.value);
-
     const handleRemoveFileButton = (soundName) => {
         const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
         var fd = new FormData();
@@ -752,9 +766,8 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
             });
         })
     }
-    const tonalitat = getAudioGraphInstance().getTonality();
-    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
 
+    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
         return (
