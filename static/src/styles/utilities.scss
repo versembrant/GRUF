@@ -2,8 +2,20 @@
     border: none;
 }
 
+.w-full {
+    width: 100%;
+}
+
+.h-full {
+    height: 100%;
+}
+
 .flex {
     display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
 }
 
 .justify-between {
