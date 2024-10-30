@@ -182,36 +182,46 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, fons, noLabel=false, noOutput=false }) => {
-    subscribeToParameterChanges(estacio, parameterName);
-    const parameterDescription = estacio.getParameterDescription(parameterName);
-    const realValue = estacio.getParameterValue(parameterName);
+export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, noLabel=false, noOutput=false }) => {
+    [activeThumbIndex, setActiveThumbIndex] = useState(0);
+    const parameterNames = Array.isArray(parameterName) ? parameterName : [parameterName];
+    parameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
 
-    const nomEstacio = estacio.nom;
+    const parameterDescriptions = parameterNames.map(parameterName => estacio.getParameterDescription(parameterName));
+    
     const marks = []
 
-    if (markStart !== undefined) marks.push({ value: getParameterNumericMin(parameterDescription), label: markStart});
-    if (markEnd !== undefined) marks.push({ value: getParameterNumericMax(parameterDescription), label: markEnd});
+    const numericMinValue = Math.min(...parameterDescriptions.map(parameterDescription=>getParameterNumericMin(parameterDescription)));
+    const numericMaxValue = Math.max(...parameterDescriptions.map(parameterDescription=>getParameterNumericMax(parameterDescription)));
+    if (markStart !== undefined) marks.push({ value: numericMinValue, label: markStart});
+    if (markEnd !== undefined) marks.push({ value: numericMaxValue, label: markEnd});
     
     const style = { top: top, left: left };
+    if (top || left) style.position = "absolute";
     if (orientation==='vertical') style.height = size || '80px';
     if (orientation==='horizontal') style.width = size || '200px';
 
+    const handleSliderChange = (newValues, activeThumbIndex) => {
+        setActiveThumbIndex(activeThumbIndex);
+        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
+    }
+    
+    const realValues = parameterNames.map(parameterName => estacio.getParameterValue(parameterName));
     const sliderId = useId();
     return (
-        <div className={`gruf-slider ${orientation} ${fons === 'linies' ? "gruf-slider-background-ratllat" : ""}`} style={style}>
+        <div className={`gruf-slider ${orientation}`} style={style}>
             <Slider
                 id={sliderId}
                 orientation={orientation}
-                value={real2Num(realValue, parameterDescription)}
-                step={getParameterStep(parameterDescription) || 0.001 } // MuiSlider needs a step size, so returning small if it's undefined
-                min={getParameterNumericMin(parameterDescription)}
-                max={getParameterNumericMax(parameterDescription)}
+                value={realValues.map((realValue, index) => real2Num(realValue, parameterDescriptions[index]))}
+                step={getParameterStep(parameterDescriptions[0]) || 0.001 } // MuiSlider needs a step size, so returning small if it's undefined
+                min={numericMinValue}
+                max={numericMaxValue}
                 marks={marks} 
-                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, num2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
+                onChange={throttle((_, newValues, activeThumb) => handleSliderChange(newValues, activeThumb), getCurrentSession().continuousControlThrottleTime)}
             />
-            {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescription.label}</label>}
-            {!noOutput && <output htmlFor={sliderId}>{real2String(realValue, parameterDescription)}</output>}
+            {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescriptions[0].label}</label>}
+            {!noOutput && <output htmlFor={sliderId}>{real2String(realValues[activeThumbIndex], parameterDescriptions[activeThumbIndex])}</output>}
         </div>
     )
 };

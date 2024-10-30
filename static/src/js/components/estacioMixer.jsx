@@ -76,7 +76,7 @@ export const GrufGainSlider = ({ estacio }) => {
     );
 };
 
-export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => {
+export const GrufGainSliderVertical = ({ estacio, top, left, height }) => {
     const nomEstacio = estacio.nom; 
     const parameterValue = getCurrentSession().getLiveGainsEstacions()[nomEstacio]; 
     const marks = [];
@@ -86,11 +86,6 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
         style.height = height;
     }
 
-    let classeFons = "";
-    if (fons === "linies") {
-        classeFons = "gruf-slider-background-ratllat";
-    }
-
     const handleGainChange = (evt, value) => {
         const currentGains = getCurrentSession().getLiveGainsEstacions();
         currentGains[nomEstacio] = parseFloat(value, 10);
@@ -98,7 +93,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     };
 
     return (
-        <div className={"gruf-gain-slider-vertical " + classeFons} style={style}>
+        <div className="gruf-gain-slider-vertical" style={style}>
             <Slider
                 orientation="vertical"
                 value={parameterValue}
@@ -112,7 +107,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
-export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
+export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
     const masterGain = getAudioGraphInstance().getMasterGain(); 
     const marks = [];
 
