@@ -701,13 +701,29 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
     );
 };
 
-export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToParameterChanges(estacio, 'selectedSoundName');
+export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const parameterValue = estacio.getParameterValue(parameterName);
+    const inputs = loopModeOptions.map((loopModeOption, i)=> {
+        return <input type="radio" key={i} name={parameterName}
+        value={loopModeOption} checked={loopModeOption===parameterValue}
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+    })
+    return(
+        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
+    )
+    
+}
+
+export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const selectedSoundName = estacio.getParameterValue(parameterName);
+
     subscribeToAudioGraphParameterChanges('tonality');
 
-    const selectedSoundName = estacio.getParameterValue('selectedSoundName');
-    const tonalitat = getAudioGraphInstance().getTonality();
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+    const tonalitat = getAudioGraphInstance().getTonality();
 
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
@@ -721,14 +737,6 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             'tonality': item.tonality
         })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
-
-    const optionTemplate = (option) => {
-        const tonalitatSampleLlista = option.tonality
-        console.log(tonalitatSampleLlista)
-        return (
-            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
-        );
-    };
     
     const optionNames = options.map(item => item.value);
     const handleRemoveFileButton = (soundName) => {
@@ -752,7 +760,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                         if (selectedOptionIndex >= filteredOptionNames.length) {
                             selectedOptionIndex = filteredOptionNames.length - 1;
                         }
-                        estacio.updateParametreEstacio('selectedSoundName', filteredOptionNames[selectedOptionIndex])
+                        estacio.updateParametreEstacio(parameterName, filteredOptionNames[selectedOptionIndex])
                     }
                 }
             });
@@ -760,6 +768,13 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
     }
 
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
+    const optionTemplate = (option) => {
+        const tonalitatSampleLlista = option.tonality
+        return (
+            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
+        );
+    };
+
     return (
         <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
             <Dropdown 
@@ -767,7 +782,7 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                 itemTemplate={optionTemplate}
                 value={selectedSoundName}
                 onChange={(evt) => {
-                    estacio.updateParametreEstacio('selectedSoundName', evt.target.value)
+                    estacio.updateParametreEstacio(parameterName, evt.target.value)
                 }} 
                 options={options}
                 placeholder="Cap"
