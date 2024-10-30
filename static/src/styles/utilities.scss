@@ -2,9 +2,14 @@
     border: none;
 }
 
-.between {
+.flex {
     display: flex;
+}
+
+.justify-between {
     justify-content: space-between;
-    flex-direction: row;
+}
+
+.items-center {
     align-items: center;
 }

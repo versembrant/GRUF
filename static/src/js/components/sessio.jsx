@@ -46,9 +46,9 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 
 const SessioHeader = ({ estacioSelected }) => {
     return(
-        <div className="header between">
+        <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
-            <div className="between">
+            <div className="flex justify-between items-center">
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
                 {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
                 {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
@@ -60,8 +60,8 @@ const SessioHeader = ({ estacioSelected }) => {
 
 const SessioFooter = () => {
     return(
-        <div className="footer between">
-            <div className="between">
+        <div className="footer flex justify-between items-center">
+            <div className="flex justify-between items-center">
                 {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
                 {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
             </div>
