@@ -58,11 +58,14 @@ const SessioHeader = ({ estacioSelected }) => {
 }
 
 const SessioFooter = () => {
+
+    const masterMode = document.getElementsByTagName('session')[0].dataset.masterAudioEngine === 'true'
+
     return(
         <div className="footer between">
             <div className="between">
                 {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
-                {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
+                {getCurrentSession().localMode ? "": <SessionConnectedUsers />}{masterMode ? <div style={{marginLeft:5}}>{"(M)"}</div>:""}
             </div>
             <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
         </div>
