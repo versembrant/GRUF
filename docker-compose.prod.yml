@@ -18,6 +18,9 @@ services:
         environment:
             - DEPLOY=1
             - FLASK_SECRET=hsau65aygasjhd5553ggjhff
+            - MAIL_SERVER=smtp.versembrant.cat
+            - MAIL_USERNAME=gruf@versembrant.cat
+            - MAIL_PASSWORD=57-1y;Bg$52E
         env_file:
             - .env
     
