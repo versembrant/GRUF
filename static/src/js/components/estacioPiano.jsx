@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLabel, GrufReverbTime, GrufSlider, GrufButtonNoBorder, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
+import { GrufKnob, GrufSeparatorLine, GrufButtonNoBorder, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
@@ -11,7 +11,9 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
 
             <fieldset className="gruf-widgetgroup widgetgroup-upleft" style={{position: "absolute", top:"4.8%", left:"3.7%", width:"443px", height:"120px"}}>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
+                <GrufSeparatorLine />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="timbre"  label = 'Timbre' />
+                <GrufSeparatorLine />
                 <GrufSelectorTonalitat />
             </fieldset>   
             
