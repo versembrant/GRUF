@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp, distanceToAbsolute, euclid, sample, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch}  from "../utils";
+import { subscribeToStoreChanges, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch}  from "../utils";
+import { subscribeToParameterChanges, updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
+import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -12,7 +14,6 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
-import { subscribeToStoreChanges, subscribeToParameterChanges, updateParametre } from "../utils";
 import throttle from 'lodash.throttle'
 
 
@@ -615,24 +616,30 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
 
 export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
+    
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
     const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
     const scalePCs = getPCsFromScaleName(tonality);
-    const possibleNotes = {};
-    
+    const scalePitchesInRange = new Map();
     scalePCs.forEach((scalePC, i) => {
         const degree = i + 1;
         let octavedPC = getNextPitchClassAfterPitch(scalePC, lowestNote);
         while (octavedPC <= highestNote) {
-            possibleNotes[octavedPC] = {degree: degree}
+            scalePitchesInRange.set(octavedPC, {degree: degree});
             octavedPC += 12;
         }
     });
-
+    const degreeWeights = {1:5, 2:1, 3:2, 4:1, 5:4, 6:1, 7:1}
 
     const compassos = 2;
     const beatsPerCompas = 4;
     const stepsPerBeat = 4;
+
+    const getNextPitch = () => {
+        const possiblePitches = [...scalePitchesInRange.keys()];
+        const weights = [...scalePitchesInRange.values()].map(noteInfo => degreeWeights[noteInfo.degree]);
+        return weightedSample(possiblePitches, weights);
+    }
 
     const randomHalves = (array, iterations=0) => {
         if (typeof array === "number") array = [array];
@@ -661,7 +668,7 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
         const newNotes = [];
         onsets.forEach((onset, index) => {
             const duration = durations[index];
-            const pitch = parseInt(sample(Object.entries(possibleNotes))[0])
+            const pitch = getNextPitch();
             const nota = {
                 b: onset,
                 d: duration,
