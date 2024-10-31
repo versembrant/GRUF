@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufButtonNoBorder, GrufSelectorPatronsGrid } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufButtonNoBorder, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -12,8 +12,11 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
             <fieldset className="gruf-widgetgroup widgetgroup-upleft" style={{position: "absolute", top:"3.8%", left:"2.7%", width:"443px", height:"120px"}}>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
+                <GrufSeparatorLine />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff"  label = 'Cutoff' />
+                <GrufSeparatorLine />
                 <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" label = 'Swing' />
+                <GrufSeparatorLine />
                 <GrufBpmCounter />
             </fieldset>
     
