@@ -88,6 +88,14 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
+export const GrufButtonBorder = ({text, top, left, onClick}) => {
+    return (
+        <button className="btn-gruf border-radius" onClick={onClick} style={{top: top, left: left}}>
+            {text}
+        </button>
+    )
+}
+
 
 export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
