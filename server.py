@@ -2,11 +2,12 @@ import os
 import sys
 import json
 import random
+import smtplib
 import hashlib
 from collections import defaultdict
+from email.message import EmailMessage
 
 from flask import Flask, render_template, request, redirect, url_for, Blueprint
-from flask_mail import Mail, Message
 from werkzeug.utils import safe_join, secure_filename
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import redis
@@ -28,33 +29,52 @@ usernames_connected_per_session = defaultdict(list)
 update_count_per_session = defaultdict(int)
 bp = Blueprint('app', __name__, template_folder='templates')
 
-mail = Mail(app)
-
-app.config['MAIL_SERVER']= os.getenv('MAIL_SERVER', 'live.smtp.example.io')
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'your_email@address.com')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'your_password')
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-
 
 def log(message):
     print(message)
     sys.stdout.flush()
 
 
-def notify_new_gruf_created(session, email_to):
-    log("Notificant nou gruf a " + email_to)
-    msg = Message("S'ha creat un nou GRUF!", sender = ('GRUF - no respondre', os.getenv('MAIL_USERNAME')), recipients = [email_to])
-    msg.body = f'Prova se missatge'
-    
-    msg.html = f"""Hola {email_to},<br><br>
-    Això és una prova de missatge amb <a href="https://test.cat">una URL</a>"""
+def send_email(email_to, subject, body):
+    log(f"Sending email \"{subject}\" to {email_to}")
+    email_from = os.getenv('MAIL_USERNAME', 'your_email@address.com')
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = email_from
+    msg['To'] = email_to
+    msg.set_content(body)
     try:
-        mail.send(msg)
-    except ConnectionRefusedError as e:
-        log(f'Error notificant email: {e} - {os.getenv('MAIL_SERVER', 'live.smtp.example.io')}')
+        password = os.getenv('MAIL_PASSWORD', 'your_password')
+        smtpObj = smtplib.SMTP(os.getenv('MAIL_SERVER', 'live.smtp.example.io'), 587)
+        smtpObj.starttls()
+        smtpObj.login(email_from, password)
+        smtpObj.send_message(msg)
+        smtpObj.quit()    
+    except Exception as e:
+        log(f'Error enviant email: {e}')
 
+
+def notify_new_gruf_created(session, email_to):
+    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}/') + app_prefix  + '/gruf/'
+    send_email(email_to, 
+               f"S'ha creat un nou GRUF: #{session.id} {session.name}", 
+               f"""Hola!
+
+Aquest correu és per informar-te de que s'ha creat un nou GRUF amb el nom \"{session.name}\".
+L'identificador (ID) d'aquest GRUF és: {session.id}
+
+Pots accedir al GRUF utilizant aquestes URLs:
+
+* {gruf_url_app_prefix}{session.id}/
+* {gruf_url_app_prefix}{session.id}/master/  (per connectar-te com a "màster")
+* {gruf_url_app_prefix}{session.id}/local/ (per connectar-te en mode local)
+
+Gràcies per utilitzar el GRUF!
+
+- Versembrant
+
+""")
+    
 
 hash_cache = {}
 get_hash = lambda content, length: hashlib.md5(content).hexdigest()[:length]
@@ -354,7 +374,8 @@ def new():
         s = Session(data)
         log(f'New session created: {s.name} ({s.id})\n{json.dumps(s.get_full_data(), indent=4)}')
         notifica_available_sessions()
-        notify_new_gruf_created(s, 'frederic.font@gmail.com')
+        if 'email' in request.form and request.form['email']:
+            notify_new_gruf_created(s, request.form['email'])
         return redirect(url_for('app.session', session_id=s.id))
     return render_template('nova_sessio.html')
 

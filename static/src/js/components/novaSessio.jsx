@@ -88,7 +88,8 @@ export const NovaSessio = () => {
     const estacionsDefault = Object.keys(estacionsDisponibles);
     const [estacionsSelected, setEstacionsSelected] = useState(estacionsDefault);
     const [nomSessio, setNomSessio] = useState(generateTitle());
-
+    const [emailNotificacio, setEmailNotificacio] = useState("");
+    
     const handleAddStation = (stationToAdd) => {
         setEstacionsSelected([...estacionsSelected, stationToAdd]);
     }
@@ -131,6 +132,10 @@ export const NovaSessio = () => {
         input2.name = 'data'
         input2.value = JSON.stringify(sessionData);
         form.appendChild(input2);        
+        const input3 = document.createElement('input');
+        input3.name = 'email'
+        input3.value = emailNotificacio;
+        form.appendChild(input3);        
         document.body.appendChild(form);
         form.submit();
     }
@@ -148,7 +153,7 @@ export const NovaSessio = () => {
                                 onChange={e => setNomSessio(e.target.value)}
                                 placeholder="Nom de la Sessió"
                             />
-                        </div>
+                        </div>                        
                     </div>
                     <div className="estacions-list">
                         <h3>Estacions Triades:</h3>
@@ -171,6 +176,14 @@ export const NovaSessio = () => {
                         <button className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
                         </div>
                     </div>
+                    <div className="notificacio-controls">
+                            Al crear el GRUF, envia un correu amb les dades del GRUF a la següent adreça de correu electrònic (opcional):
+                            <input
+                                value={emailNotificacio}
+                                onChange={e => setEmailNotificacio(e.target.value)}
+                                placeholder="correu@electronic.cat"
+                            />
+                        </div>
                     <div className="footer-controls">
                         <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
                         <a href={appPrefix + "/"} className="btn">Torna Enrere</a>
