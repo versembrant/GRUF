@@ -456,13 +456,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                 });
             }
             document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
-                let noteNumber = evt.detail.note;       
-                console.log("noteNumber was", noteNumber);      
-                if (instrumentRange < 127) {
-                    const notaMesBaixaPermesa = parameterDescription.notaMesBaixaPermesa || 0;
-                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % instrumentRange);   
-                }
-                console.log("and now noteNumber is", noteNumber)
+                let noteNumber = evt.detail.note;
                 const noteHeight = jsElement.height/jsElement.yrange;
                 let bottomPosition = noteHeight * noteNumber;
                 const canvasOffset = jsElement.yoffset*noteHeight;
