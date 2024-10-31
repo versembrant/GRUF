@@ -1,5 +1,5 @@
 import { GrufKnob, GrufSlider, GrufToggle, GrufLegend, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
-
+import React from "react";
 
 export const GrufModulADSR = ({estacio, soundNumber="", height, top, left}) => {
     const attackParamName = `attack${soundNumber}`;

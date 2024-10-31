@@ -78,8 +78,9 @@
     .estacio-main {
         height: 100%;
         position: relative;
-        background-color: var(--accent-color);
-        border-radius: 15px;
+        background-color: $black;
+        border: 15px solid var(--accent-color) ;
+        border-radius: 30px;
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -100,9 +101,10 @@
 
 .estacio-piano {
     --accent-color: #{$orange};
-    .estacio-main {
-        background-image: url("../img/piano_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/piano_bg.svg");
+        
+    } */
 }
 
 .estacio-piano-logo {
@@ -116,9 +118,10 @@
 
 .estacio-groovebox {
     --accent-color: #{$yellow};
-    .estacio-main {
-        background-image: url("../img/groovebox_bg.svg");
-    }
+    /* .estacio-main {
+       background-image: url("../img/groovebox_bg.svg");
+        
+    } */
 }
 
 .estacio-groovebox-logo {
@@ -132,9 +135,9 @@
 
 .estacio-synth {
     --accent-color: #{$red};
-    .estacio-main {
-        background-image: url("../img/synth_bg_2.svg");
-    }
+    /* .estacio-main {
+        
+    } */
 }
 
 .estacio-synth-logo {
@@ -148,9 +151,9 @@
 
 .estacio-synth_bass {
     --accent-color: #{$pink};
-    .estacio-main {
-        background-image: url("../img/synth_bass_bg_2.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/synth_bass_bg_2.svg");        
+    } */
 }
 
 .estacio-synth_bass-logo {
@@ -164,9 +167,9 @@
 
 .estacio-sampler {
     --accent-color: #{$light-blue};
-    .estacio-main {
-        background-image: url("../img/sampler_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/sampler_bg.svg");
+    } */
 }
 
 .estacio-sampler-logo {
@@ -180,9 +183,9 @@
 
 .estacio-mixer {
     --accent-color: #{$green};
-    .estacio-main {
-        background-image: url("../img/mixer_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/mixer_bg.svg");
+    } */
 }
 
 .estacio-mixer-logo {
@@ -386,7 +389,7 @@
 .estacio-computer {
     --accent-color: #{$pale-orange};
     .estacio-main {
-        background-image: url("../img/computer_bg.svg");
+        //background-image: url("../img/computer_bg.svg");
     }
 }
 
