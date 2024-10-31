@@ -21,6 +21,7 @@ services:
             - MAIL_SERVER=smtp.versembrant.cat
             - MAIL_USERNAME=gruf@versembrant.cat
             - MAIL_PASSWORD=57-1y;Bg$52E
+            - APP_BASE_URL=http://cl2024011711001.dnssw.net/
         env_file:
             - .env
     

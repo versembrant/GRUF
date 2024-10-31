@@ -104,6 +104,22 @@
         }   
     }
 
+    .notificacio-controls {
+
+        margin-top: 10px;
+        margin-bottom: 5px;
+        
+        input {
+            margin-left: 10px;
+            padding: 5px;
+            font-size: 1rem;
+            border: 2px solid $grey;
+            border-radius: 10px;
+            background-color: transparent;
+            color: $white;
+        }
+    }
+
     .footer-controls {
         display: flex;
         gap: 20px;
