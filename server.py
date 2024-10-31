@@ -361,7 +361,7 @@ def frontpage():
 
 @bp.route('/connecta/')
 def llista_sessions():
-    return render_template('llista_sessions.html')
+    return render_template('llista_sessions.html', debug_mode=os.getenv('DEPLOY') == None)
 
 
 @bp.route('/nova_sessio/', methods=['GET', 'POST'])

@@ -22,6 +22,8 @@ export const Connecta = ({infoSessions}) => {
         }
     }
 
+    const showUtimsGrufs = document.getElementById("root").dataset.debugMode === "True";
+
     return (
         <div>
             <Navbar/>
@@ -35,7 +37,7 @@ export const Connecta = ({infoSessions}) => {
                     </div>
                 </div>
             </div>
-            <div className="ultimsGrufs">
+            { showUtimsGrufs ? <div className="ultimsGrufs">
                 <div>
                     <h3>Últims GRUFs:</h3>
                     <ul>
@@ -46,9 +48,9 @@ export const Connecta = ({infoSessions}) => {
                             <a className="btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}
                     </ul>
                 </div>
-            </div>
+            </div>: ""}
             <div className="enrere">
-                <a href={appPrefix + "/"}>Torna enrere</a>
+                <a href={appPrefix + "/"}>Ves a l'inici</a>
             </div>
         </div>
     )
