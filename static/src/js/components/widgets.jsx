@@ -433,6 +433,26 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
+export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", left = "0px" }) => {
+    return (
+        <div 
+            style={{
+                position: 'absolute',
+                top: top,
+                left: left,
+                backgroundColor: 'rgb(75, 75, 76)',
+                borderRadius: '8px', 
+                display: 'inline-block',
+                width: '570px',
+                height: '341px',
+            }}
+        >
+            <GrufOnOffGrid estacio={estacio} parameterName={parameterName} />
+        </div>
+    );
+};
+
+
 export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     subscribeToPresetChanges();
     return (

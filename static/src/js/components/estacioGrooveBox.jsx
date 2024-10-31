@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGrid, GrufBpmCounter, GrufButtonNoBorder, GrufSelectorPatronsGrid } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonNoBorder, GrufSelectorPatronsGrid } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -59,8 +59,13 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
             <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    
-
+            {/* <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    */} 
+            <GrufOnOffGridContainer 
+                estacio={estacio} 
+                parameterName="pattern" 
+                top="306px" 
+                left="166.5px" 
+            />
             <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
         </div>
     </div>)
