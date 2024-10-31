@@ -117,7 +117,10 @@
 .estacio-groovebox {
     --accent-color: #{$yellow};
     .estacio-main {
-        background-image: url("../img/groovebox_bg.svg");
+       //background-image: url("../img/groovebox_bg.svg");
+        background-color: $black;
+        border: 15px solid $yellow ;
+        border-radius: 30px;
     }
 }
 
