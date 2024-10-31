@@ -2,6 +2,12 @@
     border: none;
 }
 
+.border-radius {
+    border: 1px solid lightgray;
+    border-radius: 15px;
+    padding: 0.5rem 1.5rem;
+}
+
 .w-full {
     width: 100%;
 }
@@ -28,4 +34,8 @@
 
 .gap-10 {
     gap: 10px;
+}
+
+.text-12 {
+    font-size: 12px;
 }
