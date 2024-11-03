@@ -378,22 +378,22 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
-    for (let i = 0; i < numRows; i++) {
+    for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
         const stepsElements = []
-        for (let j = 0; j < numSteps; j++) {
-            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'selected' : '';
-            const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
+        for (let stepIndex = 0; stepIndex < numSteps; stepIndex++) {
+            const isFilled = indexOfArrayMatchingObject(parameterValue, {'i': rowIndex, 'j': stepIndex}) > -1;
+            const isActive = (currentStep == stepIndex && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset )));
             stepsElements.push(
             <div 
-                key={i + "_" + j} // To avoid React warning
-                className={'step ' + filledClass + ' ' + activeStep}
+                key={rowIndex + "_" + stepIndex} // To avoid React warning
+                className={`step ${isFilled ? 'selected' : ''} ${isActive ? 'active' : ''}`}
                 onMouseDown={(evt) => {
                     let updatedParameterValue = [...parameterValue]
-                    const index = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j});
+                    const index = indexOfArrayMatchingObject(parameterValue, {'i': rowIndex, 'j': stepIndex});
                     if (index > -1){
                         updatedParameterValue.splice(index, 1);
                     } else {
-                        updatedParameterValue.push({'i': i, 'j': j})
+                        updatedParameterValue.push({'i': rowIndex, 'j': stepIndex})
                     }
                     estacio.updateParametreEstacio(parameterDescription.nom, updatedParameterValue)
                 }}>
