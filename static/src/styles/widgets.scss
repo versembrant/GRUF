@@ -75,7 +75,7 @@
 
     &.knob-gran {
         font-size: 14px;
-        gap: 8px;
+        gap: 2px;
         .knobctrl-wrapper {
             width: 78px;
             height: 78px;
@@ -93,7 +93,7 @@
 
     &.knob-petit {
         font-size: 12px;
-        gap: 5px;
+        gap: 1px;
         .knobctrl-wrapper {
             width: 32.5px;
             height: 32.5px;
@@ -1049,9 +1049,7 @@
 
 
 .tonality-selector {
-    position: absolute;
     font-size: 14px;
-    width: 100px; 
     margin-bottom: 10px;
     border: solid 1px $grey;
     border-radius: 12px;
