@@ -3,8 +3,15 @@ import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./m
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
+    return (
+        <div key={estacio.nom} className="estacio estacio-synth">
+            <EstacioSynthBaseUI estacio={estacio} setEstacioSelected={setEstacioSelected} colorNotesPiano="#d43b5d" />
+        </div>
+    )
+};
 
-    return (<div key={estacio.nom} className="estacio estacio-synth">
+export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano}) => {
+    return (
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             
@@ -25,7 +32,7 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
        
             <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" top="30%" left="36.5%" size="56px" noLabel="true" noOutput="true"/>
     
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="343px" colorNotes="#d43b5d" colorNotesDissalowed="#50121f" allowedNotes={[]}/>
+            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="343px" colorNotes={colorNotesPiano} />
         </div>
-    </div>)
-};
+    )
+}
