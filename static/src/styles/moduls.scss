@@ -37,22 +37,6 @@ fieldset {
     }
 }
 
-.gruf-widgetgroup {
-    flex-direction: row;
-    padding: 10px 30px;
-}
-
-.estacio-piano .widgetgroup-upleft {
-    .knob {
-        flex: 1;
-    }
-    .tonality-selector {
-        flex: 2;
-    }
-}
-
-
-
 .gruf-legend {
     border: 1px solid $light-grey;
     border-radius: 15px;
