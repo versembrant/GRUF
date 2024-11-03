@@ -488,7 +488,7 @@ export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
     )
 }
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
     subscribeToPresetChanges();
@@ -696,7 +696,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
-                    colnotedissalowed={colorNotesDissalowed || "#333"}
+                    colnotedissalowed="#333"    
                     collt={"rgb(200, 200, 200)"}
                     coldk={"rgb(176, 176, 176)"}
                     colgrid={"#999"}
@@ -740,7 +740,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const GrufSelectorTonalitat = ({ position="relative", top, left, label="Tonalitat" }) => {
+export const GrufSelectorTonalitat = ({ label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
         const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
@@ -760,8 +760,8 @@ export const GrufSelectorTonalitat = ({ position="relative", top, left, label="T
 
     const tonalitatctrlId = useId();
     return (
-        <div className="tonality-selector" style={{ position, top, left }}>
-            <label htmlFor={tonalitatctrlId}>{label || parameterDescription.label}</label>
+        <div className="tonality-selector">
+            {!label===null &&<label htmlFor={tonalitatctrlId}>{label || parameterDescription.label}</label>}
             <Dropdown id={tonalitatctrlId}
                 value={currentTonality}  
                 options={dropdownOptions}
