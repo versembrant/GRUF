@@ -10,7 +10,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonBorder text="Canvia estació" top="3.8%" left="82.2" onClick={() => {setEstacioSelected(undefined)}} />
 
-            <fieldset className="gruf-widgetgroup widgetgroup-upleft" style={{position: "absolute", top:"3.8%", left:"2.7%", width:"443px", height:"120px"}}>
+            <fieldset className="modul-border flex justify-between items-center gap-10" style={{position: "absolute", top:"3.8%", left:"2.7%", width:"443px", height:"120px"}}>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                 <GrufSeparatorLine />
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff"  label = 'Cutoff' />
