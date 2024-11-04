@@ -699,11 +699,6 @@
             border: none;
             font-size: 14px;
             font-weight: 400;
-
-            &.recording {
-                --text-color: #{$red};
-                animation: blink 1s steps(7, start) infinite;
-            }
         }
     }
 
@@ -742,40 +737,17 @@
 }
 
 .gruf-piano-roll {
-
     @keyframes blink {
         50% {
             opacity: 0.0;
         }
     }
-      
-
-    .gruf-piano-roll-controls{
-        height: 30px;
-        overflow: hidden;
-        margin-top:10px;
-
-        button {
-            padding: 1px 4px;
-            border: none;
-            font-size: 14px;
-            font-weight: 400;
-
-            &.recording {
-                --text-color: #{$red};
-                animation: blink 1s steps(7, start) infinite;
-            }
-        }
-    }
-   
 }
 
 .gruf-selector-presets {
-    position: absolute;
     display: flex;
 
     div {
-        font-family: "Montserrat", sans-serif;
         background-color: transparent;
         font-size: 14px;
         font-weight: 400;
@@ -783,7 +755,6 @@
         border-radius: 4px;
         text-align: center;
         vertical-align: middle;
-        margin-right: 4px;
         cursor: pointer;
 
         &.active {
@@ -950,11 +921,6 @@
         margin-left: calc(100% + 5px);
         margin-top: -20px;
         padding: 0;
-
-        &.recording {
-            color: $red;
-            animation: blink 1s steps(7, start) infinite;
-        }
     }
       
 }
@@ -1121,9 +1087,6 @@
     .sampler-record-btn {
         padding: 2 4;
         border: none;
-        &.recording {
-            animation: blinker 1s linear infinite;
-        }
         > img {
             height: 14px;
         }

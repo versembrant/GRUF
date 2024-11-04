@@ -473,10 +473,10 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({ estacio, top, left, height="30px", buttonSize="20px" }) => {
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize="20px" }) => {
     subscribeToPresetChanges();
     return (
-        <div className="gruf-selector-presets" style={{ top: top, left: left, height: height, lineHeight: height }}>
+        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
                 <div
                     key={"preset_" + i}
@@ -680,7 +680,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return (
-        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left, height}}>
+        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
@@ -716,15 +716,17 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const GrufNoteControls = ({estacio}) => {
+export const GrufNoteControls = ({ className, estacio, width }) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
     return(
-        <div className="gruf-piano-roll-controls">
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
+        <fieldset className={className} style={{width: width}}>
+            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="70px"/>
+            <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
+                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
                 <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
-                <GrufSelectorPresets estacio={estacio} top="700" left="650" height="23px"/>
-            </div>
+            </fieldset>
+        </fieldset>
     )
 }
 
