@@ -925,6 +925,9 @@
 
 .gruf-selector-patrons-grid {
     font-size: 14px;
+    border: 1px solid $light-grey;
+    border-radius: 12px;
+    padding: 1rem;
 
     .p-dropdown {
         width: 100%;
