@@ -56,8 +56,10 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
             <GrufModulReverb className="col-start-3 row-start-1 row-span-2"estacio={estacio} />
 
 
-            <GrufPianoRoll className="col-start-2 col-span-3 row-start-4" estacio={estacio} parameterName="notes" width="750px" height="343px" colorNotes={colorNotesPiano} />
-            <GrufNoteControls estacio={estacio}/>
+            <fieldset className="col-start-1 col-span-4 flex justify-between gap-10">
+                <GrufNoteControls className="flex flex-col gap-10 justify-between align-center" estacio={estacio} width="150px"/>
+                <GrufPianoRoll estacio={estacio} parameterName="notes" width="750px" height="343px" colorNotes={colorNotesPiano} />
+            </fieldset>
         </div>
     )
 };

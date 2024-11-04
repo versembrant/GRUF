@@ -26,6 +26,11 @@ button, a {
         cursor: not-allowed;
     }
 
+    &.recording {
+        --text-color: #{$red};
+        animation: blink 1s steps(7, start) infinite;
+    }
+
 }
 
 .navbar a, .footer a {
