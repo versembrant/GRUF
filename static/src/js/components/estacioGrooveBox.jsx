@@ -2,6 +2,7 @@ import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridCon
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
+import { grey } from "@mui/material/colors";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
@@ -19,6 +20,30 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 <GrufSeparatorLine />
                 <GrufBpmCounter />
             </fieldset>
+
+            <div 
+                    className="modul-border gap-10"
+                    style={{ 
+                        display: "grid", 
+                        gridTemplateColumns: "1fr 1fr", 
+                        gridTemplateRows: "1fr 1fr", 
+                        gap: "10px",
+                        position: "absolute", 
+                        top: "22%", 
+                        left: "2.7%", 
+                        width: "443px", 
+                        height: "150px" 
+                    }}
+                >
+                    <div>
+                        <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" height='100%'width="250" />       
+                    </div>
+                    <div style={{ backgroundColor: "#e0e0e0", padding: "10px", borderRadius: "4px" }}>REC</div>
+                    <div>
+                        <GrufSelectorPresets estacio={estacio} buttonSize="56px" width='250px' />          
+                    </div>
+                    <div style={{ backgroundColor: "#c0c0c0", padding: "10px", borderRadius: "4px" }}>CLEAR</div>
+            </div>
     
             <GrufModulEQ estacio={estacio} top="25.4%" left="50.5%"/>
             <GrufModulDelay estacio={estacio} top="11.5%" left="82.1%"/>
@@ -61,14 +86,12 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
-            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" buttonSize="40px" />            {/* <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    */} 
             <GrufOnOffGridContainer 
                 estacio={estacio} 
                 parameterName="pattern" 
                 top="306px" 
                 left="166.5px" 
             />
-            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="50%" left="2.7%" width="210px" />       
         </div>
     </div>)
 };
