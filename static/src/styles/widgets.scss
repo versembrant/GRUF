@@ -781,12 +781,10 @@
         font-weight: 400;
         border: 1px solid $dark-grey;
         border-radius: 4px;
-        height: 100%;
-        width: 20px;
         text-align: center;
         vertical-align: middle;
         margin-right: 4px;
-        cursor: hand;
+        cursor: pointer;
 
         &.active {
             border-color: $white;
