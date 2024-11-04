@@ -716,6 +716,18 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     )
 };
 
+export const GrufNoteControls = ({estacio}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
+    return(
+        <div className="gruf-piano-roll-controls">
+                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
+                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
+                <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <GrufSelectorPresets estacio={estacio} top="700" left="650" height="23px"/>
+            </div>
+    )
+}
+
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToPresetChanges();
