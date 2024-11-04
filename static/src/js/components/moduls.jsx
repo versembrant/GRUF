@@ -1,14 +1,16 @@
 import { GrufKnob, GrufSlider, GrufToggle, GrufLegend, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
 import React from "react";
 
-export const GrufModulADSR = ({estacio, soundNumber="", height, top, left}) => {
+export const GrufModulADSR = ({className, estacio, soundNumber="", height, top, left}) => {
+    const position = (top || left) ? "absolute" : "static"; // TODO: remove
+
     const attackParamName = `attack${soundNumber}`;
     const decayParamName = `decay${soundNumber}`;
     const sustainParamName = `sustain${soundNumber}`;
     const releaseParamName = `release${soundNumber}`;
 
     return (
-        <div className="gruf-adsr-widget" style={{top, left, height}}>
+        <div className={`gruf-adsr-widget ${className}`} style={{position, top, left, height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName={attackParamName} label='Attack'/>
@@ -20,9 +22,10 @@ export const GrufModulADSR = ({estacio, soundNumber="", height, top, left}) => {
     )
 }
 
-export const GrufModulEQ = ({estacio, top, left}) => {
+export const GrufModulEQ = ({className, estacio, top, left}) => {
+    const position = (top || left) ? "absolute" : "relative"; // TODO: remove
     return (
-        <fieldset className="gruf-modul gruf-modul-eq" style={{position: "absolute", top, left}}>
+        <fieldset className={`gruf-modul gruf-modul-eq ${className}`} style={{position, top, left}}>
             <GrufLegend text="EQ" />
             <GrufToggle estacio={estacio} parameterName="fxEqOnOff" />
             <div>
@@ -35,9 +38,10 @@ export const GrufModulEQ = ({estacio, top, left}) => {
     
 }
 
-export const GrufModulDelay = ({estacio, top, left}) => {
+export const GrufModulDelay = ({className, estacio, top, left}) => {
+    const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return(
-        <fieldset className="gruf-modul gruf-modul-delay" style={{position: "absolute", top, left}}>
+        <fieldset className={`gruf-modul gruf-modul-delay ${className}`} style={{position, top, left}}>
             <GrufLegend text="Delay" />
             <div>
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayWet" label="Send" /> 
@@ -51,9 +55,10 @@ export const GrufModulDelay = ({estacio, top, left}) => {
     )
 }
 
-export const GrufModulReverb = ({estacio, top, left}) => {
+export const GrufModulReverb = ({className, estacio, top, left}) => {
+    const position = (top || left) ? "absolute" : "relative"; // TODO: remove
     return(
-        <fieldset className="gruf-modul gruf-modul-reverb" style={{position: "absolute", top, left}}>
+        <fieldset className={`gruf-modul gruf-modul-reverb ${className}`} style={{position, top, left}}>
             <GrufLegend text="Reverb" />
             <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" position="absolute" label="Send" />
             <fieldset>
