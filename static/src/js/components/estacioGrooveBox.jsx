@@ -8,7 +8,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-            <GrufButtonBorder text="Canvia estació" top="3.8%" left="82.2" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufButtonBorder text="Canvia estació" top="3.8%" left="82.2%" onClick={() => {setEstacioSelected(undefined)}} />
 
             <fieldset className="modul-border flex justify-between items-center gap-10" style={{position: "absolute", top:"3.8%", left:"2.7%", width:"443px", height:"120px"}}>
                 <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
@@ -68,7 +68,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 top="306px" 
                 left="166.5px" 
             />
-            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
+            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="50%" left="2.7%" width="210px" />       
         </div>
     </div>)
 };
