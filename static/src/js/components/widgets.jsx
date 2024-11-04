@@ -100,9 +100,9 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
-export const GrufButtonBorder = ({text, top, left, onClick}) => {
+export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
     return (
-        <button className="btn-gruf border-radius" onClick={onClick} style={{top: top, left: left}}>
+        <button className={`btn-gruf border-radius ${className}`} onClick={onClick} style={{top: top, left: left}}>
             {text}
         </button>
     )
@@ -495,7 +495,7 @@ export const GrufSelectorPresets = ({ estacio, top, left, height="30px", buttonS
     );
 };
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
     subscribeToPresetChanges();
@@ -680,7 +680,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return (
-        <div className="gruf-piano-roll" style={{ overflow:"hidden", position, top, left, height}}>
+        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left, height}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
