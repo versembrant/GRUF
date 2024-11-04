@@ -1,5 +1,4 @@
-import { GrufKnob, GrufSeparatorLine, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat, GrufSelectorPresets } from "./widgets";
-import { createRecordingHandler } from "./widgets";
+import { GrufKnob, GrufSeparatorLine, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import waveform_sine from "../../img/waveform_sine.svg"
@@ -17,8 +16,6 @@ export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
 };
 
 export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano}) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes"); // TODO: posar en component
-
     return (
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
@@ -61,12 +58,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
 
 
             <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="750px" height="343px" colorNotes={colorNotesPiano} />
-            <div className="gruf-piano-roll-controls">
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
-                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
-                <GrufSelectorPresets estacio={estacio} top="700" left="650" height="23px"/>
-            </div>
+            <GrufNoteControls estacio={estacio}/>
         </div>
     )
 };
