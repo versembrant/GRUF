@@ -473,20 +473,27 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+export const GrufSelectorPresets = ({ estacio, top, left, height="30px", buttonSize="20px" }) => {
     subscribeToPresetChanges();
     return (
-        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
+        <div className="gruf-selector-presets" style={{ top: top, left: left, height: height, lineHeight: height }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
-            <div key={"preset_" + i}
-                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
-                onClick={(evt) => {getCurrentSession().setLivePresetForEstacio(estacio.nom, i)}}>
+                <div
+                    key={"preset_" + i}
+                    className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected" : "")}
+                    onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
+                    style={{
+                        width: buttonSize,
+                        height: buttonSize,
+                        lineHeight: buttonSize,
+                    }}
+                >
                     {i + 1}
-            </div>
+                </div>
             )}
         </div>
-    )
-}
+    );
+};
 
 export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);

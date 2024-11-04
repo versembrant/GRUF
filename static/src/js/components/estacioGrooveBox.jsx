@@ -61,8 +61,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
-            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
-            {/* <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    */} 
+            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" buttonSize="40px" />            {/* <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    */} 
             <GrufOnOffGridContainer 
                 estacio={estacio} 
                 parameterName="pattern" 
