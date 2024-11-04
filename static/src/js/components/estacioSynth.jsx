@@ -1,6 +1,11 @@
 import { GrufKnob, GrufSeparatorLine, GrufButtonNoBorder, GrufSlider, GrufPianoRoll, GrufSelectorTonalitat } from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
+import waveform_sine from "../../img/waveform_sine.svg"
+import waveform_square from "../../img/waveform_square.svg"
+import waveform_triangle from "../../img/waveform_triangle.svg"
+import waveform_saw from "../../img/waveform_saw.svg"
+
 
 export const EstacioSynthUI = ({estacio, setEstacioSelected}) => {
     return (
@@ -26,8 +31,16 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
             </fieldset>
 
             <fieldset className="modul-border modul-bg flex justify-between items-center" style={{position: "absolute", top: "28.2%", left: "3.6%", width: 220}}>
-                <fieldset className="flex justify-between items-center">
-                    <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" size="56px" noLabel="true" noOutput="true"/>
+                <fieldset className="flex justify-between items-center gap-10">
+                    <div className="flex">
+                        <GrufSlider orientation="vertical" estacio={estacio} parameterName="waveform" size="56px" noLabel="true" noOutput="true"/>
+                        <div className="flex flex-col justify-between" style={{width: 20}}>
+                            <img src={waveform_sine} alt="Forma d'ona sinusoidal" />
+                            <img src={waveform_square} alt="Forma d'ona quadrada" />
+                            <img src={waveform_triangle} alt="Forma d'ona triangular" />
+                            <img src={waveform_saw} alt="Forma d'ona de dent de serra" />
+                        </div>
+                    </div>
                     <GrufKnob mida="gran" parameterParent={estacio} parameterName="harmonicity" />
                 </fieldset>
                 <GrufSeparatorLine />
