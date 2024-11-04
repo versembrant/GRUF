@@ -677,20 +677,16 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         }
     }
 
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
-
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
     return (
-        <div className="gruf-piano-roll" style={{ position, top, left}}>
-            <div style={{overflow:"hidden"}}>
+        <div className="gruf-piano-roll" style={{ overflow:"hidden", position, top, left, height}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
                     allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
                     width={width.replace('px', '')}
-                    height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
                     xrange={numSteps}
                     yrange={parameterDescription.rangDeNotesPermeses || 36}
@@ -716,13 +712,6 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     kbstyle={modeSampler === undefined ? "piano": "midi"}
                     yruler={modeSampler === undefined ? 20: 22}
                 ></gruf-pianoroll>
-            </div>
-            <div className="gruf-piano-roll-controls">
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
-                { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
-                { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
-                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
-            </div>
         </div>
     )
 };
