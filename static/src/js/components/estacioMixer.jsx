@@ -76,7 +76,7 @@ export const GrufGainSlider = ({ estacio }) => {
     );
 };
 
-export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => {
+export const GrufGainSliderVertical = ({ estacio, top, left, height }) => {
     const nomEstacio = estacio.nom; 
     const parameterValue = getCurrentSession().getLiveGainsEstacions()[nomEstacio]; 
     const marks = [];
@@ -86,11 +86,6 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
         style.height = height;
     }
 
-    let classeFons = "";
-    if (fons === "linies") {
-        classeFons = "gruf-slider-background-ratllat";
-    }
-
     const handleGainChange = (evt, value) => {
         const currentGains = getCurrentSession().getLiveGainsEstacions();
         currentGains[nomEstacio] = parseFloat(value, 10);
@@ -98,7 +93,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     };
 
     return (
-        <div className={"gruf-gain-slider-vertical " + classeFons} style={style}>
+        <div className="gruf-gain-slider-vertical" style={style}>
             <Slider
                 orientation="vertical"
                 value={parameterValue}
@@ -112,7 +107,7 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height, fons }) => 
     );
 };
 
-export const GrufMasterGainSliderVertical = ({ top, left, height, fons }) => {
+export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
     const masterGain = getAudioGraphInstance().getMasterGain(); 
     const marks = [];
 
@@ -216,10 +211,9 @@ export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, re
     }
 
     const isIndirectMute = isAnySolo && !isSolo;
-    // TODO: remove position relative from grufknob in future
     return (
         <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' position='relative' noOutput="true" customWidth="50px" customHeight="50px"/>
+            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
@@ -303,7 +297,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     </div>
                     <div className="estacio-mixer-master-columna">
-                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" position="relative" noOutput="true" customWidth="50px" customHeight="50px"/>
+                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
                         <GrufMasterMeter showLevelMeters={showLevelMeters} />

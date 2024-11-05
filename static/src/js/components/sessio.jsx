@@ -7,6 +7,7 @@ import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
+import logo_gruf from "../../img/logo_gruf.svg"
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -45,9 +46,9 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 
 const SessioHeader = ({ estacioSelected }) => {
     return(
-        <div className="header between">
-            <div className="titol ellipsis"><div className="logo_gruf"></div><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
-            <div className="between">
+        <div className="header flex justify-between items-center">
+            <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
+            <div className="flex justify-between items-center">
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
                 {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
                 {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
@@ -62,8 +63,8 @@ const SessioFooter = () => {
     const masterMode = document.getElementsByTagName('session')[0].dataset.masterAudioEngine === 'true'
 
     return(
-        <div className="footer between">
-            <div className="between">
+        <div className="footer flex justify-between items-center">
+            <div className="flex justify-between items-center">
                 {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
                 {getCurrentSession().localMode ? "": <SessionConnectedUsers />}{masterMode ? <div style={{marginLeft:5}}>{"(M)"}</div>:""}
             </div>

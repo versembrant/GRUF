@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
@@ -37,13 +41,6 @@ body {
     .enrere {
         text-align: center;
         padding: 30px 0 80px 0;
-    }
-
-    .between {
-        display: flex;
-        justify-content: space-between;
-        flex-direction: row;
-        align-items: center;
     }
 
     .carregant {
