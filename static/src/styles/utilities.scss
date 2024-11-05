@@ -32,6 +32,10 @@
     flex-wrap: wrap;
 }
 
+.flex-auto {
+    flex: auto;
+}
+
 .flex-1 {
     flex: 1;
 }
@@ -108,6 +112,9 @@
     grid-row-start: 4;
 }
 
+.justify-center {
+    justify-content: center;
+}
 
 .justify-between {
     justify-content: space-between;

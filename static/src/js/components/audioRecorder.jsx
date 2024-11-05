@@ -143,7 +143,7 @@ export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) 
     const [isStopButtonDisabled, setStopButtonDisabled] = useState(true);
     const [isSendButtonDisabled, setSendButtonDisabled] = useState(true);
 
-    return (<div className="sampler-record-widget">
+    return (<div className="sampler-record-widget flex justify-between items-center">
         <button className={`sampler-record-btn ${isRecButtonDisabled ? "recording" : ""}`} id="toggleRecording" onClick={handleRecToggle}>
             <img src={(!isRecButtonDisabled) ? mic_icon : stop_icon}/>
         </button>
