@@ -1,15 +1,15 @@
-import { GrufKnob, GrufSeparatorLine, GrufButtonNoBorder, GrufPianoRoll, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
+import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufPianoRoll, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
 export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-piano">
-        <div className="estacio-main">
+        <div className="estacio-main grid gap-10 p-4">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-            <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
+            <GrufButtonBorder className="col-start-3 row-start-1" text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />
 
-            <fieldset className="modul-border flex justify-between items-center gap-10" style={{position: "absolute", top:"4.8%", left:"3.7%", width:"443px", height:"120px"}}>
+            <fieldset className="modul-border flex justify-between items-center gap-10 col-start-1 row-start-1 row-span-2" style={{width:"443px", height:"120px"}}>
                 <fieldset className="flex flex-1 justify-between items-center gap-10">
                     <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                     <GrufSeparatorLine />
@@ -19,12 +19,12 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
                 <GrufSelectorTonalitat className="flex-1"/>
             </fieldset>   
             
-            <GrufModulEQ estacio={estacio} top="25.4%" left="49.5%"/>
-            <GrufModulDelay estacio={estacio} top="11.5%" left="80.1%"/>
-            <GrufModulReverb estacio={estacio} top="4.8%" left="49.4%" />
+            <GrufModulEQ className="col-start-2 row-start-3" estacio={estacio} />
+            <GrufModulDelay className="col-start-3 row-start-2 row-span-2" estacio={estacio} />
+            <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
-            <GrufPianoRoll estacio={estacio} parameterName="notes" top="325px" left="35px" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
-            <GrufNoteControls estacio={estacio}/>
+            <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
+            <GrufNoteControls className="col-start-1 row-start-3" estacio={estacio}/>
         </div>
     </div>)
 };
