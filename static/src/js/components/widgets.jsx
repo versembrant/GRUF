@@ -473,20 +473,17 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize="20px" }) => {
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize}) => {
     subscribeToPresetChanges();
+    const selectedPreset = getCurrentSession().getLivePresetsEstacions()[estacio.nom];
     return (
         <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
                 <div
                     key={"preset_" + i}
-                    className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected" : "")}
+                    className={`flex-auto flex justify-center items-center ${(selectedPreset == i ? " selected" : "")}`}
                     onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
-                    style={{
-                        width: buttonSize,
-                        height: buttonSize,
-                        lineHeight: buttonSize,
-                    }}
+                    style={{width: buttonSize, height: buttonSize}}
                 >
                     {i + 1}
                 </div>
@@ -720,7 +717,7 @@ export const GrufNoteControls = ({ className, estacio, width }) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
     return(
         <fieldset className={className} style={{width: width}}>
-            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="70px"/>
+            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="58px"/>
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
@@ -860,7 +857,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
 
     return (
         <div>
-            <div className="flex">
+            <div className="flex justify-between gap-10">
                 <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
                     <Dropdown
                         className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
