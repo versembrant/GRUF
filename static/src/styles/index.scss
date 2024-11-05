@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'base';
+@import 'utilities'; // tailwind-like classes
 @import 'buttons';
 @import 'text';
 @import 'frontpage';
@@ -7,5 +8,6 @@
 @import 'nova_sessio';
 @import 'sessio';
 @import 'estacions';
+@import 'moduls';
 @import 'widgets';
 @import 'dialog';

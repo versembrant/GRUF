@@ -59,15 +59,8 @@
 }
 
 .logo_gruf {
-    background-image: url("../img/logo_gruf.svg");
-    background-size: 40px;
-    background-repeat: no-repeat;
-    background-position: 10px left;
-    height: 16px;
-    width: 48px;
-    display: inline-block;
-    padding-bottom: 10px;
-    margin-bottom: -10px;
+    height: 25px;
+    transform: translateY(7px); // to align it with the baseline of other items
 }
 
 .arranjament {
@@ -85,8 +78,9 @@
     .estacio-main {
         height: 100%;
         position: relative;
-        background-color: var(--accent-color);
-        border-radius: 15px;
+        background-color: $black;
+        border: 15px solid var(--accent-color) ;
+        border-radius: 30px;
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -107,9 +101,10 @@
 
 .estacio-piano {
     --accent-color: #{$orange};
-    .estacio-main {
-        background-image: url("../img/piano_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/piano_bg.svg");
+        
+    } */
 }
 
 .estacio-piano-logo {
@@ -123,9 +118,10 @@
 
 .estacio-groovebox {
     --accent-color: #{$yellow};
-    .estacio-main {
-        background-image: url("../img/groovebox_bg.svg");
-    }
+    /* .estacio-main {
+       background-image: url("../img/groovebox_bg.svg");
+        
+    } */
 }
 
 .estacio-groovebox-logo {
@@ -139,9 +135,9 @@
 
 .estacio-synth {
     --accent-color: #{$red};
-    .estacio-main {
-        background-image: url("../img/synth_bg_2.svg");
-    }
+    /* .estacio-main {
+        
+    } */
 }
 
 .estacio-synth-logo {
@@ -155,9 +151,9 @@
 
 .estacio-synth_bass {
     --accent-color: #{$pink};
-    .estacio-main {
-        background-image: url("../img/synth_bass_bg_2.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/synth_bass_bg_2.svg");        
+    } */
 }
 
 .estacio-synth_bass-logo {
@@ -171,9 +167,9 @@
 
 .estacio-sampler {
     --accent-color: #{$light-blue};
-    .estacio-main {
-        background-image: url("../img/sampler_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/sampler_bg.svg");
+    } */
 }
 
 .estacio-sampler-logo {
@@ -187,9 +183,9 @@
 
 .estacio-mixer {
     --accent-color: #{$green};
-    .estacio-main {
-        background-image: url("../img/mixer_bg.svg");
-    }
+    /* .estacio-main {
+        //background-image: url("../img/mixer_bg.svg");
+    } */
 }
 
 .estacio-mixer-logo {
@@ -252,7 +248,7 @@
     margin: 10px;
     margin-right: 0px;
     margin-bottom: 30px;
-    width: 50px;
+    width: 70px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid var(--accent-color,#{$light-grey});
@@ -331,7 +327,7 @@
     justify-content: end; 
     margin: 10px;
     margin-right: 10px;
-    width: 50px;
+    width: 70px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid $light-grey; 
@@ -393,7 +389,7 @@
 .estacio-computer {
     --accent-color: #{$pale-orange};
     .estacio-main {
-        background-image: url("../img/computer_bg.svg");
+        //background-image: url("../img/computer_bg.svg");
     }
 }
 

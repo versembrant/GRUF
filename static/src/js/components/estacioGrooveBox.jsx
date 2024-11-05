@@ -1,37 +1,54 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufBpmCounter, GrufButtonNoBorder, GrufLabelPetit, GrufSlider, GrufSelectorPatronsGrid } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufButtonNoBorder, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
+import { grey } from "@mui/material/colors";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-groovebox">
         <div className="estacio-main">
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-            <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" top="8%" left="6.3%" label="Vol" />
-            <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff" top="8%" left="29.0%" label = 'Cutoff' />
-            <GrufBpmCounter top="8%" left="39.6%" />
-            <GrufLabel text="bpm" top="17.3%" left="41%" />
-            
-            <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
-            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
-            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
-            
-            <GrufLabel text="Delay" top="14.2%" left="82.5%" />
-            <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
-            <GrufLabel text="EQ" top="29.6%" left="51.7%" />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label = 'Mid' /> 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label = 'High' />
-            
-            <GrufLabel text="Durada" top="29.6%" left="70.3%" />
-            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-            
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" label="Mix" top="30%" left="83%" markStart="0%" markEnd="100%" /> 
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" label="Feedback" top="30%" left="88%" markStart="0%" markEnd="100%" /> 
-           
+            <GrufButtonBorder text="Canvia estació" top="3.8%" left="82.2%" onClick={() => {setEstacioSelected(undefined)}} />
+
+            <fieldset className="modul-border flex justify-between items-center gap-10" style={{position: "absolute", top:"3.8%", left:"2.7%", width:"443px", height:"120px"}}>
+                <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
+                <GrufSeparatorLine />
+                <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff"  label = 'Cutoff' />
+                <GrufSeparatorLine />
+                <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" label = 'Swing' />
+                <GrufSeparatorLine />
+                <GrufBpmCounter />
+            </fieldset>
+
+            <div 
+                    className="modul-border gap-10"
+                    style={{ 
+                        display: "grid", 
+                        gridTemplateColumns: "1fr 1fr", 
+                        gridTemplateRows: "1fr 1fr", 
+                        gap: "10px",
+                        position: "absolute", 
+                        top: "22%", 
+                        left: "2.7%", 
+                        width: "443px", 
+                        height: "150px" 
+                    }}
+                >
+                    <div>
+                        <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" height='100%'width="250" />       
+                    </div>
+                    <div style={{ backgroundColor: "#e0e0e0", padding: "10px", borderRadius: "4px" }}>REC</div>
+                    <div>
+                        <GrufSelectorPresets estacio={estacio} buttonSize="56px" width='250px' />          
+                    </div>
+                    <div style={{ backgroundColor: "#c0c0c0", padding: "10px", borderRadius: "4px" }}>CLEAR</div>
+            </div>
+    
+            <GrufModulEQ estacio={estacio} top="25.4%" left="50.5%"/>
+            <GrufModulDelay estacio={estacio} top="11.5%" left="82.1%"/>
+            <GrufModulReverb estacio={estacio} top="3.8%" left="50.4%" />
+
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume1" top="48.5%" left="5%" label = 'Vol' />
             <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone1" top="48.5%" left="9%" label = 'Tone' />
 
@@ -69,10 +86,12 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
             <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
             <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
 
-            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    
-
-            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
+            <GrufOnOffGridContainer 
+                estacio={estacio} 
+                parameterName="pattern" 
+                top="306px" 
+                left="166.5px" 
+            />
         </div>
     </div>)
 };
