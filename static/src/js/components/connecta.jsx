@@ -37,7 +37,7 @@ export const Connecta = ({infoSessions}) => {
                     </div>
                 </div>
             </div>
-            { showUtimsGrufs ? <div className="ultimsGrufs">
+            { showUtimsGrufs && infoSessions.length !== 0 ? <div className="ultimsGrufs">
                 <div>
                     <h3>Últims GRUFs:</h3>
                     <ul>
