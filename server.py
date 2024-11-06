@@ -360,8 +360,8 @@ def frontpage():
 
 
 @bp.route('/connecta/')
-def llista_sessions():
-    return render_template('llista_sessions.html', debug_mode=os.getenv('DEPLOY') == None)
+def connecta():
+    return render_template('connecta.html', debug_mode=os.getenv('DEPLOY') == None)
 
 
 @bp.route('/nova_sessio/', methods=['GET', 'POST'])
@@ -401,7 +401,7 @@ def session(session_id):
 @bp.route('/delete_session/<session_id>/')
 def delete_session(session_id):
     delete_session_by_id(session_id)
-    return redirect(url_for('app.llista_sessions'))
+    return redirect(url_for('app.connecta'))
 
 
 def allowed_file(filename):
