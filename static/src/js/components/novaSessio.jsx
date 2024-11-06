@@ -1,5 +1,5 @@
 import { estacionsDisponibles } from "../sessionManager";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Navbar, Footer } from "./frontpage";
 import { capitalizeFirstLetter, capitalize, sample } from "../utils";
 
@@ -84,11 +84,10 @@ function getNomEstacioFromTitle(estacioTipus, nExisting) {
 }
 
 export const NovaSessio = () => {
+    const defaultTitle = useRef(generateTitle());
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
     const estacionsDefault = Object.keys(estacionsDisponibles);
     const [estacionsSelected, setEstacionsSelected] = useState(estacionsDefault);
-    const [nomSessio, setNomSessio] = useState(generateTitle());
-    const [emailNotificacio, setEmailNotificacio] = useState("");
     
     const handleAddStation = (stationToAdd) => {
         setEstacionsSelected([...estacionsSelected, stationToAdd]);
@@ -120,23 +119,14 @@ export const NovaSessio = () => {
             sessionData.live.presetsEstacions[nomEstacio] = 0
         })
         
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '.';
-        form.style.display = 'none';
-        const input = document.createElement('input');
-        input.name = 'name'
-        input.value = nomSessio;
-        form.appendChild(input);
-        const input2 = document.createElement('input');
-        input2.name = 'data'
-        input2.value = JSON.stringify(sessionData);
-        form.appendChild(input2);        
-        const input3 = document.createElement('input');
-        input3.name = 'email'
-        input3.value = emailNotificacio;
-        form.appendChild(input3);        
-        document.body.appendChild(form);
+        const form = document.querySelector('form');
+        const name = document.querySelector('[name=name]');
+        if (name.value === '') name.value = name.placeholder; // donem el títol per defecte si no s'ha introduït
+        const data = document.createElement('input');
+        data.setAttribute('type', 'hidden');
+        data.name = 'data'
+        data.value = JSON.stringify(sessionData);
+        form.appendChild(data);
         form.submit();
     }
 
@@ -144,15 +134,11 @@ export const NovaSessio = () => {
         <div>
             <Navbar/>
             <div className="nova-sessio-container">
-                <div className="nova-sessio-wrapper">
+                <form className="nova-sessio-wrapper" method="POST" action=".">
                     <div className="sessio-header">
                         <h1>Nou GRUF</h1>
                         <div className="input-title">
-                            <input
-                                value={nomSessio}
-                                onChange={e => setNomSessio(e.target.value)}
-                                placeholder="Nom de la Sessió"
-                            />
+                            <input name="name" placeholder={defaultTitle.current} />
                         </div>                        
                     </div>
                     <div className="estacions-list">
@@ -173,21 +159,20 @@ export const NovaSessio = () => {
                                 <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
                             ))}
                         </select>
-                        <button className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+                        <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
                         </div>
                     </div>
                     <div className="notificacio-controls">
                             Al crear el GRUF, envia un correu amb les dades del GRUF a la següent adreça de correu electrònic (opcional):
                             <input
-                                value={emailNotificacio}
-                                onChange={e => setEmailNotificacio(e.target.value)}
+                                name="email"
                                 placeholder="correu@electronic.cat"
                             />
                         </div>
                     <div className="footer-controls">
-                        <button className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <button type="button" className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
                     </div>
-                </div>
+                </form>
             </div>
             <Footer/>
         </div>
