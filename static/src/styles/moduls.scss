@@ -52,7 +52,6 @@ fieldset {
 }
 
 .gruf-modul-eq {
-    height: 130px;
     width: 292px;
 
     display: grid; // en lloc de flex per tenir a la mateixa llinea el legend i l'eq i no haver de wrappear legend (seria mala pràctica)
@@ -78,7 +77,6 @@ fieldset {
 
 .gruf-modul-delay {
     width: 153px;
-    height: 226px;
     
     & > div {
         display: flex;
@@ -92,7 +90,6 @@ fieldset {
 
 .gruf-modul-reverb {
     width: 293px;
-    height: 136px;
     .knob {
         position: absolute;
         top: 10px;
