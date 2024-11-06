@@ -23,11 +23,13 @@ export const Connecta = ({infoSessions}) => {
     }
 
     const showUtimsGrufs = document.getElementById("root").dataset.debugMode === "True";
+    const connectError = document.getElementById('root').dataset.connectError === "True";
 
     return (
         <div>
             <Navbar/>
             <div className="connectat">
+                {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
                     <div>
