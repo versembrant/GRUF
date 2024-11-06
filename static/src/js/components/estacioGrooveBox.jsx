@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufButtonNoBorder, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -35,10 +35,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 {/* Contenidor de controls: Selector de Patrons, Clear, Presets, Rec */}
                 <fieldset className="modul-border modul-bg flex justify-between items-center col-start-1 row-start-3" style={{width: 400, height:150}}>
                     <fieldset className="grid justify-between items-center gap-10">
-                        <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" />
-                        <div className="col-start-2 row-start-1" style={{ backgroundColor: "#e0e0e0", padding: "10px", borderRadius: "4px" }}>Clear</div>
-                        <GrufSelectorPresets className="col-start-1 row-start-2" estacio={estacio} buttonSize="56px" />
-                        <div className="col-start-2 row-start-2"style={{ backgroundColor: "#c0c0c0", padding: "10px", borderRadius: "4px" }}>Rec</div>
+                        <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" width= "200px" />
+                        <GrufNoteControls className="flex flex-row gap-10 justify-between align-center" estacio={estacio} width="400px"/>
                     </fieldset>
                 </fieldset>
 

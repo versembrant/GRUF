@@ -422,14 +422,6 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
-            <div className="gruf-grid-controls" style={{ position: 'fixed', top: '245px', left: '465px' }}>
-                { parameterDescription.showRecButton && (
-                    <>
-                        <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
-                        <button onMouseDown={(evt) => toggleRecording(evt.target)} style={{ marginBottom: '8px' }}>Rec</button>
-                    </>
-                )}
-            </div>
             <div style={{display:"none"}}>
                 {/* <button onMouseDown={(evt)=>
                     estacio.updateParametreEstacio(parameterDescription.nom, [])
@@ -742,7 +734,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
             options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
             placeholder="Cap"
             />
-            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+            {/* <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button> */}
         </div>
     )
 }
