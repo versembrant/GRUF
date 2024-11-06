@@ -1,8 +1,10 @@
 import { useState } from "react";
+import logo_gruf from "../../img/logo_gruf_gris.svg"
 
 export const Navbar = () => {
     return  <div className="navbar">
                 <ul>
+                    <li><a href={appPrefix + "/"}><img height='40px' src={logo_gruf}></img></a></li>
                     <li><a href={appPrefix + "/"}>Versembrant</a></li>
                     <li><a href={appPrefix + "/"}>Tutorials</a></li>
                 </ul>
