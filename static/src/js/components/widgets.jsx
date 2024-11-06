@@ -465,7 +465,7 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize}) => {
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize, gap}) => {
     subscribeToPresetChanges();
     const selectedPreset = getCurrentSession().getLivePresetsEstacions()[estacio.nom];
     return (
@@ -475,7 +475,7 @@ export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize}
                     key={"preset_" + i}
                     className={`flex-auto flex justify-center items-center ${(selectedPreset == i ? " selected" : "")}`}
                     onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
-                    style={{width: buttonSize, height: buttonSize}}
+                    style={{width: buttonSize, height: buttonSize, marginRight:gap}}
                 >
                     {i + 1}
                 </div>
@@ -709,7 +709,6 @@ export const GrufNoteControls = ({ className, estacio, width }) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
     return(
         <fieldset className={className} style={{width: width}}>
-            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="58px"/>
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
                 <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>

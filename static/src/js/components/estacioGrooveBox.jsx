@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabelPetitVertical, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufSelectorPresets, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -12,7 +12,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
 
                 {/* Volum, Cutoff, Swing, i BPM Counter */}
-                <fieldset className="modul-border modul-bg flex flex-col justify-between col-start-1 row-start-1 row-span-2" style={{width: 400, height: 120}}>
+                <fieldset className="modul-border modul-bg flex flex-col flex-wrap justify-between col-start-1 row-start-1 row-span-2" style={{width: 400, height: 120}}>
                     <fieldset className="flex justify-between">
                         <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                         <GrufSeparatorLine />
@@ -28,16 +28,13 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
                 {/* Botó de canviar estació */}
-                <fieldset className="col-start-3 row-start-1" style={{width: 100, height: 50}}>
-                <GrufButtonBorder text="Canvia estació" onClick={() => { setEstacioSelected(undefined) }}/>
-                </fieldset>
+                <GrufButtonBorder className="col-start-3 row-start-1" style={{width: 100, height: 50}} text="Canvia estació" onClick={() => { setEstacioSelected(undefined) }}/>
 
                 {/* Contenidor de controls: Selector de Patrons, Clear, Presets, Rec */}
-                <fieldset className="modul-border modul-bg flex justify-between items-center col-start-1 row-start-3" style={{width: 400, height:150}}>
-                    <fieldset className="grid justify-between items-center gap-10">
-                        <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" width= "200px" />
-                        <GrufNoteControls className="flex flex-row gap-10 justify-between align-center" estacio={estacio} width="400px"/>
-                    </fieldset>
+                <fieldset className="modul-border modul-bg flex flex-row justify-between items-center col-start-1 row-start-3 grid justify-between items-center gap-10" style={{width: 400, height:150}}>
+                    <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" width= "225" />
+                    <GrufNoteControls className="col-start-2 row-start-1 row-span-2" estacio={estacio} width="175px"/>
+                    <GrufSelectorPresets className="col-start-1 row-start-2" estacio={estacio} buttonSize={50} gap={5}/>
                 </fieldset>
 
                 {/* Módul de EQ */}
@@ -60,9 +57,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                         ))}
                     </fieldset>
                     {/* Grid OnOff */}
-                    <fieldset className="col-start-2 row-start-1" style={{ height: 250 }}>
-                        <GrufOnOffGridContainer  estacio={estacio} parameterName="pattern" />
-                    </fieldset>
+                    <GrufOnOffGridContainer  className="col-start-2 row-start-1" style={{ height: 250 }} estacio={estacio} parameterName="pattern" />
                     {/* Contenidor de ASSR */}
                     <fieldset className="col-start-3 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gridTemplateRows: "repeat(4, auto)", gap: "10px", marginTop:15}}>
                     {["1", "2", "3", "4"].map(i => (
@@ -75,11 +70,6 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                     ))}
                     </fieldset>
                 </fieldset>
-
-
-                
-
-                
             </div>
         </div>
     );
