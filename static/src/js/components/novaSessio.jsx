@@ -147,7 +147,9 @@ export const NovaSessio = () => {
                             {estacionsSelected.map((tipusEstacio, i) => (
                                 <div className="card" key={tipusEstacio + '_' + i}>
                                     {getNomEstacioFromTitle(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
-                                    <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
+                                    {estacionsSelected.length > 1 &&
+                                        <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
+                                    }
                                 </div>
                             ))}
                         </div>
