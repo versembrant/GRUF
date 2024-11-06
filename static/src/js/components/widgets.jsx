@@ -465,17 +465,17 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize, gap}) => {
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth, minHeight }) => {
     subscribeToPresetChanges();
     const selectedPreset = getCurrentSession().getLivePresetsEstacions()[estacio.nom];
     return (
-        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left }}>
+        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left, minHeight }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
                 <div
                     key={"preset_" + i}
                     className={`flex-auto flex justify-center items-center ${(selectedPreset == i ? " selected" : "")}`}
                     onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
-                    style={{width: buttonSize, height: buttonSize, marginRight:gap}}
+                    style={{width: buttonWidth}}
                 >
                     {i + 1}
                 </div>
@@ -707,15 +707,14 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
 
 export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
-    const parameterDescription=estacio.getParameterDescription(clearParameter);
 
     return (
         <fieldset className={className} style={{ width: width }}>
-            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="58px" />
+            <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
-                <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button> 
-                <button onMouseDown={(evt) => toggleRecording(evt.target)}>Rec</button>
+                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
     );
