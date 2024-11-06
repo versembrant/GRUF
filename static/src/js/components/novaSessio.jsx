@@ -1,5 +1,5 @@
 import { estacionsDisponibles } from "../sessionManager";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Navbar, Footer } from "./frontpage";
 import { capitalizeFirstLetter, capitalize, sample } from "../utils";
 
@@ -88,14 +88,23 @@ export const NovaSessio = () => {
     const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
     const estacionsDefault = Object.keys(estacionsDisponibles);
     const [estacionsSelected, setEstacionsSelected] = useState(estacionsDefault);
+    const wasLastStationChangeAdd = useRef(false);
     
     const handleAddStation = (stationToAdd) => {
         setEstacionsSelected([...estacionsSelected, stationToAdd]);
+        wasLastStationChangeAdd.current = true;
     }
 
     const handleRemoveStation = (index) => {
         setEstacionsSelected(estacionsSelected.filter((station, i) => i !== index));
+        wasLastStationChangeAdd.current = false;
     }
+
+    useEffect(()=> {
+        if (!wasLastStationChangeAdd.current) return;
+        const currentStationListEl = document.querySelector(".selected-cards");
+        currentStationListEl.scrollTo(0, currentStationListEl.scrollHeight);
+    }, [estacionsSelected])
 
     const handleSubmitForm = (evt) => {
         const sessionData = {}
