@@ -49,9 +49,6 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>: ""}
-            <div className="enrere">
-                <a href={appPrefix + "/"}>Ves a l'inici</a>
-            </div>
         </div>
     )
 };
