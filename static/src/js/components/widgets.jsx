@@ -457,7 +457,7 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
     return (
         <div 
             style={{
-                position: 'absolute',
+                position: 'relative',
                 top: top,
                 left: left,
                 backgroundColor: 'rgb(75, 75, 76)',
