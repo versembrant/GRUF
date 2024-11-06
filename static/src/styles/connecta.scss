@@ -21,8 +21,28 @@
         color: $black;
         width: 250px;
     }
-   
+
+    .connect-error {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -10px);
+        margin: auto;
+        color: $black;
+        background-color: $red;
+        width: fit-content;
+        opacity: 0%;
+        animation-name: fadeout;
+        animation-duration: 4s;
+        border-radius: 15px;
+        padding: 10px 20px;
+    }
 }
+
+@keyframes fadeout {
+    0%   {opacity: 100%;}
+    50%  {opacity: 100%;}
+    100% {opacity: 0%;}
+  }
 
 .ultimsGrufs {
     padding: 20px;

@@ -361,7 +361,8 @@ def frontpage():
 
 @bp.route('/connecta/')
 def connecta():
-    return render_template('connecta.html', debug_mode=os.getenv('DEPLOY') == None)
+    error = request.args.get('error', False)
+    return render_template('connecta.html', error=error, debug_mode=os.getenv('DEPLOY') == None)
 
 
 @bp.route('/nova_sessio/', methods=['GET', 'POST'])
@@ -383,18 +384,21 @@ def new():
 @bp.route('/gruf/<session_id>/master/')
 def session_master(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=True)
 
 
 @bp.route('/gruf/<session_id>/local/')
 def session_local(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=True, master_audio_engine=True)
 
 
 @bp.route('/gruf/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=False)
 
 
