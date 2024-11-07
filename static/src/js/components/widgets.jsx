@@ -874,7 +874,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
                 </div>
                 <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
                     console.log("Sound uploaded to server: ", data.url);
-                    estacio.updateParametreEstacio('selectedSoundName', data.url.split("/").slice(-1)[0])
+                    estacio.updateParametreEstacio(parameterName, data.url.split("/").slice(-1)[0])
                 }} />
             </div>
             <div id="inputMeterInner" style={{width: inputMeterPercent + "%", height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
