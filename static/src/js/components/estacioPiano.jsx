@@ -9,7 +9,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
             <GrufButtonBorder className="col-start-3 row-start-1" text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />
 
-            <fieldset className="modul-border flex justify-between items-center gap-10 col-start-1 row-start-1 row-span-2" style={{width:"443px", height:"120px"}}>
+            <fieldset className="modul-border flex justify-between items-center gap-10 col-start-1 row-start-1 row-span-2">
                 <fieldset className="flex flex-1 justify-between items-center gap-10">
                     <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                     <GrufSeparatorLine />
