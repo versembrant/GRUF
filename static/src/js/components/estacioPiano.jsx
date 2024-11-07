@@ -24,7 +24,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
             <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
-            <GrufNoteControls className="col-start-1 row-start-3" estacio={estacio}/>
+            <GrufNoteControls className="col-start-1 row-start-3" estacio={estacio} clearParameter={"notes"}/>
         </div>
     </div>)
 };

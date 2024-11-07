@@ -422,14 +422,6 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                     return <div className="grid-row-default" key={'row_' + i}>{stepsElements}</div>;
                 })}
             </div>
-            <div className="gruf-grid-controls" style={{ position: 'fixed', top: '245px', left: '465px' }}>
-                { parameterDescription.showRecButton && (
-                    <>
-                        <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
-                        <button onMouseDown={(evt) => toggleRecording(evt.target)} style={{ marginBottom: '8px' }}>Rec</button>
-                    </>
-                )}
-            </div>
             <div style={{display:"none"}}>
                 {/* <button onMouseDown={(evt)=>
                     estacio.updateParametreEstacio(parameterDescription.nom, [])
@@ -457,7 +449,7 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
     return (
         <div 
             style={{
-                position: 'absolute',
+                position: 'relative',
                 top: top,
                 left: left,
                 backgroundColor: 'rgb(75, 75, 76)',
@@ -473,17 +465,17 @@ export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", le
 };
 
 
-export const GrufSelectorPresets = ({ className, estacio, top, left, buttonSize}) => {
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth, minHeight }) => {
     subscribeToPresetChanges();
     const selectedPreset = getCurrentSession().getLivePresetsEstacions()[estacio.nom];
     return (
-        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left }}>
+        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left, minHeight }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
                 <div
                     key={"preset_" + i}
                     className={`flex-auto flex justify-center items-center ${(selectedPreset == i ? " selected" : "")}`}
                     onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
-                    style={{width: buttonSize, height: buttonSize}}
+                    style={{width: buttonWidth}}
                 >
                     {i + 1}
                 </div>
@@ -714,19 +706,20 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const GrufNoteControls = ({ className, estacio, width }) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
-    return(
-        <fieldset className={className} style={{width: width}}>
-            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="58px"/>
+export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
+
+    return (
+        <fieldset className={className} style={{ width: width }}>
+            <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
-                <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
-    )
-}
+    );
+};
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
@@ -743,7 +736,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
             options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
             placeholder="Cap"
             />
-            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+            {/* <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button> */}
         </div>
     )
 }
