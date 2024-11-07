@@ -23,11 +23,13 @@ export const Connecta = ({infoSessions}) => {
     }
 
     const showUtimsGrufs = document.getElementById("root").dataset.debugMode === "True";
+    const connectError = document.getElementById('root').dataset.connectError === "True";
 
     return (
-        <div>
+        <div className="connectat-wrapper">
             <Navbar/>
             <div className="connectat">
+                {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
                     <div>
@@ -37,7 +39,7 @@ export const Connecta = ({infoSessions}) => {
                     </div>
                 </div>
             </div>
-            { showUtimsGrufs ? <div className="ultimsGrufs">
+            { showUtimsGrufs && infoSessions.length !== 0 ? <div className="ultimsGrufs">
                 <div>
                     <h3>Últims GRUFs:</h3>
                     <ul>
@@ -49,9 +51,7 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>: ""}
-            <div className="enrere">
-                <a href={appPrefix + "/"}>Ves a l'inici</a>
-            </div>
+            <p className="crea"><a href={appPrefix + "/nova_sessio"}>Crea un nou GRUF</a></p>
         </div>
     )
 };

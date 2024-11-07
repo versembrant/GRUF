@@ -364,8 +364,9 @@ def frontpage():
 
 
 @bp.route('/connecta/')
-def llista_sessions():
-    return render_template('llista_sessions.html', debug_mode=os.getenv('DEPLOY') == None)
+def connecta():
+    error = request.args.get('error', False)
+    return render_template('connecta.html', error=error, debug_mode=os.getenv('DEPLOY') == None)
 
 
 @bp.route('/nova_sessio/', methods=['GET', 'POST'])
@@ -393,25 +394,28 @@ def old_gruf_address_redirect(session_id, rest=""):
 @bp.route('/g/<session_id>/master/')
 def session_master(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=True)
 
 
 @bp.route('/g/<session_id>/local/')
 def session_local(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=True, master_audio_engine=True)
 
 
 @bp.route('/g/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=False)
 
 
 @bp.route('/delete_session/<session_id>/')
 def delete_session(session_id):
     delete_session_by_id(session_id)
-    return redirect(url_for('app.llista_sessions'))
+    return redirect(url_for('app.connecta'))
 
 
 def allowed_file(filename):

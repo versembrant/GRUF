@@ -52,16 +52,18 @@
 
         .selected-cards {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
 
-            max-height: calc(55px * 6 + 10px *3);
+            height: calc((48px + 10px) * 5 + 10px);
             overflow-y: auto;
 
             .card {
                 background-color: $dark-grey;
-                padding: 12px 12px;
+                padding: 12px;
+                height: 48px;
+                flex: none;
                 border-radius: 5px;
                 display: flex;
                 align-items: center;
@@ -76,6 +78,7 @@
                 }
             }
         }
+        
         .selector-add-row {
             display: flex;
             gap: 10px;

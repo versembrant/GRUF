@@ -11,6 +11,7 @@ body {
     background-color: $background-color;
     color: $font-color;
 
+    min-width: fit-content;
     margin: 0px;
 
     input:focus,
@@ -47,8 +48,8 @@ body {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        width: 100%;
+        width: 100vw;
+        height: 100vh;
         color: $dark-grey;
         font-size: 20px;
     }
