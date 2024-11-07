@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="root" data-debug-mode="{{ debug_mode }}"><div class="carregant"><div>Carregant...</div></div></div>
+<div id="root" data-debug-mode="{{ debug_mode }}" data-connect-error="{{ error }}"><div class="carregant"><div>Carregant...</div></div></div>
 {% endblock %}
 
 {% block js %}
