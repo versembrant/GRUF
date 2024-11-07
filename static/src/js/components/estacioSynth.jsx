@@ -49,7 +49,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                 </fieldset>
             </fieldset>
             
-            <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio} height="276px"/>
+            <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio}/>
 
             <GrufModulEQ className="col-start-3 row-start-3" estacio={estacio} />
             <GrufModulDelay className="col-start-4 row-start-2 row-span-2"estacio={estacio} />
