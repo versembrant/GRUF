@@ -1,3 +1,9 @@
+.connectat-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .connectat {
     text-align: center;
     background-image: url("../img/home intro.jpg");
@@ -59,3 +65,15 @@
     }
 }
 
+
+.crea {
+    margin: 10px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    a {
+        border: none;
+        padding: 0;
+        text-decoration: underline;
+    }
+}
