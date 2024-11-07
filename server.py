@@ -55,7 +55,7 @@ def send_email(email_to, subject, body):
 
 
 def notify_new_gruf_created(session, email_to):
-    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}/') + app_prefix  + '/gruf/'
+    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}/') + app_prefix  + '/g/'
     send_email(email_to, 
                f"S'ha creat un nou GRUF: #{session.id} {session.name}", 
                f"""Hola!
@@ -380,19 +380,25 @@ def new():
     return render_template('nova_sessio.html')
 
 
-@bp.route('/gruf/<session_id>/master/')
+@bp.route('/gruf/<session_id>/')
+@bp.route('/gruf/<session_id>/<path:rest>')
+def old_gruf_address_redirect(session_id, rest=""):
+    return redirect(url_for('app.session', session_id=session_id) + rest)
+
+
+@bp.route('/g/<session_id>/master/')
 def session_master(session_id):
     s = get_session_by_id(session_id)
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=True)
 
 
-@bp.route('/gruf/<session_id>/local/')
+@bp.route('/g/<session_id>/local/')
 def session_local(session_id):
     s = get_session_by_id(session_id)
     return render_template('sessio.html', session=s, local_mode=True, master_audio_engine=True)
 
 
-@bp.route('/gruf/<session_id>/')
+@bp.route('/g/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=False)

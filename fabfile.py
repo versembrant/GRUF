@@ -45,6 +45,9 @@ def deploy(ctx, branch="main", test=False):
             if test:
                 # Copy the .env file for test deployment
                 c.put("deploy/.env_test", code_dir_test + '.env')
+            else:
+                # Copy the .env file for proiduction deployment
+                c.put("deploy/.env_prod", code_dir + '.env')
 
             compose_file = "docker-compose.prod.yml" if not test else "docker-compose.test.yml"
             server_service_name = "server" if not test else "server-test"
