@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GRUF</title>
+    <meta id="vp" name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+    window.onload = function() {
+        const minWidth = 1150;
+        if (screen.width < minWidth) {
+            var mvp = document.getElementById('vp');
+            mvp.setAttribute('content','user-scalable=no,width=' + minWidth);
+        }
+    }
+    </script>
+    <title>GRUF - Versembrant</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='dist/favicon.e494d1d5.svg') }}" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
