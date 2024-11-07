@@ -26,7 +26,7 @@ export const Connecta = ({infoSessions}) => {
     const connectError = document.getElementById('root').dataset.connectError === "True";
 
     return (
-        <div>
+        <div className="connectat-wrapper">
             <Navbar/>
             <div className="connectat">
                 {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
@@ -51,6 +51,7 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>: ""}
+            <p className="crea"><a href={appPrefix + "/nova_sessio"}>Crea un nou GRUF</a></p>
         </div>
     )
 };
