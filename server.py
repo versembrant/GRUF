@@ -55,7 +55,9 @@ def send_email(email_to, subject, body):
 
 
 def notify_new_gruf_created(session, email_to):
-    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}/') + app_prefix  + '/g/'
+    if app_prefix != "" and not app_prefix.startswith('/'):
+        app_prefix = '/' + app_prefix
+    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}') + app_prefix  + '/g/'
     send_email(email_to, 
                f"S'ha creat un nou GRUF: #{session.id} {session.name}", 
                f"""Hola!
