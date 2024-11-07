@@ -705,18 +705,21 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const GrufNoteControls = ({ className, estacio, width }) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, "notes");
-    return(
-        <fieldset className={className} style={{width: width}}>
+export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
+    const parameterDescription=estacio.getParameterDescription(clearParameter);
+
+    return (
+        <fieldset className={className} style={{ width: width }}>
+            <GrufSelectorPresets className="flex flex-wrap gap-10 justify-between" estacio={estacio} buttonSize="58px" />
             <fieldset className="flex flex-col gap-10">
-                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio("notes", [])}>Clear</button>
-                <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
+                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button> 
+                <button onMouseDown={(evt) => toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
-    )
-}
+    );
+};
 
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
