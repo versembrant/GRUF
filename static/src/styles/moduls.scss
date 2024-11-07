@@ -52,8 +52,6 @@ fieldset {
 }
 
 .gruf-modul-eq {
-    width: 292px;
-
     display: grid; // en lloc de flex per tenir a la mateixa llinea el legend i l'eq i no haver de wrappear legend (seria mala pràctica)
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
@@ -76,8 +74,6 @@ fieldset {
 }
 
 .gruf-modul-delay {
-    width: 153px;
-    
     & > div {
         display: flex;
         justify-content: center;
@@ -89,7 +85,6 @@ fieldset {
 }
 
 .gruf-modul-reverb {
-    width: 293px;
     .knob {
         position: absolute;
         top: 10px;
