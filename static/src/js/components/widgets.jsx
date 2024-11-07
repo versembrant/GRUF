@@ -676,6 +676,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
+    const cursorSrcUrl =  appPrefix + "/static/src/img/playhead_long.svg";
     return (
         <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left}}>
                 <gruf-pianoroll
@@ -704,7 +705,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                     colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
                     colrulerborder={"#4b4b4b"}
-                    cursorsrc={"/gruf/static/src/img/playhead_long.svg"}
+                    cursorsrc={cursorSrcUrl}
                     kbwidth={modeSampler === undefined ? 65: 0}
                     kbstyle={modeSampler === undefined ? "piano": "midi"}
                     yruler={modeSampler === undefined ? 20: 22}

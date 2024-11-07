@@ -20,7 +20,8 @@ const getSoundURL = (soundName) => {
     // Try find sound name in library of uploaded sounds
     const uploadsSoundIndex = getCurrentSession().getRecordedFiles().indexOf(soundName);
     if (uploadsSoundIndex > -1) {
-        return '/gruf/static/uploads/' + getCurrentSession().getID() +  '/' + getCurrentSession().getRecordedFiles()[uploadsSoundIndex];
+        const baseUrl = appPrefix + '/static/uploads/';
+        return baseUrl + getCurrentSession().getID() +  '/' + getCurrentSession().getRecordedFiles()[uploadsSoundIndex];
     }
     // Otherwise, return default sound
     return 'https://cdn.freesound.org/previews/262/262495_2331961-hq.mp3' // Dark pad 
