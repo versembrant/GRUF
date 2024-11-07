@@ -5,7 +5,10 @@
     <meta id="vp" name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
     window.onload = function() {
-        const minWidth = 1150;
+        let minWidth = 1100;
+        if (window.innerHeight < window.innerWidth) {
+            minWidth = 1400 //screen.width/screen.height * 600 - 200;  // 800 is the height of the session
+        }
         if (screen.width < minWidth) {
             var mvp = document.getElementById('vp');
             mvp.setAttribute('content','user-scalable=no,width=' + minWidth);
