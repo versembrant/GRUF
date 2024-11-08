@@ -668,7 +668,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
+export const NoteGenerator = ({ estacio, parameterName }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
     const tonality = getAudioGraphInstance().getTonality(); 
     
@@ -744,14 +744,14 @@ export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
     }
 
     return(
-        <button style={{position: "absolute", top, left}} onClick={generate}>Generar notes</button>
+        <button style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
     )
 }
 
-export const GrufNoteControls = ({ className, estacio, parameterName, width, ExtraComponent}) => {
+export const GrufNoteControls = ({ className, estacio, parameterName, width, maxHeight, ExtraComponent}) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterName);
     return (
-        <fieldset className={className} style={{ width: width }}>
+        <fieldset className={`modul-border ${className}`} style={{ width, maxHeight }}>
             {ExtraComponent ? <ExtraComponent estacio={estacio} parameterName={parameterName}/> : null}
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
