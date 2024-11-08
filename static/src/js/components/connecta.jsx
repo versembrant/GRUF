@@ -32,11 +32,12 @@ export const Connecta = ({infoSessions}) => {
                 {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
-                    <div>
-                        <button id="connectaButton" className="btn-black"
+                    <ul>
+                        <li><button id="connectaButton" className="btn-black"
                             onClick={goToGruf}
-                        >Connecta't al GRUF</button>
-                    </div>
+                        >Connecta't al GRUF</button></li>
+                        <li><a href={appPrefix + "/nova_sessio"} class="btn-black">Crea un nou GRUF</a></li>
+                    </ul>
                 </div>
             </div>
             { showUtimsGrufs && infoSessions.length !== 0 ? <div className="ultimsGrufs">
@@ -51,7 +52,7 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>: ""}
-            <p className="crea"><a href={appPrefix + "/nova_sessio"}>Crea un nou GRUF</a></p>
+            <Footer/>
         </div>
     )
 };
