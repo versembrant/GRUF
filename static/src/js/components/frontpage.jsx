@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import logo_gruf from "../../img/logo_gruf_gris.svg"
 
 export const Navbar = () => {
@@ -22,7 +22,12 @@ export const Footer = () => {
 
 
 export const Frontpage = () => {
-    
+    useEffect(() => {
+        const landingContent = document.getElementById("landingContent")
+        const landingContentWrapper = document.getElementById("landingContentWrapper")
+        landingContent.style.display = "block"
+        landingContentWrapper.appendChild(landingContent)
+    })
     return(
         <div>
             <Navbar/>
@@ -32,10 +37,11 @@ export const Frontpage = () => {
                     <h2>Crea la teva música sol o en comunitat amb programari lliure i gratuït</h2>
                     <ul className="buttons">
                         <li><a className="btn-black" href={appPrefix + "/connecta"}>Connecta't a un GRUF</a></li>
-                        <li><a className="btn-black" href={appPrefix + "/nova_sessio"}>Nou GRUF</a></li>
+                        <li><a className="btn-black" href={appPrefix + "/nova_sessio"}>Crea un nou GRUF</a></li>
                     </ul>
                 </div>
             </div>
+            <div id="landingContentWrapper"></div>
             <Footer/>
         </div>
     )

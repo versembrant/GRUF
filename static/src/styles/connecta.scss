@@ -42,6 +42,17 @@
         border-radius: 15px;
         padding: 10px 20px;
     }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        
+        li {
+            display:inline;
+            margin-left: 20px;
+        }
+    }
+   
 }
 
 @keyframes fadeout {
