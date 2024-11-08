@@ -120,15 +120,15 @@ export class MonoSynth extends EstacioBase {
 
     lastNoteOnBeats = {}
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-
-        const notes = this.getParameterDescription('notes');
-        if (notes.hasOwnProperty('rangDeNotesPermeses')){
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording = false) {
+        if (!getAudioGraphInstance().isGraphBuilt()) { return; }
+    
+        const notes = this.getParameterValue('notes');
+        if (notes.hasOwnProperty('rangDeNotesPermeses')) {
             const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
             midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
         }
-
+    
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
@@ -150,8 +150,11 @@ export class MonoSynth extends EstacioBase {
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
                         // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes');
-                        notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
+                        notes.push({
+                            'n': midiNoteNumber,
+                            'b': lastNoteOnTimeForNote,
+                            'd': currentStep - lastNoteOnTimeForNote
+                        });
                         this.updateParametreEstacio('notes', notes); // save change in server!
                     }
                     this.lastNoteOnBeats[midiNoteNumber] = undefined;

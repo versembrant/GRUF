@@ -113,21 +113,18 @@ export class Synth extends EstacioBase {
 
     lastNoteOnBeats = {}
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-
-        const notes = this.getParameterDescription('notes');
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording = false) {
+        if (!getAudioGraphInstance().isGraphBuilt()) { return; }    
+        const notes = this.getParameterValue('notes');
         if (notes.hasOwnProperty('rangDeNotesPermeses')){
             const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
             midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
         }
-
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
-            if (recEnabled){
-                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
-                // the note on time to save it
+            if (recEnabled) {
+                // Guardem el temps d'inici de la nota per crear la nota en el Note Off
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % this.getNumSteps();
                 this.lastNoteOnBeats[midiNoteNumber] = currentStep;
@@ -135,15 +132,19 @@ export class Synth extends EstacioBase {
         } else {
             this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
             if (recEnabled){
-                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
+                // Si Rec està activat i tenim un onSet, creem la nota
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
                 if (lastNoteOnTimeForNote !== undefined){
                     const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                     const currentStep = currentMainSequencerStep % this.getNumSteps();
                     if (lastNoteOnTimeForNote < currentStep){
-                        // Only save the note if note off time is bigger than note on time
-                        notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
-                        this.updateParametreEstacio('notes', notes); // save change in server!
+                        // Guardem la nota si el temps de Note Off es major que el de Note On
+                        notes.push({
+                            'n': midiNoteNumber,
+                            'b': lastNoteOnTimeForNote,
+                            'd': currentStep - lastNoteOnTimeForNote
+                        });
+                        this.updateParametreEstacio('notes', notes); // Guardem els canvis al servidor. 
                     }
                     this.lastNoteOnBeats[midiNoteNumber] = undefined;
                 }
