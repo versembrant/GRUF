@@ -6,23 +6,20 @@ import { EstacioGrooveBoxUI } from "../components/estacioGrooveBox";
 import { sampleLibrary} from "../sampleLibrary";
 
 
-const getSoundURL = (soundNumber, presetname) => {
-    soundName = presetname + '-sound' + soundNumber;
-    soundFound = undefined;
-    sampleLibrary.groovebox.forEach((sound) => {
-        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
-            soundFound = sound.url;
-        }
-    });
-    if (soundFound !== undefined) {
-        return soundFound;
-    }
+const getSoundURL = (playerName, presetName) => {
+    soundName = presetName + '-' + playerName;
+
+    const sampleLibrarySound = sampleLibrary.groovebox
+        .find(sound => sound.name.toLowerCase() === soundName.toLowerCase());
+    if (sampleLibrarySound) return sampleLibrarySound;
+
     // Otherwise, return default sounds
-    if (soundNumber === 1) {
+    console.warn(`The sound "${soundName}" wasn't found, resorting to default`);
+    if (playerName === 'open_hat') {
         return 'https://cdn.freesound.org/previews/509/509984_8033171-hq.mp3';
-    } else if (soundNumber === 2) {
+    } else if (playerName === 'closed_hat') {
         return 'https://cdn.freesound.org/previews/173/173537_1372815-hq.mp3';
-    } else if (soundNumber === 3) {
+    } else if (playerName === 'snare') {
         return 'https://cdn.freesound.org/previews/561/561511_12517458-hq.mp3';
     } else  {
         return 'https://cdn.freesound.org/previews/324/324982_3914271-hq.mp3';
@@ -52,11 +49,12 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
 
+        drumkit: {type: 'text', initial: 'Hip hop Classic 1'},
+
         ...Object.fromEntries(
             sounds.flatMap((sound, index) => {
                 const i = index + 1;
                 return [
-                    [`sound${i}URL`, { type: 'text', label: sound, initial: getSoundURL(i, 'Hip Hop Classic 1') }],
                     [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
                     [`tone${i}`, { type: 'float', label: `${sound}Tone`, unit: units.decibel, min: -12, max: 12, step: 1, initial: 0 }],
                     [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: 0 }],
@@ -81,19 +79,26 @@ export class EstacioGrooveBox extends EstacioBase {
         return EstacioGrooveBoxUI
     }
 
-    loadSoundinPlayer (playerName, url){
-        if (["kick", "snare", "closed_hat", "open_hat"].includes(playerName)) {
-            const player = this.audioNodes[playerName];
-            if (player.buffer && player.buffer.url === url){
-                console.log(`El Player ${playerName} ja té la URL ${url} carregada.`);
-                return;
-            }
-            player.load(url);
+    playerNames = ['open_hat', 'closed_hat', 'snare', 'kick'];
+
+    carregaDrumkitDeLaLlibreria(newDrumkitName) {
+        if (this.loadedKits.hasOwnProperty(newDrumkitName)) {
+            console.log(`El kit ${newDrumkitName} ja estava carregat.`);
+            return this.loadedKits[newDrumkitName];
         }
+
+        console.log("Carregant kit de la llibreria:", newDrumkitName);
+        this.loadedKits[newDrumkitName] = {}
+        this.playerNames.forEach(playerName => {
+            const url = getSoundURL(playerName, newDrumkitName);
+            console.log(`Carregant so ${playerName} del kit ${newDrumkitName}, amb URL:`, url);
+            const buffer = new Tone.Buffer(url);
+            this.loadedKits[newDrumkitName][playerName] = buffer;
+        })
+        return this.loadedKits[newDrumkitName];
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
-
         const cutoff = new Tone.Filter(500, 'lowpass', -24);
 
         const mainChannel = new Tone.Channel({
@@ -138,117 +143,62 @@ export class EstacioGrooveBox extends EstacioBase {
             cutoff: cutoff
         }
         this.addEffectChainNodes(cutoff, estacioMasterChannel);
+
+        this.loadedKits = {};
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        if (name == 'tone4') {
-            this.audioNodes.kick.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
+        const parametersMatch = name.match(/^(volume|attack|release|tone|reverbSend)(\d+)$/);
+        if (parametersMatch) {
+            const [_, type, indexStr] = parametersMatch;
+            const index = parseInt(indexStr, 10) - 1;
+            const playerName = this.playerNames[index];
+            if (type === 'volume') {
+                this.audioNodes[playerName].set({
+                    'volume': value > -30 ? value: -100,
+                });
+            } else if (type === 'attack') {
+                this.audioNodes[playerName].set({
+                    'fadeIn': value*this.getTempsBeat(),
+                });
+            } else if (type === 'release') {
+                this.audioNodes[playerName].set({
+                    'fadeOut': value*this.getTempsBeat(),
+                });
+            } else if (type === 'tone') {
+                this.audioNodes[playerName].set({
+                    'playbackRate': Math.pow(2,(value/12)),
+                });
+            } else if (type === 'reverbSend') {
+                const nodeName = `sendReverbGainNode${index+1}`;
+                this.audioNodes[nodeName].gain.value = value > -30 ? value: -100
+            }
         } else if (name == 'cutoff'){
             this.audioNodes.cutoff.frequency.rampTo(value, 0.01);
-        } else if (name =='volume4'){
-            this.audioNodes.kick.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack4'){
-            this.audioNodes.kick.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release4'){
-            this.audioNodes.kick.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone3'){
-            this.audioNodes.snare.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume3'){
-            this.audioNodes.snare.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack3'){
-            this.audioNodes.snare.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release3'){
-            this.audioNodes.snare.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone2'){
-            this.audioNodes.closed_hat.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume2'){
-            this.audioNodes.closed_hat.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack2'){
-            this.audioNodes.closed_hat.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release2'){
-            this.audioNodes.closed_hat.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone1'){
-            this.audioNodes.open_hat.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume1'){
-            this.audioNodes.open_hat.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack1'){
-            this.audioNodes.open_hat.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release1'){
-            this.audioNodes.open_hat.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name === 'reverbSend1'){
-            this.audioNodes.sendReverbGainNode1.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend2'){
-            this.audioNodes.sendReverbGainNode2.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend3'){
-            this.audioNodes.sendReverbGainNode3.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend4'){
-            this.audioNodes.sendReverbGainNode4.gain.value = value > -30 ? value: -100
-        } else if (name === 'sound1URL'){
-            this.loadSoundinPlayer('open_hat', value);
-        } else if (name === 'sound2URL'){
-            this.loadSoundinPlayer('closed_hat', value);
-        } else if (name === 'sound3URL'){
-            this.loadSoundinPlayer('snare', value);
-        } else if (name === 'sound4URL'){
-            this.loadSoundinPlayer('kick', value);
         } else if (name === 'pattern'){
             // If a pattern is changed, set the 4 individual sounds to what they are supposed to be
             const parameterDescription = this.getParameterDescription(name)
             const nomPatro = getNomPatroOCap(parameterDescription, value)
-            if (  nomPatro !== "Cap"){
-                setTimeout(()=> {
-                    // Aquests updates s'han de fer amb un delay per evitar crides recursives (?)
-                    this.updateParametreEstacio('sound1URL', getSoundURL(1, nomPatro));
-                    this.updateParametreEstacio('sound2URL', getSoundURL(2, nomPatro));
-                    this.updateParametreEstacio('sound3URL', getSoundURL(3, nomPatro));
-                    this.updateParametreEstacio('sound4URL', getSoundURL(4, nomPatro));
-                }, 50)
-            }   
+            if (nomPatro !== "Cap") this.updateParametreEstacio('drumkit', nomPatro);
+        } else if (name === 'drumkit') {
+            const newDrumkit = this.carregaDrumkitDeLaLlibreria(value);
+            this.playerNames.forEach((playerName) => {
+                const soundBuffer = newDrumkit[playerName];
+                const player = this.audioNodes[playerName]
+                if (soundBuffer.loaded) player.buffer = soundBuffer;
+                else soundBuffer.onload = (loadedBuffer) => player.buffer = loadedBuffer;
+            });
         }
     }
 
     playSoundFromPlayer(playerName, time) {
-        const validPlayers = ["kick", "snare", "closed_hat", "open_hat"];
-        if (validPlayers.includes(playerName) && this.audioNodes[playerName].buffer.loaded) {
+        if (this.playerNames.includes(playerName) && this.audioNodes[playerName].buffer.loaded) {
             this.audioNodes[playerName].start(time);
         }
     }
     
     stopSoundFromPlayer(playerName, time) {
-        const validPlayers = ["kick", "snare", "closed_hat", "open_hat"];
-        if (validPlayers.includes(playerName) && this.audioNodes[playerName].state === "started") {
+        if (this.playerNames.includes(playerName) && this.audioNodes[playerName].state === "started") {
             this.audioNodes[playerName].stop(time);
         }
     }
@@ -296,7 +246,7 @@ export class EstacioGrooveBox extends EstacioBase {
     onMidiNote (midiNoteNumber, midiVelocity, noteOff, skipRecording=false){
         if (!getAudioGraphInstance().isGraphBuilt()){return;}
         
-        const playerName = ["open_hat", "closed_hat", "snare", "kick"][midiNoteNumber % 4];
+        const playerName = this.playerNames[midiNoteNumber % 4];
 
         if (!noteOff){
             const recEnabled = this.recEnabled('pattern') && !skipRecording;
