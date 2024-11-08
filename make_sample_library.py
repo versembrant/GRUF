@@ -5,7 +5,7 @@ import json
 audio_folder = 'static/audio'
 
 
-def get_tonality_from_filaname(filename):
+def get_tonality_from_filename(filename):
     try:
         tonality_raw = filename.split(' - ')[1].split('.wav')[0]
         tonality_options = ['cmajor', 'cminor', 'c#major', 'c#minor', 'dmajor', 'dminor', 'ebmajor', 'ebminor', 'emajor', 'eminor', 'fmajor', 'fminor', 'f#major', 'f#minor', 'gmajor', 'gminor', 'abmajor', 'abminor', 'amajor', 'aminor', 'bbmajor', 'bbminor', 'bmajor', 'bminor']
@@ -16,13 +16,13 @@ def get_tonality_from_filaname(filename):
     return None
 
 def load_files_for_sampler(library, sampler_folder):
-    for filaname in os.listdir(sampler_folder):
-        if filaname.endswith('.wav'):
-            tonality = get_tonality_from_filaname(filaname)
+    for filename in os.listdir(sampler_folder):
+        if filename.endswith('.wav'):
+            tonality = get_tonality_from_filename(filename)
             if tonality is not None:
                 library['sampler'].append({
-                    'name': filaname.split(' - ')[0],
-                    'url': f'/{app_prefix}/static/audio/sampler/{filaname.replace('#', '%23')}',
+                    'name': filename.split(' - ')[0],
+                    'url': f'/{app_prefix}/static/audio/sampler/{filename.replace('#', '%23')}',
                     'tonality': tonality,
                 })
 
@@ -31,21 +31,21 @@ def load_files_for_groovebox(library, groovebox_folder):
         preset_folder = os.path.join(groovebox_folder, preset_name)
         if not os.path.isdir(preset_folder):
             continue
-        for filaname in os.listdir(preset_folder):
-            if filaname.endswith('.wav'):
-                if 'open hat' in filaname.lower() or 'tambourine' in filaname.lower():
+        for filename in os.listdir(preset_folder):
+            if filename.endswith('.wav'):
+                if 'open hat' in filename.lower() or 'tambourine' in filename.lower():
                     name = 'sound1'
-                elif 'closed hat' in filaname.lower():
+                elif 'closed hat' in filename.lower():
                     name = 'sound2'
-                elif 'kick' in filaname.lower():
+                elif 'kick' in filename.lower():
                     name = 'sound4'
-                elif 'snare' in filaname.lower() or 'clap' in filaname.lower():
+                elif 'snare' in filename.lower() or 'clap' in filename.lower():
                     name = 'sound3'
                 else:
                     name = 'sound1'
                 library['groovebox'].append({
                     'name': preset_name + '-' + name,
-                    'url': f'/{app_prefix}/static/audio/groovebox/{preset_name}/{filaname}',
+                    'url': f'/{app_prefix}/static/audio/groovebox/{preset_name}/{filename}',
                 })
 
 def create_sample_library_from_audio_folder():
