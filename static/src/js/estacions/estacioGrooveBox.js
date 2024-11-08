@@ -6,24 +6,20 @@ import { EstacioGrooveBoxUI } from "../components/estacioGrooveBox";
 import { sampleLibrary} from "../sampleLibrary";
 
 
-const getSoundURL = (soundNumber, presetname) => {
-    soundName = presetname + '-sound' + soundNumber;
-    soundFound = undefined;
-    sampleLibrary.groovebox.forEach((sound) => {
-        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
-            soundFound = sound.url;
-        }
-    });
-    if (soundFound !== undefined) {
-        return soundFound;
-    }
+const getSoundURL = (playerName, presetName) => {
+    soundName = presetName + '-' + playerName;
+
+    const sampleLibrarySound = sampleLibrary.groovebox
+        .find(sound => sound.name.toLowerCase() === soundName.toLowerCase());
+    if (sampleLibrarySound) return sampleLibrarySound;
+
     // Otherwise, return default sounds
     console.warn(`The sound "${soundName}" wasn't found, resorting to default`);
-    if (soundNumber === 1) {
+    if (playerName === 'open_hat') {
         return 'https://cdn.freesound.org/previews/509/509984_8033171-hq.mp3';
-    } else if (soundNumber === 2) {
+    } else if (playerName === 'closed_hat') {
         return 'https://cdn.freesound.org/previews/173/173537_1372815-hq.mp3';
-    } else if (soundNumber === 3) {
+    } else if (playerName === 'snare') {
         return 'https://cdn.freesound.org/previews/561/561511_12517458-hq.mp3';
     } else  {
         return 'https://cdn.freesound.org/previews/324/324982_3914271-hq.mp3';
@@ -93,8 +89,8 @@ export class EstacioGrooveBox extends EstacioBase {
 
         console.log("Carregant kit de la llibreria:", newDrumkitName);
         this.loadedKits[newDrumkitName] = {}
-        this.playerNames.forEach((playerName, i) => {
-            const url = getSoundURL(i+1, newDrumkitName);
+        this.playerNames.forEach(playerName => {
+            const url = getSoundURL(playerName, newDrumkitName);
             console.log(`Carregant so ${playerName} del kit ${newDrumkitName}, amb URL:`, url);
             const buffer = new Tone.Buffer(url);
             this.loadedKits[newDrumkitName][playerName] = buffer;

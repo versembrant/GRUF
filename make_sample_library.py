@@ -27,25 +27,25 @@ def load_files_for_sampler(library, sampler_folder):
                 })
 
 def load_files_for_groovebox(library, groovebox_folder):
-    for preset_name in os.listdir():
-        preset_folder = os.path.join(groovebox_folder, preset_name)
-        if not os.path.isdir(preset_folder):
+    for drumkit_name in os.listdir(groovebox_folder):
+        drumkit_path = os.path.join(groovebox_folder, drumkit_name)
+        if not os.path.isdir(drumkit_path):
             continue
-        for filename in os.listdir(preset_folder):
+        for filename in os.listdir(drumkit_path):
             if filename.endswith('.wav'):
                 if 'open hat' in filename.lower() or 'tambourine' in filename.lower():
-                    name = 'sound1'
+                    name = 'open_hat'
                 elif 'closed hat' in filename.lower():
-                    name = 'sound2'
+                    name = 'closed_hat'
                 elif 'kick' in filename.lower():
-                    name = 'sound4'
+                    name = 'kick'
                 elif 'snare' in filename.lower() or 'clap' in filename.lower():
-                    name = 'sound3'
+                    name = 'snare'
                 else:
-                    name = 'sound1'
+                    name = 'open_hat'
                 library['groovebox'].append({
-                    'name': preset_name + '-' + name,
-                    'url': f'/{app_prefix}/static/audio/groovebox/{preset_name}/{filename}',
+                    'name': drumkit_name + '-' + name,
+                    'url': f'/{app_prefix}/{drumkit_path}/{filename}',
                 })
 
 def create_sample_library_from_audio_folder():
