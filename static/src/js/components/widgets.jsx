@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, clamp , transformaNomTonalitat, getTonalityForSamplerLibrarySample, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges }  from "../utils";
+import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter}  from "../utils";
+import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
+import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
+import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
+import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -12,7 +16,6 @@ import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
-import { subscribeToStoreChanges, subscribeToParameterChanges, updateParametre } from "../utils";
 import throttle from 'lodash.throttle'
 import { AudioRecorder } from "../components/audioRecorder";
 
@@ -495,58 +498,23 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom
     let lastEditedData = "";
-    const getAllowedNotesForTonality = (tonality) => {
-        const midiNotesMap = {
-            'c': 60,  'c#': 61, 'db': 61,
-            'd': 62,  'd#': 63, 'eb': 63,
-            'e': 64,  'f': 65,  'f#': 66, 'gb': 66,
-            'g': 67,  'g#': 68, 'ab': 68,
-            'a': 69,  'a#': 70, 'bb': 70,
-            'b': 71
-        };
     
-        const parseTonality = (tonality) => {
-            let rootNote = tonality.slice(0, 2).toLowerCase();
-            //Comprova si la root té alteracions, sinó, torna a separar. 
-            if (!midiNotesMap[rootNote]) {
-                rootNote = tonality.slice(0, 1).toLowerCase();
-            }
-    
-            const isMinor = tonality.toLowerCase().includes('minor');
-    
-            if (!midiNotesMap[rootNote]) {
-                throw new Error(`Root note no vàlida: ${rootNote}`);
-            }
-    
-            return {
-                rootMidi: midiNotesMap[rootNote],  
-                isMinor: isMinor                  
-            };
-        };
-    
-        const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
-        const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
-    
-        const { rootMidi, isMinor } = parseTonality(tonality);
-    
-        const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
-    
-        let allowedNotes = [];
-    
-        for (let octave = -2; octave <= 8; octave++) { 
-            const octaveOffset = octave * 12; 
-            scaleIntervals.forEach(interval => {
-                const note = rootMidi + interval + octaveOffset;
-                if (note >= 0 && note <= 127) {  // Midi range permitido
-                    allowedNotes.push(note);
-                }
-            });
-        }
-    
-        return allowedNotes;
-    };
     const tonality = getAudioGraphInstance().getTonality(); 
+    const tonalityPCs = getPCsFromScaleName(tonality);
+    const allowedNotes = [];
+
+    for (let octave = -2; octave <= 8; octave++) { 
+        const octaveOffset = octave * 12; 
+        tonalityPCs.forEach(pitchclass => {
+            const note = pitchclass + octaveOffset;
+            if (note >= 0 && note <= 127) {  // Midi range permitido
+                allowedNotes.push(note);
+            }
+        });
+    }
     
+    const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
+
     useEffect(() => {
         const jsElement = document.getElementById(uniqueId + "_id")
         if (jsElement.dataset.alreadyBinded === undefined){
@@ -569,11 +537,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                 });
             }
             document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
-                let noteNumber = evt.detail.note;                
-                if (parameterDescription.hasOwnProperty("rangDeNotesPermeses")) {
-                    const notaMesBaixaPermesa = parameterDescription.notaMesBaixaPermesa || 0;
-                    noteNumber = notaMesBaixaPermesa + ((noteNumber - notaMesBaixaPermesa )  % parameterDescription.rangDeNotesPermeses);   
-                }
+                let noteNumber = evt.detail.note;
                 const noteHeight = jsElement.height/jsElement.yrange;
                 let bottomPosition = noteHeight * noteNumber;
                 const canvasOffset = jsElement.yoffset*noteHeight;
@@ -603,7 +567,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
             jsElement.dataset.alreadyBinded = true;
         } else {
             if (jsElement.dataset.lastTonality !== tonality) {
-                jsElement.setAllowedNotes(getAllowedNotesForTonality(tonality));
+                jsElement.setAllowedNotes(allowedNotes);
                 jsElement.dataset.lastTonality = tonality;
             }
         }
@@ -647,23 +611,21 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
         estacio.updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
-    const getLowestNoteForYOffset = () => {
-        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
-        if (parameterDescription.permetScrollVertical === 0) {
-            return parameterDescription.notaMesBaixaPermesa;
-        }
 
-        let lowestNote = 127
-        for (let i = 0; i < parameterValue.length; i++) {
-            if (parameterValue[i].n < lowestNote) {
-                lowestNote = parameterValue[i].n
-            }
-        }
-        if (lowestNote == 127) {
-            return parameterDescription.notaMesBaixaPermesa || 48
-        } else {
-            return lowestNote
-        }
+    const maxYRange = 36;
+    const doesYScroll = instrumentRange > maxYRange;
+
+    const getLowestNoteForYOffset = () => {
+        // if the roll doesn't scroll, simply return the lowest roll
+        if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
+
+        // else, return the lowest drawn note, if there are any notes drawn on the roll
+        // if (parameterValue && parameterValue.map(note => note.n)) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
+
+        // else, return a sensible default, if it exists
+        if (parameterDescription.notaMesBaixaTipica) return parameterDescription.notaMesBaixaTipica;
+
+        return 0;
     }
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
@@ -675,17 +637,17 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={modeSampler === undefined ? getAllowedNotesForTonality(tonality): []}
+                    allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
                     grid={2}
                     xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 36}
+                    yrange={Math.min(instrumentRange, maxYRange)}
                     yoffset={modeSampler === undefined ? getLowestNoteForYOffset(): 0}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
                     //cursoroffset={2500}  // make it dissapear
-                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    yscroll={doesYScroll ? 1 : 0} // only allow scroll when there is 'overflow'
                     //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
@@ -706,15 +668,95 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
+export const NoteGenerator = ({ estacio, parameterName }) => {
+    const parameterDescription = estacio.getParameterDescription(parameterName);
+    const tonality = getAudioGraphInstance().getTonality(); 
+    
+    const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
+    const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
+    const scalePCs = getPCsFromScaleName(tonality);
+    const scalePitchesInRange = new Map();
+    scalePCs.forEach((scalePC, i) => {
+        const degree = i + 1;
+        let octavedPC = getNextPitchClassAfterPitch(scalePC, lowestNote);
+        while (octavedPC <= highestNote) {
+            scalePitchesInRange.set(octavedPC, {degree: degree});
+            octavedPC += 12;
+        }
+    });
+    const degreeWeights = {1:5, 2:1, 3:2, 4:1, 5:4, 6:1, 7:1}
+    const diatonicIntervalWeights = {0:1, 1:6, 2:1, 3:1, 4:1, 5:1, 7:2}
 
+    const compassos = 2;
+    const beatsPerCompas = 4;
+    const stepsPerBeat = 4;
+
+    const getNextPitch = (previousPitch) => {
+        const possiblePitches = [...scalePitchesInRange.keys()];
+        const weights = [...scalePitchesInRange.entries()].map(([pitch, noteInfo]) => {
+            const degreeWeight = degreeWeights[noteInfo.degree];
+            const [intervalQuantity, _] = previousPitch !== undefined ? getDiatonicIntervalEZ(previousPitch, pitch) : [0, 'per'];
+            const intervalWeight = diatonicIntervalWeights[Math.abs(intervalQuantity)] ?? 0;
+            return degreeWeight * intervalWeight;
+        });
+        return weightedSample(possiblePitches, weights);
+    }
+
+    const randomHalves = (array, iterations=0) => {
+        if (typeof array === "number") array = [array];
+        if (iterations === 0) return array;
+
+        const newArray = [];
+        array.forEach(element=> {
+            if (Math.random() < 0.5) {
+                newArray.push(element)
+            } else {
+                newArray.push(element/2, element/2);
+            }
+        });
+        return randomHalves(newArray, iterations - 1);
+    }
+
+    const generate = () => {
+        
+        const parts = randomHalves(compassos*beatsPerCompas*stepsPerBeat, 2);
+        const durations = [];
+        parts.forEach(partDuration=>{
+            durations.push(...euclid(sample([2,3,4,5]), partDuration));
+        })
+        const onsets = distanceToAbsolute(durations).slice(0,-1);
+        
+        const newNotes = [];
+        let previousPitch;
+        onsets.forEach((onset, index) => {
+            const duration = durations[index];
+            const pitch = getNextPitch(previousPitch);
+            const nota = {
+                b: onset,
+                d: duration,
+                n: pitch,
+                s: 0, // this means not selected
+            }
+            newNotes.push(nota);
+            previousPitch = pitch;
+        })
+        estacio.updateParametreEstacio(parameterName, newNotes);
+    }
+
+    return(
+        <button style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
+    )
+}
+
+export const GrufNoteControls = ({ className, estacio, parameterName, width, maxHeight, ExtraComponent}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterName);
     return (
-        <fieldset className={className} style={{ width: width }}>
+        <fieldset className={`modul-border ${className}`} style={{ width, maxHeight }}>
+            {ExtraComponent ? <ExtraComponent estacio={estacio} parameterName={parameterName}/> : null}
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
                 <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
@@ -891,24 +933,20 @@ export const ADSRGraph = ({estacio, adsrParameterNames}) => {
     const sustainTime = maxTime - timeValues.reduce((sum, element)=> sum + element);
     const timeValuesWithSustain = [a, d, sustainTime, r];
 
-    const absoluteTimeValues = timeValuesWithSustain.reduce((absoluteValuesArray, timeValue, index) => {
-        const absoluteTimeValue = timeValue + (absoluteValuesArray[index-1] || 0);
-        absoluteValuesArray.push(absoluteTimeValue);
-        return absoluteValuesArray;
-    }, []);
+    const absoluteTimeValues = distanceToAbsolute(timeValuesWithSustain);
 
     const adsrPoints = absoluteTimeValues.map((absTimeValue) => {
         const normTimeValue = absTimeValue / maxTime;
         return {x: normTimeValue * (100 - strokeWidthPx / 2) + strokeWidthPx / 4}; // we account for stroke width so that the line isn't clipped
     });
 
-    const levelValues = [1, s, s, 0];
+    const levelValues = [0, 1, s, s, 0];
 
     levelValues.forEach((levelValue, index) => {
         adsrPoints[index].y = 75 - levelValue * 50;
     });
 
-    const sustainPoints = { x1: adsrPoints[1].x, x2: adsrPoints[2].x, y1: adsrPoints[1].y, y2: adsrPoints[2].y };
+    const sustainPoints = { x1: adsrPoints[2].x, x2: adsrPoints[3].x, y1: adsrPoints[2].y, y2: adsrPoints[3].y };
 
     const adsrPathString = adsrPoints.reduce((pathString, point) => {
         return pathString + ` L ${point.x} ${point.y}`;

@@ -898,12 +898,18 @@
     font-size: 14px;
     border: 1px solid $light-grey;
     border-radius: 12px;
-    padding: 8 12;
+    flex: 1;
+
 
     .p-dropdown {
+        padding: 8 12;
         width: 100%;
+        height: 100%;
         color: $white;
 
+        .p-dropdown-label {
+            align-content: center;
+        }
 
         .p-placeholder {
             color: $dark-grey

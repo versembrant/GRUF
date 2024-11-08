@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufPianoRoll, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
+import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufPianoRoll, NoteGenerator, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
@@ -24,7 +24,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
             <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
-            <GrufNoteControls className="col-start-1 row-start-3" estacio={estacio} clearParameter={"notes"}/>
+            <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="200px" estacio={estacio} parameterName={"notes"} ExtraComponent={NoteGenerator}/>
         </div>
     </div>)
 };

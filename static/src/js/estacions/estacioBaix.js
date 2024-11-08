@@ -9,8 +9,7 @@ export class EstacioBaix extends MonoSynth {
         ...MonoSynth.parametersDescription,
         notes: {...MonoSynth.parametersDescription.notes,
             notaMesBaixaPermesa: 24,
-            rangDeNotesPermeses: 24,
-            permetScrollVertical: 0
+            notaMesAltaPermesa: 47,
         },
         waveform: {...MonoSynth.parametersDescription.waveform, initial: 'square'},
     }
