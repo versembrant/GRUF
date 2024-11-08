@@ -442,14 +442,6 @@ export const getTonalityForSamplerLibrarySample = (soundName) => {
 // returns an array with the index corresponding to the position on the scale
 // and the number corresponding to the Pitch Class
 export const getPCsFromScaleName = (scale) => {
-    const midiNotesMap = {
-        'c': 0,  'c#': 1, 'db': 1,
-        'd': 2,  'd#': 3, 'eb': 3,
-        'e': 4,  'f': 5,  'f#': 6, 'gb': 6,
-        'g': 7,  'g#': 8, 'ab': 8,
-        'a': 9,  'a#': 10, 'bb': 10,
-        'b': 11
-    };
 
     const parseScale = (scale) => {
         const rootNote = scale.slice(0, -5).toLowerCase(); 
@@ -460,7 +452,7 @@ export const getPCsFromScaleName = (scale) => {
         }
 
         return {
-            rootMidi: midiNotesMap[rootNote], 
+            rootPC: getPCOfNoteClass(rootNote), 
             isMinor: isMinor                   
         };
     };
@@ -468,12 +460,67 @@ export const getPCsFromScaleName = (scale) => {
     const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
     const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
 
-    const { rootMidi, isMinor } = parseScale(scale);
+    const { rootPC, isMinor } = parseScale(scale);
 
     const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
 
-    return scaleIntervals.map(interval=>(interval+rootMidi)%12);
+    return scaleIntervals.map(interval=>(interval+rootPC)%12);
 };
+
+const getPCOfNoteClass = noteClass => {
+    return {
+        'c': 0,  'c#': 1, 'db': 1,
+        'd': 2,  'd#': 3, 'eb': 3,
+        'e': 4,  'f': 5,  'f#': 6, 'gb': 6,
+        'g': 7,  'g#': 8, 'ab': 8,
+        'a': 9,  'a#': 10, 'bb': 10,
+        'b': 11
+    }[noteClass];
+}
+
+const ascii = a => a.charCodeAt(0);
+
+const getWhiteNote = noteClass => noteClass.slice(0,1) + noteClass.slice(1).replaceAll('#', '').replaceAll('b', '');
+
+const getScaleDegreeOfNoteClass = (noteClass, rootNoteClass) => {
+    const rootWhiteAscii = ascii(getWhiteNote(rootNoteClass));
+    const noteWhiteAscii = ascii(getWhiteNote(noteClass));
+    return noteWhiteAscii - rootWhiteAscii + (rootWhiteAscii > noteWhiteAscii ? 7 : 0);
+}
+
+const separateNoteClassAndOctave = compoundNote => {
+    return [compoundNote.slice(0, -1), compoundNote.slice(-1)]
+}
+
+const noteStrToMidi = (noteStr) => {
+    [noteClass, octave] = separateNoteClassAndOctave(noteStr);
+    return getPCOfNoteClass(noteClass) + (octave + 1) * 12;
+}
+
+export const getDiatonicInterval = (note1, note2) => {
+    const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];
+    [noteClass1, octave1] = separateNoteClassAndOctave(note1);
+    [noteClass2, octave2] = separateNoteClassAndOctave(note2);
+    const noteClassInterval = getScaleDegreeOfNoteClass(noteClass2, 'c') - getScaleDegreeOfNoteClass(noteClass1, 'c');
+    const quantity = noteClassInterval + (octave2 - octave1) * 7;
+    const quality = (() =>{
+        const chromaticInterval = noteStrToMidi(note2) - noteStrToMidi(note1);
+        const modQuantity = Math.abs(quantity % 7);
+        const modChromaticInterval = Math.abs(chromaticInterval % 12);
+        const diff = modChromaticInterval - majorScaleIntervals[modQuantity];
+        if (diff === 1) return 'aug';
+        else if (modQuantity === 0 | modQuantity === 3 || modQuantity === 4) {
+            if (diff === 0) return 'jus';
+            if (diff === -1) return 'dim';
+            return undefined;
+        }
+        if (diff === 0) return 'maj';
+        if (diff === -1) return 'min';
+        if (diff === -2) return 'dim';
+    })();
+
+    return {quantity: quantity, quality: quality};
+}
 
 export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
     return midiPitch - (midiPitch % 12) + pitchClass + (midiPitch % 12 <= pitchClass ? 0 : 12);
