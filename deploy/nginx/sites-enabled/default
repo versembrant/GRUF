@@ -1,22 +1,22 @@
 server {
-    server_name cl2024011711001.dnssw.net;
+    server_name cl2024011711001.dnssw.net gruf.versembrant.cat;
 
     # Gruf main deployment
-    location /gruf/static/ {
-        alias /home/versembrant/versembrant-bruixit/static/;
+    location /static/ {
+        alias /home/versembrant/versembrant-gruf/static/;
     }
-    location /gruf/ {
+    location / {
         include uwsgi_params;
-        uwsgi_pass unix:/home/versembrant/versembrant-bruixit/versembrant_bruixit.sock;
+        uwsgi_pass unix:/home/versembrant/versembrant-gruf/versembrant_gruf.sock;
     }
 
     # Gruf test deployment
     location /gruf-test/static/ {
-        alias /home/versembrant/test/versembrant-bruixit/static/;
+        alias /home/versembrant/test/versembrant-gruf/static/;
     }
     location /gruf-test/ {
         include uwsgi_params;
-        uwsgi_pass unix:/home/versembrant/test/versembrant-bruixit/versembrant_bruixit.sock;
+        uwsgi_pass unix:/home/versembrant/test/versembrant-gruf/versembrant_gruf.sock;
     }
 
     # Sonicpi main deployment
@@ -48,10 +48,10 @@ server {
         uwsgi_pass unix:/home/versembrant/sonicpi-renderer/django_app/versembrant-sonicpi-server.sock;
     }
 
-    # Redirect from / to /gruf
-    location / {
-        rewrite (/.*)?$ /gruf$1 permanent;
-    }
+    # Redirect from / to /gruf NOTE: no longer needed as now we serve gruf at root
+    #location / {
+    #    rewrite (/.*)?$ /gruf$1 permanent;
+    #}
 
     # SSL configuration
     listen [::]:443 ssl ipv6only=on; # managed by Certbot

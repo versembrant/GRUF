@@ -5,7 +5,7 @@ services:
     server:
         build: .
         init: true
-        command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_bruixit.sock
+        command: uwsgi --http :${PORT} --gevent 1000 --http-websockets --master --wsgi-file server.py --callable app --socket versembrant_gruf.sock
         ports:
             - "${PORT}:${PORT}"
         restart: always
@@ -18,6 +18,10 @@ services:
         environment:
             - DEPLOY=1
             - FLASK_SECRET=hsau65aygasjhd5553ggjhff
+            - MAIL_SERVER=smtp.versembrant.cat
+            - MAIL_USERNAME=gruf@versembrant.cat
+            - MAIL_PASSWORD=57-1y;Bg$52E
+            - APP_BASE_URL=https://gruf.versembrant.cat
         env_file:
             - .env
     

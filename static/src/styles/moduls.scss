@@ -1,0 +1,93 @@
+// CSS reset for fieldset
+fieldset {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+@mixin gruf-border {
+    border: 1px solid $light-grey;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+@mixin gruf-bg {
+    background-color: $background-color;
+}
+
+.modul-border {
+    @include gruf-border;
+}
+
+.modul-bg {
+    @include gruf-bg;
+}
+
+// widgetgroups are fieldsets of related widgets that don't represent a synth module.
+.gruf-modul, .gruf-widgetgroup {
+    @include gruf-bg;
+    @include gruf-border;
+
+    &, fieldset {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+.gruf-legend {
+    border: 1px solid $light-grey;
+    border-radius: 15px;
+    display: inline-block;
+    padding: 4px 10px;
+    min-width: 130px;
+    align-self: flex-start;
+
+    &.bare {
+        border: none;
+        padding: 0;
+    }
+}
+
+.gruf-modul-eq {
+    display: grid; // en lloc de flex per tenir a la mateixa llinea el legend i l'eq i no haver de wrappear legend (seria mala pràctica)
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "upleft upright"
+        "bottom bottom";
+    legend {
+        grid-area: upleft;
+    }
+    .gruf-toggle {
+        grid-area: upright;
+    }
+
+    > div {
+        grid-area: bottom;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+}
+
+.gruf-modul-delay {
+    & > div {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        > * {
+            flex: 1;
+        }
+    }
+}
+
+.gruf-modul-reverb {
+    .knob {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+    }
+}
