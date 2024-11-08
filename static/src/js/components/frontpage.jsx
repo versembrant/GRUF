@@ -28,6 +28,7 @@ const LandingContent = () => {
                 <p>
                     <b>El GRUF és un programari lliure de producció musical</b>, en versió web i aplicació, dissenyat especialment per a l’aprenentatge de competències musicals i artístiques, i que integra els principals instruments que s’utilitzen en l’àmbit de la producció musical actual (sàmpler, seqüenciador, sintetitzador, mesclador…). Amb el GRUF podràs aprendre a produir els teus pròpis beats o crear en comunitat de forma col·laborativa.
                 </p>
+                <a style={{display: "block"}} href="#">Descarrega el manual</a>
                 <div style={{display: "flex", justifyContent:"center", marginTop: "30px", marginBottom: "30px"}}>
                     <div style={{border:"1px solid white", width:"800px", height:"500px"}}>
                         VIDEO INCRUSTAT
@@ -52,9 +53,6 @@ const LandingContent = () => {
                 </p>
                 <p>
                     Oferim una guia per al professorat amb materials formatius amb l’objectiu no només de capacitar-los en la utilització del programari, sinó que també oferim una sèrie d’unitats didàctiques dins les competències bàsiques dins els currículums.
-                </p>
-                <p style={{textAlign: "center", marginTop: "30px", marginBottom: "30px"}}>
-                    <a href="#">Descarrega el manual</a>
                 </p>
                 <p>
                     Vols el material formatiu i la proposta d'unitats didàctiques? <a href="#" className="no-button" >Contacta'ns</a>
