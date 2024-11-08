@@ -11,7 +11,7 @@ const getSoundURL = (playerName, presetName) => {
 
     const sampleLibrarySound = sampleLibrary.groovebox
         .find(sound => sound.name.toLowerCase() === soundName.toLowerCase());
-    if (sampleLibrarySound) return sampleLibrarySound;
+    if (sampleLibrarySound) return window.location.origin + sampleLibrarySound.url;
 
     // Otherwise, return default sounds
     console.warn(`The sound "${soundName}" wasn't found, resorting to default`);
