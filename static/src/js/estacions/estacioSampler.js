@@ -250,6 +250,9 @@ export class EstacioSampler extends EstacioBase {
                 // the note on time to save it
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % this.getNumSteps();
+                if (!this.lastNoteOnBeats) {
+                    this.lastNoteOnBeats = new Array(16).fill(undefined);
+                }
                 this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
             }
         } else {
