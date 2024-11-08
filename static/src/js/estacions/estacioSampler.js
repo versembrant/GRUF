@@ -8,15 +8,10 @@ import { sampleLibrary} from "../sampleLibrary";
 
 const getSoundURL = (soundName) => {
     // Try find sound name in sample library
-    let soundFound = undefined;
-    sampleLibrary.sampler.forEach((sound) => {
-        if (sound.name.toLowerCase() === soundName.toLowerCase()) {
-            soundFound = sound.url;
-        }
-    });
-    if (soundFound !== undefined) {
-        return soundFound;
-    }
+    const soundOfSampleLibrary = sampleLibrary.sampler
+        .find((sound) => sound.name.toLowerCase() === soundName.toLowerCase());
+    if (soundOfSampleLibrary) return window.location.origin + soundOfSampleLibrary.url;
+
     // Try find sound name in library of uploaded sounds
     const uploadsSoundIndex = getCurrentSession().getRecordedFiles().indexOf(soundName);
     if (uploadsSoundIndex > -1) {
