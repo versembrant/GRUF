@@ -30,11 +30,8 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 {/* Botó de canviar estació */}
                 <GrufButtonBorder className="col-start-3 row-start-1" style={{width: 100, height: 50}} text="Canvia estació" onClick={() => { setEstacioSelected(undefined) }}/>
 
-                {/* Contenidor de controls: Selector de Patrons, Clear, Presets, Rec */}
-                <fieldset className="modul-border modul-bg flex flex-row justify-between items-center col-start-1 row-start-3 grid justify-between items-center gap-10" style={{width: 400, height:150}}>
-                    <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" width= "225" />
-                    <GrufNoteControls className="col-start-2 row-start-1 row-span-2" estacio={estacio} width="175px" parameterName={"pattern"}/>
-                </fieldset>
+
+                <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="150px" estacio={estacio} ExtraComponent={GrufSelectorPatronsGrid} width="400px" parameterName={"pattern"}/>
 
                 {/* Módul de EQ */}
                 <GrufModulEQ className="col-start-2 row-start-3" estacio={estacio} parameterName = {'pattern'} />
