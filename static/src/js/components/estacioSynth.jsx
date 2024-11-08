@@ -57,7 +57,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
 
 
             <fieldset className="col-start-1 col-span-4 flex justify-between gap-10">
-                <GrufNoteControls className="flex flex-col gap-10 justify-between align-center" estacio={estacio} ExtraComponent={NoteGenerator} width="150px" parameterName={"notes"}/>
+                <GrufNoteControls className="flex flex-col gap-10 justify-between align-center" estacio={estacio} ExtraComponent={NoteGenerator} width="178px" parameterName={"notes"}/>
                 <GrufPianoRoll estacio={estacio} parameterName="notes" width="750px" height="343px" colorNotes={colorNotesPiano} />
             </fieldset>
         </div>
