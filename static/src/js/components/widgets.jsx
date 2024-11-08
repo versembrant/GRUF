@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { subscribeToStoreChanges, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch}  from "../utils";
+import { subscribeToStoreChanges, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter}  from "../utils";
 import { subscribeToParameterChanges, updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
+import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -624,14 +625,20 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
         }
     });
     const degreeWeights = {1:5, 2:1, 3:2, 4:1, 5:4, 6:1, 7:1}
+    const diatonicIntervalWeights = {0:1, 1:6, 2:1, 3:1, 4:1, 5:1, 7:2}
 
     const compassos = 2;
     const beatsPerCompas = 4;
     const stepsPerBeat = 4;
 
-    const getNextPitch = () => {
+    const getNextPitch = (previousPitch) => {
         const possiblePitches = [...scalePitchesInRange.keys()];
-        const weights = [...scalePitchesInRange.values()].map(noteInfo => degreeWeights[noteInfo.degree]);
+        const weights = [...scalePitchesInRange.entries()].map(([pitch, noteInfo]) => {
+            const degreeWeight = degreeWeights[noteInfo.degree];
+            const [intervalQuantity, _] = previousPitch !== undefined ? getDiatonicIntervalEZ(previousPitch, pitch) : [0, 'per'];
+            const intervalWeight = diatonicIntervalWeights[Math.abs(intervalQuantity)] ?? 0;
+            return degreeWeight * intervalWeight;
+        });
         return weightedSample(possiblePitches, weights);
     }
 
@@ -660,9 +667,10 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
         const onsets = distanceToAbsolute(durations).slice(0,-1);
         
         const newNotes = [];
+        let previousPitch;
         onsets.forEach((onset, index) => {
             const duration = durations[index];
-            const pitch = getNextPitch();
+            const pitch = getNextPitch(previousPitch);
             const nota = {
                 b: onset,
                 d: duration,
@@ -670,6 +678,7 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
                 s: 0, // this means not selected
             }
             newNotes.push(nota);
+            previousPitch = pitch;
         })
         estacio.updateParametreEstacio(parameterName, newNotes);
     }
