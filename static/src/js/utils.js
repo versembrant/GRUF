@@ -522,6 +522,24 @@ export const getDiatonicInterval = (note1, note2) => {
     return {quantity: quantity, quality: quality};
 }
 
+export const getDiatonicIntervalEZ = (note1, note2) => {
+    const semitoneDiff = note2 - note1;
+    const directionMultiplier = semitoneDiff < 0 ? -1 : 1; // for when it's downwards
+    const absModSemitoneDiff = Math.abs(semitoneDiff) % 12;
+    const octaveDiff = Math.floor(Math.abs(semitoneDiff) / 12);
+    const [absModQuantity, quality] = {
+        0: [0, 'per'],
+        1: [1, 'min'], 2: [1, 'maj'],
+        3: [2, 'min'], 4: [2, 'maj'],
+        5: [3, 'per'],
+        6: [4, 'dim'], 7: [4, 'per'],
+        8: [5, 'min'], 9: [5, 'maj'],
+        10: [6, 'min'], 11: [6, 'maj']
+    }[absModSemitoneDiff];
+    const quantity = directionMultiplier * (absModQuantity + 7 * octaveDiff);
+    return [quantity, quality]
+}
+
 export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
     return midiPitch - (midiPitch % 12) + pitchClass + (midiPitch % 12 <= pitchClass ? 0 : 12);
 }
