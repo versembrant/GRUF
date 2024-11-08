@@ -664,13 +664,13 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                     kbstyle={modeSampler === undefined ? "piano": "midi"}
                     yruler={modeSampler === undefined ? 20: 22}
                 ></gruf-pianoroll>
-                <NoteGenerator estacio={estacio} parameterName={parameterName} tonality={tonality} top={top} left="780px" />
         </div>
     )
 };
 
-export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) => {
+export const NoteGenerator = ({ estacio, parameterName, top, left }) => {
     const parameterDescription = estacio.getParameterDescription(parameterName);
+    const tonality = getAudioGraphInstance().getTonality(); 
     
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
     const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
@@ -748,15 +748,15 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
     )
 }
 
-export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
-
+export const GrufNoteControls = ({ className, estacio, parameterName, width, ExtraComponent}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterName);
     return (
         <fieldset className={className} style={{ width: width }}>
+            {ExtraComponent ? <ExtraComponent estacio={estacio} parameterName={parameterName}/> : null}
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
                 <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
