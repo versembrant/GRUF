@@ -455,15 +455,12 @@ export class AudioGraph {
             // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
         }
-        if (nomEstacio !== undefined) {
-            // If a nomEstacio is provided, only send to the estacio with that name
-            getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
-        } else {
-            // Otherwise send to all estacions
-            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+
+        // If a nomEstacio is provided, only send to the estacio with that name. Otherwise send to all estacions
+        const targetStationsNoms = nomEstacio ? [nomEstacio] : getCurrentSession().getNomsEstacions();
+        targetStationsNoms.forEach(nomEstacio => {
                 getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
-            });
-        }
+        });
 
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
         if (!data.skipTriggerEvent) {    

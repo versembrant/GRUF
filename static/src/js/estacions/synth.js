@@ -11,7 +11,7 @@ export class Synth extends EstacioBase {
     parametersDescription = {
         ...EstacioBase.parametersDescription,
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, permetScrollVertical: true},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, notaMesBaixaTipica: 60, notaMesAltaTipica: 83},
         // Synth params
         attack: {type: 'float', label:'Attack', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
@@ -115,12 +115,6 @@ export class Synth extends EstacioBase {
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         if (!getAudioGraphInstance().isGraphBuilt()){return;}
-
-        const notes = this.getParameterDescription('notes');
-        if (notes.hasOwnProperty('rangDeNotesPermeses')){
-            const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
-            midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
-        }
 
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
