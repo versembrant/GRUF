@@ -29,6 +29,11 @@ body {
         text-decoration: none;
     }
 
+    a.no-button {
+        color: $white;
+        text-decoration: underline;
+    }
+
     h1 {
         font-size: 80px;
         font-weight: 800;
