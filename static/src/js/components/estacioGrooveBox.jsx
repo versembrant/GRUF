@@ -1,78 +1,75 @@
-import { GrufKnob, GrufSelectorPresets, GrufLabel, GrufLabelPetit,GrufLabelPetitVertical, GrufOnOffGrid, GrufEnum2Columns, GrufReverbTime, GrufToggle, GrufBpmCounter, GrufButtonNoBorder, GrufLabelPetit, GrufSlider, GrufSelectorPatronsGrid } from "./widgets";
+import { GrufKnob, GrufSelectorPresets, GrufSelectorPresets, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
+import { grey } from "@mui/material/colors";
 
 export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
 
-    return (<div key={estacio.nom} className="estacio estacio-groovebox">
-        <div className="estacio-main">
-            <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-            <GrufButtonNoBorder text="Canvia estació" top="44px" left="826px" onClick={() => {setEstacioSelected(undefined)}} />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" top="8%" left="6.3%" label="Vol" />
-            <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" top="8%" left="17.8%" label = 'Swing' />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff" top="8%" left="29.0%" label = 'Cutoff' />
-            <GrufBpmCounter top="8%" left="39.6%" />
-            <GrufLabel text="bpm" top="17.3%" left="41%" />
-            
-            <GrufLabel text="Reverb" top="7.5%" left="51.6%" />
-            <GrufLabel text="Durada" top="12.7%" left="51.7%" />
-            <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" top="117px" left="51.7%" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" top="6.3%" left="71%" label="Send" />
-            
-            <GrufLabel text="Delay" top="14.2%" left="82.5%" />
-            <GrufToggle estacio={estacio} parameterName="fxDelayOnOff" top="19%" left="81.7%" valueOn={0.5} valueOff={0.0} />
-            <GrufLabel text="EQ" top="29.6%" left="51.7%" />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxLow" top="34.5%" left="51.9%" label = 'Low' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxMid" top="34.5%" left="56.9%" label = 'Mid' /> 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxHigh" top="34.5%" left="61.9%" label = 'High' />
-            
-            <GrufLabel text="Durada" top="29.6%" left="70.3%" />
-            <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" top="34.2%" left="69.4%" />
-            
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayWet" label="Mix" top="28%" left="83.6%" markStart="0%" markEnd="100%" /> 
-            <GrufSlider orientation="vertical" estacio={estacio} parameterName="fxDelayFeedback" label="Feedback" top="28%" left="88.9%" markStart="0%" markEnd="100%" /> 
-           
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume1" top="48.5%" left="5%" label = 'Vol' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone1" top="48.5%" left="9%" label = 'Tone' />
+    return (
+        <div key={estacio.nom} className="estacio estacio-groovebox">
+            <div    className="estacio-main grid gap-10 p-4" >
+                <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume2" top="61.0%" left="5%" label = 'Vol' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone2" top="61.0%" left="9%" label = 'Tone' />
+                {/* Volum, Cutoff, Swing, i BPM Counter */}
+                <fieldset className="modul-border modul-bg flex flex-col flex-wrap justify-between col-start-1 row-start-1 row-span-2" style={{width: 400, height: 120}}>
+                    <fieldset className="flex justify-between">
+                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
+                        <GrufSeparatorLine />
+                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="cutoff" label="Cutoff" />
+                        <GrufSeparatorLine />
+                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="swing" label="Swing" />
+                        <GrufSeparatorLine />
+                        <GrufBpmCounter />
+                    </fieldset>
+                </fieldset>
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume3" top="72.5%" left="5%" label = 'Vol' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone3" top="72.5%" left="9%" label = 'Tone' />
+                {/* Módul de Reverb */}
+                <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="volume4" top="85.0%" left="5%" label = 'Vol' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="tone4" top="85.0%" left="9%" label = 'Tone' />
+                {/* Botó de canviar estació */}
+                <GrufButtonBorder className="col-start-3 row-start-1" style={{width: 100, height: 50}} text="Canvia estació" onClick={() => { setEstacioSelected(undefined) }}/>
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="attack1" top="48.5%" left="77%" label = 'Attack' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="release1" top="48.5%" left="82%" label = 'Release' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="reverbSend1" top="48.5%" left="87.5%" label = 'Reverb' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="swing1" top="48.5%" left="93%" label = 'Swing' />
+                {/* Contenidor de controls: Selector de Patrons, Clear, Presets, Rec */}
+                <fieldset className="modul-border modul-bg flex flex-row justify-between items-center col-start-1 row-start-3 grid justify-between items-center gap-10" style={{width: 400, height:150}}>
+                    <GrufSelectorPatronsGrid className="col-start-1 row-start-1" estacio={estacio} parameterName="pattern" width= "225" />
+                    <GrufNoteControls className="col-start-2 row-start-1 row-span-2" estacio={estacio} width="175px" clearParameter={"pattern"}/>
+                </fieldset>
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="attack2" top="61%" left="77%" label = 'Attack' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="release2" top="61%" left="82%" label = 'Release' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="reverbSend2" top="61%" left="87.5%" label = 'Reverb' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="swing2" top="61%" left="93%" label = 'Swing' />
+                {/* Módul de EQ */}
+                <GrufModulEQ className="col-start-2 row-start-3" estacio={estacio} clearParameter = {'pattern'} />
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="attack3" top="72.5%" left="77%" label = 'Attack' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="release3" top="72.5%" left="82%" label = 'Release' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="reverbSend3" top="72.5%" left="87.5%" label = 'Reverb' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="swing3" top="72.5%" left="93%" label = 'Swing' />
+                {/* Módul de Delay */}
+                <GrufModulDelay className="col-start-3 row-start-2 row-span-2" estacio={estacio} />
 
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="attack4" top="85%" left="77%" label = 'Attack' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="release4" top="85%" left="82%" label = 'Release' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="reverbSend4" top="85%" left="87.5%" label = 'Reverb' />
-            <GrufKnob mida="petit" parameterParent={estacio} parameterName="swing4" top="85%" left="93%" label = 'Swing' />
+                {/* Contenidor de GridOnOff */}
 
-            <GrufLabelPetitVertical text="OpHat" top="50.7%" left="13.6%" />
-            <GrufLabelPetitVertical text="CHat" top="63.3%" left="14%" />
-            <GrufLabelPetitVertical text="Snare" top="75%" left="13.8%" />
-            <GrufLabelPetitVertical text="Kick" top="87.5%" left="14.3%" />
+                <fieldset className="grid col-start-1 row-start-4 col-span-3" style={{ height: 350}}>
 
-            <GrufSelectorPresets estacio={estacio} top="243px" left="345px" height="42px" />
-            <GrufOnOffGrid estacio={estacio} parameterName="pattern" top="337px" left="182.5px"  />    
-
-            <GrufSelectorPatronsGrid estacio={estacio} parameterName="pattern" top="256px" left="70px" width="210px" />       
+                    {/* Contenidor de TonVol */}
+                    <fieldset className="col-start-1 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRows: "repeat(4, auto)", width:100, marginTop:20}}>
+                        {["1", "2", "3", "4"].map(i => (
+                            <>
+                                <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${i}`} label="Vol" />
+                                <GrufKnob mida="petit" parameterParent={estacio} parameterName={`tone${i}`} label="Tone" />
+                            </>
+                        ))}
+                    </fieldset>
+                    {/* Grid OnOff */}
+                    <GrufOnOffGridContainer  className="col-start-2 row-start-1" style={{ height: 250 }} estacio={estacio} parameterName="pattern" />
+                    {/* Contenidor de ASSR */}
+                    <fieldset className="col-start-3 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gridTemplateRows: "repeat(4, auto)", gap: "10px", marginTop:15}}>
+                    {["1", "2", "3", "4"].map(i => (
+                        <>
+                            <GrufKnob mida="petit" parameterParent={estacio} parameterName={`attack${i}`} label="Attack" />
+                            <GrufKnob mida="petit" parameterParent={estacio} parameterName={`release${i}`} label="Release" />
+                            <GrufKnob mida="petit" parameterParent={estacio} parameterName={`reverbSend${i}`} label="Reverb" />
+                            <GrufKnob mida="petit" parameterParent={estacio} parameterName={`swing${i}`} label="Swing" />
+                        </>
+                    ))}
+                    </fieldset>
+                </fieldset>
+            </div>
         </div>
-    </div>)
+    );
 };

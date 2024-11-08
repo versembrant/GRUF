@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { subscribeToStoreChanges, indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter}  from "../utils";
-import { subscribeToParameterChanges, updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
+import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter}  from "../utils";
+import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
+import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
 import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
@@ -16,6 +17,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import throttle from 'lodash.throttle'
+import { AudioRecorder } from "../components/audioRecorder";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -23,6 +25,42 @@ import { circularProgressClasses } from "@mui/material";
 
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
+}
+
+export const createRecordingHandler = (estacio, parameterDescription) => {
+    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+
+    const toggleRecording = (button) => {
+        const recordingInputElement = document.getElementById(recordingElementId);
+        if (recordingInputElement.checked) {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
+        } else {
+            recordingInputElement.checked = true;
+            button.classList.add('recording');
+        }
+    };
+
+    return { recordingElementId, toggleRecording };
+};
+
+export const GrufSeparatorLine = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1 1"
+            preserveAspectRatio="none" // so that the viewBox doesn't need to scale evenly
+            width="2px" height="80%">
+            <line x1="0" x2="0" y1="0" y2="1"
+            stroke={cssVariables.lightGrey}/>
+        </svg>
+    )
+}
+
+export const GrufLegend = ({ text, bare=false }) => {
+    // we actually style the span element inside the legend element :)
+    return (
+        <legend style={{display: "contents"}}><span className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
+    )
 }
 
 export const GrufLabel = ({text, top, left}) => {
@@ -65,9 +103,16 @@ export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
     )
 }
 
+export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
+    return (
+        <button className={`btn-gruf border-radius ${className}`} onClick={onClick} style={{top: top, left: left}}>
+            {text}
+        </button>
+    )
+}
 
-// TODO: paràmetre position provisional, mentre hi hagi knobs que siguin position:absolute
-export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mida, position='absolute', noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
 
@@ -87,6 +132,7 @@ export const GrufKnob = ({ parameterParent, parameterName, top, left, label, mid
         updateParametre(parameterParent, parameterName, newRealValue);
     }
 
+    position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
@@ -159,36 +205,46 @@ export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, fons, noLabel=false, noOutput=false }) => {
-    subscribeToParameterChanges(estacio, parameterName);
-    const parameterDescription = estacio.getParameterDescription(parameterName);
-    const realValue = estacio.getParameterValue(parameterName);
+export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, noLabel=false, noOutput=false }) => {
+    [activeThumbIndex, setActiveThumbIndex] = useState(0);
+    const parameterNames = Array.isArray(parameterName) ? parameterName : [parameterName];
+    parameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
 
-    const nomEstacio = estacio.nom;
+    const parameterDescriptions = parameterNames.map(parameterName => estacio.getParameterDescription(parameterName));
+    
     const marks = []
 
-    if (markStart !== undefined) marks.push({ value: getParameterNumericMin(parameterDescription), label: markStart});
-    if (markEnd !== undefined) marks.push({ value: getParameterNumericMax(parameterDescription), label: markEnd});
+    const numericMinValue = Math.min(...parameterDescriptions.map(parameterDescription=>getParameterNumericMin(parameterDescription)));
+    const numericMaxValue = Math.max(...parameterDescriptions.map(parameterDescription=>getParameterNumericMax(parameterDescription)));
+    if (markStart !== undefined) marks.push({ value: numericMinValue, label: markStart});
+    if (markEnd !== undefined) marks.push({ value: numericMaxValue, label: markEnd});
     
     const style = { top: top, left: left };
+    if (top || left) style.position = "absolute";
     if (orientation==='vertical') style.height = size || '80px';
     if (orientation==='horizontal') style.width = size || '200px';
 
+    const handleSliderChange = (newValues, activeThumbIndex) => {
+        setActiveThumbIndex(activeThumbIndex);
+        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
+    }
+    
+    const realValues = parameterNames.map(parameterName => estacio.getParameterValue(parameterName));
     const sliderId = useId();
     return (
-        <div className={`gruf-slider ${orientation} ${fons === 'linies' ? "gruf-slider-background-ratllat" : ""}`} style={style}>
+        <div className={`gruf-slider ${orientation}`} style={style}>
             <Slider
                 id={sliderId}
                 orientation={orientation}
-                value={real2Num(realValue, parameterDescription)}
-                step={getParameterStep(parameterDescription) || 0.001 } // MuiSlider needs a step size, so returning small if it's undefined
-                min={getParameterNumericMin(parameterDescription)}
-                max={getParameterNumericMax(parameterDescription)}
+                value={realValues.map((realValue, index) => real2Num(realValue, parameterDescriptions[index]))}
+                step={getParameterStep(parameterDescriptions[0]) || 0.001 } // MuiSlider needs a step size, so returning small if it's undefined
+                min={numericMinValue}
+                max={numericMaxValue}
                 marks={marks} 
-                onChange={throttle((evt) => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, num2Real(evt.target.value, parameterDescription)), getCurrentSession().continuousControlThrottleTime)}
+                onChange={throttle((_, newValues, activeThumb) => handleSliderChange(newValues, activeThumb), getCurrentSession().continuousControlThrottleTime)}
             />
-            {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescription.label}</label>}
-            {!noOutput && <output htmlFor={sliderId}>{real2String(realValue, parameterDescription)}</output>}
+            {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescriptions[0].label}</label>}
+            {!noOutput && <output htmlFor={sliderId}>{real2String(realValues[activeThumbIndex], parameterDescriptions[activeThumbIndex])}</output>}
         </div>
     )
 };
@@ -205,20 +261,23 @@ export const GrufBpmCounter = ({ top, left }) => {
 
     return (
         <div className="bpm-counter" style={{ top: top, left: left }}>
-            <div className="inner-square">
-                <InputNumber 
-                    value={currentBpm} 
-                    onValueChange={(e) => handleBpmChange(e.value)} 
-                    min={minBpm}
-                    max={maxBpm}
-                    showButtons={false} 
-                    className="p-inputnumber"
-                />
-                <div className="bpm-buttons">
-                    <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
-                    <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+            <div className="outer-square">
+                <div className="inner-square">
+                    <InputNumber
+                        value={currentBpm}
+                        onValueChange={(e) => handleBpmChange(e.value)}
+                        min={minBpm}
+                        max={maxBpm}
+                        showButtons={false}
+                        className="p-inputnumber"
+                    />
+                    <div className="bpm-buttons">
+                        <div className="button decrement" onClick={() => handleBpmChange(currentBpm - 1)}></div>
+                        <div className="button increment" onClick={() => handleBpmChange(currentBpm + 1)}></div>
+                    </div>
                 </div>
             </div>
+            <label htmlFor="p-inputnumber">bpm</label>
         </div>
     );
 };
@@ -291,29 +350,23 @@ export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px",
     );
 };
 
-export const GrufToggle = ({ estacio, parameterName, top, left, valueOn = 1, valueOff = 0, labelOn="On", labelOff="Off" }) => {
+export const GrufToggle = ({ estacio, parameterName, top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
 
-    // Primer obtenim el valor actual
     const parameterValue = estacio.getParameterValue(parameterName);
-    const parameterValueOnOff = parameterValue === valueOn;
 
-    const handleClick = () => {
-        // En clicar, invertim el valor i l'actualitzem
-        const newValue = !parameterValueOnOff;
-        estacio.updateParametreEstacio(parameterName, newValue ? valueOn : valueOff);
+    const handleClick = () => { // En clicar, invertim el valor i l'actualitzem
+        estacio.updateParametreEstacio(parameterName, !parameterValue);
     };
 
     return (
         <div className="gruf-toggle" style={{ top: top, left: left }}>
             <div
-                className={`p-toggle ${parameterValueOnOff ? 'on' : 'off'}`}
+                className={`p-toggle ${parameterValue ? 'on' : 'off'}`}
                 onClick={handleClick}
             >
-                <div className={`circle-icon ${parameterValueOnOff ? 'selected' : ''}`}></div>
+                <div className={`circle-icon ${parameterValue ? 'selected' : ''}`}></div>
             </div>
-            <div className="toggle-label toggle-label-off">{labelOff}</div>
-            <div className="toggle-label toggle-label-on">{labelOn}</div>
         </div>
     );
 };
@@ -328,22 +381,22 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const stepsElementsPerRow = []
-    for (let i = 0; i < numRows; i++) {
+    for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
         const stepsElements = []
-        for (let j = 0; j < numSteps; j++) {
-            const filledClass = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j}) > -1 ? 'selected' : '';
-            const activeStep = (currentStep == j && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset ))) ? 'active' : '';
+        for (let stepIndex = 0; stepIndex < numSteps; stepIndex++) {
+            const isFilled = indexOfArrayMatchingObject(parameterValue, {'i': rowIndex, 'j': stepIndex}) > -1;
+            const isActive = (currentStep == stepIndex && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset )));
             stepsElements.push(
             <div 
-                key={i + "_" + j} // To avoid React warning
-                className={'step ' + filledClass + ' ' + activeStep}
+                key={rowIndex + "_" + stepIndex} // To avoid React warning
+                className={`step ${isFilled ? 'selected' : ''} ${isActive ? 'active' : ''}`}
                 onMouseDown={(evt) => {
                     let updatedParameterValue = [...parameterValue]
-                    const index = indexOfArrayMatchingObject(parameterValue, {'i': i, 'j': j});
+                    const index = indexOfArrayMatchingObject(parameterValue, {'i': rowIndex, 'j': stepIndex});
                     if (index > -1){
                         updatedParameterValue.splice(index, 1);
                     } else {
-                        updatedParameterValue.push({'i': i, 'j': j})
+                        updatedParameterValue.push({'i': rowIndex, 'j': stepIndex})
                     }
                     estacio.updateParametreEstacio(parameterDescription.nom, updatedParameterValue)
                 }}>
@@ -362,6 +415,8 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
             transformOrigin: 'left'
         }
     }
+
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
@@ -371,10 +426,9 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
                 })}
             </div>
             <div style={{display:"none"}}>
-                <button onMouseDown={(evt)=>
+                {/* <button onMouseDown={(evt)=>
                     estacio.updateParametreEstacio(parameterDescription.nom, [])
-                }>Clear</button>
-                { parameterDescription.showRecButton && <label><input id={estacio.nom + '_' + parameterDescription.nom + '_REC'} type="checkbox"/>Rec</label> } 
+                }>Clear</button> */}
                 {hasPatronsPredefinits(parameterDescription) &&
                     (
                     <div>
@@ -394,23 +448,49 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     )
 };
 
-export const GrufSelectorPresets = ({estacio, top, left, height="30px"}) => {
+export const GrufOnOffGridContainer = ({ estacio, parameterName, top = "0px", left = "0px" }) => {
     return (
-        <div className="gruf-selector-presets" style={{ top: top, left: left, height:height, lineHeight:height}}>
+        <div 
+            style={{
+                position: 'relative',
+                top: top,
+                left: left,
+                backgroundColor: 'rgb(75, 75, 76)',
+                borderRadius: '8px', 
+                display: 'inline-block',
+                width: '570px',
+                height: '341px',
+            }}
+        >
+            <GrufOnOffGrid estacio={estacio} parameterName={parameterName} />
+        </div>
+    );
+};
+
+
+export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth, minHeight }) => {
+    subscribeToPresetChanges();
+    const selectedPreset = getCurrentSession().getLivePresetsEstacions()[estacio.nom];
+    return (
+        <div className={`gruf-selector-presets ${className}`} style={{ top: top, left: left, minHeight }}>
             {[...Array(estacio.numPresets).keys()].map(i => 
-            <div key={"preset_" + i}
-                className={(getCurrentSession().getLivePresetsEstacions()[estacio.nom] == i ? " selected": "")}
-                onClick={(evt) => {getCurrentSession().setLivePresetForEstacio(estacio.nom, i)}}>
+                <div
+                    key={"preset_" + i}
+                    className={`flex-auto flex justify-center items-center ${(selectedPreset == i ? " selected" : "")}`}
+                    onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
+                    style={{width: buttonWidth}}
+                >
                     {i + 1}
-            </div>
+                </div>
             )}
         </div>
-    )
-}
+    );
+};
 
-export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, colorNotesDissalowed, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
+    subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
@@ -548,30 +628,17 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
         return 0;
     }
 
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    }
-
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
+    const position = (top || left) ? "absolute" : "static"; // TODO: remove
+    const cursorSrcUrl =  appPrefix + "/static/src/img/playhead_long.svg";
     return (
-        <div className="gruf-piano-roll" style={{ top: top, left: left}}>
-            <div style={{overflow:"hidden"}}>
+        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
-                    allowednotes={allowedNotes}
+                    allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
-                    height={height.replace('px', '') - 30} // subtract height of the clear/rec buttons below
                     grid={2}
                     xrange={numSteps}
                     yrange={Math.min(instrumentRange, maxYRange)}
@@ -584,7 +651,7 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     //xscroll={true}
                     colnote={colorNotes || "#f22"}
                     colnotesel={colorNotes || "#f22"}
-                    colnotedissalowed={colorNotesDissalowed || "#333"}
+                    colnotedissalowed="#333"    
                     collt={"rgb(200, 200, 200)"}
                     coldk={"rgb(176, 176, 176)"}
                     colgrid={"#999"}
@@ -592,19 +659,12 @@ export const GrufPianoRoll = ({ estacio, parameterName, top, left, width="500px"
                     colrulerbg={"#4b4b4b"}
                     colrulerfg={"#fff"}
                     colrulerborder={"#4b4b4b"}
-                    cursorsrc={"/gruf/static/src/img/playhead_long.svg"}
+                    cursorsrc={cursorSrcUrl}
                     kbwidth={modeSampler === undefined ? 65: 0}
                     kbstyle={modeSampler === undefined ? "piano": "midi"}
                     yruler={modeSampler === undefined ? 20: 22}
                 ></gruf-pianoroll>
-            </div>
-            <div className="gruf-piano-roll-controls">
-                <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
-                { parameterDescription.showRecButton && <input id={recordingElementId} type="checkbox" style={{display:"none"}}/> } 
-                { parameterDescription.showRecButton && <button onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button> } 
-                <GrufSelectorPresets estacio={estacio} top={height.replace('px', '') - 20} left={width.replace('px', '') - 100} height="23px"/>
                 <NoteGenerator estacio={estacio} parameterName={parameterName} tonality={tonality} top={top} left="780px" />
-            </div>
         </div>
     )
 };
@@ -688,8 +748,25 @@ export const NoteGenerator = ({ estacio, parameterName, tonality, top, left }) =
     )
 }
 
+export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
+    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
+
+    return (
+        <fieldset className={className} style={{ width: width }}>
+            <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
+            <fieldset className="flex flex-col gap-10">
+                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
+                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+            </fieldset>
+        </fieldset>
+    );
+};
+
 export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
+    subscribeToPresetChanges();
+    
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
     const nomEstacio=estacio.nom;
@@ -701,12 +778,12 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
             options={parameterDescription.patronsPredefinits.map(patro => patro.nom)}
             placeholder="Cap"
             />
-            <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button>
+            {/* <button onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterDescription.nom, [])}>Clear</button> */}
         </div>
     )
 }
 
-export const GrufSelectorTonalitat = ({ top, left }) => {
+export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
         const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
@@ -724,9 +801,11 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
         getAudioGraphInstance().updateParametreAudioGraph('tonality', selectedTonality);
     };
 
+    const tonalitatctrlId = useId();
     return (
-        <div className="tonality-selector" style={{ position: 'absolute', top: top, left: left }}>
-            <Dropdown
+        <div className={`tonality-selector ${className}`}>
+            {label!==null && <label htmlFor={tonalitatctrlId}>{label || parameterDescription.label}</label>}
+            <Dropdown id={tonalitatctrlId}
                 value={currentTonality}  
                 options={dropdownOptions}
                 onChange={handleTonalityChange}
@@ -738,10 +817,30 @@ export const GrufSelectorTonalitat = ({ top, left }) => {
     );
 };
 
-export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
-    subscribeToParameterChanges(estacio, 'selectedSoundName');
-    const selectedSoundName = estacio.getParameterValue('selectedSoundName');
+export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const parameterValue = estacio.getParameterValue(parameterName);
+    const inputs = loopModeOptions.map((loopModeOption, i)=> {
+        return <input type="radio" key={i} name={parameterName}
+        value={loopModeOption} checked={loopModeOption===parameterValue}
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+    })
+    return(
+        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
+    )
+    
+}
+
+export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
+    subscribeToParameterChanges(estacio, parameterName);
+    subscribeToAudioGraphParameterChanges('tonality');
+    [inputMeterPercent, setInputMeterPercent] = useState(0);
+
+    const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
+    const tonalitat = getAudioGraphInstance().getTonality();
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
             'label': 'Gravació usuari ' + (i + 1), 
@@ -752,10 +851,10 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
             'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        }))
+        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
+    
     const optionNames = options.map(item => item.value);
-
     const handleRemoveFileButton = (soundName) => {
         const deleteFileUrl = appPrefix + '/delete_file/' + getCurrentSession().getID() + '/';
         var fd = new FormData();
@@ -777,62 +876,48 @@ export const GrufSelectorSonsSampler = ({estacio, top, left, width}) => {
                         if (selectedOptionIndex >= filteredOptionNames.length) {
                             selectedOptionIndex = filteredOptionNames.length - 1;
                         }
-                        estacio.updateParametreEstacio('selectedSoundName', filteredOptionNames[selectedOptionIndex])
+                        estacio.updateParametreEstacio(parameterName, filteredOptionNames[selectedOptionIndex])
                     }
                 }
             });
         })
     }
-    const tonalitat = getAudioGraphInstance().getTonality();
-    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
 
+    const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
-        console.log(tonalitatSampleLlista)
         return (
             <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
         );
     };
 
     return (
-        <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
-            <Dropdown 
-                className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
-                itemTemplate={optionTemplate}
-                value={selectedSoundName}
-                onChange={(evt) => {
-                    estacio.updateParametreEstacio('selectedSoundName', evt.target.value)
-                }} 
-                options={options}
-                placeholder="Cap"
-            />
-            {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
-        </div>
-    )
-}
-
-
-// TODO: position: relative should be default for knobs
-export const GrufADSRWidget = ({estacio, soundNumber="", height, top, left}) => {
-    const attackParamName = `attack${soundNumber}`;
-    const decayParamName = `decay${soundNumber}`;
-    const sustainParamName = `sustain${soundNumber}`;
-    const releaseParamName = `release${soundNumber}`;
-
-    return (
-        <div className="gruf-adsr-widget" style={{top, left, height}}>
-            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
-            <div className="adsr-knobs">
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={attackParamName} position='relative' label='Attack'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={decayParamName} position='relative' label='Decay'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={sustainParamName} position='relative' label='Sustain'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={releaseParamName} position='relative' label='Release'/>
+        <div>
+            <div className="flex justify-between gap-10">
+                <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
+                    <Dropdown
+                        className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                        itemTemplate={optionTemplate}
+                        value={selectedSoundName}
+                        onChange={(evt) => {
+                            estacio.updateParametreEstacio(parameterName, evt.target.value)
+                        }}
+                        options={options}
+                        placeholder="Cap"
+                    />
+                    {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+                </div>
+                <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
+                    console.log("Sound uploaded to server: ", data.url);
+                    estacio.updateParametreEstacio(parameterName, data.url.split("/").slice(-1)[0])
+                }} />
             </div>
+            <div id="inputMeterInner" style={{width: inputMeterPercent + "%", height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
         </div>
     )
 }
 
-const ADSRGraph = ({estacio, adsrParameterNames}) => {
+export const ADSRGraph = ({estacio, adsrParameterNames}) => {
     adsrParameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
 
     const a = estacio.getParameterValue(adsrParameterNames[0]);

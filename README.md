@@ -1,4 +1,4 @@
-# versembrant-bruixit
+# versembrant-gruf
 
 ## Installation instructions
 
@@ -7,8 +7,8 @@ You need [Docker](https://www.docker.com/products/docker-desktop/) to be running
 1. Clone and `cd` to repo
 
 ```shell
-git clone git@github.com:ffont/versembrant-bruixit.git
-cd versembrant-bruixit/
+git clone git@github.com:ffont/versembrant-gruf.git
+cd versembrant-gruf/
 ```
 
 2. Build Docker images:
@@ -63,11 +63,11 @@ docker compose run --rm server fab deploy
 
 OJU!: aquest repositori ja inclou les claus ssh necessàries per poder accedir al servidor remot, no el compartiu!
 
-Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net/bruixit/
+Podeu accedir a l'aplicació corrent al servidor remot aquí: http://cl2024011711001.dnssw.net/
 
 ## Instruccions de desplegament mode TEST en el servidor (swhosting)
 
-Per a poder fer proves en el servidor remot sense afectar el desplegament principal de l'aplicació, es pot fer servir el flag `--test` al córrer l'script de deploy. Això desplegarà l'aplicació a http://cl2024011711001.dnssw.net/bruixit-test/ (en comptes de http://cl2024011711001.dnssw.net/bruixit/). Opcionalment també es pot especificar el branch que es vol desplegar amb el flag `--branch xxx`. Per exemple:
+Per a poder fer proves en el servidor remot sense afectar el desplegament principal de l'aplicació, es pot fer servir el flag `--test` al córrer l'script de deploy. Això desplegarà l'aplicació a http://cl2024011711001.dnssw.net/gruf-test/ (en comptes de http://cl2024011711001.dnssw.net/). Opcionalment també es pot especificar el branch que es vol desplegar amb el flag `--branch xxx`. Per exemple:
 
 ```
 docker compose run --rm server fab deploy --test --branch proves_1234

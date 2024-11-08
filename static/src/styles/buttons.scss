@@ -1,4 +1,4 @@
-button, a {
+button, a:not(.no-button) {
     cursor: pointer;
     --text-color: #{white};
 
@@ -26,10 +26,11 @@ button, a {
         cursor: not-allowed;
     }
 
-}
+    &.recording {
+        --text-color: #{$red};
+        animation: blink 1s steps(7, start) infinite;
+    }
 
-.no-border {
-    border: none;
 }
 
 .navbar a, .footer a {
@@ -45,8 +46,6 @@ button, a {
 }
 
 .btn-gruf {
-    position: absolute;
-    padding: 0;
     font-size: 14px;
     font-weight: 400;
 }

@@ -17,39 +17,42 @@ export const Connecta = ({infoSessions}) => {
     const goToGruf = () => {
         const grufId = document.getElementById("grufIdInput").value;
         if (grufId !== "") {
-            const sessionUrl = appPrefix + "/gruf/" + grufId;
+            const sessionUrl = appPrefix + "/g/" + grufId;
             window.location.replace(sessionUrl);
         }
     }
 
+    const showUtimsGrufs = document.getElementById("root").dataset.debugMode === "True";
+    const connectError = document.getElementById('root').dataset.connectError === "True";
+
     return (
-        <div>
+        <div className="connectat-wrapper">
             <Navbar/>
             <div className="connectat">
+                {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
-                    <div>
-                        <button id="connectaButton" className="btn-black"
+                    <ul>
+                        <li><button id="connectaButton" className="btn-black"
                             onClick={goToGruf}
-                        >Connecta't al GRUF</button>
-                    </div>
+                        >Connecta't al GRUF</button></li>
+                        <li><a href={appPrefix + "/nova_sessio"} class="btn-black">Crea un nou GRUF</a></li>
+                    </ul>
                 </div>
             </div>
-            <div className="ultimsGrufs">
+            { showUtimsGrufs && infoSessions.length !== 0 ? <div className="ultimsGrufs">
                 <div>
                     <h3>Últims GRUFs:</h3>
                     <ul>
                         {infoSessions.slice(0, 10).map((item, index) => <li key={item.id}>{ item.id } "{ item.name }" ({ item.num_estacions + 2 } estacions, { item.connected_users.length } usuaris)&nbsp;
-                            <a className="btn-petit btn-verd" href={appPrefix + "/gruf/" + item.id}>Connecta't</a>&nbsp;
-                            <a className="btn-petit btn-gris" href={appPrefix + "/gruf/" + item.id + "/master/"}>Connecta't (master)</a>&nbsp;
-                            <a className="btn-petit btn-gris" href={appPrefix + "/gruf/" + item.id + "/local/"}>Connecta't (local)</a>&nbsp;
+                            <a className="btn-petit btn-verd" href={appPrefix + "/g/" + item.id}>Connecta't</a>&nbsp;
+                            <a className="btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/master/"}>Connecta't (master)</a>&nbsp;
+                            <a className="btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/local/"}>Connecta't (local)</a>&nbsp;
                             <a className="btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}
                     </ul>
                 </div>
-            </div>
-            <div className="enrere">
-                <a href={appPrefix + "/"}>Torna enrere</a>
-            </div>
+            </div>: ""}
+            <Footer/>
         </div>
     )
 };

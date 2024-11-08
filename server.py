@@ -2,8 +2,10 @@ import os
 import sys
 import json
 import random
+import smtplib
 import hashlib
 from collections import defaultdict
+from email.message import EmailMessage
 
 from flask import Flask, render_template, request, redirect, url_for, Blueprint
 from werkzeug.utils import safe_join, secure_filename
@@ -32,6 +34,51 @@ def log(message):
     print(message)
     sys.stdout.flush()
 
+
+def send_email(email_to, subject, body):
+    log(f"Sending email \"{subject}\" to {email_to}")
+    email_from = os.getenv('MAIL_USERNAME', 'your_email@address.com')
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = email_from
+    msg['To'] = email_to
+    msg.set_content(body)
+    try:
+        password = os.getenv('MAIL_PASSWORD', 'your_password')
+        smtpObj = smtplib.SMTP(os.getenv('MAIL_SERVER', 'live.smtp.example.io'), 587)
+        smtpObj.starttls()
+        smtpObj.login(email_from, password)
+        smtpObj.send_message(msg)
+        smtpObj.quit()    
+    except Exception as e:
+        log(f'Error enviant email: {e}')
+
+
+def notify_new_gruf_created(session, email_to):
+    if app_prefix != "" and not app_prefix.startswith('/'):
+        app_prefix_with_slash = '/' + app_prefix
+    else:
+        app_prefix_with_slash = app_prefix
+    gruf_url_app_prefix = os.getenv('APP_BASE_URL', f'http://localhost:{port}') + app_prefix_with_slash  + '/g/'
+    send_email(email_to, 
+               f"S'ha creat un nou GRUF: #{session.id} {session.name}", 
+               f"""Hola!
+
+Aquest correu és per informar-te de que s'ha creat un nou GRUF amb el nom \"{session.name}\".
+L'identificador (ID) d'aquest GRUF és: {session.id}
+
+Pots accedir al GRUF utilizant aquestes URLs:
+
+* {gruf_url_app_prefix}{session.id}/
+* {gruf_url_app_prefix}{session.id}/master/  (per connectar-te com a "màster")
+* {gruf_url_app_prefix}{session.id}/local/ (per connectar-te en mode local)
+
+Gràcies per utilitzar el GRUF!
+
+- Versembrant
+
+""")
+    
 
 hash_cache = {}
 get_hash = lambda content, length: hashlib.md5(content).hexdigest()[:length]
@@ -317,8 +364,9 @@ def frontpage():
 
 
 @bp.route('/connecta/')
-def llista_sessions():
-    return render_template('llista_sessions.html')
+def connecta():
+    error = request.args.get('error', False)
+    return render_template('connecta.html', error=error, debug_mode=os.getenv('DEPLOY') == None)
 
 
 @bp.route('/nova_sessio/', methods=['GET', 'POST'])
@@ -331,32 +379,43 @@ def new():
         s = Session(data)
         log(f'New session created: {s.name} ({s.id})\n{json.dumps(s.get_full_data(), indent=4)}')
         notifica_available_sessions()
+        if 'email' in request.form and request.form['email']:
+            notify_new_gruf_created(s, request.form['email'])
         return redirect(url_for('app.session', session_id=s.id))
     return render_template('nova_sessio.html')
 
 
-@bp.route('/gruf/<session_id>/master/')
+@bp.route('/gruf/<session_id>/')
+@bp.route('/gruf/<session_id>/<path:rest>')
+def old_gruf_address_redirect(session_id, rest=""):
+    return redirect(url_for('app.session', session_id=session_id) + rest)
+
+
+@bp.route('/g/<session_id>/master/')
 def session_master(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=True)
 
 
-@bp.route('/gruf/<session_id>/local/')
+@bp.route('/g/<session_id>/local/')
 def session_local(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=True, master_audio_engine=True)
 
 
-@bp.route('/gruf/<session_id>/')
+@bp.route('/g/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
+    if s is None: return redirect(url_for('app.connecta', error=True))
     return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=False)
 
 
 @bp.route('/delete_session/<session_id>/')
 def delete_session(session_id):
     delete_session_by_id(session_id)
-    return redirect(url_for('app.llista_sessions'))
+    return redirect(url_for('app.connecta'))
 
 
 def allowed_file(filename):
