@@ -706,16 +706,26 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     )
 };
 
-export const GrufNoteControls = ({ className, estacio, width, clearParameter}) => {
+export const GrufNoteControls = ({ className, estacio, width, clearParameter = "notes", selectorPresets = false }) => {
     const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, clearParameter);
 
     return (
         <fieldset className={className} style={{ width: width }}>
-            <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
+            {!selectorPresets && (
+                <GrufSelectorPresets
+                    className="flex flex-auto flex-wrap gap-10 justify-between"
+                    estacio={estacio}
+                    buttonWidth="58px"
+                />
+            )}
             <fieldset className="flex flex-col gap-10">
-                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(clearParameter, [])}>Clear</button>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <input id={recordingElementId} type="checkbox" style={{ display: "none" }} />
+                <button style={{ padding: '0', minHeight: '58px' }} onMouseDown={() => estacio.updateParametreEstacio(clearParameter, [])}>
+                    Clear
+                </button>
+                <button style={{ padding: '0', minHeight: '58px' }} onMouseDown={(evt) => toggleRecording(evt.target)}>
+                    Rec
+                </button>
             </fieldset>
         </fieldset>
     );
