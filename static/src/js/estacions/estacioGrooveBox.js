@@ -141,80 +141,34 @@ export class EstacioGrooveBox extends EstacioBase {
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        if (name == 'tone4') {
-            this.audioNodes.kick.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
+        const playerNames = ['open_hat', 'closed_hat', 'snare', 'kick'];
+        const parametersMatch = name.match(/^(volume|attack|release|tone|reverbSend)(\d+)$/);
+        if (parametersMatch) {
+            const [_, type, indexStr] = parametersMatch;
+            const index = parseInt(indexStr, 10) - 1;
+            const playerName = playerNames[index];
+            if (type === 'volume') {
+                this.audioNodes[playerName].set({
+                    'volume': value > -30 ? value: -100,
+                });
+            } else if (type === 'attack') {
+                this.audioNodes[playerName].set({
+                    'fadeIn': value*this.getTempsBeat(),
+                });
+            } else if (type === 'release') {
+                this.audioNodes[playerName].set({
+                    'fadeOut': value*this.getTempsBeat(),
+                });
+            } else if (type === 'tone') {
+                this.audioNodes[playerName].set({
+                    'playbackRate': Math.pow(2,(value/12)),
+                });
+            } else if (type === 'reverbSend') {
+                const nodeName = `sendReverbGainNode${index+1}`;
+                this.audioNodes[nodeName].gain.value = value > -30 ? value: -100
+            }
         } else if (name == 'cutoff'){
             this.audioNodes.cutoff.frequency.rampTo(value, 0.01);
-        } else if (name =='volume4'){
-            this.audioNodes.kick.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack4'){
-            this.audioNodes.kick.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release4'){
-            this.audioNodes.kick.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone3'){
-            this.audioNodes.snare.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume3'){
-            this.audioNodes.snare.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack3'){
-            this.audioNodes.snare.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release3'){
-            this.audioNodes.snare.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone2'){
-            this.audioNodes.closed_hat.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume2'){
-            this.audioNodes.closed_hat.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack2'){
-            this.audioNodes.closed_hat.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release2'){
-            this.audioNodes.closed_hat.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name =='tone1'){
-            this.audioNodes.open_hat.set({
-                'playbackRate': Math.pow(2,(value/12)),
-            });
-        } else if (name =='volume1'){
-            this.audioNodes.open_hat.set({
-                'volume': value > -30 ? value: -100,
-            });
-        } else if (name =='attack1'){
-            this.audioNodes.open_hat.set({
-                'fadeIn': value*this.getTempsBeat(),
-            });
-        } else if (name =='release1'){
-            this.audioNodes.open_hat.set({
-                'fadeOut': value*this.getTempsBeat(),
-            });
-        } else if (name === 'reverbSend1'){
-            this.audioNodes.sendReverbGainNode1.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend2'){
-            this.audioNodes.sendReverbGainNode2.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend3'){
-            this.audioNodes.sendReverbGainNode3.gain.value = value > -30 ? value: -100
-        } else if (name === 'reverbSend4'){
-            this.audioNodes.sendReverbGainNode4.gain.value = value > -30 ? value: -100
         } else if (name === 'sound1URL'){
             this.loadSoundinPlayer('open_hat', value);
         } else if (name === 'sound2URL'){
