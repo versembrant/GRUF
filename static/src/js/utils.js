@@ -447,7 +447,7 @@ export const getPCsFromScaleName = (scale) => {
         const rootNote = scale.slice(0, -5).toLowerCase(); 
         const isMinor = scale.toLowerCase().includes('minor'); 
         
-        if (!midiNotesMap.hasOwnProperty(rootNote)) {
+        if (!getPCOfNoteClass === undefined) {
             throw new Error(`Root no vàlida: ${rootNote}`);
         }
 
