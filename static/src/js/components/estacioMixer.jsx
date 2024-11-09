@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio } from "../components/widgets";
+import { GrufKnob, GrufButtonBorder, GrufLabelEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
 
 export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
@@ -279,7 +279,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
             <div className="estacio-main">
-                <GrufButtonNoBorder text="Canvia estació" top="44px" left="830px" onClick={() => { setEstacioSelected(undefined); }} />
+                <GrufButtonBorder text="Canvia estació" onClick={() => { setEstacioSelected(undefined); }} />
                 <div className="estacio-mixer-container">
                     <div className="estacio-mixer-normal-tracks">
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
