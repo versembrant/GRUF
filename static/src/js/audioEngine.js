@@ -32,6 +32,7 @@ export class AudioGraph {
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
             isPlaying: {type: 'bool', initial: false},
             isPlayingArranjement: {type: 'bool', initial: false},
+            isMetronomeEnabled: { type: 'bool', initial: false },
             swing: {type: 'float', min: 0.0, max: 1.0, initial: 0.0},
             compas: {type: 'enum', options: ['2/4', '3/4', '4/4'], initial: '4/4'},
             tonality: {
@@ -256,6 +257,19 @@ export class AudioGraph {
         return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
     }
 
+    //Creem un metronom
+
+    initMetronome() {
+        this.metronome = new Tone.NoiseSynth({
+            volume: -10, 
+            envelope: {
+                attack: 0.001,
+                decay: 0.1,
+                sustain: 0,
+            }
+        }).toDestination();
+    }
+
     //Creem uns efectes
     initEffects(){
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
@@ -288,6 +302,14 @@ export class AudioGraph {
             mid: effectParams.eq3MidGain,
             high: effectParams.eq3HighGain
         });
+    }
+
+    setIsMetronomeEnabled(value) {
+        this.setParametreInStore('isMetronomeEnabled', value);
+    }
+    
+    isMetronomeEnabled() {
+        return this.store.getState().isMetronomeEnabled;
     }
 
     setEffectParameters(newEffectParameters) {
@@ -407,6 +429,14 @@ export class AudioGraph {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
             });
+            if (this.isMetronomeEnabled()) {
+                this.initMetronome();
+                // Sonarà en el primer beat de cada compàs.
+                const beatInBar = this.mainSequencerCurrentStep % 4;
+                if (beatInBar === 0) {
+                    this.metronome.triggerAttackRelease("16n", time);
+                }
+            }
         } else if (this.isPlayingArranjement()) {
             // Primer settejem la propietat arranjamentPreset de totes les estacions a -1, més tard canviarem aquest valor si hi ha clips que s'han de 
             // reproduir en aquest beat. Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.

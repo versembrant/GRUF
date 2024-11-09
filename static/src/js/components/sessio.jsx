@@ -8,6 +8,7 @@ import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 import logo_gruf from "../../img/logo_gruf.svg"
+import { getAudioGraphInstance } from "../audioEngine";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -45,6 +46,13 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 // removeURLParam('e');
 
 const SessioHeader = ({ estacioSelected }) => {
+    const [isMetronomeActive, setIsMetronomeActive] = useState(false);
+
+    const toggleMetronome = () => {
+        const newState = !isMetronomeActive;
+        setIsMetronomeActive(newState);
+        getAudioGraphInstance().setIsMetronomeEnabled(newState);
+    };
     return(
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
@@ -52,6 +60,13 @@ const SessioHeader = ({ estacioSelected }) => {
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
                 {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
                 {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
+                <button
+                onClick={toggleMetronome}
+                className={` btn-petit metronome-button ${isMetronomeActive ? "active" : ""}`}
+                title="Metronome"
+                >
+                🎵
+                </button>
                 <AudioTransportPlayStop/>
             </div>
         </div>
