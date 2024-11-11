@@ -7,7 +7,8 @@ import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
-import logo_gruf from "../../img/logo_gruf.svg"
+import logo_gruf from "../../img/logo_gruf.svg";
+import metronome from "../../img/metronome.svg"
 import { getAudioGraphInstance } from "../audioEngine";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
@@ -61,11 +62,15 @@ const SessioHeader = ({ estacioSelected }) => {
                 {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
                 {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
                 <button
-                onClick={toggleMetronome}
-                className={` btn-petit metronome-button ${isMetronomeActive ? "active" : ""}`}
-                title="Metronome"
+                    onClick={toggleMetronome}
+                    className={`btn-petit metronome-button ${isMetronomeActive ? "active" : ""}`}
+                    title="Metronome"
                 >
-                🎵
+                    <img
+                        src={metronome}
+                        alt="Metronome"
+                        style={{ width: "20px", height: "20px", filter: isMetronomeActive ? "invert(100%)" : "none" }}
+                    />
                 </button>
                 <AudioTransportPlayStop/>
             </div>
