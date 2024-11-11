@@ -267,7 +267,7 @@ export class AudioGraph {
                 decay: 0.1,
                 sustain: 0,
             }
-        }).toDestination();
+        }).connect(this.masterGainNode);
     }
 
     //Creem uns efectes
@@ -351,6 +351,9 @@ export class AudioGraph {
 
         // Inicialitzem els efectes
         this.initEffects();
+        
+        this.initMetronome();
+
 
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
@@ -429,14 +432,7 @@ export class AudioGraph {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
             });
-            if (this.isMetronomeEnabled()) {
-                this.initMetronome();
-                // Sonarà en el primer beat de cada compàs.
-                const beatInBar = this.mainSequencerCurrentStep % 4;
-                if (beatInBar === 0) {
-                    this.metronome.triggerAttackRelease("16n", time);
-                }
-            }
+            
         } else if (this.isPlayingArranjement()) {
             // Primer settejem la propietat arranjamentPreset de totes les estacions a -1, més tard canviarem aquest valor si hi ha clips que s'han de 
             // reproduir en aquest beat. Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
@@ -462,6 +458,13 @@ export class AudioGraph {
             // Check if we have to stop the arranjament
             if (this.mainSequencerCurrentStep >= (getCurrentSession().getArranjament().numSteps * getCurrentSession().getArranjament().beatsPerStep) -1){
                 this.transportStop();
+            }
+        }
+        if (this.isMetronomeEnabled() && this.isGraphBuilt()) {
+            // Sonarà en el primer beat de cada compàs.
+            const beatInBar = this.mainSequencerCurrentStep % 4;
+            if (beatInBar === 0) {
+                this.metronome.triggerAttackRelease("16n", time);
             }
         }
     }
