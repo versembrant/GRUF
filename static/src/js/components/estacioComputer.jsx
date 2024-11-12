@@ -74,7 +74,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
         <div className="estacio-main">
             <div className="estacio-computer-container grid gap-10 p-4">
                 <fieldset className="computer-header flex flex-row  col-start-1 row-start-1 col-span-3">
-                    <fieldset className="flex flex-row items-center gap-10" style={{width: 775}}>
+                    <fieldset className="flex flex-row items-center gap-10" style={{width: 737}}>
                         <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
                         <GrufButtonBorder text="Elimina arranjament" onClick={handleClearClips}/>      
                     </fieldset>

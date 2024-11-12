@@ -279,6 +279,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
             <div className="estacio-main grid gap-10 p-4">
+                <div className="col-start-1 row-start-1 col-span-3" style={{width:825}}></div>
                 <GrufButtonBorder className= "col-start-3 row-start-1" text="Canvia estació" onClick={() => { setEstacioSelected(undefined); }} />
                 <div className="estacio-mixer-container grid col-start-1 row-start-2 col-span-3">
                     <fieldset className=" col-start-1 row-start-1 estacio-mixer-normal-tracks">
