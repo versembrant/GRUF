@@ -203,7 +203,7 @@
     justify-content: start; 
     align-items: start; 
     //min-height: 100vh;
-    padding: 30px;
+    padding: 10px 0px 5px 0px;
 
     scrollbar-width: thin;  
     scrollbar-color: transparent transparent; 
@@ -245,15 +245,12 @@
     flex-direction: column; 
     align-items: center;
     justify-content: end; 
-    margin: 10px;
-    margin-right: 0px;
-    margin-bottom: 30px;
+    margin: 0px 0px 50px 10px;
     width: 70px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid var(--accent-color,#{$light-grey});
     height: 100%;
-    margin-top: 68px;
     position: relative;
 
     .slider-wrapper {
@@ -325,14 +322,12 @@
     flex-direction: column; 
     align-items: center;
     justify-content: end; 
-    margin: 10px;
-    margin-right: 10px;
+    margin: 0px 0px 50px 10px;
     width: 70px;
     padding: 10px; 
     border-radius: 10px; 
     border: 2px solid $light-grey; 
-    height: 100%;
-    margin-top: 68px;
+    height: 92.5%;
     position: relative;
     .slider-wrapper {
         display: flex;

@@ -278,10 +278,10 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
 
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
-            <div className="estacio-main">
-                <GrufButtonBorder text="Canvia estació" onClick={() => { setEstacioSelected(undefined); }} />
-                <div className="estacio-mixer-container">
-                    <div className="estacio-mixer-normal-tracks">
+            <div className="estacio-main grid gap-10 p-4">
+                <GrufButtonBorder className= "col-start-3 row-start-1" text="Canvia estació" onClick={() => { setEstacioSelected(undefined); }} />
+                <div className="estacio-mixer-container grid col-start-1 row-start-2 col-span-3">
+                    <fieldset className=" col-start-1 row-start-1 estacio-mixer-normal-tracks">
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
                         return (
@@ -295,8 +295,8 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             />
                         );
                     })}
-                    </div>
-                    <div className="estacio-mixer-master-columna">
+                    </fieldset>
+                    <div className="estacio-mixer-master-columna col-start-2 row-start-1">
                         <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
