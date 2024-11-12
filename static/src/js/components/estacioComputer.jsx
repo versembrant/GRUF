@@ -72,26 +72,22 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
 
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main">
-            <div className="estacio-computer-container">
-                <div className="computer-header">
-                    <GrufButtonBorder text="Canvia estació" top="44px" left="824px" onClick={() => {setEstacioSelected(undefined)}} />
-                    <div>
-                        <div style={{position:"absolute", top:35, left: 45}}>
-                            <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
-                        </div>
-                        <div style={{position:"absolute"}}>
-                        <GrufButtonBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
-                        </div>
-                    </div>
-                </div>
-                <div className="computer-widgets">
+            <div className="estacio-computer-container grid gap-10 p-4">
+                <fieldset className="computer-header flex flex-row  col-start-1 row-start-1 col-span-3">
+                    <fieldset className="flex flex-row items-center gap-10" style={{width: 775}}>
+                        <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
+                        <GrufButtonBorder text="Elimina arranjament" onClick={handleClearClips}/>      
+                    </fieldset>
+                    <GrufButtonBorder text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />
+                </fieldset>
+                <fieldset className="computer-widgets">
                     <div className="grid-computer">
                         {stepsElementsPerEstacio.map(function(stepsElements, i){
                             return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
                         })}
                     </div>
                     <SpectrumGraph />
-                </div>
+                </fieldset>
             </div>
         </div>
     </div>)
