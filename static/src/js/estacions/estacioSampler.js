@@ -24,15 +24,16 @@ const getSoundURL = (soundName) => {
 
 
 const getInitialStartValue = (numSound) => {
-    const totalSlices = 16;
+    const totalSlices = 20;
     const sliceNum = numSound % totalSlices;
-    return sliceNum * 1/totalSlices;
+    return sliceNum / totalSlices;
 }
 
 const getInitialEndValue = (numSound) => {
-    const totalSlices = 16;
+    const totalSlices = 20;
+    const sliceSpan = 5;
     const sliceNum = numSound % totalSlices;
-    return (sliceNum + 1) * 1/totalSlices;
+    return (sliceNum + sliceSpan) / totalSlices;
 }
 
 
