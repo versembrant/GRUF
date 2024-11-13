@@ -320,6 +320,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
 
 
 export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
+    const notesDescription = estacio.getParameterDescription('notes');
 
     document.notesActivades = {};
     getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
@@ -334,7 +335,7 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
     }
 
     const handleOctaveDown = (evt) => {
-        if (document.baseNote <= 12) return;
+        if (document.baseNote < 12) return;
         document.baseNote -= 12;
     }
 
@@ -345,7 +346,19 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             // Notes
             const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
             if (kbdNotes.includes(evt.key.toLowerCase())) {
-                const midiNote = document.baseNote + kbdNotes.indexOf(evt.key.toLowerCase());
+                let midiNote;
+                while (true) {
+                    midiNote = document.baseNote + kbdNotes.indexOf(evt.key.toLowerCase());
+                    if (notesDescription && midiNote < notesDescription.notaMesBaixaPermesa) {
+                        handleOctaveUp();
+                        continue;    
+                    }
+                    else if (notesDescription && midiNote > notesDescription.notaMesAltaPermesa) {
+                        handleOctaveDown();
+                        continue;
+                    }
+                    break;
+                }
                 if (evt.type === 'keydown') sendNoteOn(midiNote, 127);
                 else sendNoteOff(midiNote, 0);
             }
