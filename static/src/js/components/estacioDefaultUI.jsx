@@ -183,23 +183,21 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
         getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterDescription.nom, widgetSequenceToAppSequence(widgetSequence))
     }
 
-    const getLowestNoteForYOffset = () => {
-        // Gets the lowest midi note value in the sequence, or a sensible default to be used in the piano roll
-        if (parameterDescription.permetScrollVertical === 0) {
-            return parameterDescription.notaMesBaixaPermesa;
-        }
+    const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
+    const maxYRange = 36;
+    const doesYScroll = instrumentRange > maxYRange;
 
-        let lowestNote = 127
-        for (let i = 0; i < parameterValue.length; i++) {
-            if (parameterValue[i].n < lowestNote) {
-                lowestNote = parameterValue[i].n
-            }
-        }
-        if (lowestNote == 127) {
-            return parameterDescription.notaMesBaixaPermesa || 48
-        } else {
-            return lowestNote
-        }
+    const getLowestNoteForYOffset = () => {
+        // if the roll doesn't scroll, simply return the lowest roll
+        if (!doesYScroll) return parameterDescription.notaMesBaixaPermesa;
+
+        // else, return the lowest drawn note, if there are any notes drawn on the roll
+        // if (parameterValue && parameterValue.map(note => note.n)) return parameterValue.map(note => note.n).reduce((min, value) => Math.min(min, value));
+
+        // else, return a sensible default, if it exists
+        if (parameterDescription.notaMesBaixaTipica) return parameterDescription.notaMesBaixaTipica;
+
+        return 0;
     }
 
     return (
@@ -210,12 +208,12 @@ const PianoRollParameterDefaultWidget = ({parameterDescription, parameterValue, 
                     id={uniqueId + "_id"}
                     width="600"
                     xrange={numSteps}
-                    yrange={parameterDescription.rangDeNotesPermeses || 36}
+                    yrange={Math.min(instrumentRange, maxYRange)}
                     yoffset={getLowestNoteForYOffset()}
                     xruler={0}
                     markstart={-10}  // make it dissapear
                     markend={-10}  // make it dissapear
-                    yscroll={parameterDescription.hasOwnProperty('permetScrollVertical') ? parameterDescription.permetScrollVertical : 1}
+                    yscroll={doesYScroll ? 1 : 0} // only allow scroll when there is 'overflow'
                 ></webaudio-pianoroll>
             </div>
             <button onMouseDown={(evt)=>

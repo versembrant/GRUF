@@ -36,6 +36,21 @@ export const sample = (arr, sampleSize=1) => {
     return [...sampledItems];
 }
 
+// based on https://github.com/trekhleb/javascript-algorithms/tree/master/src/algorithms/statistics/weighted-random
+export const weightedSample = (items, weights) => {
+    if (items.length !== weights.length) throw new Error('Items and weights must be of the same size');
+    if (!items.length) throw new Error('Items must not be empty');
+
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0); // Calculate the total sum of weights.
+    const threshold = totalWeight * Math.random();
+  
+    let cumulative = 0;
+    for (let i = 0; i < items.length; i++) {
+      cumulative += weights[i];
+      if (cumulative >= threshold) return items[i];
+    }
+}
+
 export const roundToStep = (value, step) => {
     if (step === undefined || step === 0) return value;
     return Math.round(value / step) * step;
@@ -43,6 +58,59 @@ export const roundToStep = (value, step) => {
 
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+
+export const distanceToAbsolute = (distanceArray, startOffset=0) => {
+    return distanceArray.reduce((absoluteArray, distanceValue, index) => {
+        const absoluteValue = distanceValue + (absoluteArray[index]);
+        absoluteArray.push(absoluteValue);
+        return absoluteArray;
+    }, [startOffset])
+}
+
+export const absoluteToDistance = (absoluteArray) => {
+    return absoluteArray.slice(1).reduce((distanceArray, absoluteValue, index) => {
+        const distanceValue = absoluteValue - absoluteArray[index];
+        distanceArray.push(distanceValue);
+        return distanceArray;
+    }, []);
+}
+
+// the good old http://cgm.cs.mcgill.ca/~godfried/publications/banff.pdf
+export const euclid = (pulses, steps, offset=0) => {
+    if (pulses > steps) throw new Error(`More pulses (${pulses}) than steps (${steps})!`);
+
+    const bjorklundArray = Array(steps);
+	let lastTruncated = 0;
+	for (let i = 1; i <= steps; i++) {	
+		const truncatedValue = Math.floor((i * pulses)/steps);
+		const bjorklundValue = truncatedValue - lastTruncated;
+		lastTruncated = truncatedValue;
+		
+		const index = (i==steps) ? 0 : i;	// puts the last element first
+		bjorklundArray[index] = bjorklundValue;
+	}
+
+    const rotatedBjorklund = rotateArray(bjorklundArray, offset);
+    const euclidAbsolute = rotatedBjorklund.map((value, index)=>value == 1 ? value*index : undefined).filter(item=>item!==undefined);
+	const euclidArray = absoluteToDistance([...euclidAbsolute, steps]);
+	return euclidArray;
+}
+
+const rotateArray = (array, rotation) => {
+    const n = array.length;
+    const rotatedArray = Array(n);
+    
+    //	Check for sanity
+    rotation = (rotation % n + n) % n;
+    
+    for (let i = 0; i < n; i++) {
+        const element = array[i];
+        const newIndex = (i + rotation) % n;
+        rotatedArray[newIndex] = element;
+    }
+    return rotatedArray;
+}
 
 // Make sure enum value is within options
 export const ensureValueInOptions = (value, options, defaultValue) => {
@@ -373,4 +441,109 @@ export const getTonalityForSamplerLibrarySample = (soundName) => {
         }
     });
     return tonalityFound;
+}
+
+// returns an array with the index corresponding to the position on the scale
+// and the number corresponding to the Pitch Class
+export const getPCsFromScaleName = (scale) => {
+
+    const parseScale = (scale) => {
+        const rootNote = scale.slice(0, -5).toLowerCase(); 
+        const isMinor = scale.toLowerCase().includes('minor'); 
+        
+        if (!getPCOfNoteClass === undefined) {
+            throw new Error(`Root no vàlida: ${rootNote}`);
+        }
+
+        return {
+            rootPC: getPCOfNoteClass(rootNote), 
+            isMinor: isMinor                   
+        };
+    };
+
+    const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];  
+    const minorScaleIntervals = [0, 2, 3, 5, 7, 8, 10];  
+
+    const { rootPC, isMinor } = parseScale(scale);
+
+    const scaleIntervals = isMinor ? minorScaleIntervals : majorScaleIntervals;
+
+    return scaleIntervals.map(interval=>(interval+rootPC)%12);
+};
+
+const getPCOfNoteClass = noteClass => {
+    return {
+        'c': 0,  'c#': 1, 'db': 1,
+        'd': 2,  'd#': 3, 'eb': 3,
+        'e': 4,  'f': 5,  'f#': 6, 'gb': 6,
+        'g': 7,  'g#': 8, 'ab': 8,
+        'a': 9,  'a#': 10, 'bb': 10,
+        'b': 11
+    }[noteClass];
+}
+
+const ascii = a => a.charCodeAt(0);
+
+const getWhiteNote = noteClass => noteClass.slice(0,1) + noteClass.slice(1).replaceAll('#', '').replaceAll('b', '');
+
+const getScaleDegreeOfNoteClass = (noteClass, rootNoteClass) => {
+    const rootWhiteAscii = ascii(getWhiteNote(rootNoteClass));
+    const noteWhiteAscii = ascii(getWhiteNote(noteClass));
+    return noteWhiteAscii - rootWhiteAscii + (rootWhiteAscii > noteWhiteAscii ? 7 : 0);
+}
+
+const separateNoteClassAndOctave = compoundNote => {
+    return [compoundNote.slice(0, -1), compoundNote.slice(-1)]
+}
+
+const noteStrToMidi = (noteStr) => {
+    [noteClass, octave] = separateNoteClassAndOctave(noteStr);
+    return getPCOfNoteClass(noteClass) + (octave + 1) * 12;
+}
+
+export const getDiatonicInterval = (note1, note2) => {
+    const majorScaleIntervals = [0, 2, 4, 5, 7, 9, 11];
+    [noteClass1, octave1] = separateNoteClassAndOctave(note1);
+    [noteClass2, octave2] = separateNoteClassAndOctave(note2);
+    const noteClassInterval = getScaleDegreeOfNoteClass(noteClass2, 'c') - getScaleDegreeOfNoteClass(noteClass1, 'c');
+    const quantity = noteClassInterval + (octave2 - octave1) * 7;
+    const quality = (() =>{
+        const chromaticInterval = noteStrToMidi(note2) - noteStrToMidi(note1);
+        const modQuantity = Math.abs(quantity % 7);
+        const modChromaticInterval = Math.abs(chromaticInterval % 12);
+        const diff = modChromaticInterval - majorScaleIntervals[modQuantity];
+        if (diff === 1) return 'aug';
+        else if (modQuantity === 0 | modQuantity === 3 || modQuantity === 4) {
+            if (diff === 0) return 'jus';
+            if (diff === -1) return 'dim';
+            return undefined;
+        }
+        if (diff === 0) return 'maj';
+        if (diff === -1) return 'min';
+        if (diff === -2) return 'dim';
+    })();
+
+    return {quantity: quantity, quality: quality};
+}
+
+export const getDiatonicIntervalEZ = (note1, note2) => {
+    const semitoneDiff = note2 - note1;
+    const directionMultiplier = semitoneDiff < 0 ? -1 : 1; // for when it's downwards
+    const absModSemitoneDiff = Math.abs(semitoneDiff) % 12;
+    const octaveDiff = Math.floor(Math.abs(semitoneDiff) / 12);
+    const [absModQuantity, quality] = {
+        0: [0, 'per'],
+        1: [1, 'min'], 2: [1, 'maj'],
+        3: [2, 'min'], 4: [2, 'maj'],
+        5: [3, 'per'],
+        6: [4, 'dim'], 7: [4, 'per'],
+        8: [5, 'min'], 9: [5, 'maj'],
+        10: [6, 'min'], 11: [6, 'maj']
+    }[absModSemitoneDiff];
+    const quantity = directionMultiplier * (absModQuantity + 7 * octaveDiff);
+    return [quantity, quality]
+}
+
+export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
+    return midiPitch - (midiPitch % 12) + pitchClass + (midiPitch % 12 <= pitchClass ? 0 : 12);
 }

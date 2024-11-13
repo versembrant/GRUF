@@ -123,12 +123,6 @@ export class MonoSynth extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
         if (!getAudioGraphInstance().isGraphBuilt()){return;}
 
-        const notes = this.getParameterDescription('notes');
-        if (notes.hasOwnProperty('rangDeNotesPermeses')){
-            const notaMesBaixaPermesa = notes.notaMesBaixaPermesa || 0;
-            midiNoteNumber = notaMesBaixaPermesa + ((midiNoteNumber - notaMesBaixaPermesa) % notes.rangDeNotesPermeses);
-        }
-
         const recEnabled = this.recEnabled('notes') && !skipRecording;
         if (!noteOff){
             const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
