@@ -344,9 +344,10 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             if (evt.repeat) return; // If repeat event, ignore it
             // Notes
             const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
-            if (kbdNotes.includes(evt.key)) {
-                if (evt.type === 'keydown') sendNoteOn(document.baseNote + kbdNotes.indexOf(evt.key), 127);
-                else sendNoteOff(document.baseNote + kbdNotes.indexOf(evt.key), 0);
+            if (kbdNotes.includes(evt.key.toLowerCase())) {
+                const midiNote = document.baseNote + kbdNotes.indexOf(evt.key.toLowerCase());
+                if (evt.type === 'keydown') sendNoteOn(midiNote, 127);
+                else sendNoteOff(midiNote, 0);
             }
 
             // Drum pads
