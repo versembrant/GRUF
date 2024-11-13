@@ -488,7 +488,7 @@ export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth
     );
 };
 
-export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px", height="320px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
     subscribeToPresetChanges();
@@ -546,8 +546,9 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
 
                 if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
                     const noteMarker = document.createElement('div');
+                    noteMarker.className = 'noteMarker'
                     noteMarker.style.position = 'absolute';
-                    noteMarker.style.bottom = (bottomPosition + 38) + 'px';
+                    noteMarker.style.bottom = bottomPosition + 'px';
                     noteMarker.style.left = modeSampler ? '0px': '22px';
                     noteMarker.style.width = modeSampler ? '22px': '62px';
                     noteMarker.style.height = (noteHeight * 0.9) + 'px';
@@ -630,16 +631,16 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     }
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
-    const position = (top || left) ? "absolute" : "static"; // TODO: remove
     const cursorSrcUrl =  appPrefix + "/static/src/img/playhead_long.svg";
     return (
-        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left}}>
+        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
                     allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
+                    height={height.replace('px', '')}
                     grid={2}
                     xrange={numSteps}
                     yrange={Math.min(instrumentRange, maxYRange)}

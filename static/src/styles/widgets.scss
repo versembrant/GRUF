@@ -737,6 +737,8 @@
 }
 
 .gruf-piano-roll {
+    position: relative; // perquè l'overlay de noteon es dibuixi bé
+
     @keyframes blink {
         50% {
             opacity: 0.0;
