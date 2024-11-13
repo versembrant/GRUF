@@ -669,9 +669,10 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
 };
 
 export const NoteGenerator = ({ estacio, parameterName }) => {
-    const parameterDescription = estacio.getParameterDescription(parameterName);
+    subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const tonality = getAudioGraphInstance().getTonality(); 
-    
+
+    const parameterDescription = estacio.getParameterDescription(parameterName);
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
     const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
     const scalePCs = getPCsFromScaleName(tonality);
