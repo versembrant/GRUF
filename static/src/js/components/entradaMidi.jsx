@@ -56,10 +56,10 @@ const bindMidiInputDevice = (nomDevice) => {
 
 export const EntradaMidiMinimal = ({estacioSelected}) => {
 
-    document.notesActivades = {};
-    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-        document.notesActivades[nomEstacio] = new Set();
-    });
+    if (document.noteActivades === undefined) {
+        document.notesActivades = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
+    }
 
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
