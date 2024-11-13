@@ -463,7 +463,7 @@ export class AudioGraph {
         });
 
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
-        if (!data.skipTriggerEvent) {    
+        if (data.type === 'noteOn' && !data.skipTriggerEvent) {    
             const event = new CustomEvent("midiNoteOn-" + nomEstacio, { detail: {note: data.noteNumber, velocity: data.noteVelocity }});
             document.dispatchEvent(event);
         }
