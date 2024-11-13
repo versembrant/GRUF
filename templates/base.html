@@ -5,13 +5,39 @@
     <meta id="vp" name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
     window.onload = function() {
-        let minWidth = 1100;
-        if (window.innerHeight < window.innerWidth) {
-            minWidth = 1400 //screen.width/screen.height * 600 - 200;  // 800 is the height of the session
-        }
-        if (screen.width < minWidth) {
-            var mvp = document.getElementById('vp');
-            mvp.setAttribute('content','user-scalable=no,width=' + minWidth);
+
+        // Gruff session size is 1000px x 800px
+        const grufHeight = 800;
+        const grufWidth = 1060;
+
+        const isLandscape = window.innerHeight < window.innerWidth;
+        const isSmallLikePhone = window.innerHeight < 600 || window.innerWidth < 800;
+
+        
+        if (!isSmallLikePhone) {
+            if (isLandscape) {
+                // In landscape mode, we make sure that height fits the screen
+                if (window.innerHeight < grufHeight) {
+                    var mvp = document.getElementById('vp');
+                    mvp.setAttribute('content','user-scalable=no,height=' + grufHeight * 1.05);
+                }
+            } else {
+                // In portrait mode, we make sure that width fits the screen 
+                if (window.innerWidth < grufWidth) {
+                    var mvp = document.getElementById('vp');
+                    mvp.setAttribute('content','user-scalable=no,width=' + grufWidth * 1.05);
+                }
+            }
+        } else {
+            if (isLandscape) {
+                // If the device is really small and we're landscape mode, we adjust the width and height-dimension can be scrolled
+                var mvp = document.getElementById('vp');
+                mvp.setAttribute('content','user-scalable=no,width=' + grufWidth * 1.05);
+            } else {
+                // If the device is really small and we're portrait mode, we adjust the height and width-dimension can be scrolled
+                var mvp = document.getElementById('vp');
+                mvp.setAttribute('content','user-scalable=no,height=' + grufHeight * 1.05);
+            }
         }
     }
     </script>
