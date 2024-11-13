@@ -845,13 +845,20 @@
 .gruf-selector-playermode {
     padding: 0;
     margin: 0;
-    background-color: $background-color;
-    display: inline-flex;
-    width: 100px;
-    height: 30px;
-    border: 1px solid $light-grey;
-    border-radius: 8px;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .inputs {
+        background-color: $background-color;
+        display: inline-flex;
+        width: 100px;
+        height: 30px;
+        border: 1px solid $light-grey;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
 
     input {
         margin: 0;
@@ -892,6 +899,17 @@
             }
         }
     }
+
+    .labels {
+        display: flex;
+        label {
+            flex: 1;
+            font-size: 12px;
+            text-transform: capitalize;
+            text-align: center;
+        }
+    }
+    
 }
 
 .gruf-selector-patrons-grid {
