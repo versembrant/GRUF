@@ -248,7 +248,7 @@ export class EstacioSampler extends EstacioBase {
                 this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
             }
         } else {
-            this.samplePlayers[playerIndex].stop();
+            if (this.samplePlayers[playerIndex].playerMode !== 'oneshot') this.samplePlayers[playerIndex].stop();
             if (recEnabled){
                 // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
@@ -305,6 +305,10 @@ class SamplePlayer {
     set playerMode(newPlayerMode) {
         this._playerMode = newPlayerMode;
         this.tonePlayer.loop = newPlayerMode === 'loop';
+    }
+
+    get playerMode() {
+        return this._playerMode;
     }
 
     trigger(time, duration=undefined) {
