@@ -23,7 +23,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufModulDelay className="col-start-3 row-start-2 row-span-2" estacio={estacio} />
             <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
-            <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="343px" colorNotes="rgb(255, 134, 56)"/>
+            <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="327px" colorNotes="rgb(255, 134, 56)"/>
             <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="200px" estacio={estacio} parameterName={"notes"} ExtraComponent={NoteGenerator}/>
         </div>
     </div>)
