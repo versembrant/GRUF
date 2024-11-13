@@ -374,6 +374,7 @@ export const GrufToggle = ({ estacio, parameterName, top, left}) => {
 export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position
+    subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
     const parameterValue=estacio.getParameterValue(parameterName);
