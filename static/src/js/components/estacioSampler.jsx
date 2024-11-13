@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorLoopMode, GrufSeparatorLine, GrufNoteControls} from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSeparatorLine, GrufNoteControls} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 
@@ -38,7 +38,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                         {/* <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} label='Vol' /> */}
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} label='Pan' />
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' />
-                        <GrufSelectorLoopMode estacio={estacio} parameterName={`loopMode${selectedPad + 1}`} />
+                        <GrufSelectorPlayerMode estacio={estacio} parameterName={`playerMode${selectedPad + 1}`} />
                     </fieldset>
                 </fieldset>
 
