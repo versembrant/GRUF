@@ -819,17 +819,17 @@ export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     );
 };
 
-export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
-    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const playerModeOptions = estacio.getParameterDescription(parameterName).options;
     const parameterValue = estacio.getParameterValue(parameterName);
-    const inputs = loopModeOptions.map((loopModeOption, i)=> {
+    const inputs = playerModeOptions.map((playerModeOption, i)=> {
         return <input type="radio" key={i} name={parameterName}
-        value={loopModeOption} checked={loopModeOption===parameterValue}
+        value={playerModeOption} checked={playerModeOption===parameterValue}
         onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
     })
     return(
-        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
+        <fieldset className="gruf-selector-playermode">{inputs}</fieldset>
     )
     
 }

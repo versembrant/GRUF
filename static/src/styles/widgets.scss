@@ -842,7 +842,7 @@
     }
 }
 
-.gruf-selector-loopmode {
+.gruf-selector-playermode {
     padding: 0;
     margin: 0;
     background-color: $background-color;
@@ -862,10 +862,10 @@
             border-right: 1px solid $light-grey;
         }
 
-        &[value=forward]::after {
+        &[value=loop]::after {
             mask-image: url(../img/icona-forward_loop.svg);
         }
-        &[value=noLoop]::after {
+        &[value=gate]::after {
             mask-image: url(../img/icona-oneshot.svg);
         }
 
