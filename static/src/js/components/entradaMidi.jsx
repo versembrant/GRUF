@@ -350,8 +350,8 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
                 else sendNoteOff(midiNote, 0);
             }
 
-            // Drum pads
-            const padNotes = ["1", "2", "3", "4"];
+            // Drum and sampler pads
+            const padNotes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
             if (padNotes.includes(evt.key)) {
                 if (evt.type === 'keydown') sendNoteOn(padNotes.indexOf(evt.key), 127);
                 else sendNoteOff(padNotes.indexOf(evt.key), 127);
