@@ -109,7 +109,7 @@ export const NovaSessio = () => {
     const handleSubmitForm = (evt) => {
         const sessionData = {}
         sessionData.creation_timestamp = new Date().getTime();
-        sessionData.bpm = 120;
+        sessionData.bpm = 90;
         sessionData.swing = 0;
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
