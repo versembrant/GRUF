@@ -326,128 +326,46 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
         document.notesActivades[nomEstacio] = new Set();
     });
 
-    let baseNote = 60;
-    document.baseNote = baseNote;
+    document.baseNote = 60;
 
     const handleOctaveUp = (evt) => {
-        if (baseNote < 100) {
-            baseNote += 12;
-            document.baseNote = baseNote;
-        }
+        if (document.baseNote >= 100) return;
+        document.baseNote += 12;
     }
 
     const handleOctaveDown = (evt) => {
-        if (baseNote > 12) {
-            baseNote -= 12;
-            document.baseNote = baseNote;
-        }
+        if (document.baseNote <= 12) return;
+        document.baseNote -= 12;
+    }
+
+    const handleKeyEvent = (evt) => {
+        if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")) return;
+                // If typing in a text input, do not trigger MIDI events from keypress
+            if (evt.repeat) return; // If repeat event, ignore it
+            // Notes
+            const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
+            if (kbdNotes.includes(evt.key)) {
+                if (evt.type === 'keydown') sendNoteOn(document.baseNote + kbdNotes.indexOf(evt.key), 127);
+                else sendNoteOff(document.baseNote + kbdNotes.indexOf(evt.key), 0);
+            }
+
+            // Drum pads
+            const padNotes = ["1", "2", "3", "4"];
+            if (padNotes.includes(evt.key)) {
+                if (evt.type === 'keydown') sendNoteOn(padNotes.indexOf(evt.key), 127);
+                else sendNoteOff(padNotes.indexOf(evt.key), 127);
+            }
+
+            if (evt.type === 'keyup') return;
+            // Octave change
+            if (evt.key == "+") handleOctaveUp();
+            else if (evt.key == "-") handleOctaveDown();
     }
     
     if (document.inputKeyDownEventBinded === undefined){
         document.inputKeyDownEventBinded = true;
-        document.addEventListener('keydown', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOn(document.baseNote, 127);
-                } else if (evt.key == "w") {
-                    sendNoteOn(document.baseNote + 1, 127);
-                } else if (evt.key == "s") {
-                    sendNoteOn(document.baseNote + 2, 127);
-                } else if (evt.key == "e") {
-                    sendNoteOn(document.baseNote + 3, 127);
-                } else if (evt.key == "d") {
-                    sendNoteOn(document.baseNote + 4, 127);
-                } else if (evt.key == "f") {
-                    sendNoteOn(document.baseNote + 5, 127);
-                } else if (evt.key == "t") {
-                    sendNoteOn(document.baseNote + 6, 127);
-                } else if (evt.key == "g") {
-                    sendNoteOn(document.baseNote + 7, 127);
-                } else if (evt.key == "y") {
-                    sendNoteOn(document.baseNote + 8, 127);
-                } else if (evt.key == "h") {
-                    sendNoteOn(document.baseNote + 9, 127);
-                } else if (evt.key == "u") {
-                    sendNoteOn(document.baseNote + 10, 127);
-                } else if (evt.key == "j") {
-                    sendNoteOn(document.baseNote + 11, 127);
-                } else if (evt.key == "k") {
-                    sendNoteOn(document.baseNote + 12, 127);
-                } 
-
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOn(0, 127);
-                } else if (evt.key == "2") {
-                    sendNoteOn(1, 127);
-                } else if (evt.key == "3") {
-                    sendNoteOn(2, 127);
-                } else if (evt.key == "4") {
-                    sendNoteOn(3, 127);
-                }
-
-                // Octave change
-                if (evt.key == "+") {
-                    handleOctaveUp();
-                } else if (evt.key == "-") {
-                    handleOctaveDown();
-                }
-            }
-        })
-
-        document.addEventListener('keyup', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOff(document.baseNote, 0);
-                } else if (evt.key == "w") {
-                    sendNoteOff(document.baseNote + 1, 0);
-                } else if (evt.key == "s") {
-                    sendNoteOff(document.baseNote + 2, 0);
-                } else if (evt.key == "e") {
-                    sendNoteOff(document.baseNote + 3, 0);
-                } else if (evt.key == "d") {
-                    sendNoteOff(document.baseNote + 4, 0);
-                } else if (evt.key == "f") {
-                    sendNoteOff(document.baseNote + 5, 0);
-                } else if (evt.key == "t") {
-                    sendNoteOff(document.baseNote + 6, 0);
-                } else if (evt.key == "g") {
-                    sendNoteOff(document.baseNote + 7, 0);
-                } else if (evt.key == "y") {
-                    sendNoteOff(document.baseNote + 8, 0);
-                } else if (evt.key == "h") {
-                    sendNoteOff(document.baseNote + 9, 0);
-                } else if (evt.key == "u") {
-                    sendNoteOff(document.baseNote + 10, 0);
-                } else if (evt.key == "j") {
-                    sendNoteOff(document.baseNote + 11, 0);
-                } else if (evt.key == "k") {
-                    sendNoteOff(document.baseNote + 12, 0);
-                } 
-
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOff(0, 0);
-                } else if (evt.key == "2") {
-                    sendNoteOff(1, 0);
-                } else if (evt.key == "3") {
-                    sendNoteOff(2, 0);
-                } else if (evt.key == "4") {
-                    sendNoteOff(3, 0);
-                }
-            }
-        })
-    }
+        document.addEventListener('keydown', async (evt) => handleKeyEvent(evt));
+        document.addEventListener('keyup', async (evt) => handleKeyEvent(evt));
     
     return (
         <div>
