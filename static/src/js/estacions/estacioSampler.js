@@ -62,7 +62,7 @@ export class EstacioSampler extends EstacioBase {
             [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
             [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
-            [`playerMode${i + 1}`]: {type: 'enum', options: ['gate', 'loop'], initial: 'gate'}
+            [`playerMode${i + 1}`]: {type: 'enum', options: ['oneshot', 'loop'], initial: 'oneshot'}
         }), {}),
 
         lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
@@ -302,6 +302,7 @@ class SamplePlayer {
 
 
     set playerMode(newPlayerMode) {
+        this._playerMode = newPlayerMode;
         this.tonePlayer.loop = newPlayerMode === 'loop';
     }
 
@@ -313,8 +314,10 @@ class SamplePlayer {
             this.tonePlayer.start(time);
             return;
         }
-        if (!this.tonePlayer.loop) duration = Math.min(duration, this.tonePlayer.buffer.duration) // capping it on gate
-        const sampleDuration = this.tonePlayer.loop ? duration + this.release : duration; // when it's not gate, so that the note-off occurs alongside the end of the sustain phase
+        const sampleDuration =
+            this._playerMode === 'oneshot' ? this.tonePlayer.buffer.duration :
+            this._playerMode === 'loop' ? duration + this.release : // so that the note-off occurs alongside the end of the sustain phase
+            duration;
         const sustainDuration = sampleDuration - this.attack - this.decay - this.release;
         this.envelope.triggerAttackRelease(sustainDuration, time);
         this.tonePlayer.start(time, undefined, sampleDuration);
