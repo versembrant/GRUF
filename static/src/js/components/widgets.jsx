@@ -537,8 +537,15 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }
-            document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
-                let noteNumber = evt.detail.note;
+            document.addEventListener("midiNote-" + estacio.nom , (evt) => {
+                const noteNumber = evt.detail.note;
+                if (evt.detail.type == 'noteOff') {
+                    const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
+                    if (!noteMarker) return;
+                    noteMarker.remove();
+                    return;
+                }
+
                 const noteHeight = jsElement.height/jsElement.yrange;
                 let bottomPosition = noteHeight * noteNumber;
                 const canvasOffset = jsElement.yoffset*noteHeight;
@@ -547,6 +554,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                 if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
                     const noteMarker = document.createElement('div');
                     noteMarker.className = 'noteMarker'
+                    noteMarker.dataset.notenumber = noteNumber;
                     noteMarker.style.position = 'absolute';
                     noteMarker.style.bottom = bottomPosition + 'px';
                     noteMarker.style.left = modeSampler ? '0px': '22px';
@@ -559,10 +567,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     noteMarker.style.pointerEvents = 'none';
                     noteMarker.style.transition = 'opacity 1s ease-in-out;';
                     jsElement.appendChild(noteMarker);
-
-                    setTimeout(() => {
-                        noteMarker.remove();
-                    }, 500);
                 }
             })
             
