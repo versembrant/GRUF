@@ -823,13 +823,20 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
     const playerModeOptions = estacio.getParameterDescription(parameterName).options;
     const parameterValue = estacio.getParameterValue(parameterName);
-    const inputs = playerModeOptions.map((playerModeOption, i)=> {
-        return <input type="radio" key={i} name={parameterName}
+    const inputsLabels = playerModeOptions.map((playerModeOption, i)=> {
+        const inputId = useId();
+        return {
+        input: <input type="radio" key={i} id={inputId} name={parameterName}
         value={playerModeOption} checked={playerModeOption===parameterValue}
-        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>,
+        label: <label htmlFor={inputId}>{playerModeOption}</label>
+        }   
     })
     return(
-        <fieldset className="gruf-selector-playermode">{inputs}</fieldset>
+        <fieldset className="gruf-selector-playermode">
+            <div className="inputs">{inputsLabels.map(inputLabel=> inputLabel.input)}</div>
+            <div className="labels">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
+        </fieldset>
     )
     
 }
