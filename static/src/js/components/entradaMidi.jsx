@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
@@ -322,24 +323,27 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
 export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
     const notesDescription = estacio.getParameterDescription('notes');
 
-    document.notesActivades = {};
-    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-        document.notesActivades[nomEstacio] = new Set();
-    });
+    if (document.noteActivades === undefined) {
+        document.notesActivades = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
+    }
 
-    document.baseNote = 60;
+    if (document.baseNotes === undefined) {
+        document.baseNotes = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.baseNotes[nomEstacio] = 60);
+    }
 
     const handleOctaveUp = (evt) => {
-        if (document.baseNote >= 100) return;
-        document.baseNote += 12;
+        if (document.baseNotes[estacio.nom] >= 100) return;
+        document.baseNotes[estacio.nom] += 12;
     }
 
     const handleOctaveDown = (evt) => {
-        if (document.baseNote < 12) return;
-        document.baseNote -= 12;
+        if (document.baseNotes[estacio.nom] < 12) return;
+        document.baseNotes[estacio.nom] -= 12;
     }
 
-    const handleKeyEvent = (evt) => {
+    const handleKeyEvent = async (evt) => {
         if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")) return;
                 // If typing in a text input, do not trigger MIDI events from keypress
             if (evt.repeat) return; // If repeat event, ignore it
@@ -348,7 +352,7 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             if (kbdNotes.includes(evt.key.toLowerCase())) {
                 let midiNote;
                 while (true) {
-                    midiNote = document.baseNote + kbdNotes.indexOf(evt.key.toLowerCase());
+                    midiNote = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
                     if (notesDescription && midiNote < notesDescription.notaMesBaixaPermesa) {
                         handleOctaveUp();
                         continue;    
@@ -376,10 +380,15 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             else if (evt.key == "-") handleOctaveDown();
     }
     
-    if (document.inputKeyDownEventBinded === undefined){
-        document.inputKeyDownEventBinded = true;
-        document.addEventListener('keydown', async (evt) => handleKeyEvent(evt));
-        document.addEventListener('keyup', async (evt) => handleKeyEvent(evt));
+    useEffect(()=> {
+        document.addEventListener('keydown', handleKeyEvent);
+        document.addEventListener('keyup', handleKeyEvent);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyEvent);
+            document.removeEventListener('keyup', handleKeyEvent);
+        }
+    })
     
     return (
         <div>
@@ -387,4 +396,4 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} style={{display:"none"}} />
         </div>
     )
-};
+}
