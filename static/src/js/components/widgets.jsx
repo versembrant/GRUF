@@ -282,67 +282,47 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) => {
-    const [isClicked, setIsClicked] = useState(false);
-    const [isHeld, setIsHeld] = useState(false);
-    const holdTimer = useRef(null);
-    const nomEstacio = estacio.nom;
+export const GrufPad = ({ playerIndex, isSelected, setSelected, label }) => {
 
-    const handleMouseDown = (evt) => {
-        setIsClicked(true);
-        playSample(playerIndex);
-        setIsHeld(true);  // He canviar el comportament de "is held" perquè sempre soni la nota quan es toca el pad. Però com que només sona mentre el pad s'aguanta, no passa res si es clicka rapid per triar un pad
+    const handleMouseDown = () => {
+        setSelected();
+        sendNoteOn(playerIndex, 127);
+        document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    const handleMouseUp = () => {
+        document.removeEventListener('mouseup', handleMouseUp);
+        sendNoteOff(playerIndex, 0, {force: true});
     };
 
-    const handleMouseUp = (evt) => {
-        if (isHeld) {
-            clearTimeout(holdTimer.current);
-            setIsClicked(false);
-            setIsHeld(false);
-            stopSample(playerIndex);
-            onClick(playerIndex);
-        }
-    };
-
-    const playSample = async (playerIndex) => {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-        const estacio = getCurrentSession().getEstacio(nomEstacio);
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(playerIndex, Tone.now());
-        }
-    }; 
-
-    const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-        const estacio = getCurrentSession().getEstacio(nomEstacio);
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.stopSoundFromPlayer(playerIndex, Tone.now());
-        }
-    }; 
 
     return (
         <div className="gruf-pad">
             <Button
-                className={ isClicked || isSelected ? 'selected': '' }
+                className={ isSelected ? 'selected': '' }
                 onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseOut={handleMouseUp}
                 label={label}
             />
         </div>
     )
 }
 
-export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px", onPadClick, currentSelectedPad }) => {
+export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPad, setSelectedPad }) => {
+    useEffect(()=> {
+        document.addEventListener("midiNote-" + estacio.nom , (evt) => {
+            if (evt.detail.type == 'noteOff') return;
+            setSelectedPad(evt.detail.note)
+        });
+    })
+   
     return (
-        <div className="pad-grid" style={{ top: top, left: left, width: width, height:height }}>
+        <div className="pad-grid" style={{ width, height }}>
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
                     playerIndex={index}
-                    onClick={onPadClick}
-                    estacio={estacio}
-                    isSelected={currentSelectedPad===index}
+                    isSelected={selectedPad===index}
+                    setSelected={() => setSelectedPad(index)}
                     label={index + 1}
                 />
             ))}
@@ -488,7 +468,7 @@ export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth
     );
 };
 
-export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, width="500px", height="200px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px", height="320px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
     subscribeToPresetChanges();
@@ -537,8 +517,15 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }
-            document.addEventListener("midiNoteOn-" + estacio.nom , (evt) => {
-                let noteNumber = evt.detail.note;
+            document.addEventListener("midiNote-" + estacio.nom , (evt) => {
+                const noteNumber = evt.detail.note;
+                if (evt.detail.type == 'noteOff') {
+                    const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
+                    if (!noteMarker) return;
+                    noteMarker.remove();
+                    return;
+                }
+
                 const noteHeight = jsElement.height/jsElement.yrange;
                 let bottomPosition = noteHeight * noteNumber;
                 const canvasOffset = jsElement.yoffset*noteHeight;
@@ -546,8 +533,10 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
 
                 if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
                     const noteMarker = document.createElement('div');
+                    noteMarker.className = 'noteMarker'
+                    noteMarker.dataset.notenumber = noteNumber;
                     noteMarker.style.position = 'absolute';
-                    noteMarker.style.bottom = (bottomPosition + 38) + 'px';
+                    noteMarker.style.bottom = bottomPosition + 'px';
                     noteMarker.style.left = modeSampler ? '0px': '22px';
                     noteMarker.style.width = modeSampler ? '22px': '62px';
                     noteMarker.style.height = (noteHeight * 0.9) + 'px';
@@ -558,10 +547,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
                     noteMarker.style.pointerEvents = 'none';
                     noteMarker.style.transition = 'opacity 1s ease-in-out;';
                     jsElement.appendChild(noteMarker);
-
-                    setTimeout(() => {
-                        noteMarker.remove();
-                    }, 500);
                 }
             })
             
@@ -573,8 +558,18 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
             }
         }
 
-        if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
-            jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
+        const newWidgetSequence = appSequenceToWidgetSequence(parameterValue);
+        const oldWidgetSequence = jsElement.sequence;
+        if (!isequal(oldWidgetSequence, newWidgetSequence)) {
+            jsElement.sequence = newWidgetSequence.map(notaNova => {
+                const notaAntigua = oldWidgetSequence.find(nota => {
+                    return (nota.ot ?? nota.t) === (notaNova.ot ?? notaNova.t) &&
+                    (nota.og ?? nota.g) === (notaNova.og ?? notaNova.g) &&
+                    (nota.on ?? nota.n) === (notaNova.on ?? notaNova.n)
+                });
+                if (notaAntigua) return Object.assign(notaAntigua, notaNova); // perquè el widget js sàpiga que és la mateixa nota i es pugui arrosegar bé
+                return {...notaNova, f: 0};
+            });
             jsElement.redraw()
         }
         if (currentStep >= 0) {
@@ -589,7 +584,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
             't': value.b,  // time in beats
             'n': value.n,  // midi note number
             'g': value.d,  // note duration in beats
-            'f': value.s,  // note is selected
             'on': value.on,  // original note
             'ot': value.ob,  // original time
             'og': value.od,  // original duration
@@ -601,7 +595,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
             'b': value.t,  // beat position
             'n': value.n,  // midi note number
             'd': value.g,  // note duration in beats
-            's': value.f,  // note is selected
             'on': value.on,  // original note
             'ob': value.ot,  // original time
             'od': value.og,  // original duration
@@ -630,16 +623,16 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, top, left, wi
     }
 
     // Available webaudio-pianoroll attributes: https://github.com/g200kg/webaudio-pianoroll
-    const position = (top || left) ? "absolute" : "static"; // TODO: remove
     const cursorSrcUrl =  appPrefix + "/static/src/img/playhead_long.svg";
     return (
-        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden", position, top, left}}>
+        <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
                     editmode={monophonic ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
                     allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
+                    height={height.replace('px', '')}
                     grid={2}
                     xrange={numSteps}
                     yrange={Math.min(instrumentRange, maxYRange)}
@@ -819,17 +812,24 @@ export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     );
 };
 
-export const GrufSelectorLoopMode = ({estacio, parameterName, top, left}) => {
+export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
-    const loopModeOptions = estacio.getParameterDescription(parameterName).options;
+    const playerModeOptions = estacio.getParameterDescription(parameterName).options;
     const parameterValue = estacio.getParameterValue(parameterName);
-    const inputs = loopModeOptions.map((loopModeOption, i)=> {
-        return <input type="radio" key={i} name={parameterName}
-        value={loopModeOption} checked={loopModeOption===parameterValue}
-        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>
+    const inputsLabels = playerModeOptions.map((playerModeOption, i)=> {
+        const inputId = useId();
+        return {
+        input: <input type="radio" key={i} id={inputId} name={parameterName}
+        value={playerModeOption} checked={playerModeOption===parameterValue}
+        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>,
+        label: <label htmlFor={inputId}>{playerModeOption}</label>
+        }   
     })
     return(
-        <fieldset className="gruf-selector-loopmode">{inputs}</fieldset>
+        <fieldset className="gruf-selector-playermode">
+            <div className="inputs">{inputsLabels.map(inputLabel=> inputLabel.input)}</div>
+            <div className="labels">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
+        </fieldset>
     )
     
 }

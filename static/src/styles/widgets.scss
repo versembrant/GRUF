@@ -737,6 +737,8 @@
 }
 
 .gruf-piano-roll {
+    position: relative; // perquè l'overlay de noteon es dibuixi bé
+
     @keyframes blink {
         50% {
             opacity: 0.0;
@@ -842,16 +844,23 @@
     }
 }
 
-.gruf-selector-loopmode {
+.gruf-selector-playermode {
     padding: 0;
     margin: 0;
-    background-color: $background-color;
-    display: inline-flex;
-    width: 100px;
-    height: 30px;
-    border: 1px solid $light-grey;
-    border-radius: 8px;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .inputs {
+        background-color: $background-color;
+        display: inline-flex;
+        width: 100px;
+        height: 30px;
+        border: 1px solid $light-grey;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
 
     input {
         margin: 0;
@@ -862,10 +871,10 @@
             border-right: 1px solid $light-grey;
         }
 
-        &[value=forward]::after {
+        &[value=loop]::after {
             mask-image: url(../img/icona-forward_loop.svg);
         }
-        &[value=noLoop]::after {
+        &[value=oneshot]::after {
             mask-image: url(../img/icona-oneshot.svg);
         }
 
@@ -892,6 +901,17 @@
             }
         }
     }
+
+    .labels {
+        display: flex;
+        label {
+            flex: 1;
+            font-size: 12px;
+            text-transform: capitalize;
+            text-align: center;
+        }
+    }
+    
 }
 
 .gruf-selector-patrons-grid {

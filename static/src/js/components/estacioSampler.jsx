@@ -1,15 +1,11 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorLoopMode, GrufSeparatorLine, GrufNoteControls} from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSeparatorLine, GrufNoteControls} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
-import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
+import { EntradaMidiTeclatQUERTYHidden, sendNoteOn, sendNoteOff } from "./entradaMidi";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
     const [selectedPad, setSelectedPad] = useState(0);
-
-    const handlePadClick = (padIndex) => {
-        setSelectedPad(padIndex);
-    };
 
     return (
         <div key={estacio.nom} className="estacio estacio-sampler">
@@ -38,7 +34,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                         {/* <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} label='Vol' /> */}
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} label='Pan' />
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' />
-                        <GrufSelectorLoopMode estacio={estacio} parameterName={`loopMode${selectedPad + 1}`} />
+                        <GrufSelectorPlayerMode estacio={estacio} parameterName={`playerMode${selectedPad + 1}`} />
                     </fieldset>
                 </fieldset>
 
@@ -49,8 +45,8 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <GrufModulReverb className="col-start-3 row-start-1 row-span-2" estacio={estacio}/>
 
                 <fieldset className="flex gap-10 col-start-1 col-span-4 row-start-4">
-                    <GrufPadGrid estacio={estacio}  width="250px" height="333px" onPadClick={handlePadClick} currentSelectedPad={selectedPad} />
-                    <GrufPianoRoll estacio={estacio} parameterName="notes" width="550px" height="335px" colorNotes="#00e2d3" modeSampler="true"/>
+                    <GrufPadGrid estacio={estacio} width="250px" height="333px" selectedPad={selectedPad} setSelectedPad={setSelectedPad} />
+                    <GrufPianoRoll estacio={estacio} parameterName="notes" width="550px" height="333px" colorNotes="#00e2d3" modeSampler="true"/>
                     <GrufNoteControls className="modul-border flex flex-col gap-10 justify-between align-center" estacio={estacio} width="100px" parameterName={"notes"}/>
                 </fieldset>
                 
