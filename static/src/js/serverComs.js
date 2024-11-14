@@ -121,7 +121,7 @@ const onMessageFromServer = (name, data) => {
     } else if (name === 'update_master_sequencer_current_step'){
         getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
     } else if (name === 'update_parametre_audio_graph'){
-        getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(data.nom_parametre, data.valor);
+        getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(data.nom_parametre, data.valor, data.origin_socket_id);
     } else if (name === 'midi_event'){
         getAudioGraphInstance().receiveMidiEventFromServer(data.nom_estacio, data.midi_event_data);
     } 
