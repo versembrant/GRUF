@@ -472,22 +472,24 @@ export class AudioGraph {
     }
 
     updateParametreAudioGraph(nomParametre, valor) {
-        if (!getCurrentSession().localMode) {
-            // In remote mode, we send parameter update to the server and the server will send it back
-            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-            // locally before sending it to the sever and in this way the user experience is better as
-            // parameter changes are more responsive
-            if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
-                getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
-            }
-            sendMessageToServer('update_parametre_audio_graph', {session_id: getCurrentSession().getID(), nom_parametre: nomParametre, valor: valor});
-        } else {
-            // In local mode, simulate the message coming from the server and perform the actual action
-            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
+        if (getCurrentSession().localMode) {
+            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromLocal(nomParametre, valor);
+            return;
         }
+        // In remote mode, we send parameter update to the server and the server will send it back
+        // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
+        // locally before sending it to the sever and in this way the user experience is better as
+        // parameter changes are more responsive
+        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
+        sendMessageToServer('update_parametre_audio_graph', {session_id: getCurrentSession().getID(), nom_parametre: nomParametre, valor: valor, origin_socket_id: getSocketID()});
     }
 
-    receiveUpdateParametreAudioGraphFromServer(nomParametre, valor) {
+    receiveUpdateParametreAudioGraphFromLocal(nomParametre, valor) {
+        this.setParameterValue(nomParametre, valor);
+    }
+
+    receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, originSocketid) {
+        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates && originSocketid === getCurrentSession().getId()) return;
         this.setParameterValue(nomParametre, valor);
     }
 

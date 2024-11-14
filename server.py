@@ -243,7 +243,7 @@ class Session(object):
             self.update_parametre_sessio('connected_users', [])
             notifica_available_sessions()
 
-    def update_parametre_sessio(self, nom_parametre, valor, emit_msg_name='update_parametre_sessio', no_context=False):
+    def update_parametre_sessio(self, nom_parametre, valor, origin_socket_id=None, emit_msg_name='update_parametre_sessio', no_context=False):
         # NOTE: en aquest cas tenim un 'emit_msg_name' parametre perquè els paràmetres relacionat amb àudio han de fer
         # servir un nom de missatge diferent perquè el client els pugui diferenciar i tractar-los de forma diferent (encara
         # que siguin paràmetres de la sessió).
@@ -252,7 +252,7 @@ class Session(object):
         if no_context:
             socketio.emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
         else:
-            emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+            emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor, 'origin_socket_id': origin_socket_id}, to=self.room_name)
         
         # Guarda el canvi a la sessió al servidor
         self.data[nom_parametre] = valor  
@@ -561,7 +561,7 @@ def on_update_parametre_audio_graph(data):  # session_id, nom_estacio, nom_param
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_parametre_sessio(data['nom_parametre'], data['valor'], emit_msg_name='update_parametre_audio_graph')
+    s.update_parametre_sessio(data['nom_parametre'], data['valor'], origin_socket_id=data['origin_socket_id'], emit_msg_name='update_parametre_audio_graph')
 
 
 @socketio.on('update_parametre_sessio')
