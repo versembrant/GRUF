@@ -24,11 +24,12 @@ export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => 
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-export const sendNoteOff = (noteNumber, noteVelocity) => {
+export const sendNoteOff = (noteNumber, noteVelocity, extras={}) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
-        type: 'noteOff'
+        type: 'noteOff',
+        ...extras
     }
     if (document.getElementById("entradaMidiNomEstacio") === null){
         return;

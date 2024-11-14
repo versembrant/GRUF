@@ -232,12 +232,12 @@ export class EstacioSampler extends EstacioBase {
         this.samplePlayers.forEach(player => player.stop());
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()){return;}
 
         const playerIndex = midiNoteNumber % 16;
         const reducedMidiNoteNumber = playerIndex;
-        const recEnabled = this.recEnabled('notes') && !skipRecording;
+        const recEnabled = this.recEnabled('notes') && !extras.skipRecording;
         if (!noteOff){
             this.samplePlayers[playerIndex].trigger(Tone.now());
             if (recEnabled){
@@ -248,7 +248,7 @@ export class EstacioSampler extends EstacioBase {
                 this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
             }
         } else {
-            if (this.samplePlayers[playerIndex].playerMode !== 'oneshot') this.samplePlayers[playerIndex].stop();
+            if (extras.force || this.samplePlayers[playerIndex].playerMode !== 'oneshot') this.samplePlayers[playerIndex].stop();
             if (recEnabled){
                 // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
