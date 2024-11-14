@@ -282,67 +282,40 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ estacio, playerIndex, onClick, isSelected, label }) => {
-    const [isClicked, setIsClicked] = useState(false);
-    const [isHeld, setIsHeld] = useState(false);
-    const holdTimer = useRef(null);
-    const nomEstacio = estacio.nom;
+export const GrufPad = ({ playerIndex, isSelected, setSelected, label }) => {
 
-    const handleMouseDown = (evt) => {
-        setIsClicked(true);
-        playSample(playerIndex);
-        setIsHeld(true);  // He canviar el comportament de "is held" perquè sempre soni la nota quan es toca el pad. Però com que només sona mentre el pad s'aguanta, no passa res si es clicka rapid per triar un pad
+    const handleMouseDown = () => {
+        setSelected();
+        sendNoteOn(playerIndex, 127);
+        document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    const handleMouseUp = () => {
+        document.removeEventListener('mouseup', handleMouseUp);
+        sendNoteOff(playerIndex, 0, {force: true});
     };
 
-    const handleMouseUp = (evt) => {
-        if (isHeld) {
-            clearTimeout(holdTimer.current);
-            setIsClicked(false);
-            setIsHeld(false);
-            stopSample(playerIndex);
-            onClick(playerIndex);
-        }
-    };
-
-    const playSample = async (playerIndex) => {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-        const estacio = getCurrentSession().getEstacio(nomEstacio);
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.playSoundFromPlayer(playerIndex, Tone.now());
-        }
-    }; 
-
-    const stopSample = (playerIndex) => {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-        const estacio = getCurrentSession().getEstacio(nomEstacio);
-        if (estacio && estacio.playSoundFromPlayer) {
-            estacio.stopSoundFromPlayer(playerIndex, Tone.now());
-        }
-    }; 
 
     return (
         <div className="gruf-pad">
             <Button
-                className={ isClicked || isSelected ? 'selected': '' }
+                className={ isSelected ? 'selected': '' }
                 onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseOut={handleMouseUp}
                 label={label}
             />
         </div>
     )
 }
 
-export const GrufPadGrid = ({ estacio, top, left, width="200px", height="200px", onPadClick, currentSelectedPad }) => {
+export const GrufPadGrid = ({ width="200px", height="200px", selectedPad, setSelectedPad }) => {
     return (
-        <div className="pad-grid" style={{ top: top, left: left, width: width, height:height }}>
+        <div className="pad-grid" style={{ width, height }}>
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
                     playerIndex={index}
-                    onClick={onPadClick}
-                    estacio={estacio}
-                    isSelected={currentSelectedPad===index}
+                    isSelected={selectedPad===index}
+                    setSelected={() => setSelectedPad(index)}
                     label={index + 1}
                 />
             ))}

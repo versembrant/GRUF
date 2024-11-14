@@ -459,7 +459,8 @@ export class AudioGraph {
         // If a nomEstacio is provided, only send to the estacio with that name. Otherwise send to all estacions
         const targetStationsNoms = nomEstacio ? [nomEstacio] : getCurrentSession().getNomsEstacions();
         targetStationsNoms.forEach(nomEstacio => {
-                getCurrentSession().getEstacio(nomEstacio).onMidiNote(data.noteNumber, data.velocity, data.type === 'noteOff');
+                const {noteNumber, velocity, type, ...extras} = data;
+                getCurrentSession().getEstacio(nomEstacio).onMidiNote(noteNumber, velocity, type === 'noteOff', {...extras, skipRecording: false});
         });
 
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
