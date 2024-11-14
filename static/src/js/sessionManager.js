@@ -1,11 +1,10 @@
 import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { makePartial } from 'redux-partial';
-import { sendMessageToServer } from "./serverComs";
+import { sendMessageToServer, getSocketID } from "./serverComs";
 import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 import { EstacioDefaultUI } from "./components/estacioDefaultUI";
-import { getSocketID } from "../serverComs";
 
 var currentSession = undefined; 
 
