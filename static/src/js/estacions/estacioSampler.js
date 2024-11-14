@@ -227,7 +227,7 @@ export class EstacioSampler extends EstacioBase {
 
     onTransportStop() {
         // Stop all notes that are still playing
-        this.samplePlayers.forEach(player => player.stop());
+        this.samplePlayers.forEach(player => player.stop(true));
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
