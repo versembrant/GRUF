@@ -250,7 +250,7 @@ class Session(object):
         # Envia el nou paràmetre als clients connectats
         update_count_per_session[self.id] += 1
         if no_context:
-            socketio.emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor}, to=self.room_name)
+            socketio.emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor, 'origin_socket_id': origin_socket_id}, to=self.room_name)
         else:
             emit(emit_msg_name, {'update_count': update_count_per_session[self.id] ,'nom_parametre': nom_parametre, 'valor': valor, 'origin_socket_id': origin_socket_id}, to=self.room_name)
         
@@ -258,9 +258,9 @@ class Session(object):
         self.data[nom_parametre] = valor  
         self.save_to_redis()
 
-    def update_arranjament_sessio(self, update_data):
+    def update_arranjament_sessio(self, update_data, origin_socket_id=None):
         update_count_per_session[self.id] += 1
-        emit('update_arranjament_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data}, to=self.room_name)
+        emit('update_arranjament_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data, 'origin_socket_id': origin_socket_id}, to=self.room_name)
 
         # Guarda el canvi a la sessió al servidor
         if update_data['accio'] == 'add_clips':
@@ -271,9 +271,9 @@ class Session(object):
         self.data['arranjament']['clips'] = sorted(self.data['arranjament']['clips'], key=lambda c: c['beatInici'])
         self.save_to_redis()
 
-    def update_live_sessio(self, update_data):
+    def update_live_sessio(self, update_data, origin_socket_id=None):
         update_count_per_session[self.id] += 1
-        emit('update_live_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data}, to=self.room_name)
+        emit('update_live_sessio', {'update_count': update_count_per_session[self.id], 'update_data': update_data, 'origin_socket_id': origin_socket_id}, to=self.room_name)
 
         # Guarda el canvi a la sessió al servidor
         if update_data['accio'] == 'set_gains':
@@ -295,10 +295,10 @@ class Session(object):
                 self.data['live']['presetsEstacions'][nom_estacio] = valor
         self.save_to_redis()
         
-    def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset):
+    def update_parametre_estacio(self, nom_estacio, nom_parametre, valor, preset, origin_socket_id=None):
         # Envia el nou paràmetre als clients connectats
         update_count_per_session[self.id] += 1
-        emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor, 'preset': preset}, to=self.room_name)
+        emit('update_parametre_estacio', {'update_count': update_count_per_session[self.id], 'nom_estacio': nom_estacio, 'nom_parametre': nom_parametre, 'valor': valor, 'preset': preset, 'origin_socket_id': origin_socket_id}, to=self.room_name)
         
         # Guarda el canvi a la sessió al servidor
         try:
@@ -553,7 +553,7 @@ def on_update_parametre_estacio(data):  # session_id, nom_estacio, nom_parametre
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'], data['preset'])
+    s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'], data['preset'], origin_socket_id=data['origin_socket_id'])
     
 
 @socketio.on('update_parametre_audio_graph')
@@ -569,7 +569,7 @@ def on_update_parametre_sessio(data):  # session_id, nom_estacio, nom_parametre,
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_parametre_sessio(data['nom_parametre'], data['valor'])
+    s.update_parametre_sessio(data['nom_parametre'], data['valor'], origin_socket_id=data['origin_socket_id'])
 
 
 @socketio.on('update_arranjament_sessio')
@@ -577,7 +577,7 @@ def on_update_arranjament_sessio(data):  # session_id, update_data
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_arranjament_sessio(data['update_data'])
+    s.update_arranjament_sessio(data['update_data'], origin_socket_id=data['origin_socket_id'])
 
 
 @socketio.on('update_live_sessio')
@@ -585,7 +585,7 @@ def on_update_live_sessio(data):  # session_id, update_data
     s = get_session_by_id(data['session_id'])
     if s is None:
         raise Exception('Session not found')
-    s.update_live_sessio(data['update_data'])
+    s.update_live_sessio(data['update_data'], origin_socket_id=data['origin_socket_id'])
 
 
 @socketio.on('update_master_sequencer_current_step')

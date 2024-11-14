@@ -40,6 +40,8 @@ const getThrottledFuctionKey = (name, data) => {
 
 // Methods to send a message to the server
 export const sendMessageToServer = (name, data) => {
+    data.session_id = getCurrentSession().getID();
+    data.origin_socket_id = getSocketID()
     const throttledFunctionKey = getThrottledFuctionKey(name, data);
     if (throttledFunctionKey === undefined){
         // No throttle
@@ -111,13 +113,13 @@ const onMessageFromServer = (name, data) => {
     if (name === 'message'){
         console.log(data);
     } else if (name === 'update_parametre_sessio'){
-        getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor);
+        getCurrentSession().receiveUpdateParametreSessioFromServer(data.nom_parametre, data.valor, data.origin_socket_id);
     } else if (name === 'update_arranjament_sessio'){
-        getCurrentSession().receiveUpdateArranjamentFromServer(data.update_data);
+        getCurrentSession().receiveUpdateArranjamentFromServer(data.update_data, data.origin_socket_id);
     } else if (name === 'update_live_sessio'){
-        getCurrentSession().receiveUpdateLiveFromServer(data.update_data);
+        getCurrentSession().receiveUpdateLiveFromServer(data.update_data, data.origin_socket_id);
     } else if (name === 'update_parametre_estacio'){
-        getCurrentSession().getEstacio(data.nom_estacio).receiveUpdateParametreEstacioFromServer(data.nom_parametre, data.valor, data.preset);
+        getCurrentSession().getEstacio(data.nom_estacio).receiveUpdateParametreEstacioFromServer(data.nom_parametre, data.valor, data.preset, data.origin_socket_id);
     } else if (name === 'update_master_sequencer_current_step'){
         getAudioGraphInstance().receiveRemoteMainSequencerCurrentStep(data.current_step);
     } else if (name === 'update_parametre_audio_graph'){
