@@ -205,7 +205,7 @@ export class AudioGraph {
     setMainSequencerCurrentStep(currentStep) {
         this.mainSequencerCurrentStep = currentStep;
         if (this.isMasterAudioEngine() && !getCurrentSession().localMode) {
-            sendMessageToServer('update_master_sequencer_current_step', {session_id: getCurrentSession().getID(), current_step: currentStep});
+            sendMessageToServer('update_master_sequencer_current_step', {current_step: currentStep});
         }
         this.setParametreInStore('mainSequencerCurrentStep', this.mainSequencerCurrentStep);
     }
@@ -446,7 +446,7 @@ export class AudioGraph {
         if (getCurrentSession().localMode || !forwardToServer) return;
         data.origin_socket_id = getSocketID();
         console.log("Sending MIDI event to server")
-        sendMessageToServer('midi_event', {session_id: getCurrentSession().getID(), nom_estacio: nomEstacio, midi_event_data: data});
+        sendMessageToServer('midi_event', {nom_estacio: nomEstacio, midi_event_data: data});
     }
 
     receiveMidiEventFromServer(nomEstacio, data) {
@@ -472,24 +472,18 @@ export class AudioGraph {
     }
 
     updateParametreAudioGraph(nomParametre, valor) {
-        if (getCurrentSession().localMode) {
-            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromLocal(nomParametre, valor);
-            return;
+        if (getCurrentSession().localMode || getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
+            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, null);
         }
+        if (getCurrentSession().localMode) return;
         // In remote mode, we send parameter update to the server and the server will send it back
         // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
         // locally before sending it to the sever and in this way the user experience is better as
         // parameter changes are more responsive
-        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates) getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor)
-        sendMessageToServer('update_parametre_audio_graph', {session_id: getCurrentSession().getID(), nom_parametre: nomParametre, valor: valor, origin_socket_id: getSocketID()});
+        sendMessageToServer('update_parametre_audio_graph', {nom_parametre: nomParametre, valor: valor});
     }
-
-    receiveUpdateParametreAudioGraphFromLocal(nomParametre, valor) {
-        this.setParameterValue(nomParametre, valor);
-    }
-
-    receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, originSocketid) {
-        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates && originSocketid === getCurrentSession().getId()) return;
+    receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, originSocketID) {
+        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
         this.setParameterValue(nomParametre, valor);
     }
 
