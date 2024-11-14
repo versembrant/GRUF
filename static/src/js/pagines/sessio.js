@@ -18,10 +18,6 @@ const onSessionDataLoaded = () => {
 
     const isMasterAudioEngine = currentSession.localMode || sessionElement.dataset.masterAudioEngine === 'true';
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
-    getAudioGraphInstance().setBpm(currentSession.rawData.bpm);
-    getAudioGraphInstance().setSwing(currentSession.rawData.swing);
-    getAudioGraphInstance().setCompas(currentSession.rawData.compas);
-    getAudioGraphInstance().setTonality(currentSession.rawData.tonality);
 
 
     if (currentSession.rawData.effectParameters) { 

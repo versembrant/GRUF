@@ -19,7 +19,7 @@ export class AudioGraph {
         this.spectrumSize = 64;
 
         this.parametersDescription = {
-            bpm: {type: 'float', min: 40, max: 300, initial: 120},
+            bpm: {type: 'float', min: 40, max: 300, initial: 90},
             masterGain: {type: 'float', min: 0.0, max: 1.0, initial: 1.0},
             masterPan: {type: 'float', min: -1.0, max: 1.0, initial: 0.0, label: "Pan"},
             gainsEstacions: {initial: {}},
