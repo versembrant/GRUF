@@ -1127,3 +1127,40 @@
         border-radius: 15px;
     }
 }
+
+.metronome-container {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .triangle {
+    position: relative;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 18px solid white;
+  }
+  
+  .thread {
+    transform-origin: top;
+    background: black;
+    width: 0.75px;
+    height: 12px;
+    position: absolute;
+    top: 4px;
+    left: -0.3px;
+  }
+  
+  .thread.swing {
+    animation: swing 1.25s ease-in-out infinite;
+  }
+  
+  @keyframes swing {
+    0%, 100% { transform: rotate(30deg); }
+    50% { transform: rotate(-30deg); }
+  }

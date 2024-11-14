@@ -8,8 +8,8 @@ import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 import logo_gruf from "../../img/logo_gruf.svg";
-import metronome from "../../img/metronome.svg"
 import { getAudioGraphInstance } from "../audioEngine";
+import { PendulumMetronome } from "./widgets";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -63,14 +63,10 @@ const SessioHeader = ({ estacioSelected }) => {
                 {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
                 <button
                     onClick={toggleMetronome}
-                    className={`btn-petit metronome-button ${isMetronomeActive ? "active" : ""}`}
+                    className={`btn-petit ${isMetronomeActive ? "active" : ""}`}
                     title="Metronome"
-                >
-                    <img
-                        src={metronome}
-                        alt="Metronome"
-                        style={{ width: "20px", height: "20px", filter: isMetronomeActive ? "invert(100%)" : "none" }}
-                    />
+                    >
+                    <PendulumMetronome isMetronomeActive={isMetronomeActive} />
                 </button>
                 <AudioTransportPlayStop/>
             </div>

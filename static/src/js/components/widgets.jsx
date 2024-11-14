@@ -1045,3 +1045,13 @@ export const SpectrumGraph = () => {
         </div>
     )
 }
+
+export const PendulumMetronome = ({ isMetronomeActive }) => {
+    return (
+      <div className="metronome-container">
+        <div className="triangle">
+          <div className={`thread ${isMetronomeActive ? 'swing' : ''}`}></div>
+        </div>
+      </div>
+    );
+  };
