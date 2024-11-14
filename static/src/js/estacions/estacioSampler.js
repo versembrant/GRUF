@@ -160,9 +160,7 @@ export class EstacioSampler extends EstacioBase {
 
             // Actualitza els paràmetres de ADSR i Channel
             if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
-                const envelope = this.samplePlayers[index].envelope;
-                envelope[type] = value;
-                if (type !== 'sustain') this.samplePlayers[index][type] = value;
+                this.samplePlayers[index].envelope[type] = value;
             } else if (type === 'volume'|| type === 'pan') {
                 const channel = this.samplePlayers[index].channel;
                 if (type === 'volume'){
@@ -248,7 +246,7 @@ export class EstacioSampler extends EstacioBase {
                 this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
             }
         } else {
-            if (extras.force || this.samplePlayers[playerIndex].playerMode !== 'oneshot') this.samplePlayers[playerIndex].stop();
+            this.samplePlayers[playerIndex].stop(extras.force);
             if (recEnabled){
                 // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
                 const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
@@ -321,17 +319,19 @@ class SamplePlayer {
         }
         const sampleDuration =
             this._playerMode === 'oneshot' ? this.tonePlayer.buffer.duration :
-            this._playerMode === 'loop' ? duration + this.release : // so that the note-off occurs alongside the end of the sustain phase
+            this._playerMode === 'loop' ? duration + this.envelope.release : // so that the note-off occurs alongside the end of the sustain phase
             duration;
-        const sustainDuration = sampleDuration - this.attack - this.decay - this.release;
+        const sustainDuration = sampleDuration - this.envelope.release; // not the duration of the sustain phase, but the time between 'noteon' and 'noteoff'
+        if (sustainDuration < 0) console.warn(`Negative sustain duration (${sustainDuration}) on sampleplayer. This will result in janky behavior`); // TODO: posar límits en la quantitat d'ADSR
         this.envelope.triggerAttackRelease(sustainDuration, time);
         this.tonePlayer.start(time, undefined, sampleDuration);
     }
 
-    stop(time) {
+    stop(force=false) {
         if (!this.tonePlayer.buffer.loaded) return;
-        this.tonePlayer.stop(time + this.release);
-        this.envelope.triggerRelease(time);
+        if (!force && this.playerMode === 'oneshot') return;
+        this.tonePlayer.stop(Tone.now() + this.envelope.release);
+        this.envelope.triggerRelease();
     }
 
     _makeSlicedBuffer() {
