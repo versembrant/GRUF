@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessage } from "../midi";
@@ -23,11 +24,12 @@ export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => 
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-export const sendNoteOff = (noteNumber, noteVelocity) => {
+export const sendNoteOff = (noteNumber, noteVelocity, extras={}) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
-        type: 'noteOff'
+        type: 'noteOff',
+        ...extras
     }
     if (document.getElementById("entradaMidiNomEstacio") === null){
         return;
@@ -53,220 +55,12 @@ const bindMidiInputDevice = (nomDevice) => {
     })
 }
 
-
-export const EntradaMidi = ({estacioSelected}) => {
-
-    let baseNote = 60;
-    document.baseNote = baseNote;
-
-    const getMidiNoteNoteNumber = buttonElement => {
-        if (buttonElement.dataset.midiNote !== undefined) {
-            return baseNote + parseInt(buttonElement.dataset.midiNote, 10);
-        } else {
-            return parseInt(buttonElement.dataset.midiPad, 10);
-        }
-    }
-
-    const handleKeyDown = async (evt) => {
-        sendNoteOn(getMidiNoteNoteNumber(evt.target), 127);
-    }
-
-    const handleKeyUp = async (evt) => {  
-        sendNoteOff(getMidiNoteNoteNumber(evt.target), 127);
-    }
-
-    const handleOctaveUp = (evt) => {
-        baseNote += 12;
-        document.baseNote = baseNote;
-    }
-
-    const handleOctaveDown = (evt) => {
-        baseNote -= 12;
-        document.baseNote = baseNote;
-    }
-
-    document.notesActivades = {};
-    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-        document.notesActivades[nomEstacio] = new Set();
-    });
-
-    if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
-        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
-    }
-
-    const panic = () => {
-        // Sends a note off for all active notes in all devices
-        for (let nomEstacio in document.notesActivades) {
-            document.notesActivades[nomEstacio].forEach((noteNumber) => {
-                const messageData =  {
-                    noteNumber: noteNumber,
-                    velocity: 0,
-                    type: 'noteOff'
-                }
-                document.notesActivades[nomEstacio].delete(noteNumber);
-                getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
-            });
-        }
-    }
-
-    if (document.inputKeyDownEventBinded === undefined){
-        document.inputKeyDownEventBinded = true;
-        document.addEventListener('keydown', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOn(0, 127);
-                } else if (evt.key == "2") {
-                    sendNoteOn(1, 127);
-                } else if (evt.key == "3") {
-                    sendNoteOn(2, 127);
-                } else if (evt.key == "4") {
-                    sendNoteOn(3, 127);
-                }
-
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOn(document.baseNote, 127);
-                } else if (evt.key == "w") {
-                    sendNoteOn(document.baseNote + 1, 127);
-                } else if (evt.key == "s") {
-                    sendNoteOn(document.baseNote + 2, 127);
-                } else if (evt.key == "e") {
-                    sendNoteOn(document.baseNote + 3, 127);
-                } else if (evt.key == "d") {
-                    sendNoteOn(document.baseNote + 4, 127);
-                } else if (evt.key == "f") {
-                    sendNoteOn(document.baseNote + 5, 127);
-                } else if (evt.key == "t") {
-                    sendNoteOn(document.baseNote + 6, 127);
-                } else if (evt.key == "g") {
-                    sendNoteOn(document.baseNote + 7, 127);
-                } else if (evt.key == "y") {
-                    sendNoteOn(document.baseNote + 8, 127);
-                } else if (evt.key == "h") {
-                    sendNoteOn(document.baseNote + 9, 127);
-                } else if (evt.key == "u") {
-                    sendNoteOn(document.baseNote + 10, 127);
-                } else if (evt.key == "j") {
-                    sendNoteOn(document.baseNote + 11, 127);
-                } else if (evt.key == "k") {
-                    sendNoteOn(document.baseNote + 12, 127);
-                } 
-            }
-        })
-
-        document.addEventListener('keyup', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOff(0, 0);
-                } else if (evt.key == "2") {
-                    sendNoteOff(1, 0);
-                } else if (evt.key == "3") {
-                    sendNoteOff(2, 0);
-                } else if (evt.key == "4") {
-                    sendNoteOff(3, 0);
-                }
-
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOff(document.baseNote, 0);
-                } else if (evt.key == "w") {
-                    sendNoteOff(document.baseNote + 1, 0);
-                } else if (evt.key == "s") {
-                    sendNoteOff(document.baseNote + 2, 0);
-                } else if (evt.key == "e") {
-                    sendNoteOff(document.baseNote + 3, 0);
-                } else if (evt.key == "d") {
-                    sendNoteOff(document.baseNote + 4, 0);
-                } else if (evt.key == "f") {
-                    sendNoteOff(document.baseNote + 5, 0);
-                } else if (evt.key == "t") {
-                    sendNoteOff(document.baseNote + 6, 0);
-                } else if (evt.key == "g") {
-                    sendNoteOff(document.baseNote + 7, 0);
-                } else if (evt.key == "y") {
-                    sendNoteOff(document.baseNote + 8, 0);
-                } else if (evt.key == "h") {
-                    sendNoteOff(document.baseNote + 9, 0);
-                } else if (evt.key == "u") {
-                    sendNoteOff(document.baseNote + 10, 0);
-                } else if (evt.key == "j") {
-                    sendNoteOff(document.baseNote + 11, 0);
-                } else if (evt.key == "k") {
-                    sendNoteOff(document.baseNote + 12, 0);
-                } 
-            }
-        })
-    }
-    
-    return (
-        <div>
-            <h2>Entrada MIDI</h2>
-            <div style={{display:"none"}}>
-                Enviar a estació: 
-                <select 
-                    id="entradaMidiNomEstacio"
-                    defaultValue={estacioSelected}>
-                    {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <option key={nomEstacio} value={nomEstacio}>{nomEstacio}</option>)}
-                </select>
-            </div>
-            <div>
-                <label>Enviar al servidor: <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} /></label>
-            </div>
-            <div>
-                <button data-midi-pad="0" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #1</button>
-                <button data-midi-pad="1" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #2</button>
-                <button data-midi-pad="2" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #3</button>
-                <button data-midi-pad="3" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>Pad #4</button>
-            </div>
-            <div>
-                <button data-midi-note="0" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>C</button>
-                <button data-midi-note="2" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>D</button>
-                <button data-midi-note="4" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>E</button>
-                <button data-midi-note="5" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>F</button>
-                <button data-midi-note="7" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>G</button>
-                <button data-midi-note="9" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>A</button>
-                <button data-midi-note="11" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>B</button>
-                <button data-midi-note="12" onMouseDown={handleKeyDown} onMouseUp={handleKeyUp} onMouseLeave={handleKeyUp}>C</button>
-                <button onClick={handleOctaveDown}>Octave down</button>
-                <button onClick={handleOctaveUp}>Octave up</button>
-            </div>
-            <div>Pots tocar els pads amb les tecles 1, 2, 3, 4. Pots tocar el "piano" amb les tecles a, w, s, e, d...</div>
-            {isWebMidiEnabled() && 
-                <div>
-                    <select
-                        defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
-                        onChange={async (evt) => {
-                            localStorage.setItem("lastMidiInputDevice", evt.target.value);
-                            bindMidiInputDevice(evt.target.value);
-                        }}>
-                        <option value="cap">Cap</option>
-                        {getAvailableMidiInputNames().map((nomDevice, i) => <option key={nomDevice} value={nomDevice}>{nomDevice}</option>)}
-                    </select>
-                </div>
-            }
-            <div>
-                <button onClick={panic}>Panic</button>
-            </div>
-        </div>
-    )
-};
-
 export const EntradaMidiMinimal = ({estacioSelected}) => {
 
-    document.notesActivades = {};
-    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-        document.notesActivades[nomEstacio] = new Set();
-    });
+    if (document.noteActivades === undefined) {
+        document.notesActivades = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
+    }
 
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
@@ -320,134 +114,74 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
 
 
 export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
+    const notesDescription = estacio.getParameterDescription('notes');
 
-    document.notesActivades = {};
-    getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-        document.notesActivades[nomEstacio] = new Set();
-    });
+    if (document.noteActivades === undefined) {
+        document.notesActivades = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
+    }
 
-    let baseNote = 60;
-    document.baseNote = baseNote;
+    if (document.baseNotes === undefined) {
+        document.baseNotes = {};
+        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.baseNotes[nomEstacio] = 60);
+    }
 
     const handleOctaveUp = (evt) => {
-        if (baseNote < 100) {
-            baseNote += 12;
-            document.baseNote = baseNote;
-        }
+        if (document.baseNotes[estacio.nom] >= 100) return;
+        document.baseNotes[estacio.nom] += 12;
     }
 
     const handleOctaveDown = (evt) => {
-        if (baseNote > 12) {
-            baseNote -= 12;
-            document.baseNote = baseNote;
-        }
+        if (document.baseNotes[estacio.nom] < 12) return;
+        document.baseNotes[estacio.nom] -= 12;
+    }
+
+    const handleKeyEvent = async (evt) => {
+        if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")) return;
+                // If typing in a text input, do not trigger MIDI events from keypress
+            if (evt.repeat) return; // If repeat event, ignore it
+            // Notes
+            const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
+            if (kbdNotes.includes(evt.key.toLowerCase())) {
+                let midiNote;
+                while (true) {
+                    midiNote = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
+                    if (notesDescription && midiNote < notesDescription.notaMesBaixaPermesa) {
+                        handleOctaveUp();
+                        continue;    
+                    }
+                    else if (notesDescription && midiNote > notesDescription.notaMesAltaPermesa) {
+                        handleOctaveDown();
+                        continue;
+                    }
+                    break;
+                }
+                if (evt.type === 'keydown') sendNoteOn(midiNote, 127);
+                else sendNoteOff(midiNote, 0);
+            }
+
+            // Drum and sampler pads
+            const padNotes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+            if (padNotes.includes(evt.key)) {
+                if (evt.type === 'keydown') sendNoteOn(padNotes.indexOf(evt.key), 127);
+                else sendNoteOff(padNotes.indexOf(evt.key), 127);
+            }
+
+            if (evt.type === 'keyup') return;
+            // Octave change
+            if (evt.key == "+") handleOctaveUp();
+            else if (evt.key == "-") handleOctaveDown();
     }
     
-    if (document.inputKeyDownEventBinded === undefined){
-        document.inputKeyDownEventBinded = true;
-        document.addEventListener('keydown', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOn(document.baseNote, 127);
-                } else if (evt.key == "w") {
-                    sendNoteOn(document.baseNote + 1, 127);
-                } else if (evt.key == "s") {
-                    sendNoteOn(document.baseNote + 2, 127);
-                } else if (evt.key == "e") {
-                    sendNoteOn(document.baseNote + 3, 127);
-                } else if (evt.key == "d") {
-                    sendNoteOn(document.baseNote + 4, 127);
-                } else if (evt.key == "f") {
-                    sendNoteOn(document.baseNote + 5, 127);
-                } else if (evt.key == "t") {
-                    sendNoteOn(document.baseNote + 6, 127);
-                } else if (evt.key == "g") {
-                    sendNoteOn(document.baseNote + 7, 127);
-                } else if (evt.key == "y") {
-                    sendNoteOn(document.baseNote + 8, 127);
-                } else if (evt.key == "h") {
-                    sendNoteOn(document.baseNote + 9, 127);
-                } else if (evt.key == "u") {
-                    sendNoteOn(document.baseNote + 10, 127);
-                } else if (evt.key == "j") {
-                    sendNoteOn(document.baseNote + 11, 127);
-                } else if (evt.key == "k") {
-                    sendNoteOn(document.baseNote + 12, 127);
-                } 
+    useEffect(()=> {
+        document.addEventListener('keydown', handleKeyEvent);
+        document.addEventListener('keyup', handleKeyEvent);
 
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOn(0, 127);
-                } else if (evt.key == "2") {
-                    sendNoteOn(1, 127);
-                } else if (evt.key == "3") {
-                    sendNoteOn(2, 127);
-                } else if (evt.key == "4") {
-                    sendNoteOn(3, 127);
-                }
-
-                // Octave change
-                if (evt.key == "+") {
-                    handleOctaveUp();
-                } else if (evt.key == "-") {
-                    handleOctaveDown();
-                }
-            }
-        })
-
-        document.addEventListener('keyup', async (evt) => {
-            if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")){
-                // If typing in a text input, do not trigger MIDI events from keypress
-            } else if (evt.repeat) {
-                // If repeat event, ignore it
-            } else {
-                // Notes
-                if (evt.key == "a") {
-                    sendNoteOff(document.baseNote, 0);
-                } else if (evt.key == "w") {
-                    sendNoteOff(document.baseNote + 1, 0);
-                } else if (evt.key == "s") {
-                    sendNoteOff(document.baseNote + 2, 0);
-                } else if (evt.key == "e") {
-                    sendNoteOff(document.baseNote + 3, 0);
-                } else if (evt.key == "d") {
-                    sendNoteOff(document.baseNote + 4, 0);
-                } else if (evt.key == "f") {
-                    sendNoteOff(document.baseNote + 5, 0);
-                } else if (evt.key == "t") {
-                    sendNoteOff(document.baseNote + 6, 0);
-                } else if (evt.key == "g") {
-                    sendNoteOff(document.baseNote + 7, 0);
-                } else if (evt.key == "y") {
-                    sendNoteOff(document.baseNote + 8, 0);
-                } else if (evt.key == "h") {
-                    sendNoteOff(document.baseNote + 9, 0);
-                } else if (evt.key == "u") {
-                    sendNoteOff(document.baseNote + 10, 0);
-                } else if (evt.key == "j") {
-                    sendNoteOff(document.baseNote + 11, 0);
-                } else if (evt.key == "k") {
-                    sendNoteOff(document.baseNote + 12, 0);
-                } 
-
-                // Drum pads
-                if (evt.key == "1") {
-                    sendNoteOff(0, 0);
-                } else if (evt.key == "2") {
-                    sendNoteOff(1, 0);
-                } else if (evt.key == "3") {
-                    sendNoteOff(2, 0);
-                } else if (evt.key == "4") {
-                    sendNoteOff(3, 0);
-                }
-            }
-        })
-    }
+        return () => {
+            document.removeEventListener('keydown', handleKeyEvent);
+            document.removeEventListener('keyup', handleKeyEvent);
+        }
+    })
     
     return (
         <div>
@@ -455,4 +189,4 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} style={{display:"none"}} />
         </div>
     )
-};
+}

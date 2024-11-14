@@ -345,7 +345,7 @@ export class EstacioBase {
         // Called at each tick (16th note) of the main sequencer so the station can trigger notes, etc.
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, skipRecording=false) {
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         // Called everytime a note message is received from a live stream of notes (could be MIDI input or virtual input
         // noteOff = boolean which will be true if the message is a noteOff
     }
