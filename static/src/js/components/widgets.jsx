@@ -551,8 +551,18 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             }
         }
 
-        if (!isequal(jsElement.sequence, appSequenceToWidgetSequence(parameterValue))) {
-            jsElement.sequence = appSequenceToWidgetSequence(parameterValue)
+        const newWidgetSequence = appSequenceToWidgetSequence(parameterValue);
+        const oldWidgetSequence = jsElement.sequence;
+        if (!isequal(oldWidgetSequence, newWidgetSequence)) {
+            jsElement.sequence = newWidgetSequence.map(notaNova => {
+                const notaAntigua = oldWidgetSequence.find(nota => {
+                    return (nota.ot ?? nota.t) === (notaNova.ot ?? notaNova.t) &&
+                    (nota.og ?? nota.g) === (notaNova.og ?? notaNova.g) &&
+                    (nota.on ?? nota.n) === (notaNova.on ?? notaNova.n)
+                });
+                if (notaAntigua) return Object.assign(notaAntigua, notaNova); // perquè el widget js sàpiga que és la mateixa nota i es pugui arrosegar bé
+                return {...notaNova, f: 0};
+            });
             jsElement.redraw()
         }
         if (currentStep >= 0) {
@@ -567,7 +577,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             't': value.b,  // time in beats
             'n': value.n,  // midi note number
             'g': value.d,  // note duration in beats
-            'f': value.s,  // note is selected
             'on': value.on,  // original note
             'ot': value.ob,  // original time
             'og': value.od,  // original duration
@@ -579,7 +588,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             'b': value.t,  // beat position
             'n': value.n,  // midi note number
             'd': value.g,  // note duration in beats
-            's': value.f,  // note is selected
             'on': value.on,  // original note
             'ob': value.ot,  // original time
             'od': value.og,  // original duration
