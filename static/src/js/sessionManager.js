@@ -5,6 +5,7 @@ import { sendMessageToServer } from "./serverComs";
 import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
 import { EstacioDefaultUI } from "./components/estacioDefaultUI";
+import { getSocketID } from "../serverComs";
 
 var currentSession = undefined; 
 
