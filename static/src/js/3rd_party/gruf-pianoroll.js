@@ -467,7 +467,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             if(t1>t2)
                 t=t1,t1=t2,t2=t;
             while(e){
-                if(e.t>=t1 && e.t<t2 && e.n>=n1 && e.n <= n2)
+                if(e.t+e.g>=t1 && e.t<t2 && e.n>=n1 && e.n <= n2)
                     e.f=1;
                 else
                     e.f=0;
