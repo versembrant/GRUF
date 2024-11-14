@@ -307,7 +307,14 @@ export const GrufPad = ({ playerIndex, isSelected, setSelected, label }) => {
     )
 }
 
-export const GrufPadGrid = ({ width="200px", height="200px", selectedPad, setSelectedPad }) => {
+export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPad, setSelectedPad }) => {
+    useEffect(()=> {
+        document.addEventListener("midiNote-" + estacio.nom , (evt) => {
+            if (evt.detail.type == 'noteOff') return;
+            setSelectedPad(evt.detail.note)
+        });
+    })
+   
     return (
         <div className="pad-grid" style={{ width, height }}>
             {Array.from({ length: 16 }).map((_, index) => (
