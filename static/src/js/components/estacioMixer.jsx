@@ -124,7 +124,7 @@ export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
     };
 
     return (
-        <div className="gruf-master-gain-slider-vertical" style={style}>
+        <div className="gruf-gain-slider-vertical" style={style}>
             <Slider
                 orientation="vertical"
                 value={masterGain}
@@ -208,22 +208,22 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
     const isMute = isDirectMute || isIndirectMute;
     return (
         <div key={estacio.nom} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
-            <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
-
-            <div className="slider-wrapper">
-                <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
-                <GrufGainMeter
-                    id={`meter-${estacio.nom}`}
-                    isMute={isMute}
-                    levelData={levelData}
-                />
+            <div className="track-controls">
+                <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
+                <div className="slider-wrapper">
+                    <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
+                    <GrufGainMeter
+                        id={`meter-${estacio.nom}`}
+                        isMute={isMute}
+                        levelData={levelData}
+                    />
+                </div>
+                <div className="mute-solo-container">
+                    <GrufMuteCheckbox estacio={estacio} setIsDirectMute={setIsDirectMute} isIndirectMute={isIndirectMute}/>
+                    <GrufSoloCheckbox estacio={estacio} changeSoloState={changeSoloState} />
+                </div>
             </div>
-
-            <div className="mute-solo-container">
-                <GrufMuteCheckbox estacio={estacio} setIsDirectMute={setIsDirectMute} isIndirectMute={isIndirectMute}/>
-                <GrufSoloCheckbox estacio={estacio} changeSoloState={changeSoloState} />
-            </div>
-            <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
+            <GrufLabelEstacio className= 'label'estacio={estacio}/>
         </div>
     )
 }
@@ -242,9 +242,9 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
 
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
-            <div className="estacio-main">
+            <div className="estacio-main p-4 flex flex-col justify-between">
                 <GrufLogoEstacio tipusEstacio='mixer' setEstacioSelected={setEstacioSelected}/>
-                <div className="estacio-mixer-container">
+                <div className="estacio-mixer-tracks">
                     <div className="estacio-mixer-normal-tracks">
                     {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
                         const estacio = getCurrentSession().getEstacio(nomEstacio);
@@ -260,12 +260,14 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                     })}
                     </div>
                     <div className="estacio-mixer-columna estacio-mixer-master-columna">
-                        <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
-                        <div className="slider-wrapper">
-                        <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                        <GrufMasterMeter showLevelMeters={showLevelMeters} />
+                        <div className="track-controls">
+                            <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
+                            <div className="slider-wrapper">
+                                <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                                <GrufMasterMeter showLevelMeters={showLevelMeters} />
+                            </div>
                         </div>
-                        <div className="master-label">Master</div>
+                        <div className="label">Master</div>
                     </div>
                 </div>
             </div>
