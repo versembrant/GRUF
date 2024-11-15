@@ -7,7 +7,7 @@ import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
-import { GrufButtonBorder } from "../components/widgets";
+import { GrufButtonBorder, GrufLogoEstacio } from "../components/widgets";
 import logo_gruf from "../../img/logo_gruf.svg"
 
 const Estacio = ({estacio, setEstacioSelected}) => {
@@ -46,13 +46,13 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 // removeURLParam('e');
 
 const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
+    const tipusEstacio = estacioSelected === undefined ? undefined : ['mixer', 'computer'].includes(estacioSelected) ? estacioSelected : getCurrentSession().getEstacio(estacioSelected).tipus;
     return(
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center">
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
-                {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
-                {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
+                {estacioSelected === undefined || <GrufLogoEstacio tipusEstacio={tipusEstacio}/> }
                 {estacioSelected === undefined || <GrufButtonBorder text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />}
                 <AudioTransportPlayStop/>
             </div>

@@ -44,6 +44,12 @@ export const createRecordingHandler = (estacio, parameterDescription) => {
     return { recordingElementId, toggleRecording };
 };
 
+export const GrufLogoEstacio = ({tipusEstacio}) => {
+    return(
+        <div className={`estacio-${tipusEstacio}-logo`}></div>
+    )
+}
+
 export const GrufSeparatorLine = () => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg"
