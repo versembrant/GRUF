@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSelectorPresets, GrufSelectorPresets, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufKnob, GrufLogoEstacio, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
@@ -27,8 +27,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 {/* Módul de Reverb */}
                 <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
-                {/* Botó de canviar estació */}
-                <GrufButtonBorder className="col-start-3 row-start-1" style={{width: 100, height: 50}} text="Canvia estació" onClick={() => { setEstacioSelected(undefined) }}/>
+                <GrufLogoEstacio className="col-start-3 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
 
 
                 <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="150px" estacio={estacio} ExtraComponent={GrufSelectorPatronsGrid} width="400px" parameterName={"pattern"}/>

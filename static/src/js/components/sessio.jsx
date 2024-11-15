@@ -1,6 +1,6 @@
 import { useState, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
-import { AudioTransportPlayStop } from "../components/audioTransport";
+import { AudioTransportPlayStop, PlayArranjamentButton } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
@@ -44,14 +44,13 @@ const onEstacioNoDisponible = (nomEstacio) => {
 let estacioSelectedURLParam = getURLParamValue('e', undefined);
 // removeURLParam('e');
 
-const SessioHeader = ({ estacioSelected }) => {
+const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
     return(
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
-                {estacioSelected == "mixer" || estacioSelected == "computer" ?  <div className={`estacio-${estacioSelected}-logo`}></div>: ""}
-                {estacioSelected != undefined && estacioSelected != "computer" && estacioSelected != "mixer" ?  <div className={"estacio-" + getCurrentSession().getEstacio(estacioSelected).tipus + "-logo"}></div>: ""}
+                {estacioSelected === "computer" && <PlayArranjamentButton />}
                 <AudioTransportPlayStop/>
             </div>
         </div>
@@ -123,7 +122,7 @@ export const Sessio = () => {
         <div className="sessio-wrapper">
             <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
             <div className="sessio">
-                <SessioHeader estacioSelected={estacioSelected} />
+                <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
                 {estacioSelected ? <EstacioUI estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/> : <SelectorEstacions setEstacioSelected={setEstacioSelected}/>}
                 <SessioFooter />
             </div>

@@ -44,6 +44,12 @@ export const createRecordingHandler = (estacio, parameterDescription) => {
     return { recordingElementId, toggleRecording };
 };
 
+export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected, className=""}) => {
+    return(
+        <button className={`logo-estacio estacio-${tipusEstacio}-logo ${className}`} onClick={() => setEstacioSelected(undefined)}></button>
+    )
+}
+
 export const GrufSeparatorLine = () => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -95,9 +101,9 @@ export const GrufLabelEstacio = ({ estacio, className }) => {
     );
 };
 
-export const GrufButtonNoBorder = ({text, top, left, onClick}) => {
+export const GrufButtonNoBorder = ({text, style, onClick}) => {
     return (
-        <button className="btn-gruf no-border" onClick={onClick} style={{top: top, left: left}}>
+        <button className="btn-gruf no-border" onClick={onClick} style={style}>
             {text}
         </button>
     )

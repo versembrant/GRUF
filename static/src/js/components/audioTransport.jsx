@@ -82,3 +82,15 @@ export const AudioTransportPlayStop = () => {
     )
 };
 
+export const PlayArranjamentButton = () => {
+    return(
+        <button disabled={!getAudioGraphInstance().isGraphBuilt()}
+        className="btn-petit"
+        onClick={handlePlayArranjementButton}>
+        {getAudioGraphInstance().isPlaying() ?
+            <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/>
+        : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}
+        </button>
+    )
+}
+

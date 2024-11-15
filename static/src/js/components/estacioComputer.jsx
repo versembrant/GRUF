@@ -1,8 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { handlePlayArranjementButton } from "../components/audioTransport";
-import { GrufButtonNoBorder, SpectrumGraph } from "../components/widgets";
+import { GrufButtonNoBorder, SpectrumGraph, GrufLogoEstacio } from "../components/widgets";
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -71,26 +70,17 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     }
 
     return (<div key="computer1" className="estacio estacio-computer">
-        <div className="estacio-main">
-            <div className="estacio-computer-container">
-                <div className="computer-header">
-                    <GrufButtonNoBorder text="Canvia estació" top="44px" left="824px" onClick={() => {setEstacioSelected(undefined)}} />
-                    <div>
-                        <div style={{position:"absolute", top:35, left: 45}}>
-                            <button disabled={!getAudioGraphInstance().isGraphBuilt()} className="btn-petit" style={{height:35, padding: "8px 10px"}} onClick={handlePlayArranjementButton}>{getAudioGraphInstance().isPlaying() ? <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/> : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}</button>
-                        </div>
-                        <GrufButtonNoBorder text="Elimina arranjament" top="42px" left="110px" onClick={handleClearClips}/>  
-                    </div>
-                </div>
-                <div className="computer-widgets">
-                    <div className="grid-computer">
-                        {stepsElementsPerEstacio.map(function(stepsElements, i){
-                            return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
-                        })}
-                    </div>
-                    <SpectrumGraph />
+        <div className="estacio-main p-4 flex flex-col gap-10 items-center">
+            <GrufLogoEstacio tipusEstacio='computer' setEstacioSelected={setEstacioSelected}/>
+            <div className="modul-border flex flex-col gap-10 p-4">
+                <GrufButtonNoBorder text="Elimina arranjament" style={{alignSelf: 'flex-end', padding: 0}} onClick={handleClearClips}/>  
+                <div className="grid-computer">
+                    {stepsElementsPerEstacio.map(function(stepsElements, i){
+                        return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
+                    })}
                 </div>
             </div>
+            <SpectrumGraph />
         </div>
     </div>)
 };

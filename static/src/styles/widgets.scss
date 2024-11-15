@@ -1,3 +1,47 @@
+.logo-estacio {
+    font-size: 14px;
+    font-weight: 400;
+    width: 100%;
+    padding: 0;
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 35px;
+
+    &.estacio-computer-logo {
+        width: 130px;
+        align-self: flex-end;
+        flex: none;
+        background-image: url("../img/computer_logo.svg");
+    }
+    &.estacio-piano-logo {
+        background-image: url("../img/piano_logo.svg");
+    }
+    &.estacio-groovebox-logo {
+        background-image: url("../img/groovebox_logo.svg");
+    }
+    &.estacio-synth-logo {
+        background-image: url("../img/synth_logo.svg");
+    }
+    &.estacio-sampler-logo {
+        background-image: url("../img/sampler_logo.svg");
+    }
+    &.estacio-mixer-logo {
+        width: 130px;
+        align-self: flex-end;
+        background-image: url("../img/mixer_logo.svg");
+    }
+    &.estacio-synth_bass-logo {
+        background-image: url("../img/synth_bass_logo.svg");
+    }
+    &:hover {
+        background: none;
+        &::after {
+            content: "Canvia estació";
+        }
+    }
+}
+
 .gruf-label {
     position: absolute;
     font-size: 14px;
@@ -10,17 +54,6 @@
 
 .transformed {
     transform: rotate(-90deg);
-}
-
-.gruf-button-no-border {
-    font-family: "Montserrat", sans-serif;
-    border: none;
-    background-color: transparent;
-    position: absolute;
-    font-size: 14px;
-    font-weight: 400;
-    color: $white;
-    cursor: pointer;
 }
 
 .knob, .gruf-slider {
@@ -336,89 +369,6 @@
     display: inline-flex;
     justify-content: center;
     margin-top: 10px ;
-
-    &.gruf-slider-background-ratllat {
-        background-image: url("../img/slider_bg.svg");
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
-
-    .p-slider {
-        cursor: pointer;
-    }
-
-    div {
-        text-align: center;
-        padding-top: 3px;
-    }
-
-    .MuiSlider-vertical {
-        margin-right: 0px!important;
-        padding: 0 3.5px!important;
-        z-index: 1;
-    }
-   
-    .MuiSlider-thumb {
-        border-radius: 2px;
-        height: 6px; 
-        width: 24px;
-        color: $white;
-
-        &:hover {
-            -webkit-box-shadow: none;
-            box-shadow: none;
-            animation: none;
-        }
-    }
-   
-    .MuiSlider-dragging {
-        background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
-    }
-    
-    .Mui-focusVisible {
-        -webkit-box-shadow: none!important;
-        box-shadow: none!important;
-        animation: none;
-    }
-    
-    .MuiSlider-mark {
-        color: $grey;
-        width: 0px;
-    }
-
-    .MuiSlider-markLabel {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        color: $font-color;
-        font-size: 10px;
-        margin-left: -10px;
-    }
-    
-    .MuiSlider-root {
-        border-radius: 5px;
-    }
-
-    .MuiSlider-track {
-        color: transparent;
-        width: 1px;
-    }
-
-    .MuiSlider-rail {
-        color: $white;
-        width: 10px; /* reduced size by 1/3 */
-        border-radius: 2px;
-        opacity: 0.5;
-    }
-}
-
-.gruf-master-gain-slider-vertical {
-    font-size: 14px;
-    display: inline-flex;
-    justify-content: center;
-    margin-top: 10px ;
-    margin-bottom: 41px;
 
     &.gruf-slider-background-ratllat {
         background-image: url("../img/slider_bg.svg");
@@ -970,11 +920,6 @@
 }
 
 .estacio-computer {
-    .computer-widgets {
-        margin-top: 90px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         gap: 25px;
         overflow: scroll;
 
@@ -983,14 +928,10 @@
         }  
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */ 
-    }
 }
 
 .grid-computer {
     user-select: none;
-    padding: 15px; 
-    border-radius: 10px; 
-    border: 1px solid $light-grey;
     
     .grid-row-computer {
         display: flex;
