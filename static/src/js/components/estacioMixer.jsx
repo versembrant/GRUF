@@ -139,78 +139,44 @@ export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
 };
 
 export const GrufMasterMeter = ({showLevelMeters}) => {
-    const leftMeterRef = useRef(null);
-    const rightMeterRef = useRef(null);
+
+    const [levelData, setLevelData] = useState([-Infinity, -Infinity]);
 
     useEffect(() => {
-        if (!showLevelMeters) {return;}
+        if (!showLevelMeters) return;
         const interval = setInterval(() => {
-            const levelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
-
-            if (leftMeterRef.current && rightMeterRef.current) {
-                // Canal esquerre
-                const dbLeft = Math.max(-60, Math.min(levelData.left.db, 12));
-                const heightLeft = ((dbLeft + 60) / 60) * 100;
-                leftMeterRef.current.style.height = `${heightLeft}%`;
-
-                // Canal dret
-                const dbRight = Math.max(-60, Math.min(levelData.right.db, 12));
-                const heightRight = ((dbRight + 60) / 60) * 100;
-                rightMeterRef.current.style.height = `${heightRight}%`;
-
-                let colorLeft, colorRight;
-                if (dbLeft <= -2) {
-                    const greenToYellow = Math.min(1, (dbLeft + 60) / 50);
-                    const green = Math.round(255 * (1 - greenToYellow));
-                    const red = Math.round(255 * greenToYellow);
-                    colorLeft = `rgb(${red}, 255, 0)`;
-                } else {
-                    const yellowToRed = Math.min(1, (dbLeft + 10) / 16);
-                    const red = 255;
-                    const green = Math.round(255 * (1 - yellowToRed));
-                    colorLeft = `rgb(${red}, ${green}, 0)`;
-                }
-
-                if (dbRight <= -2) {
-                    const greenToYellow = Math.min(1, (dbRight + 60) / 50);
-                    const green = Math.round(255 * (1 - greenToYellow));
-                    const red = Math.round(255 * greenToYellow);
-                    colorRight = `rgb(${red}, 255, 0)`;
-                } else {
-                    const yellowToRed = Math.min(1, (dbRight + 10) / 16);
-                    const red = 255;
-                    const green = Math.round(255 * (1 - yellowToRed));
-                    colorRight = `rgb(${red}, ${green}, 0)`;
-                }
-
-                leftMeterRef.current.style.backgroundColor = colorLeft;
-                rightMeterRef.current.style.backgroundColor = colorRight;
-            }
+            const newLevelData = getAudioGraphInstance().getCurrentMasterLevelStereo();
+            setLevelData([newLevelData.left, newLevelData.right]);
         }, 100);
-
         return () => {
             clearInterval(interval);
         };
-    }, []);
+    }, [showLevelMeters]);
+
+    const gainMeters = levelData.map((channelLevelData, i)=> <GrufGainMeter
+        key={`meter-master-${i}`}
+        isMute={false}
+        levelData={channelLevelData}
+    />);
 
     return (
         <div className="master-stereo-meters">
-            <div className="volume-meter">
-                <div className="volume-level" ref={leftMeterRef}></div>
-            </div>
-            <div className="volume-meter">
-                <div className="volume-level" ref={rightMeterRef}></div>
-            </div>
+            {gainMeters}
         </div>
     );
 };
 
-const GrufGainMeter = ({isMute, id, level}) => {
+const GrufGainMeter = ({isMute, id, levelData}) => {
+    const minDB = -60;
+    const maxDB = 6;
+    const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
+    const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+
     return (
         <div
             id={id}
             className={`volume-meter ${isMute ? 'grayscale' : ""}`}
-            style={{'--meter-level': `${level}%`}}
+            style={{'--meter-level': `${meterLevel}%`}}
         >
             <div className="volume-level" />
         </div>
@@ -224,13 +190,12 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
 
     useEffect(() => {
         if (!showLevelMeters) return;
-        const intervalName = `${estacio.nom}LevelMeterInterval`;
-        document[intervalName] = setInterval(() => {
+        const interval = setInterval(() => {
             const newLevelData = getAudioGraphInstance().getCurrentLevelEstacio(estacio.nom);
             setLevelData(newLevelData);
         }, 100);
         return () => {
-            clearInterval(document[intervalName]);
+            clearInterval(interval);
         };
     }, [showLevelMeters]);
 
@@ -238,11 +203,6 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
         setIsSolo(newState);
         reportSoloChange();
     }
-
-    const minDB = -60;
-    const maxDB = 6;
-    const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
-    const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
 
     const isIndirectMute = isAnySolo && !isSolo && !isDirectMute;
     const isMute = isDirectMute || isIndirectMute;
@@ -255,7 +215,7 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
                 <GrufGainMeter
                     id={`meter-${estacio.nom}`}
                     isMute={isMute}
-                    level={meterLevel}
+                    levelData={levelData}
                 />
             </div>
 
@@ -299,7 +259,7 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         );
                     })}
                     </div>
-                    <div className="estacio-mixer-master-columna">
+                    <div className="estacio-mixer-columna estacio-mixer-master-columna">
                         <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
                         <div className="slider-wrapper">
                         <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
