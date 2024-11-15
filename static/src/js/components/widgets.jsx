@@ -1056,7 +1056,20 @@ export const PendulumMetronome = ({ isMetronomeActive }) => {
     );
 };
 
-export const AlternatingCirclesMetronome = ({ isMetronomeActive, bpm }) => {
+export const AlternatingCirclesMetronome = ({ isMetronomeActive }) => {
+    const [bpm, setBpm] = useState(getAudioGraphInstance().getBpm());
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const newBpm = getAudioGraphInstance().getBpm();
+        if (newBpm !== bpm) {
+          setBpm(newBpm);
+        }
+      }, 100); 
+  
+      return () => clearInterval(interval); 
+    }, [bpm]);
+  
     const animationDuration = 60 / bpm;
   
     return (
@@ -1076,4 +1089,4 @@ export const AlternatingCirclesMetronome = ({ isMetronomeActive, bpm }) => {
         ></div>
       </div>
     );
-  };
+};
