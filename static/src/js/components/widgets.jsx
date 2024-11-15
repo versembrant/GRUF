@@ -1054,4 +1054,26 @@ export const PendulumMetronome = ({ isMetronomeActive }) => {
         </div>
       </div>
     );
+};
+
+export const AlternatingCirclesMetronome = ({ isMetronomeActive, bpm }) => {
+    const animationDuration = 60 / bpm;
+  
+    return (
+      <div className="metronome-circles-container">
+        <div
+          className={`circle-left ${isMetronomeActive ? 'circle-alternate' : ''}`}
+          style={{
+            animationDuration: `${animationDuration}s`,
+          }}
+        ></div>
+        <div
+          className={`circle-right ${isMetronomeActive ? 'circle-alternate' : ''}`}
+          style={{
+            animationDuration: `${animationDuration}s`,
+            animationDelay: `${animationDuration / 2}s`, 
+          }}
+        ></div>
+      </div>
+    );
   };

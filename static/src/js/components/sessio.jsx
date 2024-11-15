@@ -9,7 +9,7 @@ import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 import logo_gruf from "../../img/logo_gruf.svg";
 import { getAudioGraphInstance } from "../audioEngine";
-import { PendulumMetronome } from "./widgets";
+import { PendulumMetronome, AlternatingCirclesMetronome } from "./widgets";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -48,6 +48,7 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 
 const SessioHeader = ({ estacioSelected }) => {
     const [isMetronomeActive, setIsMetronomeActive] = useState(false);
+    const bpm = getAudioGraphInstance().getBpm(); 
 
     const toggleMetronome = () => {
         const newState = !isMetronomeActive;
@@ -64,9 +65,8 @@ const SessioHeader = ({ estacioSelected }) => {
                 <button
                     onClick={toggleMetronome}
                     className={`btn-petit ${isMetronomeActive ? "active" : ""}`}
-                    title="Metronome"
                     >
-                    <PendulumMetronome isMetronomeActive={isMetronomeActive} />
+                    <AlternatingCirclesMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
                 </button>
                 <AudioTransportPlayStop/>
             </div>

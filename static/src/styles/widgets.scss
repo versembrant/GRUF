@@ -1163,4 +1163,50 @@
   @keyframes swing {
     0%, 100% { transform: rotate(30deg); }
     50% { transform: rotate(-30deg); }
+}
+
+.metronome-circles-container {
+    position: relative;
+    width: 28px; 
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #f0f0f0; 
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .circle-left {
+    left: 8px; 
+    background-color: $light-grey; 
+  }
+  
+  .circle-right {
+    right: 0; 
+    background-color: $dark-grey; 
+  }
+  
+  .circle-alternate {
+    animation: alternate-light 1s infinite;
+  }
+  
+  @keyframes alternate-light {
+    0%, 100% {
+      opacity: 1; 
+    }
+    50% {
+      opacity: 0.4; 
+    }
+  }
+  
+  .circle-right.circle-alternate {
+    animation-delay: 0.5s;
   }
