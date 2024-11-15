@@ -205,6 +205,18 @@ export const GrufMasterMeter = ({showLevelMeters}) => {
     );
 };
 
+const GrufGainMeter = ({isMute, id, level}) => {
+    return (
+        <div
+            id={id}
+            className={`volume-meter ${isMute ? 'grayscale' : ""}`}
+            style={{'--meter-level': `${level}%`}}
+        >
+            <div className="volume-level" />
+        </div>
+    )
+}
+
 export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLevelMeters}) => {
     const [isSolo, setIsSolo] = useState(false);
     const [isDirectMute, setIsDirectMute] = useState(false);
@@ -240,13 +252,11 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
-                <div
+                <GrufGainMeter
                     id={`meter-${estacio.nom}`}
-                    className={`volume-meter ${isMute ? 'grayscale' : ""}`}
-                    style={{'--meter-level': `${meterLevel}%`}}
-                >
-                    <div className="volume-level" />
-                </div>
+                    isMute={isMute}
+                    level={meterLevel}
+                />
             </div>
 
             <div className="mute-solo-container">
