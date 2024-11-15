@@ -9,6 +9,9 @@
     height: 35px;
 
     &.estacio-computer-logo {
+        width: 130px;
+        align-self: flex-end;
+        flex: none;
         background-image: url("../img/computer_logo.svg");
     }
     &.estacio-piano-logo {
@@ -51,17 +54,6 @@
 
 .transformed {
     transform: rotate(-90deg);
-}
-
-.gruf-button-no-border {
-    font-family: "Montserrat", sans-serif;
-    border: none;
-    background-color: transparent;
-    position: absolute;
-    font-size: 14px;
-    font-weight: 400;
-    color: $white;
-    cursor: pointer;
 }
 
 .knob, .gruf-slider {
@@ -928,11 +920,6 @@
 }
 
 .estacio-computer {
-    .computer-widgets {
-        margin-top: 90px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         gap: 25px;
         overflow: scroll;
 
@@ -941,14 +928,10 @@
         }  
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */ 
-    }
 }
 
 .grid-computer {
     user-select: none;
-    padding: 15px; 
-    border-radius: 10px; 
-    border: 1px solid $light-grey;
     
     .grid-row-computer {
         display: flex;
