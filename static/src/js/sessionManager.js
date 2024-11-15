@@ -4,7 +4,6 @@ import { makePartial } from 'redux-partial';
 import { sendMessageToServer, getSocketID } from "./serverComs";
 import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
-import { EstacioDefaultUI } from "./components/estacioDefaultUI";
 
 var currentSession = undefined; 
 
@@ -300,7 +299,7 @@ export class EstacioBase {
     // UI stuff
 
     getUserInterfaceComponent() {
-        return EstacioDefaultUI  // If not overriden, use the default UI
+        throw new Error("No UI per aquiesta estació!");  // If not overriden, throw error
     }
 
     // AUDIO stuff
