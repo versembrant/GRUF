@@ -44,9 +44,9 @@ export const createRecordingHandler = (estacio, parameterDescription) => {
     return { recordingElementId, toggleRecording };
 };
 
-export const GrufLogoEstacio = ({tipusEstacio}) => {
+export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected}) => {
     return(
-        <div className={`estacio-${tipusEstacio}-logo`}></div>
+        <button className={`logo-estacio estacio-${tipusEstacio}-logo`} onClick={() => setEstacioSelected(undefined)}></button>
     )
 }
 

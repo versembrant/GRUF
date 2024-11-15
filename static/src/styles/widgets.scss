@@ -1,3 +1,15 @@
+.logo-estacio {
+    padding: 0;
+    font-size: 14px;
+    font-weight: 400;
+    &:hover {
+        background: none;
+        &::after {
+            content: "Canvia estació";
+        }
+    }
+}
+
 .gruf-label {
     position: absolute;
     font-size: 14px;
