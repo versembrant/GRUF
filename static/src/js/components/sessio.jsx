@@ -52,8 +52,6 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center">
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
-                {estacioSelected === undefined || <GrufLogoEstacio tipusEstacio={tipusEstacio} setEstacioSelected={setEstacioSelected}/> }
-                {estacioSelected === undefined || <GrufButtonBorder text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />}
                 <AudioTransportPlayStop/>
             </div>
         </div>
