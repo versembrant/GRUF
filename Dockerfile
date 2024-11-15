@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 # node, npm and yarn
 RUN apt-get update \
@@ -14,7 +14,8 @@ RUN apt-get update \
 		ffmpeg \
 	&& rm -rf /var/lib/apt/lists/*
 
-# python
+# python (we include build-essential as it is needed for building uwsgi)
+RUN apt-get update && apt-get install build-essential -y
 WORKDIR /code
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
