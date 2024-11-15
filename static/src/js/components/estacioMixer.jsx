@@ -5,13 +5,16 @@ import { subscribeToStoreChanges } from "../utils";
 import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio, GrufLogoEstacio } from "../components/widgets";
 import Slider from '@mui/material/Slider';
 
-export const GrufMuteCheckbox = ({ estacio, isIndirectMute }) => {
+export const GrufMuteCheckbox = ({ estacio, isIndirectMute, setIsDirectMute }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
+    setIsDirectMute(parameterValue);
 
     const handleMuteToggle = (evt) => {
+        const isDirectMute =  evt.target.checked;
         const currentMutes = getCurrentSession().getLiveMutesEstacions();
-        currentMutes[estacio.nom] = evt.target.checked;
+        currentMutes[estacio.nom] = isDirectMute;
         getCurrentSession().setLiveMutesEstacions(currentMutes);
+        setIsDirectMute(parameterValue);
     };
 
     
@@ -202,32 +205,52 @@ export const GrufMasterMeter = ({showLevelMeters}) => {
     );
 };
 
-export const EstacioMixerTrack = ({nomEstacio, estacio, metersRef, isAnySolo, reportSoloChange}) => {
+export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLevelMeters}) => {
     const [isSolo, setIsSolo] = useState(false);
+    const [isDirectMute, setIsDirectMute] = useState(false);
+    const [levelData, setLevelData] = useState(-Infinity);
+
+    useEffect(() => {
+        if (!showLevelMeters) return;
+        const intervalName = `${estacio.nom}LevelMeterInterval`;
+        document[intervalName] = setInterval(() => {
+            const newLevelData = getAudioGraphInstance().getCurrentLevelEstacio(estacio.nom);
+            setLevelData(newLevelData);
+        }, 100);
+        return () => {
+            clearInterval(document[intervalName]);
+        };
+    }, [showLevelMeters]);
 
     const changeSoloState = (newState) => {
         setIsSolo(newState);
         reportSoloChange();
     }
 
-    const isIndirectMute = isAnySolo && !isSolo;
+    const minDB = -60;
+    const maxDB = 6;
+    const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
+    const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
+
+    const isIndirectMute = isAnySolo && !isSolo && !isDirectMute;
+    const isMute = isDirectMute || isIndirectMute;
     return (
-        <div key={nomEstacio} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
+        <div key={estacio.nom} className={"estacio-mixer-columna " + " estacio-" + estacio.tipus + " mixer-border"}>
             <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
 
             <div className="slider-wrapper">
                 <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
                 <div
-                    id={`meter-${nomEstacio}`}
-                    className="volume-meter"
-                    ref={(el) => (metersRef.current[nomEstacio] = el)}
+                    id={`meter-${estacio.nom}`}
+                    className={`volume-meter ${isMute ? 'grayscale' : ""}`}
+                    style={{'--meter-level': `${meterLevel}%`}}
                 >
                     <div className="volume-level" />
                 </div>
             </div>
 
             <div className="mute-solo-container">
-                <GrufMuteCheckbox estacio={estacio} isIndirectMute={isIndirectMute}/>
+                <GrufMuteCheckbox estacio={estacio} setIsDirectMute={setIsDirectMute} isIndirectMute={isIndirectMute}/>
                 <GrufSoloCheckbox estacio={estacio} changeSoloState={changeSoloState} />
             </div>
             <GrufLabelEstacio className= 'nom-estacio-container'estacio={estacio}/>
@@ -247,35 +270,6 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
         setIsAnySolo(isAnySolo);
     }
 
-    const metersRef = useRef({});
-
-    useEffect(() => {
-        if (showLevelMeters) {
-            document.levelMeterInterval = setInterval(() => {
-                getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
-                    const levelData = getAudioGraphInstance().getCurrentLevelEstacio(nomEstacio);
-                    const isMuted = getAudioGraphInstance().isMutedEstacio(nomEstacio);
-                    const meterLevelDiv = metersRef.current[nomEstacio]; // Acceso al div .volume-level
-    
-                    if (meterLevelDiv) {
-                        const minDB = -60;
-                        const maxDB = 6;
-                        const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
-                        const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
-                        meterLevelDiv.style.setProperty('--meter-level', `${meterLevel}%`);
-
-                        if (isMuted) meterLevelDiv.classList.add("grayscale");
-                        else meterLevelDiv.classList.remove("grayscale");
-                    }
-                });
-            }, 100);
-    
-            return () => {
-                clearInterval(document.levelMeterInterval);
-            };
-        }
-    }, [showLevelMeters]);
-
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
             <div className="estacio-main">
@@ -287,11 +281,10 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                         return (
                             <EstacioMixerTrack
                                 key={nomEstacio}
-                                nomEstacio={nomEstacio}
                                 estacio={estacio}
-                                metersRef = {metersRef}
                                 isAnySolo = {isAnySolo}
                                 reportSoloChange = {reportSoloChange}
+                                showLevelMeters = {showLevelMeters}
                             />
                         );
                     })}
