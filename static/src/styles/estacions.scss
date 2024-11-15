@@ -107,30 +107,12 @@
     } */
 }
 
-.estacio-piano-logo {
-    background-image: url("../img/piano_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 120px;
-}
-
 .estacio-groovebox {
     --accent-color: #{$yellow};
     /* .estacio-main {
        background-image: url("../img/groovebox_bg.svg");
         
     } */
-}
-
-.estacio-groovebox-logo {
-    background-image: url("../img/groovebox_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 160px;
 }
 
 .estacio-synth {
@@ -140,29 +122,11 @@
     } */
 }
 
-.estacio-synth-logo {
-    background-image: url("../img/synth_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 110px;
-}
-
 .estacio-synth_bass {
     --accent-color: #{$pink};
     /* .estacio-main {
         //background-image: url("../img/synth_bass_bg_2.svg");        
     } */
-}
-
-.estacio-synth_bass-logo {
-    background-image: url("../img/synth_bass_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 165px;
 }
 
 .estacio-sampler {
@@ -172,29 +136,13 @@
     } */
 }
 
-.estacio-sampler-logo {
-    background-image: url("../img/sampler_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 145px;
-}
+
 
 .estacio-mixer {
     --accent-color: #{$green};
     /* .estacio-main {
         //background-image: url("../img/mixer_bg.svg");
     } */
-}
-
-.estacio-mixer-logo {
-    background-image: url("../img/mixer_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 150px;
 }
 
 .estacio-mixer-container {
@@ -424,11 +372,4 @@
     flex: auto;
 }
 
-.estacio-computer-logo {
-    background-image: url("../img/computer_logo.svg");
-    background-size: auto 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 30px;
-    width: 150px;
-}
+

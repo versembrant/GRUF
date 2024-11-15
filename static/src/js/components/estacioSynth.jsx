@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufSlider, GrufPianoRoll, NoteGenerator, GrufSelectorTonalitat, GrufNoteControls } from "./widgets";
+import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufSlider, GrufPianoRoll, NoteGenerator, GrufSelectorTonalitat, GrufNoteControls, GrufLogoEstacio } from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
 import waveform_sine from "../../img/waveform_sine.svg"
@@ -17,7 +17,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
         <div key={estacio.nom} className={`estacio estacio-${estacio.tipus}`}>
             <div className="estacio-main grid gap-10 p-4">
                 <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
-                <GrufButtonBorder className="col-start-4 row-start-1" text="Canvia estació" onClick={() => {setEstacioSelected(undefined)}} />
+                <GrufLogoEstacio className="col-start-4 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
 
                 <fieldset className="modul-border modul-bg flex flex-col justify-between col-start-1 row-start-1 row-span-2" style={{width: 220}}>
                     <fieldset className="flex justify-between">
