@@ -81,7 +81,7 @@ Per fer funcionar HTTPS fem servir certificats de letsencrypt. Aquí hi ha instr
 Bàsicament `certboot` de letsencrypt modifica la configuració de Nginx, així que si actualitzem la configuació hauriem d'actualitzar també amb `certbot`. La primera instal·lació de certificats es fa amb aquesta comanda:
 
 ```
-sudo certbot --nginx -d
+sudo certbot --nginx -d cl2024011711001.dnssw.net -d gruf.versembrant.cat
 ```
 
 Després es pot renovar amb un `cronjob` automaticament (veure instruccions del link) o amb la comanda:
