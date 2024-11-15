@@ -1,13 +1,12 @@
 import { useState, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
-import { AudioTransportPlayStop } from "../components/audioTransport";
+import { AudioTransportPlayStop, PlayArranjamentButton } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidiMinimal } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
-import { GrufButtonBorder, GrufLogoEstacio } from "../components/widgets";
 import logo_gruf from "../../img/logo_gruf.svg"
 
 const Estacio = ({estacio, setEstacioSelected}) => {
@@ -46,12 +45,12 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 // removeURLParam('e');
 
 const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
-    const tipusEstacio = estacioSelected === undefined ? undefined : ['mixer', 'computer'].includes(estacioSelected) ? estacioSelected : getCurrentSession().getEstacio(estacioSelected).tipus;
     return(
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidiMinimal estacioSelected={estacioSelected}/>: ""}
+                {estacioSelected === "computer" && <PlayArranjamentButton />}
                 <AudioTransportPlayStop/>
             </div>
         </div>
