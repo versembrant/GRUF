@@ -85,7 +85,6 @@ function getNomEstacioFromTitle(estacioTipus, nExisting) {
 
 export const NovaSessio = () => {
     const defaultTitle = useRef(generateTitle());
-    const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
     const estacionsDefault = Object.keys(estacionsDisponibles);
     const [estacionsSelected, setEstacionsSelected] = useState(estacionsDefault);
     const wasLastStationChangeAdd = useRef(false);
@@ -160,16 +159,7 @@ export const NovaSessio = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="selector-add-row"> 
-                        <select
-                            value={selectedOption}
-                            onChange={(evt) => setSelectedOption(evt.target.value)}>
-                            {Object.keys(estacionsDisponibles).map(tipusEstacio => (
-                                <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
-                            ))}
-                        </select>
-                        <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
-                        </div>
+                        < EstacioAdder handleAddStation={handleAddStation}/>
                     </div>
                     <div className="notificacio-controls">
                             Al crear el GRUF, envia un correu amb les dades del GRUF a la següent adreça de correu electrònic (opcional):
@@ -187,3 +177,20 @@ export const NovaSessio = () => {
         </div>
     )
 };
+
+const EstacioAdder = ({handleAddStation}) => {
+    const [selectedOption, setSelectedOption] = useState(Object.keys(estacionsDisponibles)[0]);
+
+    return (
+        <div className="selector-add-row"> 
+        <select
+            value={selectedOption}
+            onChange={(evt) => setSelectedOption(evt.target.value)}>
+            {Object.keys(estacionsDisponibles).map(tipusEstacio => (
+                <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
+            ))}
+        </select>
+        <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+        </div>
+    )
+}
