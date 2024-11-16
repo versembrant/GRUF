@@ -80,9 +80,12 @@
         }
         
         .selector-add-row {
-            display: flex;
-            gap: 10px;
+            height: 45px;
             margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
 
             select {
                 width: 70%;
