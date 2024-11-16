@@ -113,7 +113,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
 }
 
 
-export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
+export const EntradaMidiTeclatQWERTY = ({estacio}) => {
     const notesDescription = estacio.getParameterDescription('notes');
 
     if (document.noteActivades === undefined) {

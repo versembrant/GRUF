@@ -1,6 +1,6 @@
 import { GrufKnob, GrufLogoEstacio, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
-import { EntradaMidiTeclatQUERTYHidden } from "./entradaMidi";
+import { EntradaMidiTeclatQWERTY } from "./entradaMidi";
 import { getAudioGraphInstance } from "../audioEngine";
 import { grey } from "@mui/material/colors";
 
@@ -9,7 +9,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
     return (
         <div key={estacio.nom} className="estacio estacio-groovebox">
             <div    className="estacio-main grid gap-10 p-4" >
-                <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
+                <EntradaMidiTeclatQWERTY estacio={estacio} />
 
                 {/* Volum, Cutoff, Swing, i BPM Counter */}
                 <fieldset className="modul-border modul-bg flex flex-col flex-wrap justify-between col-start-1 row-start-1 row-span-2" style={{width: 400, height: 120}}>

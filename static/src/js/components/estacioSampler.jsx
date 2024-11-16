@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
-import { EntradaMidiTeclatQUERTYHidden, sendNoteOn, sendNoteOff } from "./entradaMidi";
+import { EntradaMidiTeclatQWERTY, sendNoteOn, sendNoteOff } from "./entradaMidi";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
 
@@ -10,7 +10,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     return (
         <div key={estacio.nom} className="estacio estacio-sampler">
             <div className="estacio-main grid gap-10 p-4">
-                <EntradaMidiTeclatQUERTYHidden estacio={estacio} />
+                <EntradaMidiTeclatQWERTY estacio={estacio} />
                 <GrufLogoEstacio className="col-start-4 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
                 
                 <fieldset className="modul-border modul-bg flex flex-col gap-10 justify-between col-start-1 row-start-1 row-span-2">
