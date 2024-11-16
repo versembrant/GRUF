@@ -61,7 +61,12 @@ export const EntradaMidi = ({estacio}) => {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
     }
 
-    <EntradaMidiExternal estacio={estacio}/>
+    return(
+        <div>
+            <EntradaMidiExternal estacio={estacio}/>
+            <EntradaMidiTeclatQWERTY estacio={estacio}/>
+        </div>
+    )
 }
 
 const EntradaMidiExternal = ({estacio}) => {
@@ -116,13 +121,8 @@ const EntradaMidiExternal = ({estacio}) => {
 }
 
 
-export const EntradaMidiTeclatQWERTY = ({estacio}) => {
+const EntradaMidiTeclatQWERTY = ({estacio}) => {
     const notesDescription = estacio.getParameterDescription('notes');
-
-    if (document.noteActivades === undefined) {
-        document.notesActivades = {};
-        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
-    }
 
     if (document.baseNotes === undefined) {
         document.baseNotes = {};

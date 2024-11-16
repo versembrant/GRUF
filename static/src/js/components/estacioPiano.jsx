@@ -1,12 +1,10 @@
 import { GrufKnob, GrufSeparatorLine, GrufButtonBorder, GrufPianoRoll, NoteGenerator, GrufSelectorTonalitat, GrufNoteControls, GrufLogoEstacio } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
-import { EntradaMidiTeclatQWERTY } from "./entradaMidi";
 
 export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
 
     return (<div key={estacio.nom} className="estacio estacio-piano">
         <div className="estacio-main grid gap-10 p-4">
-            <EntradaMidiTeclatQWERTY estacio={estacio} />
             <GrufLogoEstacio className="col-start-3 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
 
             <fieldset className="modul-border flex justify-between items-center gap-10 col-start-1 row-start-1 row-span-2">
