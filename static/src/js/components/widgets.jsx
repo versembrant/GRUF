@@ -288,17 +288,17 @@ export const GrufBpmCounter = ({ top, left }) => {
     );
 };
 
-export const GrufPad = ({ playerIndex, isSelected, setSelected, label }) => {
+export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }) => {
 
     const handleMouseDown = () => {
         setSelected();
-        sendNoteOn(playerIndex, 127);
+        sendNoteOn(estacio.nom, playerIndex, 127);
         document.addEventListener('mouseup', handleMouseUp);
     }
 
     const handleMouseUp = () => {
         document.removeEventListener('mouseup', handleMouseUp);
-        sendNoteOff(playerIndex, 0, {force: true});
+        sendNoteOff(estacio.nom, playerIndex, 0, {force: true});
     };
 
 
@@ -326,6 +326,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
             {Array.from({ length: 16 }).map((_, index) => (
                 <GrufPad
                     key={index}
+                    estacio={estacio}
                     playerIndex={index}
                     isSelected={selectedPad===index}
                     setSelected={() => setSelectedPad(index)}
@@ -517,9 +518,9 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    sendNoteOn(evt.detail.midiNote, 127, skipTriggerEvent=true);
+                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=true);
                     setTimeout(() => {
-                        sendNoteOff(evt.detail.midiNote, 0);
+                        sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }

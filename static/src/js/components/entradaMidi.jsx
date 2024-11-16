@@ -6,64 +6,64 @@ import Checkbox from '@mui/material/Checkbox';
 import NativeSelect from '@mui/material/NativeSelect';
 
 
-export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => {
+export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOn',
         skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
     }
-    if (document.getElementById("entradaMidiNomEstacio") === null){
-        return;
-    }
-    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-    if (nomEstacio == "all") {
-        nomEstacio = undefined;
-    }
     document.notesActivades[nomEstacio].add(noteNumber);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-export const sendNoteOff = (noteNumber, noteVelocity, extras={}) => {
+export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOff',
         ...extras
     }
-    if (document.getElementById("entradaMidiNomEstacio") === null){
-        return;
-    }
-    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-    if (nomEstacio == "all") {
-        nomEstacio = undefined;
-    }
     document.notesActivades[nomEstacio].delete(noteNumber);
-    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getCurrentSession().usesAudioEngine());
 }
 
-const bindMidiInputDevice = (nomDevice) => {
+const bindMidiInputDevice = (nomDevice, nomEstacio) => {
     console.log("Binding MIDI input device: " + nomDevice);
     bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
         if (midiMessage.data[0] === 144) {
             // Note on
-            sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOn(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
         } else if (midiMessage.data[0] === 128) {
             // Note off
-            sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOff(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
         }
     })
 }
 
-export const EntradaMidiMinimal = ({estacioSelected}) => {
+export const EntradaMidi = ({estacio}) => {
+    useEffect(()=>{
+        return () => { // es dispara al canviar d'estació, per treure les notes penjades que no han rebut noteoff
+            document.notesActivades[estacio.nom].forEach(nota => sendNoteOff(estacio.nom, nota, 0, {force: true}))
+        }
+    })
 
-    if (document.noteActivades === undefined) {
+    if (document.notesActivades === undefined) {
         document.notesActivades = {};
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
     }
 
+    return(
+        <div>
+            <EntradaMidiExternal estacio={estacio}/>
+            <EntradaMidiTeclatQWERTY estacio={estacio}/>
+        </div>
+    )
+}
+
+const EntradaMidiExternal = ({estacio}) => {
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
-        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"), estacio.nom);
     }
     
     return (
@@ -73,7 +73,7 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
                     <input 
                         type="hidden"
                         id="entradaMidiNomEstacio"
-                        value={estacioSelected}>
+                        value={estacio.nom}>
                     </input>
                     <NativeSelect
                         defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
@@ -113,13 +113,8 @@ export const EntradaMidiMinimal = ({estacioSelected}) => {
 }
 
 
-export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
+const EntradaMidiTeclatQWERTY = ({estacio}) => {
     const notesDescription = estacio.getParameterDescription('notes');
-
-    if (document.noteActivades === undefined) {
-        document.notesActivades = {};
-        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
-    }
 
     if (document.baseNotes === undefined) {
         document.baseNotes = {};
@@ -136,6 +131,8 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
         document.baseNotes[estacio.nom] -= 12;
     }
 
+    const boundKeys = new Map();
+
     const handleKeyEvent = async (evt) => {
         if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")) return;
                 // If typing in a text input, do not trigger MIDI events from keypress
@@ -143,6 +140,13 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
             // Notes
             const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
             if (kbdNotes.includes(evt.key.toLowerCase())) {
+                if (evt.type === 'keyup') {
+                    const midiNote = boundKeys.get(evt.key.toLowerCase());
+                    sendNoteOff(estacio.nom, midiNote, 0);
+                    boundKeys.delete(evt.key.toLowerCase())
+                    return;
+                }
+                // so, it's keydown
                 let midiNote;
                 while (true) {
                     midiNote = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
@@ -156,15 +160,15 @@ export const EntradaMidiTeclatQUERTYHidden = ({estacio}) => {
                     }
                     break;
                 }
-                if (evt.type === 'keydown') sendNoteOn(midiNote, 127);
-                else sendNoteOff(midiNote, 0);
+                boundKeys.set(evt.key.toLowerCase(), midiNote);
+                sendNoteOn(estacio.nom, midiNote, 127);
             }
 
             // Drum and sampler pads
             const padNotes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
             if (padNotes.includes(evt.key)) {
-                if (evt.type === 'keydown') sendNoteOn(padNotes.indexOf(evt.key), 127);
-                else sendNoteOff(padNotes.indexOf(evt.key), 127);
+                if (evt.type === 'keydown') sendNoteOn(estacio.nom, padNotes.indexOf(evt.key), 127);
+                else sendNoteOff(estacio.nom, padNotes.indexOf(evt.key), 127);
             }
 
             if (evt.type === 'keyup') return;
