@@ -55,13 +55,16 @@ const bindMidiInputDevice = (nomDevice) => {
     })
 }
 
-export const EntradaMidiMinimal = ({estacioSelected}) => {
-
+export const EntradaMidi = ({estacioSelected}) => {
     if (document.noteActivades === undefined) {
         document.notesActivades = {};
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
     }
 
+    <EntradaMidiExternal estacioSelected={estacioSelected}/>
+}
+
+const EntradaMidiExternal = ({estacioSelected}) => {
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
     }
