@@ -475,7 +475,7 @@ export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth
     );
 };
 
-export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px", height="320px", monophonic=false, colorNotes, modeSampler, triggerNotes=true }) => {
+export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px", height="320px", colorNotes, modeSampler, triggerNotes=true }) => {
     subscribeToParameterChanges(estacio, parameterName);
     subscribeToStoreChanges(getAudioGraphInstance());  // Subscriu als canvis de l'audio graph per actualizar playhead position i tonality
     subscribeToPresetChanges();
@@ -635,7 +635,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
         <div className={`gruf-piano-roll ${className}`} style={{ overflow:"hidden"}}>
                 <gruf-pianoroll
                     id={uniqueId + "_id"}
-                    editmode={monophonic ? "dragmono" : "dragpoly"}
+                    editmode={parameterDescription.isMono ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
                     allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
