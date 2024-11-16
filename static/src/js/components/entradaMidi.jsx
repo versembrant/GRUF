@@ -131,6 +131,8 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
         document.baseNotes[estacio.nom] -= 12;
     }
 
+    const boundKeys = new Map();
+
     const handleKeyEvent = async (evt) => {
         if ((document.activeElement.tagName === "INPUT") && (document.activeElement.type === "text")) return;
                 // If typing in a text input, do not trigger MIDI events from keypress
@@ -138,6 +140,13 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
             // Notes
             const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
             if (kbdNotes.includes(evt.key.toLowerCase())) {
+                if (evt.type === 'keyup') {
+                    const midiNote = boundKeys.get(evt.key.toLowerCase());
+                    sendNoteOff(estacio.nom, midiNote, 0);
+                    boundKeys.delete(evt.key.toLowerCase())
+                    return;
+                }
+                // so, it's keydown
                 let midiNote;
                 while (true) {
                     midiNote = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
@@ -151,8 +160,8 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
                     }
                     break;
                 }
-                if (evt.type === 'keydown') sendNoteOn(estacio.nom, midiNote, 127);
-                else sendNoteOff(estacio.nom, midiNote, 0);
+                boundKeys.set(evt.key.toLowerCase(), midiNote);
+                sendNoteOn(estacio.nom, midiNote, 127);
             }
 
             // Drum and sampler pads
