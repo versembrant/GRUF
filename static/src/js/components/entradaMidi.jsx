@@ -6,51 +6,37 @@ import Checkbox from '@mui/material/Checkbox';
 import NativeSelect from '@mui/material/NativeSelect';
 
 
-export const sendNoteOn = (noteNumber, noteVelocity, skipTriggerEvent=false) => {
+export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOn',
         skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
     }
-    if (document.getElementById("entradaMidiNomEstacio") === null){
-        return;
-    }
-    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-    if (nomEstacio == "all") {
-        nomEstacio = undefined;
-    }
     document.notesActivades[nomEstacio].add(noteNumber);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-export const sendNoteOff = (noteNumber, noteVelocity, extras={}) => {
+export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
         type: 'noteOff',
         ...extras
     }
-    if (document.getElementById("entradaMidiNomEstacio") === null){
-        return;
-    }
-    let nomEstacio = document.getElementById("entradaMidiNomEstacio").value;
-    if (nomEstacio == "all") {
-        nomEstacio = undefined;
-    }
     document.notesActivades[nomEstacio].delete(noteNumber);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-const bindMidiInputDevice = (nomDevice) => {
+const bindMidiInputDevice = (nomDevice, nomEstacio) => {
     console.log("Binding MIDI input device: " + nomDevice);
     bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
         if (midiMessage.data[0] === 144) {
             // Note on
-            sendNoteOn(midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOn(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
         } else if (midiMessage.data[0] === 128) {
             // Note off
-            sendNoteOff(midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOff(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
         }
     })
 }
@@ -71,7 +57,7 @@ export const EntradaMidi = ({estacio}) => {
 
 const EntradaMidiExternal = ({estacio}) => {
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
-        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
+        bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"), estacio.nom);
     }
     
     return (
@@ -159,15 +145,15 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
                     }
                     break;
                 }
-                if (evt.type === 'keydown') sendNoteOn(midiNote, 127);
-                else sendNoteOff(midiNote, 0);
+                if (evt.type === 'keydown') sendNoteOn(estacio.nom, midiNote, 127);
+                else sendNoteOff(estacio.nom, midiNote, 0);
             }
 
             // Drum and sampler pads
             const padNotes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
             if (padNotes.includes(evt.key)) {
-                if (evt.type === 'keydown') sendNoteOn(padNotes.indexOf(evt.key), 127);
-                else sendNoteOff(padNotes.indexOf(evt.key), 127);
+                if (evt.type === 'keydown') sendNoteOn(estacio.nom, padNotes.indexOf(evt.key), 127);
+                else sendNoteOff(estacio.nom, padNotes.indexOf(evt.key), 127);
             }
 
             if (evt.type === 'keyup') return;
