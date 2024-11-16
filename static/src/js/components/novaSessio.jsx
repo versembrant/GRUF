@@ -159,7 +159,9 @@ export const NovaSessio = () => {
                                 </div>
                             ))}
                         </div>
-                        < EstacioAdder handleAddStation={handleAddStation}/>
+                        {estacionsSelected.length < 10 ?
+                            < EstacioAdder handleAddStation={handleAddStation}/> :
+                            <div className="selector-add-row">Has arribat al límit d'estacions! Gaudeix de la teva mega-sessió ;)</div>}
                     </div>
                     <div className="notificacio-controls">
                             Al crear el GRUF, envia un correu amb les dades del GRUF a la següent adreça de correu electrònic (opcional):
@@ -183,14 +185,14 @@ const EstacioAdder = ({handleAddStation}) => {
 
     return (
         <div className="selector-add-row"> 
-        <select
-            value={selectedOption}
-            onChange={(evt) => setSelectedOption(evt.target.value)}>
-            {Object.keys(estacionsDisponibles).map(tipusEstacio => (
-                <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
-            ))}
-        </select>
-        <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+            <select
+                value={selectedOption}
+                onChange={(evt) => setSelectedOption(evt.target.value)}>
+                {Object.keys(estacionsDisponibles).map(tipusEstacio => (
+                    <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
+                ))}
+            </select>
+            <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
         </div>
     )
 }
