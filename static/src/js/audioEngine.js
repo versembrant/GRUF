@@ -48,7 +48,7 @@ export class AudioGraph {
                     'amajor', 'aminor',
                     'bbmajor', 'bbminor',
                     'bmajor', 'bminor'],
-                initial: 'cmajor'},
+                initial: 'cminor'},
             effectParameters: {
                 initial: {
                     reverbWet:0,
