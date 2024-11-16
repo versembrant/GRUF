@@ -25,7 +25,7 @@ export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => 
         ...extras
     }
     document.notesActivades[nomEstacio].delete(noteNumber);
-    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getCurrentSession().usesAudioEngine());
 }
 
 const bindMidiInputDevice = (nomDevice, nomEstacio) => {
@@ -42,7 +42,13 @@ const bindMidiInputDevice = (nomDevice, nomEstacio) => {
 }
 
 export const EntradaMidi = ({estacio}) => {
-    if (document.noteActivades === undefined) {
+    useEffect(()=>{
+        return () => { // es dispara al canviar d'estació, per treure les notes penjades que no han rebut noteoff
+            document.notesActivades[estacio.nom].forEach(nota => sendNoteOff(estacio.nom, nota, 0, {force: true}))
+        }
+    })
+
+    if (document.notesActivades === undefined) {
         document.notesActivades = {};
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
     }
