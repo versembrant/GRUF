@@ -1,22 +1,23 @@
 import { GrufKnob, GrufSlider, GrufToggle, GrufLegend, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
 import React from "react";
+import { capitalize } from "../utils";
 
-export const GrufModulADSR = ({className, estacio, soundNumber="", height, top, left}) => {
-    const position = (top || left) ? "absolute" : "static"; // TODO: remove
+export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"]}) => {
 
+    const knobs = availableParameters.map(parameter=> {
+        return <GrufKnob mida="petit" parameterParent={estacio}
+            parameterName={parameter + soundNumber} label={capitalize(parameter)} />
+    })
     const attackParamName = `attack${soundNumber}`;
     const decayParamName = `decay${soundNumber}`;
     const sustainParamName = `sustain${soundNumber}`;
     const releaseParamName = `release${soundNumber}`;
 
     return (
-        <div className={`gruf-adsr-widget ${className}`} style={{position, top, left, height}}>
+        <div className={`gruf-adsr-widget ${className}`} style={{height}}>
             <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={attackParamName} label='Attack'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={decayParamName} label='Decay'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={sustainParamName} label='Sustain'/>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName={releaseParamName} label='Release'/>
+                {knobs}
             </div>
         </div>
     )
