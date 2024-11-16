@@ -49,7 +49,7 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
-                {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacioSelected={estacioSelected}/>: ""}
+                {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
                 {estacioSelected === "computer" && <PlayArranjamentButton />}
                 <AudioTransportPlayStop/>
             </div>

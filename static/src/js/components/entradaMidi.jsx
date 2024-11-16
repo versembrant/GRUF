@@ -55,16 +55,16 @@ const bindMidiInputDevice = (nomDevice) => {
     })
 }
 
-export const EntradaMidi = ({estacioSelected}) => {
+export const EntradaMidi = ({estacio}) => {
     if (document.noteActivades === undefined) {
         document.notesActivades = {};
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
     }
 
-    <EntradaMidiExternal estacioSelected={estacioSelected}/>
+    <EntradaMidiExternal estacio={estacio}/>
 }
 
-const EntradaMidiExternal = ({estacioSelected}) => {
+const EntradaMidiExternal = ({estacio}) => {
     if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"));
     }
@@ -76,7 +76,7 @@ const EntradaMidiExternal = ({estacioSelected}) => {
                     <input 
                         type="hidden"
                         id="entradaMidiNomEstacio"
-                        value={estacioSelected}>
+                        value={estacio.nom}>
                     </input>
                     <NativeSelect
                         defaultValue={localStorage.getItem("lastMidiInputDevice", getAvailableMidiInputNames()[0])}
