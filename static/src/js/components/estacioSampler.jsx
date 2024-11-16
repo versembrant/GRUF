@@ -36,7 +36,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                     </fieldset>
                 </fieldset>
 
-                <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio} soundNumber={selectedPad + 1}/>
+                <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio} soundNumber={selectedPad + 1} availableParameters={["attack", "release"]}/>
 
                 <GrufModulEQ className="col-start-3 row-start-3" estacio={estacio}/>
                 <GrufModulDelay className="col-start-4 row-start-2 row-span-2" estacio={estacio}/>

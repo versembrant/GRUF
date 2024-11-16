@@ -1081,10 +1081,13 @@
         height: 82px;
         padding: 0 14px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
 
         border: 1.5px solid $grey;
         border-radius: 15px;
+
+        .knob {
+            flex: auto;
+        }
     }
 }
