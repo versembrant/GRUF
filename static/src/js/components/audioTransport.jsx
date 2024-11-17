@@ -5,25 +5,16 @@ import icona_play_arranjament from "../../img/play_button_grid.svg"
 import icona_stop_live from "../../img/stop_button.svg"
 import icona_stop_arranjament from "../../img/stop_button_grid.svg"
 
-const handlePlayButton = async () => {  
-    if (!getAudioGraphInstance().isPlaying()){
-        getAudioGraphInstance().transportStart();
-    } else {
-        getAudioGraphInstance().transportStop() 
-    }
-}
+const handlePlayButton = async (playMode) => {
+    if (playMode !== 'live' && playMode !== 'arranjament') throw new Error(`Unknown playMode: ${playMode}`)
 
-const handlePlayArranjamentButton = async () => {  
-    if (!getAudioGraphInstance().isPlaying()){
-        getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjament', true)
-        setTimeout(() => {
-            // Give it some time make sure isPlayingArranjament is updated
-            getAudioGraphInstance().transportStart();
-        }, 100)
-    } else {
-        getAudioGraphInstance().transportStop();
-        // No need to set isPlayingArranjament to false here as this is done automatically when hitting transportStop
-    }
+    if (getAudioGraphInstance().isPlaying()) return getAudioGraphInstance().transportStop();
+    if (playMode === 'live') return getAudioGraphInstance().transportStart(); // isPlayingArranjament is auto-set to false when hitting transportStop
+    getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjament', true);
+    setTimeout(() => {
+        // Give it some time make sure isPlayingArranjament is updated
+        getAudioGraphInstance().transportStart();
+    }, 100)
 }
 
 export const AudioTransportPlayStop = () => {
@@ -35,7 +26,7 @@ export const AudioTransportPlayStop = () => {
         <div>
             <button disabled={!getAudioGraphInstance().isGraphBuilt()}
             className="btn-petit"
-            onClick={handlePlayButton}>
+            onClick={() => handlePlayButton('live')}>
                 <img height="16px" src={imgSrc}/>
             </button>
         </div>
@@ -46,7 +37,7 @@ export const PlayArranjamentButton = () => {
     return(
         <button disabled={!getAudioGraphInstance().isGraphBuilt()}
         className="btn-petit"
-        onClick={handlePlayArranjamentButton}>
+        onClick={() => handlePlayButton('arranjament')}>
         {getAudioGraphInstance().isPlaying() ?
             <img height="16px" src={getAudioGraphInstance().isPlayingArranjament() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/>
         : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}
