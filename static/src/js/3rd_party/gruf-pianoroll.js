@@ -1164,42 +1164,49 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.redrawKeyboard=function(){
             this.ctx.fillStyle = "white";
             this.ctx.fillRect(this.yruler, 0, this.kbwidth, this.height); // background
-
-            const transparentAccentColor = this.colnote + "aa";
-            // first, white keys. we'll only draw the colored ones
-            this.ctx.fillStyle = transparentAccentColor;
-            for(let y=0;y<128;++y){
-                const ysemi=y%12;
-                const fsemi=this.semiflag[ysemi];
+            const realYOffset = this.steph*this.yoffset;
+            const octaveHeight = this.steph*12;
+            const whiteKeyHeight = octaveHeight/7;
+            const translucidAccentColor = this.colnote + "aa";
+            // first, white keys and grey lines
+            for(let pc=0; pc<12;pc++) {
+                const fsemi=this.semiflag[pc];
                 if (fsemi & 1) continue;
-                if (!this.externalnoteons.has(y)) continue;
-                const ys=this.height-this.steph*(y-this.yoffset);
-                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth, -this.steph);
+                const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
+                for(let octave=0;;octave++) {
+                    const n = octave*12 + pc;
+                    if (n > 127) break;
+                    const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset;
+                    // white keys
+                    if (this.externalnoteons.has(n)) {
+                        this.ctx.fillStyle = translucidAccentColor;
+                        this.ctx.fillRect(this.yruler, ys, this.kbwidth, -whiteKeyHeight);
+                    };
+                    // grey lines
+                    if (pc === 0) continue; // don't do it for C, as it will be overwritten by white key B
+                    this.ctx.fillStyle = "grey";
+                    this.ctx.fillRect(this.yruler, ys, this.kbwidth, 0.5);
+                    if (pc === 11) this.ctx.fillRect(this.yruler, ys-whiteKeyHeight, this.kbwidth, 0.5); // do it for the missing C
+                }
             }
-
-            //then, grey lines (tried doing stroked white keys but it's more complicated)
-            this.ctx.fillStyle = "grey";
-            for(let y=0;y<128;++y){
-                const ysemi=y%12;
-                const fsemi=this.semiflag[ysemi];
-                if (!(fsemi&2 || fsemi&1)) continue;
-                const ys=this.height-this.steph*(y-this.yoffset);
-                this.ctx.fillRect(this.yruler, (ys|0) - (fsemi&1 ? this.steph/2 : 0), this.kbwidth, 0.5);
+            // then, black keys. we do them separately so that they appear above the white ones
+            const blackKeyHeight = this.steph;
+            for(let pc=0; pc<12;pc++) {
+                const fsemi=this.semiflag[pc];
+                if (!(fsemi & 1)) continue;
+                const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
+                for(let octave=0;;octave++) {
+                    const n = octave*12 + pc;
+                    if (n > 127) break;
+                    const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset+blackKeyHeight/2;
+                    this.ctx.fillStyle = "black"; // we always draw the black key
+                    this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
+                    if (!this.externalnoteons.has(n)) continue;
+                    this.ctx.fillStyle = translucidAccentColor; // and then we draw the colored ones if needed
+                    this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
+                };
             }
-
-            // above, black keys
-            for(let y=0;y<128;++y){
-                const ysemi=y%12;
-                const fsemi=this.semiflag[ysemi];
-                if (!(fsemi&1)) continue;
-                const ys=this.height-this.steph*(y-this.yoffset);
-                this.ctx.fillStyle = "black";
-                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth/2, -this.steph);
-                if (!this.externalnoteons.has(y)) continue;
-                this.ctx.fillStyle = transparentAccentColor;
-                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth/2, -this.steph);
-            }
-        };
+        }
         this.redrawAreaSel=function(){
             if(this.dragging && this.dragging.o=="A"){
                 this.ctx.fillStyle=this.colselarea;
