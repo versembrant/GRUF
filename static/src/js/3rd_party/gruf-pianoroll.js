@@ -30,8 +30,10 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 height:             {type:Number, value:320, observer:'layout'},
                 timebase:           {type:Number, value:16, observer:'layout'},
                 editmode:           {type:String, value:"dragpoly"},
+                nomestacio:         {type:String, value:'undefined'},
                 secondclickdelete:  {type:Boolean, value:false},
                 allowednotes:       {type:Array, value:[]},
+                externalnoteons:    {type:Set, value:new Set()},
                 xrange:             {type:Number, value:16, observer:'layout'},
                 yrange:             {type:Number, value:16, observer:'layout'},
                 xoffset:            {type:Number, value:0, observer:'layout'},
@@ -716,6 +718,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.kbimg.style.height=this.sheight+"px";
             this.kbimg.style.backgroundSize=(this.steph*12)+"px";
             this.layout();
+            document.addEventListener("midiNote-" + this.nomestacio, this.onmidinote.bind(this))
             this.initialized=1;
             this.redraw();
         };
@@ -750,6 +753,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.redraw();
                 break;
             }
+        };
+        this.onmidinote=function(e) {
+            const noteNumber = e.detail.note;
+            if (e.detail.type == 'noteOff') this.externalnoteons.delete(noteNumber);
+            else this.externalnoteons.add(noteNumber);
         };
         this.popMenu=function(pos){
             const s=this.menu.style;

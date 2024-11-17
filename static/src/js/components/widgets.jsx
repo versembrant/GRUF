@@ -637,6 +637,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     id={uniqueId + "_id"}
                     editmode={parameterDescription.isMono ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
+                    nomestacio={estacio.nom}
                     allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '')}
