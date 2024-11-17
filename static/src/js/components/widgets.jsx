@@ -524,38 +524,41 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }
-            document.addEventListener("midiNote-" + estacio.nom , (evt) => {
-                const noteNumber = evt.detail.note;
-                if (evt.detail.type == 'noteOff') {
-                    const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
-                    if (!noteMarker) return;
-                    noteMarker.remove();
-                    return;
-                }
-
-                const noteHeight = jsElement.height/jsElement.yrange;
-                let bottomPosition = noteHeight * noteNumber;
-                const canvasOffset = jsElement.yoffset*noteHeight;
-                bottomPosition = bottomPosition - canvasOffset;
-
-                if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
-                    const noteMarker = document.createElement('div');
-                    noteMarker.className = 'noteMarker'
-                    noteMarker.dataset.notenumber = noteNumber;
-                    noteMarker.style.position = 'absolute';
-                    noteMarker.style.bottom = bottomPosition + 'px';
-                    noteMarker.style.left = modeSampler ? '0px': '22px';
-                    noteMarker.style.width = modeSampler ? '22px': '62px';
-                    noteMarker.style.height = (noteHeight * 0.9) + 'px';
-                    noteMarker.style.backgroundColor = colorNotes;
-                    noteMarker.style.zIndex = 1000;
-                    noteMarker.style.borderRadius = '2px';
-                    noteMarker.style.opacity = '0.5';
-                    noteMarker.style.pointerEvents = 'none';
-                    noteMarker.style.transition = 'opacity 1s ease-in-out;';
-                    jsElement.appendChild(noteMarker);
-                }
-            })
+            if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
+                document.addEventListener("midiNote-" + estacio.nom , (evt) => {
+                    const noteNumber = evt.detail.note;
+                    if (evt.detail.type == 'noteOff') {
+                        const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
+                        if (!noteMarker) return;
+                        noteMarker.remove();
+                        return;
+                    }
+    
+                    const noteHeight = jsElement.height/jsElement.yrange;
+                    let bottomPosition = noteHeight * noteNumber;
+                    const canvasOffset = jsElement.yoffset*noteHeight;
+                    bottomPosition = bottomPosition - canvasOffset;
+    
+                    if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
+                        const noteMarker = document.createElement('div');
+                        noteMarker.className = 'noteMarker'
+                        noteMarker.dataset.notenumber = noteNumber;
+                        noteMarker.style.position = 'absolute';
+                        noteMarker.style.bottom = bottomPosition + 'px';
+                        noteMarker.style.left = modeSampler ? '0px': '22px';
+                        noteMarker.style.width = modeSampler ? '22px': '62px';
+                        noteMarker.style.height = (noteHeight * 0.9) + 'px';
+                        noteMarker.style.backgroundColor = colorNotes;
+                        noteMarker.style.zIndex = 1000;
+                        noteMarker.style.borderRadius = '2px';
+                        noteMarker.style.opacity = '0.5';
+                        noteMarker.style.pointerEvents = 'none';
+                        noteMarker.style.transition = 'opacity 1s ease-in-out;';
+                        jsElement.appendChild(noteMarker);
+                    }
+                })
+            }
+           
             
             jsElement.dataset.alreadyBinded = true;
         } else {
@@ -637,6 +640,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     id={uniqueId + "_id"}
                     editmode={parameterDescription.isMono ? "dragmono" : "dragpoly"}
                     secondclickdelete={true}
+                    nomestacio={estacio.nom}
                     allowednotes={modeSampler === undefined ? allowedNotes: []}
                     width={width.replace('px', '')}
                     height={height.replace('px', '')}
