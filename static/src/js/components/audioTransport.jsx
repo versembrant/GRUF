@@ -13,24 +13,24 @@ const handlePlayButton = async () => {
     }
 }
 
-const handlePlayArranjementButton = async () => {  
+const handlePlayArranjamentButton = async () => {  
     if (!getAudioGraphInstance().isPlaying()){
-        getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjement', true)
+        getAudioGraphInstance().updateParametreAudioGraph('isPlayingArranjament', true)
         setTimeout(() => {
-            // Give it some time make sure isPlayingArranjement is updated
+            // Give it some time make sure isPlayingArranjament is updated
             getAudioGraphInstance().transportStart();
         }, 100)
     } else {
         getAudioGraphInstance().transportStop();
-        // No need to set isPlayingArranjement to false here as this is done automatically when hitting transportStop
+        // No need to set isPlayingArranjament to false here as this is done automatically when hitting transportStop
     }
 }
 
 export const AudioTransportPlayStop = () => {
     subscribeToStoreChanges(getAudioGraphInstance());
-    // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "isPlaying" si s'està fent play en mode live, no en mode arranjement
+    // Aquest play/stop el mostrem a la part superior de les estacions. Només mostra l'estat de "isPlaying" si s'està fent play en mode live, no en mode arranjament
     const imgSrc = !getAudioGraphInstance().isPlaying() ? icona_play_live :
-        getAudioGraphInstance().isPlayingArranjement() ? icona_stop_arranjament : icona_stop_live;
+        getAudioGraphInstance().isPlayingArranjament() ? icona_stop_arranjament : icona_stop_live;
     return (
         <div>
             <button disabled={!getAudioGraphInstance().isGraphBuilt()}
@@ -46,9 +46,9 @@ export const PlayArranjamentButton = () => {
     return(
         <button disabled={!getAudioGraphInstance().isGraphBuilt()}
         className="btn-petit"
-        onClick={handlePlayArranjementButton}>
+        onClick={handlePlayArranjamentButton}>
         {getAudioGraphInstance().isPlaying() ?
-            <img height="16px" src={getAudioGraphInstance().isPlayingArranjement() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/>
+            <img height="16px" src={getAudioGraphInstance().isPlayingArranjament() ? (appPrefix + "/static/src/img/stop_button_grid.svg"): (appPrefix + "/static/src/img/stop_button.svg")}/>
         : <img height="16px" src={appPrefix + "/static/src/img/play_button_grid.svg"}/>}
         </button>
     )

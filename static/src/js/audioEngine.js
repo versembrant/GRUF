@@ -31,7 +31,7 @@ export class AudioGraph {
             isMasterAudioEngine: {type: 'bool', initial: true},
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
             isPlaying: {type: 'bool', initial: false},
-            isPlayingArranjement: {type: 'bool', initial: false},
+            isPlayingArranjament: {type: 'bool', initial: false},
             swing: {type: 'float', min: 0.0, max: 1.0, initial: 0.0},
             compas: {type: 'enum', options: ['2/4', '3/4', '4/4'], initial: '4/4'},
             tonality: {
@@ -103,16 +103,16 @@ export class AudioGraph {
         return this.store.getState().isPlaying;
     }
 
-    isPlayingArranjement() {
-        return this.store.getState().isPlayingArranjement;
+    isPlayingArranjament() {
+        return this.store.getState().isPlayingArranjament;
     }
 
-    setIsPlayingArranjement(value) {
-        this.setParametreInStore('isPlayingArranjement', value);
+    setIsPlayingArranjament(value) {
+        this.setParametreInStore('isPlayingArranjament', value);
     }
 
     isPlayingLive() {
-        return !this.isPlayingArranjement();
+        return !this.isPlayingArranjament();
     }
 
     getMasterGain() {
@@ -395,7 +395,7 @@ export class AudioGraph {
         Tone.Transport.stop()
         this.setMainSequencerCurrentStep(-1);
 
-        this.updateParametreAudioGraph('isPlayingArranjement', false);
+        this.updateParametreAudioGraph('isPlayingArranjament', false);
     }
 
     onMainSequencerTick(time) {
@@ -407,11 +407,11 @@ export class AudioGraph {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
             });
-        } else if (this.isPlayingArranjement()) {
+        } else if (this.isPlayingArranjament()) {
             // Primer settejem la propietat arranjamentPreset de totes les estacions a -1, més tard canviarem aquest valor si hi ha clips que s'han de 
             // reproduir en aquest beat. Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                getCurrentSession().getEstacio(nomEstacio).arranjementPreset = -1;
+                getCurrentSession().getEstacio(nomEstacio).arranjamentPreset = -1;
             })
 
             // En mode arranjament, calculem el beat intern que li tocaria a cada estació segons la seva duració,
@@ -424,7 +424,7 @@ export class AudioGraph {
                         // If required preset not loaded, do it now
                         estacio.setCurrentPreset(clip.preset)
                     }
-                    estacio.arranjementPreset = clip.preset // Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
+                    estacio.arranjamentPreset = clip.preset // Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
                     estacio.onSequencerTick(beatIntern, time);
                 }
             })

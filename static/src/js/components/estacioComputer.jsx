@@ -37,7 +37,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
             const preset = clip ? clip.preset : -1;
             const filledClass = preset > -1 ? 'filled' : '';
             const estacioClasses = "estacio-" + getCurrentSession().getEstacio(nomsEstacions[i]).tipus + " computer-step"
-            const activeStep = getAudioGraphInstance().isPlayingArranjement() && (currentStep >= j * beatsPerStep && currentStep < (j  + 1) * beatsPerStep) ? 'active' : '';
+            const activeStep = getAudioGraphInstance().isPlayingArranjament() && (currentStep >= j * beatsPerStep && currentStep < (j  + 1) * beatsPerStep) ? 'active' : '';
             stepsElements.push(
             <div 
                 key={i + "_" + j} // To avoid React warning

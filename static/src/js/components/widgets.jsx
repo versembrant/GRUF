@@ -373,7 +373,7 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
         const stepsElements = []
         for (let stepIndex = 0; stepIndex < numSteps; stepIndex++) {
             const isFilled = indexOfArrayMatchingObject(parameterValue, {'i': rowIndex, 'j': stepIndex}) > -1;
-            const isActive = (currentStep == stepIndex && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjement() && estacio.getCurrentLivePreset() === estacio.arranjementPreset )));
+            const isActive = (currentStep == stepIndex && (getAudioGraphInstance().isPlayingLive() || (getAudioGraphInstance().isPlayingArranjament() && estacio.getCurrentLivePreset() === estacio.arranjamentPreset )));
             stepsElements.push(
             <div 
                 key={rowIndex + "_" + stepIndex} // To avoid React warning
