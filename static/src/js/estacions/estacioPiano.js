@@ -64,38 +64,12 @@ export class EstacioPiano extends EstacioBase {
         this.audioNodes.piano.stopAll()
     }
 
-    lastNoteOnBeats = {}
-
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        const recEnabled = this.recEnabled('notes') && !extras.skipRecording;
-        if (!noteOff){
-            this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()})
-            if (recEnabled){
-                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
-                // the note on time to save it
-                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % this.getNumSteps();
-                this.lastNoteOnBeats[midiNoteNumber] = currentStep;
-            }
-        } else {
-            this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()})
-            if (recEnabled){
-                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
-                const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
-                if (lastNoteOnTimeForNote !== undefined){
-                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % this.getNumSteps();
-                    if (lastNoteOnTimeForNote < currentStep){
-                        // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes');
-                        notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
-                        this.updateParametreEstacio('notes', notes); // save change in server!
-                    }
-                    this.lastNoteOnBeats[midiNoteNumber] = undefined;
-                }
-            }
-        }
+        if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
+        else this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
+        
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }

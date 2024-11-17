@@ -231,38 +231,13 @@ export class EstacioSampler extends EstacioBase {
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()) return;
 
         const playerIndex = midiNoteNumber % 16;
-        const reducedMidiNoteNumber = playerIndex;
-        const recEnabled = this.recEnabled('notes') && !extras.skipRecording;
-        if (!noteOff){
-            this.samplePlayers[playerIndex].trigger(Tone.now());
-            if (recEnabled){
-                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
-                // the note on time to save it
-                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % this.getNumSteps();
-                this.lastNoteOnBeats[reducedMidiNoteNumber] = currentStep;
-            }
-        } else {
-            this.samplePlayers[playerIndex].stop(extras.force);
-            if (recEnabled){
-                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
-                const lastNoteOnTimeForNote = this.lastNoteOnBeats[reducedMidiNoteNumber]
-                if (lastNoteOnTimeForNote !== undefined){
-                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % this.getNumSteps();
-                    if (lastNoteOnTimeForNote < currentStep){
-                        // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes');
-                        notes.push({'n': reducedMidiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
-                        this.updateParametreEstacio('notes', notes); // save change in server!
-                    }
-                    this.lastNoteOnBeats[reducedMidiNoteNumber] = undefined;
-                }
-            }
-        }
+        if (!noteOff) this.samplePlayers[playerIndex].trigger(Tone.now());
+        else this.samplePlayers[playerIndex].stop(extras.force);
+
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }
 
