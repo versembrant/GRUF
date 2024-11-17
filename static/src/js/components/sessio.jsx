@@ -50,8 +50,7 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
-                {estacioSelected === "computer" && <AudioTransportPlayStop playMode='arranjament' />}
-                <AudioTransportPlayStop/>
+                <AudioTransportPlayStop playMode={estacioSelected === 'computer' ? 'arranjament' : 'live'} />
             </div>
         </div>
     )
