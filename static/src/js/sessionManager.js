@@ -355,6 +355,25 @@ export class EstacioBase {
         return false;
     }
 
+    unfinishedNotesOnsets = new Map();
+    handlePianoRollRecording(midiNoteNumber, noteOff) {
+        if (!this.recEnabled('notes')) return;
+        const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+        const currentStep = currentMainSequencerStep % this.getNumSteps();
+    
+        if (!noteOff) return this.unfinishedNotesOnsets.set(midiNoteNumber, currentStep);
+        
+        const noteOnset = this.unfinishedNotesOnsets.get(midiNoteNumber)
+        this.unfinishedNotesOnsets.delete(midiNoteNumber)
+        if (noteOnset === undefined) return; // if we don't have a time for the last note on, don't do anything
+        if (noteOnset >= currentStep) return; // likewise, don't save the note if the noteoff insn't bigger than the noteon
+        
+        // now yes, create a note object
+        const notes = this.getParameterValue('notes');
+        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset})
+        this.updateParametreEstacio('notes', notes); // and save change in server!
+    }
+
 }
 
 export class Session {

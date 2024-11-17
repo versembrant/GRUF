@@ -118,39 +118,26 @@ export class MonoSynth extends EstacioBase {
         this.audioNodes.synth.triggerRelease(Tone.now())
     }
 
-    lastNoteOnBeats = {}
-
+    unfinishedNotes = [];
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
+        if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        const recEnabled = this.recEnabled('notes') && !extras.skipRecording;
-        if (!noteOff){
-            const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
+        const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
+        if (!noteOff) {
+            if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);
             this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
-            if (recEnabled){
-                // If rec enabled, we can't create a note because we need to wait until the note off, but we should save
-                // the note on time to save it
-                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % this.getNumSteps();
-                this.lastNoteOnBeats[midiNoteNumber] = currentStep;
-            }
-        } else {
-            this.audioNodes.synth.triggerRelease(Tone.now());
-            if (recEnabled){
-                // If rec enabled and we have a time for the last note on, then create a new note object, otherwise do nothing
-                const lastNoteOnTimeForNote = this.lastNoteOnBeats[midiNoteNumber]
-                if (lastNoteOnTimeForNote !== undefined){
-                    const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                    const currentStep = currentMainSequencerStep % this.getNumSteps();
-                    if (lastNoteOnTimeForNote < currentStep){
-                        // Only save the note if note off time is bigger than note on time
-                        const notes = this.getParameterValue('notes');
-                        notes.push({'n': midiNoteNumber, 'b': lastNoteOnTimeForNote, 'd': currentStep - lastNoteOnTimeForNote})
-                        this.updateParametreEstacio('notes', notes); // save change in server!
-                    }
-                    this.lastNoteOnBeats[midiNoteNumber] = undefined;
-                }
+        }
+        else {
+            const removedIndex = this.unfinishedNotes.indexOf(midiNoteNumber);
+            this.unfinishedNotes.splice(removedIndex, 1);
+            const newStackLength = this.unfinishedNotes.length;
+            if (removedIndex === newStackLength) { // if removed note was the last one (sounding...)
+                this.audioNodes.synth.triggerRelease(Tone.now()); // release it
+                // ...and if there were other notes pressed, play the newest one among them
+                if (newStackLength > 0) this.onMidiNote(this.unfinishedNotes[newStackLength-1], midiVelocity, false, {...extras, skipStack: true})
             }
         }
+        
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }
