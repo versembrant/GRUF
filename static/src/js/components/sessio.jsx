@@ -1,6 +1,6 @@
 import { useState, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
-import { AudioTransportPlayStop, PlayArranjamentButton } from "../components/audioTransport";
+import { AudioTransportPlayStop } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
@@ -50,8 +50,7 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
-                {estacioSelected === "computer" && <PlayArranjamentButton />}
-                <AudioTransportPlayStop/>
+                <AudioTransportPlayStop playMode={estacioSelected === 'computer' ? 'arranjament' : 'live'} />
             </div>
         </div>
     )
