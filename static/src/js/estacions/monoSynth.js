@@ -118,12 +118,25 @@ export class MonoSynth extends EstacioBase {
         this.audioNodes.synth.triggerRelease(Tone.now())
     }
 
+    unfinishedNotes = [];
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
         const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
-        if (!noteOff) this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
-        else this.audioNodes.synth.triggerRelease(Tone.now());
+        if (!noteOff) {
+            if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);
+            this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
+        }
+        else {
+            const removedIndex = this.unfinishedNotes.indexOf(midiNoteNumber);
+            this.unfinishedNotes.splice(removedIndex, 1);
+            const newStackLength = this.unfinishedNotes.length;
+            if (removedIndex === newStackLength) { // if removed note was the last one (sounding...)
+                this.audioNodes.synth.triggerRelease(Tone.now()); // release it
+                // ...and if there were other notes pressed, play the newest one among them
+                if (newStackLength > 0) this.onMidiNote(this.unfinishedNotes[newStackLength-1], midiVelocity, false, {...extras, skipStack: true})
+            }
+        }
         
         if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
