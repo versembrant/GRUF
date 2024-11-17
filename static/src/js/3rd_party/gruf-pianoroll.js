@@ -756,6 +756,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const noteNumber = e.detail.note;
             if (e.detail.type == 'noteOff') this.externalnoteons.delete(noteNumber);
             else this.externalnoteons.add(noteNumber);
+            this.redrawKeyboard();
         };
         this.popMenu=function(pos){
             const s=this.menu.style;
@@ -1164,21 +1165,25 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.ctx.fillStyle = "white";
             this.ctx.fillRect(this.yruler, 0, this.kbwidth, this.height); // background
 
-            // first, white keys
+            const transparentAccentColor = this.colnote + "aa";
+            // first, white keys. we'll only draw the colored ones
+            this.ctx.fillStyle = transparentAccentColor;
             for(let y=0;y<128;++y){
                 const ysemi=y%12;
                 const fsemi=this.semiflag[ysemi];
                 if (fsemi & 1) continue;
-                // empty for now
+                if (!this.externalnoteons.has(y)) continue;
+                const ys=this.height-this.steph*(y-this.yoffset);
+                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth, -this.steph);
             }
 
             //then, grey lines (tried doing stroked white keys but it's more complicated)
+            this.ctx.fillStyle = "grey";
             for(let y=0;y<128;++y){
                 const ysemi=y%12;
                 const fsemi=this.semiflag[ysemi];
                 if (!(fsemi&2 || fsemi&1)) continue;
                 const ys=this.height-this.steph*(y-this.yoffset);
-                this.ctx.fillStyle = "grey";
                 this.ctx.fillRect(this.yruler, (ys|0) - (fsemi&1 ? this.steph/2 : 0), this.kbwidth, 0.5);
             }
 
@@ -1189,6 +1194,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 if (!(fsemi&1)) continue;
                 const ys=this.height-this.steph*(y-this.yoffset);
                 this.ctx.fillStyle = "black";
+                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth/2, -this.steph);
+                if (!this.externalnoteons.has(y)) continue;
+                this.ctx.fillStyle = transparentAccentColor;
                 this.ctx.fillRect(this.yruler, ys|0, this.kbwidth/2, -this.steph);
             }
         };
