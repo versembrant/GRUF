@@ -1083,10 +1083,8 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.redrawGrid=function(){
             for(let y=0;y<128;++y){
                 if (this.kbstyle === "piano") {
-                    if(this.semiflag[y%12]&1)
-                        this.ctx.fillStyle=this.coldk;
-                    else
-                        this.ctx.fillStyle=this.collt;
+                    const isNoteAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(y) > -1;
+                    this.ctx.fillStyle = isNoteAllowed ? this.collt : this.coldk;
                 } else {
                     this.ctx.fillStyle=y%2==0 ? this.coldk: this.collt;
                 }
