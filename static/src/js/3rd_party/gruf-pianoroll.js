@@ -715,8 +715,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.setListener(this.menu,false);
             this.sequence=[];
             this.dragging={o:null};
-            this.kbimg.style.height=this.sheight+"px";
-            this.kbimg.style.backgroundSize=(this.steph*12)+"px";
             this.layout();
             document.addEventListener("midiNote-" + this.nomestacio, this.onmidinote.bind(this))
             this.initialized=1;
@@ -1063,8 +1061,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const bodystyle = this.body.style;
             if(this.bgsrc)
                 proll.style.background="url('"+this.bgsrc+"')";
-            if (this.kbstyle === "piano")
-                this.kbimg.style.background="url('"+this.kbsrc+"')";
             if(this.width){
                 proll.width = this.width;
                 bodystyle.width = proll.style.width = this.width+"px";
@@ -1163,30 +1159,37 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.kbimg.style.top=(this.xruler)+"px";
             this.kbimg.style.left=this.yruler+"px";
             this.kbimg.style.width=this.kbwidth+"px";
-            this.kbimg.style.backgroundSize="100% "+(this.steph*12)+"px";
-            this.kbimg.style.backgroundPosition="0px "+(this.sheight+this.steph*this.yoffset)+"px";
         };
         this.redrawKeyboard=function(){
-            if(this.yruler){
-                this.ctx.textAlign="right";
-                this.ctx.font=(this.steph/2)+"px 'sans-serif'";
-                this.ctx.fillStyle=this.colortab.kbwh;
-                this.ctx.fillRect(1,this.xruler,this.yruler,this.sheight);
-                this.ctx.fillStyle=this.colortab.kbbk;
-                for(y=0;y<128;++y){
-                    const ys=this.height-this.steph*(y-this.yoffset);
-                    const ysemi=y%12;
-                    const fsemi=this.semiflag[ysemi];
-                    if(fsemi&1){
-                        this.ctx.fillRect(0,ys,this.yruler/2,-this.steph);
-                        this.ctx.fillRect(0,(ys-this.steph/2)|0,this.yruler,-1);
-                    }
-                    if(fsemi&2)
-                        this.ctx.fillRect(0,ys|0,this.yruler,-1);
-                    if(fsemi&4)
-                        this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-4,ys-4);
-                }
-                this.ctx.fillRect(this.yruler,this.xruler,1,this.sheight);
+            this.ctx.fillStyle = "white";
+            this.ctx.fillRect(this.yruler, 0, this.kbwidth, this.height); // background
+
+            // first, white keys
+            for(let y=0;y<128;++y){
+                const ysemi=y%12;
+                const fsemi=this.semiflag[ysemi];
+                if (fsemi & 1) continue;
+                // empty for now
+            }
+
+            //then, grey lines (tried doing stroked white keys but it's more complicated)
+            for(let y=0;y<128;++y){
+                const ysemi=y%12;
+                const fsemi=this.semiflag[ysemi];
+                if (!(fsemi&2 || fsemi&1)) continue;
+                const ys=this.height-this.steph*(y-this.yoffset);
+                this.ctx.fillStyle = "grey";
+                this.ctx.fillRect(this.yruler, (ys|0) - (fsemi&1 ? this.steph/2 : 0), this.kbwidth, 0.5);
+            }
+
+            // above, black keys
+            for(let y=0;y<128;++y){
+                const ysemi=y%12;
+                const fsemi=this.semiflag[ysemi];
+                if (!(fsemi&1)) continue;
+                const ys=this.height-this.steph*(y-this.yoffset);
+                this.ctx.fillStyle = "black";
+                this.ctx.fillRect(this.yruler, ys|0, this.kbwidth/2, -this.steph);
             }
         };
         this.redrawAreaSel=function(){
@@ -1202,6 +1205,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.ctx.clearRect(0,0,this.width,this.height);
             this.stepw = this.swidth/this.xrange;
             this.steph = this.sheight/this.yrange;
+            this.redrawKeyboard();
             this.redrawGrid();
             const l=this.sequence.length;
             for(let s=0; s<l; ++s){
