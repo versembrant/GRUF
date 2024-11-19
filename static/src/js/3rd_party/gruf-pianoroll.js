@@ -113,18 +113,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
     background-position:left bottom;
     border-radius: 4px;
 }
-#wac-menu {
-    display:none;
-    position:absolute;
-    top:0px;
-    left:0px;
-    background:#eef;
-    color:#000;
-    padding:2px 10px;
-    border:1px solid #66f;
-    border-radius: 4px;
-    cursor:pointer;
-}
 .marker{
     position: absolute;
     left:0px;
@@ -151,7 +139,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
 <img id="wac-markstart" class="marker" src="${this.markstartsrc}"/>
 <img id="wac-markend" class="marker" src="${this.markendsrc}"/>
 <img id="wac-cursor" class="marker" src="${this.cursorsrc}"/>
-<div id="wac-menu">Delete</div>
 </div>`;
 
         this.sortSequence=function(){
@@ -404,10 +391,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.hitTest=function(pos){
             const ht={t:0,n:0,i:-1,m:" "};
             const l=this.sequence.length;
-            if(pos.t==this.menu){
-                ht.m="m";
-                return ht;
-            }
             ht.t=(this.xoffset+(pos.x-this.yruler-this.kbwidth)/this.swidth*this.xrange);
             ht.n=this.yoffset-(pos.y-this.height)/this.steph;
             if(pos.y>=this.height || pos.x>=this.width){
@@ -700,7 +683,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.markstartimg=this.elem.children[2];
             this.markendimg=this.elem.children[3];
             this.cursorimg=this.elem.children[4];
-            this.menu=this.elem.children[5];
             this.rcMenu={x:0, y:0, width:0, height:0};
             this.lastx=0;
             this.lasty=0;
@@ -712,7 +694,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.setListener(this.markendimg,true);
             this.setListener(this.markstartimg,true);
             this.setListener(this.cursorimg,true);
-            this.setListener(this.menu,false);
             this.sequence=[];
             this.dragging={o:null};
             this.layout();
@@ -733,9 +714,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.lastx=e.clientX-this.rcTarget.left;
                 this.lasty=e.clientY-this.rcTarget.top;
             }
-            if(this.lastx>=this.rcMenu.x&&this.lastx<this.rcMenu.x+this.rcMenu.width
-                    &&this.lasty>=this.rcMenu.y&&this.lasty<this.rcMenu.y+this.rcMenu.height)
-                t=this.menu;
             return {t:t, x:this.lastx, y:this.lasty};
         };
         this.contextmenu= function(e){
@@ -758,24 +736,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             else this.externalnoteons.add(noteNumber);
             this.redrawKeyboard();
         };
-        this.popMenu=function(pos){
-            const s=this.menu.style;
-            s.display="block";
-            s.top=(pos.y+8)+"px";
-            s.left=(pos.x+8)+"px";
-            this.rcMenu=this.menu.getBoundingClientRect();
-        };
         this.longtapcountup=function(){
             if(++this.longtapcount >= 18){
                 clearInterval(this.longtaptimer);
-                switch(this.downht.m){
-                case "N":
-                case "B":
-                case "E":
-                    this.popMenu(this.downpos);
-                    this.dragging={o:"m"};
-                    break;
-                }
             }
         };
         this.pointerdown=function(ev) {
@@ -811,18 +774,8 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             window.addEventListener("contextmenu",this.bindcontextmenu);
 
             if(e.button==2||e.ctrlKey){
-                switch(this.downht.m){
-                case "N":
-                case "B":
-                case "E":
-                    this.popMenu(this.downpos);
-                    this.dragging={o:"m"};
-                    break;
-                default:
-                    if(this.editmode=="dragmono"||this.editmode=="dragpoly")
-                        this.dragging={o:"A",p:this.downpos,p2:this.downpos,t1:this.downht.t,n1:this.downht.n};
-                    break;
-                }
+                if(this.editmode=="dragmono"||this.editmode=="dragpoly")
+                    this.dragging={o:"A",p:this.downpos,p2:this.downpos,t1:this.downht.t,n1:this.downht.n};
                 ev.preventDefault();
                 ev.stopPropagation();
                 this.canvas.focus();
@@ -896,14 +849,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 if(this.yscroll)
                     this.yoffset=this.dragging.offsy+(pos.y-this.dragging.y)*(this.yrange/this.height);
                 break;
-            case "m":
-                if(ht.m=="m"){
-                    this.menu.style.background="#ff6";
-                }
-                else {
-                    this.menu.style.background="#eef";
-                }
-                break;
             case "A":
                 this.dragging.p2=pos;
                 this.dragging.t2=ht.t;
@@ -950,13 +895,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 clearInterval(this.longtaptimer);
             const pos=this.getPos(e);
             
-            if(this.dragging.o=="m"){
-                this.menu.style.display="none";
-                this.rcMenu={x:0,y:0,width:0,height:0};
-                if(pos.t==this.menu)
-                    this.delSelectedNote();
-                this.redraw();
-            }
             if(this.dragging.o=="A"){
                 this.selAreaNote(this.dragging.t1,this.dragging.t2,this.dragging.n1,this.dragging.n2);
                 this.dragging={o:null};
@@ -1014,13 +952,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             window.removeEventListener("mouseup",this.bindcancel,false);
             ev.preventDefault();
             ev.stopPropagation();
-//            window.removeEventListener("contextmenu",this.contextmenu);
             return false;
         };
         this.pointerover=function(e) {
         };
         this.pointerout=function(e) {
-//            window.removeEventListener("contextmenu",this.contextmenu);
         };
         this.wheel=function(e) {
             let delta = 0;
