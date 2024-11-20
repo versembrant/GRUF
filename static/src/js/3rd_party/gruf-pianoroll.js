@@ -1067,6 +1067,32 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     break;
             }
         };
+        this.redrawEvent=function(ev) {
+            let x,w,y,x2,y2;
+            if(ev.f) 
+                this.ctx.fillStyle=this.colnotesel;
+            else
+                this.ctx.fillStyle=this.colnote;
+            const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(ev.n) > -1;
+            if (!noteIsAllowed) {
+                this.ctx.fillStyle = this.colnotedissalowed;
+            }
+            w=ev.g*this.stepw;
+            x=(ev.t-this.xoffset)*this.stepw+this.yruler+this.kbwidth;
+            x2=(x+w)|0; x|=0;
+            y=this.height - (ev.n-this.yoffset)*this.steph;
+            y2=(y-this.steph)|0; y|=0;
+            this.ctx.fillRect(x,y,x2-x,y2-y);
+            if(ev.f)
+                this.ctx.fillStyle=this.colnoteselborder;
+            else
+                this.ctx.fillStyle=this.colnoteborder;
+            
+            this.ctx.fillRect(x,y,1,y2-y);
+            this.ctx.fillRect(x2,y,1,y2-y);
+            this.ctx.fillRect(x,y,x2-x,1);
+            this.ctx.fillRect(x,y2,x2-x,1);
+        }
         this.semiflag=[6,1,0,1,0,2,1,0,1,0,1,0];
         this.redrawXRuler=function(){
             if(this.xruler){
@@ -1175,7 +1201,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             }
         };
         this.redraw=function() {
-            let x,w,y,x2,y2;
             if(!this.ctx)
                 return;
             this.ctx.clearRect(0,0,this.width,this.height);
@@ -1184,31 +1209,13 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.redrawKeyboard();
             this.redrawGrid();
             const l=this.sequence.length;
-            for(let s=0; s<l; ++s){
+            for(let s=0; s<l; ++s){ // first, draw not selected events
                 const ev=this.sequence[s];
-                if(ev.f)
-                    this.ctx.fillStyle=this.colnotesel;
-                else
-                    this.ctx.fillStyle=this.colnote;
-                const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(ev.n) > -1;
-                if (!noteIsAllowed) {
-                    this.ctx.fillStyle = this.colnotedissalowed;
-                }
-                w=ev.g*this.stepw;
-                x=(ev.t-this.xoffset)*this.stepw+this.yruler+this.kbwidth;
-                x2=(x+w)|0; x|=0;
-                y=this.height - (ev.n-this.yoffset)*this.steph;
-                y2=(y-this.steph)|0; y|=0;
-                this.ctx.fillRect(x,y,x2-x,y2-y);
-                if(ev.f)
-                    this.ctx.fillStyle=this.colnoteselborder;
-                else
-                    this.ctx.fillStyle=this.colnoteborder;
-                
-                this.ctx.fillRect(x,y,1,y2-y);
-                this.ctx.fillRect(x2,y,1,y2-y);
-                this.ctx.fillRect(x,y,x2-x,1);
-                this.ctx.fillRect(x,y2,x2-x,1);
+                if (ev.f === 0) this.redrawEvent(ev);
+            }
+            for(let s=0; s<l; ++s){ // then, draw selected events
+                const ev=this.sequence[s];
+                if (ev.f === 1) this.redrawEvent(ev);
             }
             this.redrawYRuler();
             this.redrawXRuler();
