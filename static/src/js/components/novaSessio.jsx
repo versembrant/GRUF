@@ -171,7 +171,7 @@ export const NovaSessio = () => {
                             />
                         </div>
                     <div className="footer-controls">
-                        <button type="button" className="btn-verd" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <button type="button" className="btn-verd--primary" onClick={handleSubmitForm}>Crear GRUF!</button>
                     </div>
                 </form>
             </div>

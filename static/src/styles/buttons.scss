@@ -1,25 +1,16 @@
-button, a:not(.no-button) {
+button, .btn {
     cursor: pointer;
-    --text-color: #{white};
-
-    font-family: Montserrat, sans-serif;
+    font-family: inherit;
     font-optical-sizing: auto;
 
     font-weight: 600;
     font-size: 100%;
     color: var(--text-color);
     text-wrap: nowrap;
-
-    background-color: transparent;
-
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
 
     padding: 10px 40px;
-
-    &:hover {
-        --text-color: #{$grey};
-    }
 
     &:disabled {
         opacity: 0.5;
@@ -30,8 +21,26 @@ button, a:not(.no-button) {
         --text-color: #{$red};
         animation: blink 1s steps(7, start) infinite;
     }
+}
+
+.btn-white {
+    --text-color: #{white};
+    &:hover {
+        --text-color: #{$grey};
+    }
 
 }
+
+
+.btn-black--primary {
+    --text-color: #{$white};
+    --background-color: #{$black};
+    --border-color: #{$black};
+    &:hover {
+        --background-color: #{transparentize($black, 0.2)};
+    }
+}
+ 
 
 .navbar a, .footer a {
     border: none;
@@ -52,25 +61,39 @@ button, a:not(.no-button) {
 
 .btn-verd {
     --text-color: #{$green};
+    &:hover {
+        --text-color: #{lighten($green, 20%)};
+    }
+}
+
+.btn-verd--primary {
+    --text-color: #{$black};
+    --background-color: #{$green};
+    &:hover {
+        --text-color: #{lighten($black, 10%)};
+        --background-color: #{lighten($green, 10%)};
+
+    }
 }
 
 .btn-gris {
     --text-color: #{$grey};
+    &:hover {
+        --text-color: #{lighten($grey, 50%)};
+    }
 }
 
 .btn-black {
     --text-color: #{$black};
-}
-
-.btn-verd, .btn-gris, .btn-black {
     &:hover {
-        --text-color: #{white};
+        --background-color: #{transparentize($grey, 0.5)};
+        --text-color: #{$white};
     }
 }
 
 .btn-vermell {
     --text-color: #{$red};
     &:hover {
-    --text-color: #{lighten($red, 10%)};
+    --text-color: #{lighten($red, 50%)};
     }
 }

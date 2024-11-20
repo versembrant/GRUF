@@ -25,7 +25,7 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
     return (
         <div>
             <button disabled={!getAudioGraphInstance().isGraphBuilt()}
-            className="btn-petit"
+            className="btn-white btn-petit"
             onClick={() => handlePlayButton(playMode)}>
                 <img height="16px" src={imgSrc}/>
             </button>

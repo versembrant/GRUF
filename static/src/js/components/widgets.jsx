@@ -46,7 +46,7 @@ export const createRecordingHandler = (estacio, parameterDescription) => {
 
 export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected, className=""}) => {
     return(
-        <button className={`logo-estacio estacio-${tipusEstacio}-logo ${className}`} onClick={() => setEstacioSelected(undefined)}></button>
+        <button className={`logo-estacio btn-white estacio-${tipusEstacio}-logo ${className}`} onClick={() => setEstacioSelected(undefined)}></button>
     )
 }
 
@@ -305,7 +305,7 @@ export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }
     return (
         <div className="gruf-pad">
             <Button
-                className={ isSelected ? 'selected': '' }
+                className={ "btn-white " + (isSelected ? 'selected': '') }
                 onMouseDown={handleMouseDown}
                 label={label}
             />
@@ -745,7 +745,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
     }
 
     return(
-        <button style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
+        <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
     )
 }
 
@@ -757,8 +757,8 @@ export const GrufNoteControls = ({ className, estacio, parameterName, width, max
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
+                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
     );

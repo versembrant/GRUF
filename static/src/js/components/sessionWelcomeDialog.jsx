@@ -44,12 +44,12 @@ export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
                         </div>
                     </div>
                     <div className="buttons">
-                        <button onClick={(evt) => {
+                        <button className="btn-white" onClick={(evt) => {
                             hide(evt);
                             document.welcomeDialogShown = true;
                             connectaAmbAudio();
                         }}>Connecta amb àudio <img height="20px" src={appPrefix + "/static/src/img/loudspeaker_on.svg"}></img></button>
-                        <button onClick={(evt) => {
+                        <button className="btn-white" onClick={(evt) => {
                             hide(evt);
                             document.welcomeDialogShown = true;
                             connectaSenseAudio();

@@ -33,10 +33,10 @@ export const Connecta = ({infoSessions}) => {
                 <div>
                     <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
                     <ul>
-                        <li><button id="connectaButton" className="btn-black"
+                        <li><a href={appPrefix + "/nova_sessio"} class="btn btn-black">Crea un nou GRUF</a></li>
+                        <li><button id="connectaButton" className="btn btn-black--primary"
                             onClick={goToGruf}
                         >Connecta't al GRUF</button></li>
-                        <li><a href={appPrefix + "/nova_sessio"} class="btn-black">Crea un nou GRUF</a></li>
                     </ul>
                 </div>
             </div>
@@ -45,10 +45,10 @@ export const Connecta = ({infoSessions}) => {
                     <h3>Últims GRUFs:</h3>
                     <ul>
                         {infoSessions.slice(0, 10).map((item, index) => <li key={item.id}>{ item.id } "{ item.name }" ({ item.num_estacions + 2 } estacions, { item.connected_users.length } usuaris)&nbsp;
-                            <a className="btn-petit btn-verd" href={appPrefix + "/g/" + item.id}>Connecta't</a>&nbsp;
-                            <a className="btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/master/"}>Connecta't (master)</a>&nbsp;
-                            <a className="btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/local/"}>Connecta't (local)</a>&nbsp;
-                            <a className="btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}
+                            <a className="btn btn-petit btn-verd" href={appPrefix + "/g/" + item.id}>Connecta't</a>&nbsp;
+                            <a className="btn btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/master/"}>Connecta't (master)</a>&nbsp;
+                            <a className="btn btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/local/"}>Connecta't (local)</a>&nbsp;
+                            <a className="btn btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}
                     </ul>
                 </div>
             </div>: ""}
