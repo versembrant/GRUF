@@ -44,14 +44,12 @@ const bindMidiInputDevice = (nomDevice, nomEstacio) => {
 export const EntradaMidi = ({estacio}) => {
     useEffect(()=>{
         return () => { // es dispara al canviar d'estació, per treure les notes penjades que no han rebut noteoff
-            document.notesActivades[estacio.nom].forEach(nota => sendNoteOff(estacio.nom, nota, 0, {force: true}))
+            document.notesActivades[estacio.nom]?.forEach(nota => sendNoteOff(estacio.nom, nota, 0, {force: true}))
         }
     })
 
-    if (document.notesActivades === undefined) {
-        document.notesActivades = {};
-        getCurrentSession().getNomsEstacions().forEach(nomEstacio => document.notesActivades[nomEstacio] = new Set());
-    }
+    if (document.notesActivades === undefined) document.notesActivades = {};
+    if (document.notesActivades[estacio.nom] === undefined) document.notesActivades[estacio.nom] = new Set();
 
     return(
         <div>
