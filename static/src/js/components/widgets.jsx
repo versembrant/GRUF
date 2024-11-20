@@ -62,10 +62,10 @@ export const GrufSeparatorLine = () => {
     )
 }
 
-export const GrufLegend = ({ text, bare=false }) => {
+export const GrufLegend = ({ text, style={}, bare=false }) => {
     // we actually style the span element inside the legend element :)
     return (
-        <legend style={{display: "contents"}}><span className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
+        <legend style={{display: 'contents'}}><span style={style}className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
     )
 }
 
@@ -337,7 +337,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
     );
 };
 
-export const GrufToggle = ({ estacio, parameterName, top, left}) => {
+export const GrufToggle = ({ estacio, parameterName, className="", top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
 
     const parameterValue = estacio.getParameterValue(parameterName);
@@ -347,7 +347,7 @@ export const GrufToggle = ({ estacio, parameterName, top, left}) => {
     };
 
     return (
-        <div className="gruf-toggle" style={{ top: top, left: left }}>
+        <div className={`gruf-toggle ${className}`}style={{ top: top, left: left }}>
             <div
                 className={`p-toggle ${parameterValue ? 'on' : 'off'}`}
                 onClick={handleClick}

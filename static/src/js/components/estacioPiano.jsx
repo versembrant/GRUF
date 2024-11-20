@@ -8,7 +8,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufLogoEstacio className="col-start-3 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
 
             <fieldset className="modul-border flex justify-between items-center gap-10 col-start-1 row-start-1 row-span-2">
-                <fieldset className="flex flex-1 justify-between items-center gap-10">
+                <fieldset className="flex flex-1 justify-between self-stretch items-center gap-10">
                     <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                     <GrufSeparatorLine />
                     <GrufKnob mida="gran" parameterParent={estacio} parameterName="timbre"  label = 'Timbre' />
@@ -22,7 +22,7 @@ export const EstacioPianoUI = ({estacio, setEstacioSelected}) => {
             <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} />
 
             <GrufPianoRoll className="col-start-1 row-start-4 col-span-3" estacio={estacio} parameterName="notes" width="920px" height="327px" colorNotes="#fa8639"/>
-            <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="200px" estacio={estacio} parameterName={"notes"} ExtraComponent={NoteGenerator}/>
+            <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="150px" estacio={estacio} parameterName={"notes"} ExtraComponent={NoteGenerator}/>
         </div>
     </div>)
 };
