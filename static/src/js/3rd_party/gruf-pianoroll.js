@@ -113,18 +113,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
     background-position:left bottom;
     border-radius: 4px;
 }
-#wac-menu {
-    display:none;
-    position:absolute;
-    top:0px;
-    left:0px;
-    background:#eef;
-    color:#000;
-    padding:2px 10px;
-    border:1px solid #66f;
-    border-radius: 4px;
-    cursor:pointer;
-}
 .marker{
     position: absolute;
     left:0px;
@@ -151,7 +139,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
 <img id="wac-markstart" class="marker" src="${this.markstartsrc}"/>
 <img id="wac-markend" class="marker" src="${this.markendsrc}"/>
 <img id="wac-cursor" class="marker" src="${this.cursorsrc}"/>
-<div id="wac-menu">Delete</div>
 </div>`;
 
         this.sortSequence=function(){
@@ -404,10 +391,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.hitTest=function(pos){
             const ht={t:0,n:0,i:-1,m:" "};
             const l=this.sequence.length;
-            if(pos.t==this.menu){
-                ht.m="m";
-                return ht;
-            }
             ht.t=(this.xoffset+(pos.x-this.yruler-this.kbwidth)/this.swidth*this.xrange);
             ht.n=this.yoffset-(pos.y-this.height)/this.steph;
             if(pos.y>=this.height || pos.x>=this.width){
@@ -451,11 +434,19 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const event = new CustomEvent("pianoRollEdited", { detail: this.sequence });
             this.dispatchEvent(event);
         };
+        this.createID=function() {
+            const sortedCurrentIDs = this.sequence.map(note=>note.id).sort((a,b)=> a-b);
+            for (let i = 0; i < sortedCurrentIDs.length; i++) {
+                if (i !== sortedCurrentIDs[i]) return i; // si hi ha un forat, l'emplenem
+            }
+            return sortedCurrentIDs.length; // si no, i la lista és compacta, simplement afegim un
+        }
         this.addNote=function(t,n,g,v,f){
             if(t>=0 && n>=0 && n<128){
-                const ev={t:t,c:0x90,n:n,g:g,v:v,f:f};
+                const ev={t:t,n:n,g:g,v:v,f:f,id:this.createID()};
                 this.sequence.push(ev);
                 this.sortSequence();
+                this.triggerPostEditEvent();
                 this.redraw();
                 return ev;
             }
@@ -517,17 +508,16 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const l=this.sequence.length;
             for(let i=0;i<l;++i){
                 const ev=this.sequence[i];
-                if(ev.f && ev.ot+dt<0)
-                    dt=-ev.ot;
+                if(ev.f && ev.t+dt<0)
+                    dt=-ev.t;
             }
             for(let i=0;i<l;++i){
                 const ev=this.sequence[i];
                 if(ev.f){
-                    ev.t=(((ev.ot+dt)/this.snap+.5)|0)*this.snap;
-                    ev.n=ev.on+dn;
+                    ev.t=(((ev.t+dt)/this.snap+.5)|0)*this.snap;
+                    ev.n=ev.n+dn;
                 }
             }
-            this.triggerPostEditEvent();
         };
         this.clearSel=function(){
             const l=this.sequence.length;
@@ -549,12 +539,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             let ev;
             if(ht.m=="N"){
                 ev=this.sequence[ht.i];
-                this.dragging={o:"D",m:"N",i:ht.i,t:ht.t,n:ev.n,dt:ht.t-ev.t};
-                for(let i=0,l=this.sequence.length;i<l;++i){
-                    ev=this.sequence[i];
-                    if(ev.f)
-                        ev.on=ev.n, ev.ot=ev.t, ev.og=ev.g;
-                }
+                this.dragging={o:"D",m:"N",i:ht.i,t:ht.t,n:ev.n,dt:ht.t-ev.t+1};
                 this.redraw();
             }
             else if(ht.m=="n"){
@@ -574,11 +559,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             else if(ht.m=="s"&&ht.t>=0){
                 this.clearSel();
                 var t=((ht.t/this.snap)|0)*this.snap;
-                this.sequence.push({t:t, n:ht.n|0, g:1, f:1});
+                this.sequence.push({t:t, n:ht.n|0, g:1, f:1,id:this.createID()});
                 this.dragging={o:"D",m:"E",i:this.sequence.length-1, t:t, g:1, ev:[{t:t,g:1,ev:this.sequence[this.sequence.length-1]}]};
+                this.triggerPostEditEvent();
                 this.redraw();
             }
-            this.triggerPostEditEvent();
         };
         this.editDragMove=function(pos){
             const ht=this.hitTest(pos);
@@ -588,6 +573,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 case "E":
                     if(this.dragging.ev){
                         const dt=((Math.max(0,ht.t)/this.snap+0.9)|0)*this.snap - this.dragging.t - this.dragging.g;
+                        if (dt === 0) break;
                         const list=this.dragging.ev;
                         for(let i = list.length - 1; i >= 0; --i){
                             const ev = list[i].ev;
@@ -597,13 +583,18 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                             if(this.editmove=="dragmono")
                                 this.delAreaNote(ev.t,ev.g);
                         }
+                        this.dragging.g = this.sequence[this.dragging.i].g;
+                        this.dragging.t = this.sequence[this.dragging.i].t;
+                        this.dragging.ev = this.selectedNotes();
 
                     }
                     this.redraw();
+                    this.triggerPostEditEvent();
                     break;
                 case "B":
                     if(this.dragging.ev){
                         const dt=((Math.max(0,ht.t)/this.snap+0.9)|0)*this.snap - this.dragging.t;
+                        if (dt === 0) break;
                         const list=this.dragging.ev;
                         for(let i = list.length - 1; i >= 0; --i){
                             const ev = list[i].ev;
@@ -614,9 +605,12 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                             if(this.editmove=="dragmono")
                                 this.delAreaNote(ev.t,ev.g);
                         }
+                        this.dragging.t = this.sequence[this.dragging.i].t;
+                        this.dragging.ev = this.selectedNotes();
 
                     }
                     this.redraw();
+                    this.triggerPostEditEvent();
                     break;
 
                 ev=this.sequence[this.dragging.i];
@@ -635,13 +629,26 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     this.redraw();
                     break;
                 case "N":
+                    if (this.notesDueDuplicate) {
+                        this.notesDueDuplicate = false;
+                        const selectedNotes = this.selectedNotes();
+                        this.clearSel(); // we will leave the olf notes on place
+                        for (const note of selectedNotes) {
+                            this.addNote(note.ev.t, note.ev.n, note.ev.g, note.ev.v, 1); // ..and select the new notes
+                        }
+                    }
                     ev=this.sequence[this.dragging.i];
-                    this.moveSelectedNote((ht.t-this.dragging.t)|0, (ht.n|0)-this.dragging.n);
+                    const dt = (ht.t-this.dragging.t)|0; // |0 is the same as Math.floor
+                    const dn = (ht.n|0)-this.dragging.n;
+                    if (dt === 0 && dn === 0) break;
+                    this.moveSelectedNote(dt, dn);
+                    this.dragging.t = this.dragging.t + dt;
+                    this.dragging.n = this.dragging.n + dn;
+                    this.triggerPostEditEvent();
                     this.redraw();
                     break;
                 }
             }
-            this.triggerPostEditEvent();
         };
         this.editGridDown=function(pos){
             const ht=this.hitTest(pos);
@@ -700,7 +707,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.markstartimg=this.elem.children[2];
             this.markendimg=this.elem.children[3];
             this.cursorimg=this.elem.children[4];
-            this.menu=this.elem.children[5];
             this.rcMenu={x:0, y:0, width:0, height:0};
             this.lastx=0;
             this.lasty=0;
@@ -712,7 +718,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.setListener(this.markendimg,true);
             this.setListener(this.markstartimg,true);
             this.setListener(this.cursorimg,true);
-            this.setListener(this.menu,false);
             this.sequence=[];
             this.dragging={o:null};
             this.layout();
@@ -733,9 +738,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.lastx=e.clientX-this.rcTarget.left;
                 this.lasty=e.clientY-this.rcTarget.top;
             }
-            if(this.lastx>=this.rcMenu.x&&this.lastx<this.rcMenu.x+this.rcMenu.width
-                    &&this.lasty>=this.rcMenu.y&&this.lasty<this.rcMenu.y+this.rcMenu.height)
-                t=this.menu;
             return {t:t, x:this.lastx, y:this.lasty};
         };
         this.contextmenu= function(e){
@@ -758,24 +760,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             else this.externalnoteons.add(noteNumber);
             this.redrawKeyboard();
         };
-        this.popMenu=function(pos){
-            const s=this.menu.style;
-            s.display="block";
-            s.top=(pos.y+8)+"px";
-            s.left=(pos.x+8)+"px";
-            this.rcMenu=this.menu.getBoundingClientRect();
-        };
         this.longtapcountup=function(){
             if(++this.longtapcount >= 18){
                 clearInterval(this.longtaptimer);
-                switch(this.downht.m){
-                case "N":
-                case "B":
-                case "E":
-                    this.popMenu(this.downpos);
-                    this.dragging={o:"m"};
-                    break;
-                }
             }
         };
         this.pointerdown=function(ev) {
@@ -804,6 +791,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
      
             this.longtapcount = 0;
             this.longtaptimer = setInterval(this.longtapcountup.bind(this),100);
+            this.notesDueDuplicate = e.altKey;
             window.addEventListener("touchmove", this.bindpointermove,false);
             window.addEventListener("mousemove",this.bindpointermove,false);
             window.addEventListener("touchend",this.bindcancel);
@@ -811,18 +799,8 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             window.addEventListener("contextmenu",this.bindcontextmenu);
 
             if(e.button==2||e.ctrlKey){
-                switch(this.downht.m){
-                case "N":
-                case "B":
-                case "E":
-                    this.popMenu(this.downpos);
-                    this.dragging={o:"m"};
-                    break;
-                default:
-                    if(this.editmode=="dragmono"||this.editmode=="dragpoly")
-                        this.dragging={o:"A",p:this.downpos,p2:this.downpos,t1:this.downht.t,n1:this.downht.n};
-                    break;
-                }
+                if(this.editmode=="dragmono"||this.editmode=="dragpoly")
+                    this.dragging={o:"A",p:this.downpos,p2:this.downpos,t1:this.downht.t,n1:this.downht.n};
                 ev.preventDefault();
                 ev.stopPropagation();
                 this.canvas.focus();
@@ -896,14 +874,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 if(this.yscroll)
                     this.yoffset=this.dragging.offsy+(pos.y-this.dragging.y)*(this.yrange/this.height);
                 break;
-            case "m":
-                if(ht.m=="m"){
-                    this.menu.style.background="#ff6";
-                }
-                else {
-                    this.menu.style.background="#eef";
-                }
-                break;
             case "A":
                 this.dragging.p2=pos;
                 this.dragging.t2=ht.t;
@@ -950,13 +920,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 clearInterval(this.longtaptimer);
             const pos=this.getPos(e);
             
-            if(this.dragging.o=="m"){
-                this.menu.style.display="none";
-                this.rcMenu={x:0,y:0,width:0,height:0};
-                if(pos.t==this.menu)
-                    this.delSelectedNote();
-                this.redraw();
-            }
             if(this.dragging.o=="A"){
                 this.selAreaNote(this.dragging.t1,this.dragging.t2,this.dragging.n1,this.dragging.n2);
                 this.dragging={o:null};
@@ -1014,13 +977,11 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             window.removeEventListener("mouseup",this.bindcancel,false);
             ev.preventDefault();
             ev.stopPropagation();
-//            window.removeEventListener("contextmenu",this.contextmenu);
             return false;
         };
         this.pointerover=function(e) {
         };
         this.pointerout=function(e) {
-//            window.removeEventListener("contextmenu",this.contextmenu);
         };
         this.wheel=function(e) {
             let delta = 0;
@@ -1106,6 +1067,32 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     break;
             }
         };
+        this.redrawEvent=function(ev) {
+            let x,w,y,x2,y2;
+            if(ev.f) 
+                this.ctx.fillStyle=this.colnotesel;
+            else
+                this.ctx.fillStyle=this.colnote;
+            const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(ev.n) > -1;
+            if (!noteIsAllowed) {
+                this.ctx.fillStyle = this.colnotedissalowed;
+            }
+            w=ev.g*this.stepw;
+            x=(ev.t-this.xoffset)*this.stepw+this.yruler+this.kbwidth;
+            x2=(x+w)|0; x|=0;
+            y=this.height - (ev.n-this.yoffset)*this.steph;
+            y2=(y-this.steph)|0; y|=0;
+            this.ctx.fillRect(x,y,x2-x,y2-y);
+            if(ev.f)
+                this.ctx.fillStyle=this.colnoteselborder;
+            else
+                this.ctx.fillStyle=this.colnoteborder;
+            
+            this.ctx.fillRect(x,y,1,y2-y);
+            this.ctx.fillRect(x2,y,1,y2-y);
+            this.ctx.fillRect(x,y,x2-x,1);
+            this.ctx.fillRect(x,y2,x2-x,1);
+        }
         this.semiflag=[6,1,0,1,0,2,1,0,1,0,1,0];
         this.redrawXRuler=function(){
             if(this.xruler){
@@ -1214,7 +1201,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             }
         };
         this.redraw=function() {
-            let x,w,y,x2,y2;
             if(!this.ctx)
                 return;
             this.ctx.clearRect(0,0,this.width,this.height);
@@ -1223,31 +1209,13 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.redrawKeyboard();
             this.redrawGrid();
             const l=this.sequence.length;
-            for(let s=0; s<l; ++s){
+            for(let s=0; s<l; ++s){ // first, draw not selected events
                 const ev=this.sequence[s];
-                if(ev.f)
-                    this.ctx.fillStyle=this.colnotesel;
-                else
-                    this.ctx.fillStyle=this.colnote;
-                const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(ev.n) > -1;
-                if (!noteIsAllowed) {
-                    this.ctx.fillStyle = this.colnotedissalowed;
-                }
-                w=ev.g*this.stepw;
-                x=(ev.t-this.xoffset)*this.stepw+this.yruler+this.kbwidth;
-                x2=(x+w)|0; x|=0;
-                y=this.height - (ev.n-this.yoffset)*this.steph;
-                y2=(y-this.steph)|0; y|=0;
-                this.ctx.fillRect(x,y,x2-x,y2-y);
-                if(ev.f)
-                    this.ctx.fillStyle=this.colnoteselborder;
-                else
-                    this.ctx.fillStyle=this.colnoteborder;
-                
-                this.ctx.fillRect(x,y,1,y2-y);
-                this.ctx.fillRect(x2,y,1,y2-y);
-                this.ctx.fillRect(x,y,x2-x,1);
-                this.ctx.fillRect(x,y2,x2-x,1);
+                if (ev.f === 0) this.redrawEvent(ev);
+            }
+            for(let s=0; s<l; ++s){ // then, draw selected events
+                const ev=this.sequence[s];
+                if (ev.f === 1) this.redrawEvent(ev);
             }
             this.redrawYRuler();
             this.redrawXRuler();
