@@ -629,6 +629,14 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     this.redraw();
                     break;
                 case "N":
+                    if (this.notesDueDuplicate) {
+                        this.notesDueDuplicate = false;
+                        const selectedNotes = this.selectedNotes();
+                        this.clearSel(); // we will leave the olf notes on place
+                        for (const note of selectedNotes) {
+                            this.addNote(note.ev.t, note.ev.n, note.ev.g, note.ev.v, 1); // ..and select the new notes
+                        }
+                    }
                     ev=this.sequence[this.dragging.i];
                     const dt = (ht.t-this.dragging.t)|0; // |0 is the same as Math.floor
                     const dn = (ht.n|0)-this.dragging.n;
@@ -783,6 +791,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
      
             this.longtapcount = 0;
             this.longtaptimer = setInterval(this.longtapcountup.bind(this),100);
+            this.notesDueDuplicate = e.altKey;
             window.addEventListener("touchmove", this.bindpointermove,false);
             window.addEventListener("mousemove",this.bindpointermove,false);
             window.addEventListener("touchend",this.bindcancel);
