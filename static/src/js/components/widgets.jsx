@@ -572,12 +572,10 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
         const oldWidgetSequence = jsElement.sequence;
         if (!isequal(oldWidgetSequence, newWidgetSequence)) {
             jsElement.sequence = newWidgetSequence.map(notaNova => {
-                const notaAntigua = oldWidgetSequence.find(nota => {
-                    return (nota.ot ?? nota.t) === (notaNova.ot ?? notaNova.t) &&
-                    (nota.og ?? nota.g) === (notaNova.og ?? notaNova.g) &&
-                    (nota.on ?? nota.n) === (notaNova.on ?? notaNova.n)
-                });
-                if (notaAntigua) return Object.assign(notaAntigua, notaNova); // perquè el widget js sàpiga que és la mateixa nota i es pugui arrosegar bé
+                // si la nota ja existia, la coloquem amb la mateixa referència amb Object.assign
+                // així, el widget sap que és la mateixa nota, i mantindrà el seu estat de selecció i s'hi podrà interactuar bé
+                const notaAntigua = oldWidgetSequence.find(nota => nota.id === notaNova.id);
+                if (notaAntigua) return Object.assign(notaAntigua, notaNova);
                 return {...notaNova, f: 0};
             });
             jsElement.redraw()
@@ -597,6 +595,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             'on': value.on,  // original note
             'ot': value.ob,  // original time
             'og': value.od,  // original duration
+            'id': value.id, // identifier
         }})
     }
 
@@ -608,6 +607,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             'on': value.on,  // original note
             'ob': value.ot,  // original time
             'od': value.og,  // original duration
+            'id': value.id, // identifier
         }})
     }
 
@@ -742,6 +742,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
                 d: duration,
                 n: pitch,
                 s: 0, // this means not selected
+                id: index,
             }
             newNotes.push(nota);
             previousPitch = pitch;

@@ -434,9 +434,16 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const event = new CustomEvent("pianoRollEdited", { detail: this.sequence });
             this.dispatchEvent(event);
         };
+        this.createID=function() {
+            const sortedCurrentIDs = this.sequence.map(note=>note.id).sort((a,b)=> a-b);
+            for (let i = 0; i < sortedCurrentIDs.length; i++) {
+                if (i !== sortedCurrentIDs[i]) return i; // si hi ha un forat, l'emplenem
+            }
+            return sortedCurrentIDs.length; // si no, i la lista és compacta, simplement afegim un
+        }
         this.addNote=function(t,n,g,v,f){
             if(t>=0 && n>=0 && n<128){
-                const ev={t:t,c:0x90,n:n,g:g,v:v,f:f};
+                const ev={t:t,c:0x90,n:n,g:g,v:v,f:f,id:this.createID()};
                 this.sequence.push(ev);
                 this.sortSequence();
                 this.redraw();
@@ -557,7 +564,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             else if(ht.m=="s"&&ht.t>=0){
                 this.clearSel();
                 var t=((ht.t/this.snap)|0)*this.snap;
-                this.sequence.push({t:t, n:ht.n|0, g:1, f:1});
+                this.sequence.push({t:t, n:ht.n|0, g:1, f:1,id:this.createID()});
                 this.dragging={o:"D",m:"E",i:this.sequence.length-1, t:t, g:1, ev:[{t:t,g:1,ev:this.sequence[this.sequence.length-1]}]};
                 this.redraw();
             }
