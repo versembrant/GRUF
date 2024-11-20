@@ -443,9 +443,10 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         }
         this.addNote=function(t,n,g,v,f){
             if(t>=0 && n>=0 && n<128){
-                const ev={t:t,c:0x90,n:n,g:g,v:v,f:f,id:this.createID()};
+                const ev={t:t,n:n,g:g,v:v,f:f,id:this.createID()};
                 this.sequence.push(ev);
                 this.sortSequence();
+                this.triggerPostEditEvent();
                 this.redraw();
                 return ev;
             }
@@ -507,17 +508,16 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const l=this.sequence.length;
             for(let i=0;i<l;++i){
                 const ev=this.sequence[i];
-                if(ev.f && ev.ot+dt<0)
-                    dt=-ev.ot;
+                if(ev.f && ev.t+dt<0)
+                    dt=-ev.t;
             }
             for(let i=0;i<l;++i){
                 const ev=this.sequence[i];
                 if(ev.f){
-                    ev.t=(((ev.ot+dt)/this.snap+.5)|0)*this.snap;
-                    ev.n=ev.on+dn;
+                    ev.t=(((ev.t+dt)/this.snap+.5)|0)*this.snap;
+                    ev.n=ev.n+dn;
                 }
             }
-            this.triggerPostEditEvent();
         };
         this.clearSel=function(){
             const l=this.sequence.length;
@@ -539,12 +539,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             let ev;
             if(ht.m=="N"){
                 ev=this.sequence[ht.i];
-                this.dragging={o:"D",m:"N",i:ht.i,t:ht.t,n:ev.n,dt:ht.t-ev.t};
-                for(let i=0,l=this.sequence.length;i<l;++i){
-                    ev=this.sequence[i];
-                    if(ev.f)
-                        ev.on=ev.n, ev.ot=ev.t, ev.og=ev.g;
-                }
+                this.dragging={o:"D",m:"N",i:ht.i,t:ht.t,n:ev.n,dt:ht.t-ev.t+1};
                 this.redraw();
             }
             else if(ht.m=="n"){
@@ -566,9 +561,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 var t=((ht.t/this.snap)|0)*this.snap;
                 this.sequence.push({t:t, n:ht.n|0, g:1, f:1,id:this.createID()});
                 this.dragging={o:"D",m:"E",i:this.sequence.length-1, t:t, g:1, ev:[{t:t,g:1,ev:this.sequence[this.sequence.length-1]}]};
+                this.triggerPostEditEvent();
                 this.redraw();
             }
-            this.triggerPostEditEvent();
         };
         this.editDragMove=function(pos){
             const ht=this.hitTest(pos);
@@ -578,6 +573,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 case "E":
                     if(this.dragging.ev){
                         const dt=((Math.max(0,ht.t)/this.snap+0.9)|0)*this.snap - this.dragging.t - this.dragging.g;
+                        if (dt === 0) break;
                         const list=this.dragging.ev;
                         for(let i = list.length - 1; i >= 0; --i){
                             const ev = list[i].ev;
@@ -587,13 +583,18 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                             if(this.editmove=="dragmono")
                                 this.delAreaNote(ev.t,ev.g);
                         }
+                        this.dragging.g = this.sequence[this.dragging.i].g;
+                        this.dragging.t = this.sequence[this.dragging.i].t;
+                        this.dragging.ev = this.selectedNotes();
 
                     }
                     this.redraw();
+                    this.triggerPostEditEvent();
                     break;
                 case "B":
                     if(this.dragging.ev){
                         const dt=((Math.max(0,ht.t)/this.snap+0.9)|0)*this.snap - this.dragging.t;
+                        if (dt === 0) break;
                         const list=this.dragging.ev;
                         for(let i = list.length - 1; i >= 0; --i){
                             const ev = list[i].ev;
@@ -604,9 +605,12 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                             if(this.editmove=="dragmono")
                                 this.delAreaNote(ev.t,ev.g);
                         }
+                        this.dragging.t = this.sequence[this.dragging.i].t;
+                        this.dragging.ev = this.selectedNotes();
 
                     }
                     this.redraw();
+                    this.triggerPostEditEvent();
                     break;
 
                 ev=this.sequence[this.dragging.i];
@@ -626,12 +630,17 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     break;
                 case "N":
                     ev=this.sequence[this.dragging.i];
-                    this.moveSelectedNote((ht.t-this.dragging.t)|0, (ht.n|0)-this.dragging.n);
+                    const dt = (ht.t-this.dragging.t)|0; // |0 is the same as Math.floor
+                    const dn = (ht.n|0)-this.dragging.n;
+                    if (dt === 0 && dn === 0) break;
+                    this.moveSelectedNote(dt, dn);
+                    this.dragging.t = this.dragging.t + dt;
+                    this.dragging.n = this.dragging.n + dn;
+                    this.triggerPostEditEvent();
                     this.redraw();
                     break;
                 }
             }
-            this.triggerPostEditEvent();
         };
         this.editGridDown=function(pos){
             const ht=this.hitTest(pos);

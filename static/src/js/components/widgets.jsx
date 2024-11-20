@@ -592,9 +592,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             't': value.b,  // time in beats
             'n': value.n,  // midi note number
             'g': value.d,  // note duration in beats
-            'on': value.on,  // original note
-            'ot': value.ob,  // original time
-            'og': value.od,  // original duration
             'id': value.id, // identifier
         }})
     }
@@ -604,9 +601,6 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             'b': value.t,  // beat position
             'n': value.n,  // midi note number
             'd': value.g,  // note duration in beats
-            'on': value.on,  // original note
-            'ob': value.ot,  // original time
-            'od': value.og,  // original duration
             'id': value.id, // identifier
         }})
     }
