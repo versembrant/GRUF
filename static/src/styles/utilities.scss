@@ -130,10 +130,25 @@
     justify-content: space-between;
 }
 
+.justify-self-end {
+    justify-self: end;
+}
+
 .items-center {
     align-items: center;
 }
 
+.self-start {
+    align-self: flex-start;
+}
+
+.self-center {
+    align-self: center;
+}
+
+.self-stretch {
+    align-self: stretch;
+}
 
 .text-12 {
     font-size: 12px;

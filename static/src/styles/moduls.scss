@@ -46,6 +46,8 @@ fieldset {
     align-self: flex-start;
 
     &.bare {
+        min-width: initial;
+        align-self: auto;
         border: none;
         padding: 0;
     }
@@ -74,7 +76,8 @@ fieldset {
 }
 
 .gruf-modul-delay {
-    & > div {
+    & > div, & > fieldset {
+        width: 110px;
         display: flex;
         justify-content: center;
         gap: 10px;
@@ -85,6 +88,7 @@ fieldset {
 }
 
 .gruf-modul-reverb {
+    position: relative;
     .knob {
         position: absolute;
         top: 10px;

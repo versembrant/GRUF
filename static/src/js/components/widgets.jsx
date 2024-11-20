@@ -46,7 +46,7 @@ export const createRecordingHandler = (estacio, parameterDescription) => {
 
 export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected, className=""}) => {
     return(
-        <button className={`logo-estacio estacio-${tipusEstacio}-logo ${className}`} onClick={() => setEstacioSelected(undefined)}></button>
+        <button className={`logo-estacio btn-white estacio-${tipusEstacio}-logo ${className}`} onClick={() => setEstacioSelected(undefined)}></button>
     )
 }
 
@@ -62,10 +62,10 @@ export const GrufSeparatorLine = () => {
     )
 }
 
-export const GrufLegend = ({ text, bare=false }) => {
+export const GrufLegend = ({ text, style={}, bare=false }) => {
     // we actually style the span element inside the legend element :)
     return (
-        <legend style={{display: "contents"}}><span className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
+        <legend style={{display: 'contents'}}><span style={style}className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
     )
 }
 
@@ -305,7 +305,7 @@ export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }
     return (
         <div className="gruf-pad">
             <Button
-                className={ isSelected ? 'selected': '' }
+                className={ "btn-white " + (isSelected ? 'selected': '') }
                 onMouseDown={handleMouseDown}
                 label={label}
             />
@@ -337,7 +337,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
     );
 };
 
-export const GrufToggle = ({ estacio, parameterName, top, left}) => {
+export const GrufToggle = ({ estacio, parameterName, className="", top, left}) => {
     subscribeToParameterChanges(estacio, parameterName);
 
     const parameterValue = estacio.getParameterValue(parameterName);
@@ -347,7 +347,7 @@ export const GrufToggle = ({ estacio, parameterName, top, left}) => {
     };
 
     return (
-        <div className="gruf-toggle" style={{ top: top, left: left }}>
+        <div className={`gruf-toggle ${className}`}style={{ top: top, left: left }}>
             <div
                 className={`p-toggle ${parameterValue ? 'on' : 'off'}`}
                 onClick={handleClick}
@@ -745,7 +745,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
     }
 
     return(
-        <button style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
+        <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
     )
 }
 
@@ -757,8 +757,8 @@ export const GrufNoteControls = ({ className, estacio, parameterName, width, max
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
                 <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
-                <button style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
+                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
             </fieldset>
         </fieldset>
     );
