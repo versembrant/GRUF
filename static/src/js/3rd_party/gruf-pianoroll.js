@@ -707,6 +707,8 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.markstartimg=this.elem.children[2];
             this.markendimg=this.elem.children[3];
             this.cursorimg=this.elem.children[4];
+            this.cursorimg.style.height=this.height+"px";
+            this.cursorimg.style.width='3px';
             this.rcMenu={x:0, y:0, width:0, height:0};
             this.lastx=0;
             this.lasty=0;
