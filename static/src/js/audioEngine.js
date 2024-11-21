@@ -321,10 +321,7 @@ export class AudioGraph {
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
-            if (this.isPlaying()) {
-                this.onMainSequencerTick(time)
-                this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1)
-            }
+            if (this.isPlaying()) this.onMainSequencerTick(time);
         }, "16n").start(0);
 
         // Inicialitzem els efectes
@@ -399,6 +396,8 @@ export class AudioGraph {
     }
 
     onMainSequencerTick(time) {
+        this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1); // primer, actualitzem el current step
+        // després, enviem aquesta dada a on calgui
         if (this.isPlayingLive()){
             // En mode live, trigueja el tick del sequenciador a totes les estacions
             // amb el referent de temps actual i el beat general. Les estacions s'encarreguen
