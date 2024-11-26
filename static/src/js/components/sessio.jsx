@@ -8,6 +8,8 @@ import { EntradaMidi } from "../components/entradaMidi";
 import { getURLParamValue, removeURLParam } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 import logo_gruf from "../../img/logo_gruf.svg"
+import { IkigaiMetronome } from "./widgets";
+import { getAudioGraphInstance } from "../audioEngine";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -45,11 +47,25 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 // removeURLParam('e');
 
 const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
+    const [isMetronomeActive, setIsMetronomeActive] = useState(false);
+    const bpm = getAudioGraphInstance().getBpm(); // Obtiene el BPM actual
+
+    const toggleMetronome = () => {
+    const newState = !isMetronomeActive;
+    setIsMetronomeActive(newState);
+    getAudioGraphInstance().setIsMetronomeEnabled(newState);
+    };
     return(
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
+                <button
+                    onClick={toggleMetronome}
+                    className={`btn-petit btn-white ${isMetronomeActive ? "active" : ""}`}
+                    >
+                    <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
+                </button>
                 <AudioTransportPlayStop playMode={estacioSelected === 'computer' ? 'arranjament' : 'live'} />
             </div>
         </div>
