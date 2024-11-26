@@ -243,32 +243,39 @@ export class EstacioGrooveBox extends EstacioBase {
 
         }
     }
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff, extras){
-        if (!getAudioGraphInstance().isGraphBuilt()){return;}
-        
+
+    setRecordingEnabled(isEnabled) {
+        this.recordingEnabled = isEnabled;
+    }
+
+    recEnabled(parameter) {
+        return this.recordingEnabled;
+    }
+
+    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+        if (!getAudioGraphInstance().isGraphBuilt()) {
+            return;
+        }
+
         const playerName = this.playerNames[midiNoteNumber % 4];
 
-        if (!noteOff){
-            const recEnabled = this.recEnabled('pattern') && !extras.skipRecording;
-            // Si Rec està ON
-            if (recEnabled) {   
-                const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
-                const currentStep = currentMainSequencerStep % this.getNumSteps();
-                const pattern = this.getParameterValue('pattern');
-                const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
+        if (!noteOff) {
+            const recEnabled = this.recEnabled('pattern') && !extras?.skipRecording;
+            const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
+            const currentStep = currentMainSequencerStep % this.getNumSteps();
+            const pattern = this.getParameterValue('pattern');
+
+            if (recEnabled) {
+                const index = indexOfArrayMatchingObject(pattern, { i: midiNoteNumber % 4, j: currentStep });
                 if (index === -1) {
-                    // Si la nota no està en el patró, l'afegeix
-                    pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
-                    this.updateParametreEstacio('pattern', pattern); // save change in server!
-                };
+                    pattern.push({ i: midiNoteNumber % 4, j: currentStep });
+                    this.updateParametreEstacio('pattern', pattern);
+                }
+            } else {
+                this.playSoundFromPlayer(playerName, Tone.now());
             }
-            // Play
-            else  this.playSoundFromPlayer(playerName, Tone.now());
-        } 
-        else {
-            // Stop
+        } else {
             this.stopSoundFromPlayer(playerName);
         }
-        
     }
 }

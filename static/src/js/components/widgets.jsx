@@ -27,17 +27,21 @@ const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
 
-export const createRecordingHandler = (estacio, parameterDescription) => {
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
+export const createRecordingHandler = (estacio, parameterName) => {
+    const recordingElementId = `${estacio.nom}_${parameterName}_REC`;
 
     const toggleRecording = (button) => {
         const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
+        const isRecording = !recordingInputElement.checked;
+
+        estacio.setRecordingEnabled(isRecording);
+
+        if (isRecording) {
             recordingInputElement.checked = true;
             button.classList.add('recording');
+        } else {
+            recordingInputElement.checked = false;
+            button.classList.remove('recording');
         }
     };
 
