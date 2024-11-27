@@ -370,7 +370,8 @@ export class EstacioBase {
         
         // now yes, create a note object
         const notes = this.getParameterValue('notes');
-        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset})
+        const jsPianoRollEl = document.getElementById(this.nom + "_" + "notes_id");
+        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset, 'id': jsPianoRollEl.getNextAvailableID()});
         this.updateParametreEstacio('notes', notes); // and save change in server!
     }
 
