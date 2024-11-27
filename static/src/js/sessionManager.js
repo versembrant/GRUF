@@ -175,19 +175,15 @@ export class EstacioBase {
         }
 
         const preset = this.parameterFollowsPreset(nomParametre) ? this.getCurrentLivePreset() : 0;  // For parameters that don't follow presets, allways update preset 0
-        if (getCurrentSession().localMode || getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
-            this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset, null);
-        }
+        this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset, null);
         if (getCurrentSession().localMode) return;
-            // In remote mode, we send parameter update to the server and the server will send it back
-            // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-            // locally before sending it to the sever and in this way the user experience is better as
-            // parameter changes are more responsive
+        // In remote mode, we send parameter update to the server and the server will send it to the rest of users
+        // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_parametre_estacio', {nom_estacio: this.nom, nom_parametre: nomParametre, valor: valor, preset: preset});
     }
     
     receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset, originSocketID) {
-        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
+        if (originSocketID === getSocketID()) return;
         // Triguejem canvi a l'store (que generarà canvi a la UI)
         this.setParametreInStore(nomParametre, valor, preset);
 
@@ -371,7 +367,6 @@ export class Session {
     constructor(data, local=false) {
         this.useAudioEngine = true
         this.localMode = local
-        this.performLocalUpdatesBeforeServerUpdates = true
         this.continuousControlThrottleTime = 50
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
@@ -488,19 +483,15 @@ export class Session {
     }
     
     updateParametreSessio(nomParametre, valor) {
-        if (this.localMode || this.performLocalUpdatesBeforeServerUpdates) {
-            this.receiveUpdateParametreSessioFromServer(nomParametre, valor, null);
-        }
+        this.receiveUpdateParametreSessioFromServer(nomParametre, valor, null);
         if (this.localMode) return;
-        // In remote mode, we send parameter update to the server and the server will send it back
-        // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-        // locally before sending it to the sever and in this way the user experience is better as
-        // parameter changes are more responsive
+        // In remote mode, we send parameter update to the server and the server will send it to the rest of users
+        // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_parametre_sessio', {nom_parametre: nomParametre, valor: valor});
     }
 
     receiveUpdateParametreSessioFromServer(nomParametre, valor, originSocketID) {
-        if (this.performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
+        if (originSocketID === getSocketID()) return;
         // Guardem valors a l'store
         this.setParametreInStore(nomParametre, valor);
     }
@@ -607,14 +598,10 @@ export class Session {
     }
 
     updateParametreLive(updateData) {
-        if (this.localMode || this.performLocalUpdatesBeforeServerUpdates) {
-            this.receiveUpdateLiveFromServer(updateData, null);
-        }
+        this.receiveUpdateLiveFromServer(updateData, null);
         if (this.localMode) return;
-        // In remote mode, we send parameter update to the server and the server will send it back
-        // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-        // locally before sending it to the sever and in this way the user experience is better as
-        // parameter changes are more responsive
+        // In remote mode, we send parameter update to the server and the server will send it to the rest of users
+        // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_live_sessio', {update_data: updateData});
     }
 
@@ -631,7 +618,7 @@ export class Session {
     }
 
     receiveUpdateLiveFromServer(updateData, originSocketID) {
-        if (this.performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
+        if (originSocketID === getSocketID()) return;
 
         const liveActualitzat = Object.assign({}, this.getLive());
         if (updateData.accio === 'set_gains') {
@@ -707,19 +694,15 @@ export class Session {
     }
 
     updateParametreArranjament(updateData) {
-        if (this.localMode || this.performLocalUpdatesBeforeServerUpdates) {
-            this.receiveUpdateArranjamentFromServer(updateData, null);
-        }
+        this.receiveUpdateArranjamentFromServer(updateData, null);
         if (this.localMode) return;
-        // In remote mode, we send parameter update to the server and the server will send it back
-        // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-        // locally before sending it to the sever and in this way the user experience is better as
-        // parameter changes are more responsive
+        // In remote mode, we send parameter update to the server and the server will send it to the rest of users
+        // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_arranjament_sessio', {update_data: updateData});
     }
 
     receiveUpdateArranjamentFromServer(updateData, originSocketID) {
-        if (this.performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
+        if (originSocketID === getSocketID()) return;
         
         const arranjamentActualitat = Object.assign({}, this.getArranjament());
         if (updateData.accio === 'add_clips') {

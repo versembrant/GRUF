@@ -471,18 +471,14 @@ export class AudioGraph {
     }
 
     updateParametreAudioGraph(nomParametre, valor) {
-        if (getCurrentSession().localMode || getCurrentSession().performLocalUpdatesBeforeServerUpdates) {
-            getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, null);
-        }
+        getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, null);
         if (getCurrentSession().localMode) return;
-        // In remote mode, we send parameter update to the server and the server will send it back
-        // However, if performLocalUpdatesBeforeServerUpdates is enabled, we can also set the parameter
-        // locally before sending it to the sever and in this way the user experience is better as
-        // parameter changes are more responsive
+        // In remote mode, we send parameter update to the server and the server will send it to the rest of users
+        // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_parametre_audio_graph', {nom_parametre: nomParametre, valor: valor});
     }
     receiveUpdateParametreAudioGraphFromServer(nomParametre, valor, originSocketID) {
-        if (getCurrentSession().performLocalUpdatesBeforeServerUpdates && originSocketID === getSocketID()) return;
+        if (originSocketID === getSocketID()) return;
         this.setParameterValue(nomParametre, valor);
     }
 
