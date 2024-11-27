@@ -346,18 +346,8 @@ export class EstacioBase {
         // noteOff = boolean which will be true if the message is a noteOff
     }
 
-    recEnabled(sequenceParameterName) {
-        // Checks if the "REC" button of the provided parameter name estació is pressed
-        const recToggleElement = document.getElementById(this.nom + '_' + sequenceParameterName + '_REC');
-        if (recToggleElement !== null){
-            return recToggleElement.checked;
-        }
-        return false;
-    }
-
     unfinishedNotesOnsets = new Map();
     handlePianoRollRecording(midiNoteNumber, noteOff) {
-        if (!this.recEnabled('notes')) return;
         const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
         const currentStep = currentMainSequencerStep % this.getNumSteps();
     
@@ -370,7 +360,8 @@ export class EstacioBase {
         
         // now yes, create a note object
         const notes = this.getParameterValue('notes');
-        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset})
+        const jsPianoRollEl = document.getElementById(this.nom + "_" + "notes_id");
+        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset, 'id': jsPianoRollEl.getNextAvailableID()});
         this.updateParametreEstacio('notes', notes); // and save change in server!
     }
 

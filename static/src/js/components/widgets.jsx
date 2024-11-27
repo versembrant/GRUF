@@ -669,9 +669,14 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
 
 export const NoteGenerator = ({ estacio, parameterName }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
-    const tonality = getAudioGraphInstance().getTonality(); 
+    const tonality = getAudioGraphInstance().getTonality();
 
     const parameterDescription = estacio.getParameterDescription(parameterName);
+    let jsPianoRollEl;
+    useEffect(()=> {
+        jsPianoRollEl = document.getElementById(estacio.nom + "_" + parameterDescription.nom + "_id");
+    })
+
     const lowestNote = parameterDescription.notaMesBaixaTipica || parameterDescription.notaMesBaixaPermesa;
     const highestNote = parameterDescription.notaMesAltaTipica || parameterDescription.notaMesAltaPermesa;
     const scalePCs = getPCsFromScaleName(tonality);
@@ -728,6 +733,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
         
         const newNotes = [];
         let previousPitch;
+        const firstAvailableID = jsPianoRollEl.getNextAvailableID();
         onsets.forEach((onset, index) => {
             const duration = durations[index];
             const pitch = getNextPitch(previousPitch);
@@ -736,7 +742,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
                 d: duration,
                 n: pitch,
                 s: 0, // this means not selected
-                id: index,
+                id: firstAvailableID + index,
             }
             newNotes.push(nota);
             previousPitch = pitch;
