@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useId, createElement } from "react";
 import { getCurrentSession } from "../sessionManager";
 import { getAudioGraphInstance } from '../audioEngine';
-import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter}  from "../utils";
+import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, subscribeToEstacioParameterChanges}  from "../utils";
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
@@ -26,23 +26,6 @@ import { circularProgressClasses } from "@mui/material";
 const valueToText = (value) => {
     return `${value >= 5 ? value.toFixed(0) : value.toFixed(2)}`;
 }
-
-export const createRecordingHandler = (estacio, parameterDescription) => {
-    const recordingElementId = estacio.nom + '_' + parameterDescription.nom + '_REC';
-
-    const toggleRecording = (button) => {
-        const recordingInputElement = document.getElementById(recordingElementId);
-        if (recordingInputElement.checked) {
-            recordingInputElement.checked = false;
-            button.classList.remove('recording');
-        } else {
-            recordingInputElement.checked = true;
-            button.classList.add('recording');
-        }
-    };
-
-    return { recordingElementId, toggleRecording };
-};
 
 export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected, className=""}) => {
     return(
@@ -403,8 +386,6 @@ export const GrufOnOffGrid = ({ estacio, parameterName, top, left }) => {
             transformOrigin: 'left'
         }
     }
-
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterDescription);
     
     return (
         <div className="gruf-on-off-grid" style={{ top: top, left: left}}>
@@ -756,15 +737,21 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
 }
 
 export const GrufNoteControls = ({ className, estacio, parameterName, width, maxHeight, ExtraComponent}) => {
-    const { recordingElementId, toggleRecording } = createRecordingHandler(estacio, parameterName);
+    subscribeToParameterChanges(estacio, 'isRecording');
+    useEffect(()=> {
+        estacio.updateParametreEstacio('isRecording', false); // stop recording when entering station (could be on for whatever reason (refresh instead of exit...))
+        return () => {
+            estacio.updateParametreEstacio('isRecording', false); // stop recording when exiting station
+        }
+    }, []);
+    const isRecording = estacio.getParameterValue('isRecording');
     return (
         <fieldset className={`modul-border ${className}`} style={{ width, maxHeight }}>
             {ExtraComponent ? <ExtraComponent estacio={estacio} parameterName={parameterName}/> : null}
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
-                <input id={recordingElementId} type="checkbox" style={{display:"none"}}/>
                 <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
-                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> toggleRecording(evt.target)}>Rec</button>
+                <button className={`btn-white ${isRecording ? 'recording' : ''}`} style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio('isRecording', !isRecording)}>Rec</button>
             </fieldset>
         </fieldset>
     );

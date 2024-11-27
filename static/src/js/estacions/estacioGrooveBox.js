@@ -249,7 +249,7 @@ export class EstacioGrooveBox extends EstacioBase {
         const playerName = this.playerNames[midiNoteNumber % 4];
 
         if (!noteOff){
-            const recEnabled = !extras.skipRecording;
+            const recEnabled = !extras.skipRecording && this.getParameterValue('isRecording');
             // Si Rec està ON
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();

@@ -68,6 +68,7 @@ export class EstacioBase {
         fxLow:{type: 'float', label: 'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
+        isRecording:{type: 'bool', initial: false, local: true}
     }
     store = undefined
     audioNodes = {}
@@ -177,6 +178,7 @@ export class EstacioBase {
         const preset = this.parameterFollowsPreset(nomParametre) ? this.getCurrentLivePreset() : 0;  // For parameters that don't follow presets, allways update preset 0
         this.receiveUpdateParametreEstacioFromServer(nomParametre, valor, preset, null);
         if (getCurrentSession().localMode) return;
+        if (this.getParameterDescription(nomParametre).local) return; // if it's a local parameter (like recording), don't send to others
         // In remote mode, we send parameter update to the server and the server will send it to the rest of users
         // However, we set it locally before sending it to the server, that way the UX is better as parameter changes are more responsive
         sendMessageToServer('update_parametre_estacio', {nom_estacio: this.nom, nom_parametre: nomParametre, valor: valor, preset: preset});
@@ -344,6 +346,7 @@ export class EstacioBase {
 
     unfinishedNotesOnsets = new Map();
     handlePianoRollRecording(midiNoteNumber, noteOff) {
+        if (!this.getParameterValue('isRecording')) return;
         const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
         const currentStep = currentMainSequencerStep % this.getNumSteps();
     
