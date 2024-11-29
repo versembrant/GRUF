@@ -17,10 +17,10 @@
 }
 
 html,body{
-	font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
-	font-size: 1rem;
+  font-size: 1rem;
   background: var(--base);
   color: var(--contrast);
   overflow-x: clip;
@@ -37,7 +37,7 @@ a {
 }
 
 a:hover {
- cursor: pointer;
+  cursor: pointer;
 }
 
 h1, h2 {
@@ -231,10 +231,10 @@ header.no-sticky {
 }
 
 @media (max-width: 57rem) {
-    nav .menu {
+  nav .menu {
     background: var(--verd-clar);
     border-radius: 16px;
-    }
+  }
 }
 
 
@@ -403,11 +403,11 @@ header.no-sticky {
 }
 
 .background-video {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
-   border-radius: 16px;
-   opacity: .7;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  opacity: .7;
 }
 
 /* frase en moviment */
@@ -417,12 +417,12 @@ header.no-sticky {
 }
 
 .title-moving-forward, .title-moving-backward {
-	clear: both;
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	padding: 0 6vw;
-	box-sizing: border-box;
+  clear: both;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 6vw;
+  box-sizing: border-box;
 }
 
 .moviment .title-moving-forward, .moviment .title-moving-backward {
@@ -457,14 +457,14 @@ header.no-sticky {
 
 /*
 .moviment:hover .title-moving-forward, .moviment:hover .title-moving-backward, .moviment:hover .reel {
-  background: var(--groc);
-  color: var(--contrast);
-  transition: all 0.3s ease-out;
+background: var(--groc);
+color: var(--contrast);
+transition: all 0.3s ease-out;
 }
 
 .moviment:hover .tipo-blanc {
-  color: var(--contrast);
-  transition: all 0.3s ease-out;
+color: var(--contrast);
+transition: all 0.3s ease-out;
 }
 */
 
@@ -534,14 +534,14 @@ header.no-sticky {
 }
 
 .programari {
-    width: 50%;
-    border: solid 2px var(--contrast);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: all 0.5s ease-out;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  width: 50%;
+  border: solid 2px var(--contrast);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.5s ease-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .programari:hover {
@@ -594,11 +594,11 @@ header.no-sticky {
 
 
 .tndm-acordio {
-	margin-top: 100px;
+  margin-top: 100px;
 }
 
 .tndm-acordio input {
-	position: absolute;
+  position: absolute;
   opacity: 0;
   z-index: -1;
 }
@@ -606,7 +606,7 @@ header.no-sticky {
 /* testimonis carrusel */
 
 .testimonis {
-	min-height: 100vh;
+  min-height: 100vh;
   overflow-x: hidden;
   margin-top: 12rem;
   margin-bottom: 12rem;
@@ -620,20 +620,20 @@ header.no-sticky {
 }
 
 .container-testimonis_sm {
-    display: flex;
-    gap: 4rem;
+  display: flex;
+  gap: 4rem;
 }
 
 .testimoni {
-    display: flex;
-    flex-direction: column;
-    height: fit-content;
-    flex: 1;
-    padding: 1em;
-    align-items: center;
-    border: solid 2px var(--contrast);
-    border-radius: 16px;
-    transition: all 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  flex: 1;
+  padding: 1em;
+  align-items: center;
+  border: solid 2px var(--contrast);
+  border-radius: 16px;
+  transition: all 0.3s ease-out;
 }
 .testimoni:hover {
   background: var(--groc);
@@ -654,12 +654,12 @@ header.no-sticky {
 }
 
 .testimoni img {
-    width: 280px;
-    height: 280px;
-    border-radius: 280px;
-    border: solid 2px var(--contrast);
-    margin: 1em;
-    object-fit: cover;
+  width: 280px;
+  height: 280px;
+  border-radius: 280px;
+  border: solid 2px var(--contrast);
+  margin: 1em;
+  object-fit: cover;
 }
 
 .testimoni:hover img {
@@ -676,21 +676,21 @@ header.no-sticky {
 /*** tutorials ***/
 
 details {
-	position: relative;
-	padding: 2rem;
-	margin-block: 1rem 0;
-	margin-inline: auto;
-	border: 2px solid var(--contrast);
-	border-radius: 16px;
+  position: relative;
+  padding: 2rem;
+  margin-block: 1rem 0;
+  margin-inline: auto;
+  border: 2px solid var(--contrast);
+  border-radius: 16px;
   transition: max-height .5s;
 }
 
 summary {
-	padding-inline: 4rem;
-	position: relative;
+  padding-inline: 4rem;
+  position: relative;
   font-size: 2rem;
-	font-weight: 700;
-	cursor: pointer;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .details__content {
@@ -700,21 +700,21 @@ summary {
 
 /* List Item ::marker supports only some CSS properties, so we're using ::before pseudo-element instead */
 summary::marker {
-	content: '+';
-	content: none;
+  content: '+';
+  content: none;
 }
 
 summary::before {
-	content: '+';
-	position: absolute;
-	inset-inline-start: 1rem;
-	inset-block-start: -0.05rem;
-	transition: rotate 0.2s;
+  content: '+';
+  position: absolute;
+  inset-inline-start: 1rem;
+  inset-block-start: -0.05rem;
+  transition: rotate 0.2s;
 }
 
 .details[open] summary::before {
-	rotate: 45deg;
-	inset-block-start: 0.05rem;
+  rotate: 45deg;
+  inset-block-start: 0.05rem;
 }
 
 
@@ -769,8 +769,8 @@ summary::before {
 }
 
 .logo-gene img {
- height: 1.5rem;
- opacity: .8;
+  height: 1.5rem;
+  opacity: .8;
 }
 
 .legal a {
@@ -781,98 +781,98 @@ summary::before {
 /* responsive */
 
 @media only screen and (max-width: 52rem) {
-    header, main, footer {
-      margin: 1rem 1rem 0 1rem;
-    }
-
-    .marge {
-      margin: 0px 2rem;
-    }
-
-    .header ul {
-      padding: 0;
-    }
-
-    .header ul li:first-child {
-      margin-left: 0;
-    }
-
-    .container {
-      flex-direction: column;
-    }
-
-    .presentacio {
-      width: auto;
-    }
-
-    .accio {
-      width: auto;
-    }
-
-   .title-moving-forward  {
-     overflow-x: hidden;
-   }
-
-    .explicacio, .reel .video {
-      width: 100%;
-    }
-
-    .postals {
-      flex-direction: column;
-    }
-
-    .frase {
-      width: 100%;
-      position: inherit;
-      padding-bottom: 2rem;
-    }
-
-    .carrusel {
-      width: 100%;
-    }
-
-    .compartir-container {
-      flex-direction: column;
-    }
-
-    .programari, .material {
-      width: auto;
-    }
-
-    .projecte-container {
-      flex-direction: column;
-    }
-
-    .versembrant-dreta, .versembrant-esquerra {
-      width: auto;
-    }
-
-    .footer {
-      flex-direction: column;
-    }
-
-    .logo-versembrant, .logo-gene {
-      flex-direction: column;
-    }
-
-    .container-testimonis {
-      padding-left: 2rem;
-    }
-
-    .testimoni:last-child:hover {
-      margin-right: 10rem;
-    }
-
-    .tndm-tab-content {
-      flex-direction: column;
-      gap: 2rem;
-
+  header, main, footer {
+    margin: 1rem 1rem 0 1rem;
+  }
+  
+  .marge {
+    margin: 0px 2rem;
+  }
+  
+  .header ul {
+    padding: 0;
+  }
+  
+  .header ul li:first-child {
+    margin-left: 0;
+  }
+  
+  .container {
+    flex-direction: column;
+  }
+  
+  .presentacio {
+    width: auto;
+  }
+  
+  .accio {
+    width: auto;
+  }
+  
+  .title-moving-forward  {
+    overflow-x: hidden;
+  }
+  
+  .explicacio, .reel .video {
+    width: 100%;
+  }
+  
+  .postals {
+    flex-direction: column;
+  }
+  
+  .frase {
+    width: 100%;
+    position: inherit;
+    padding-bottom: 2rem;
+  }
+  
+  .carrusel {
+    width: 100%;
+  }
+  
+  .compartir-container {
+    flex-direction: column;
+  }
+  
+  .programari, .material {
+    width: auto;
+  }
+  
+  .projecte-container {
+    flex-direction: column;
+  }
+  
+  .versembrant-dreta, .versembrant-esquerra {
+    width: auto;
+  }
+  
+  .footer {
+    flex-direction: column;
+  }
+  
+  .logo-versembrant, .logo-gene {
+    flex-direction: column;
+  }
+  
+  .container-testimonis {
+    padding-left: 2rem;
+  }
+  
+  .testimoni:last-child:hover {
+    margin-right: 10rem;
+  }
+  
+  .tndm-tab-content {
+    flex-direction: column;
+    gap: 2rem;
+    
     .tab-text, .tab-video {
       width: 100%
     }
-
+    
+  }
 }
-
 
 @media only screen and (max-width: 576px) {
   .botons {
@@ -888,98 +888,5 @@ summary::before {
     width: 180px;
     height: 180px;
   }
-
-}
-
-/* Connecta */
-
-.connectat-wrapper {
-  display: flex;
-  flex-direction: column;
-  //min-height: 100vh;
-}
-
-.connectat {
-  text-align: center;
-  background-image: url("../img/home intro.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  padding-top: 100px;
-  padding-bottom: 100px;
   
-  h1 {
-      color: rgb(35, 35, 38);
-      font-size: 60px;
-  }
-
-  input {
-      /* input element with transparent background, montserrat font, adaptable width and only lower border */
-      background-color: transparent;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 60px;
-      border: none;
-      border-bottom: 1px dotted rgb(35, 35, 38);
-      color: rgb(35, 35, 38);
-      width: 250px;
-  }
-
-  .connect-error {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, -10px);
-      margin: auto;
-      color: rgb(35, 35, 38);
-      background-color: rgb(212, 59, 93);
-      width: fit-content;
-      opacity: 0%;
-      animation-name: fadeout;
-      animation-duration: 4s;
-      border-radius: 15px;
-      padding: 10px 20px;
-  }
-
-  ul {
-      list-style-type: none;
-      padding: 0;
-      
-      li {
-          display:inline;
-          margin-left: 20px;
-      }
-  }
- 
-}
-
-@keyframes fadeout {
-  0%   {opacity: 100%;}
-  50%  {opacity: 100%;}
-  100% {opacity: 0%;}
-}
-
-.ultimsGrufs {
-  padding: 20px;
-  color: white;
-
-  ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-          line-height: 40px;
-      }
-  }
-}
-
-
-.crea {
-  margin: 10px;
-  margin-top: auto;
-  display: flex;
-  justify-content: center;
-  a {
-      border: none;
-      padding: 0;
-      text-decoration: underline;
-  }
 }

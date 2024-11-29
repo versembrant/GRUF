@@ -36,18 +36,7 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>
-            { showUtimsGrufs && infoSessions.length !== 0 ? <div className="ultimsGrufs">
-                <div>
-                    <h3>Últims GRUFs:</h3>
-                    <ul>
-                        {infoSessions.slice(0, 10).map((item, index) => <li key={item.id}>{ item.id } "{ item.name }" ({ item.num_estacions + 2 } estacions, { item.connected_users.length } usuaris)&nbsp;
-                            <a className="btn btn-petit btn-verd" href={appPrefix + "/g/" + item.id}>Connecta't</a>&nbsp;
-                            <a className="btn btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/master/"}>Connecta't (master)</a>&nbsp;
-                            <a className="btn btn-petit btn-gris" href={appPrefix + "/g/" + item.id + "/local/"}>Connecta't (local)</a>&nbsp;
-                            <a className="btn btn-petit btn-vermell"  href={appPrefix + "/delete_session/" + item.id}>Elimina</a></li>)}
-                    </ul>
-                </div>
-            </div>: ""}
+            
         </div>
     )
 };
