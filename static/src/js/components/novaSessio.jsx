@@ -1,6 +1,5 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState, useRef, useEffect } from "react";
-import { Navbar, Footer } from "./frontpage";
 import { capitalizeFirstLetter, capitalize, sample } from "../utils";
 
 const paraules = {
@@ -138,11 +137,10 @@ export const NovaSessio = () => {
 
     return(
         <div>
-            <Navbar/>
             <div className="nova-sessio-container">
                 <form className="nova-sessio-wrapper" method="POST" action=".">
                     <div className="sessio-header">
-                        <h1>Nou GRUF</h1>
+                        <h1>Crea un nou GRUF</h1>
                         <div className="input-title">
                             <input name="name" placeholder={defaultTitle.current} />
                         </div>                        
@@ -175,7 +173,6 @@ export const NovaSessio = () => {
                     </div>
                 </form>
             </div>
-            <Footer/>
         </div>
     )
 };

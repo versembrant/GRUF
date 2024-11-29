@@ -1,6 +1,3 @@
-
-import { Navbar, Footer } from "./frontpage";
-
 export const Connecta = ({infoSessions}) => {
 
     setTimeout(() => {
@@ -27,7 +24,6 @@ export const Connecta = ({infoSessions}) => {
 
     return (
         <div className="connectat-wrapper">
-            <Navbar/>
             <div className="connectat">
                 {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
                 <div>
@@ -52,7 +48,6 @@ export const Connecta = ({infoSessions}) => {
                     </ul>
                 </div>
             </div>: ""}
-            <Footer/>
         </div>
     )
 };

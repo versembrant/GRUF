@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<link href="{{ url_for('static', filename='dist/landing/style.css') }}" rel="stylesheet">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'header_no_sticky.html' %}
+<main>
+    <h1>Termes i Condicions</h1>
+
+    <div class="legal-section">
+        <h2>Introducció</h2>
+        <p>Benvingut a la nostra pàgina web. En accedir o utilitzar aquest lloc web, acceptes els termes i condicions següents. Si no estàs d'acord amb aquests termes, et demanem que no utilitzis aquest lloc web.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Propietat Intel·lectual</h2>
+        <p>Tots els drets de propietat intel·lectual sobre el contingut d'aquesta pàgina web (textos, imatges, logotips, gràfics, etc.) són propietat exclusiva de [Nom de l'empresa] o dels seus respectius titulars de drets. Queda prohibit qualsevol ús no autoritzat del contingut d'aquesta pàgina.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Protecció de Dades</h2>
+        <p>La nostra pàgina web compleix amb la normativa vigent de protecció de dades personals. Per obtenir més informació sobre com recollim, utilitzem i protegim la teva informació personal, et recomanem llegir la nostra <a href="#">Política de Privacitat</a>.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Exempció de Responsabilitat</h2>
+        <p>La informació proporcionada en aquest lloc web és només de caràcter informatiu. [Nom de l'empresa] no es fa responsable de cap dany directe o indirecte derivat de l'ús d'aquesta pàgina web ni de les seves fonts d'informació.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Canvis en els Termes i Condicions</h2>
+        <p>[Nom de l'empresa] es reserva el dret a modificar aquests termes i condicions en qualsevol moment. Els canvis entraran en vigor en el moment de la seva publicació al lloc web. Et recomanem revisar aquests termes periòdicament.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Llei Aplicable</h2>
+        <p>Aquests termes i condicions es regiran per la legislació vigent a [indica el país o la regió], i qualsevol conflicte derivat d'aquests termes serà sotmès als tribunals competents d'aquesta jurisdicció.</p>
+    </div>
+</main>
+{% include 'footer.html' %}
+{% endblock %}
+
+{% block js %}
+    <script src="{{ url_for('static', filename='dist/landing/js/script.js') }}"></script>
+{% endblock %}

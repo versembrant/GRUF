@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<link href="{{ url_for('static', filename='dist/landing/style.css') }}" rel="stylesheet">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+</style>
+{% endblock %}
+
 {% block content %}
-<div id="root" data-debug-mode="{{ debug_mode }}" data-connect-error="{{ error }}"><div class="carregant"><div>Carregant...</div></div></div>
+{% include 'header_no_sticky.html' %}
+<main>
+    <div id="root" data-debug-mode="{{ debug_mode }}" data-connect-error="{{ error }}"><div class="carregant"><div>Carregant...</div></div></div>
+</main>
+{% include 'footer.html' %}
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/connecta.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/connecta.js') }}"></script>
+    <script src="{{ url_for('static', filename='dist/landing/js/script.js') }}"></script>
 {% endblock %}

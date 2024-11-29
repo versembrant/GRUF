@@ -5,12 +5,15 @@
     "static/src/js/pagines/sessio.js",
     "static/src/js/pagines/novaSessio.js",
     "static/src/js/pagines/connecta.js",
-    "static/src/js/pagines/frontpage.js",
     "static/src/js/favicon.svg"
   ],
   "scripts": {
     "watch": "parcel watch --no-cache --no-hmr --dist-dir static/dist",
     "build": "parcel build --dist-dir static/dist"
+  },
+  "staticFiles": {
+    "staticPath": "static/src/landing",
+    "staticOutPath": "landing"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -36,6 +39,7 @@
   },
   "devDependencies": {
     "events": "^3.1.0",
+    "parcel-reporter-static-files-copy": "^1.5.3",
     "postcss": "^8.2.1",
     "postcss-modules": "^4.3.0"
   }

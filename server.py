@@ -352,7 +352,7 @@ def notifica_available_sessions():
 
 @bp.route('/')
 def frontpage():
-    return render_template('frontpage.html')
+    return render_template('frontpage.html', noappcss=True, noappjs=True)
 
 
 @bp.route('/connecta/')
@@ -375,6 +375,11 @@ def new():
             notify_new_gruf_created(s, request.form['email'])
         return redirect(url_for('app.session', session_id=s.id))
     return render_template('nova_sessio.html')
+
+
+@bp.route('/legal/')
+def legal():
+    return render_template('legal.html')
 
 
 @bp.route('/gruf/<session_id>/')

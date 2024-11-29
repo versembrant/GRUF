@@ -1,7 +1,6 @@
 .connectat-wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
 }
 
 .connectat {
@@ -11,6 +10,7 @@
     background-repeat: no-repeat;
     padding-top: 100px;
     padding-bottom: 100px;
+    border-radius: 15px;
     
     h1 {
         color: $black;
