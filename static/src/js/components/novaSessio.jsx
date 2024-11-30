@@ -142,11 +142,11 @@ export const NovaSessio = () => {
                     <div className="sessio-header">
                         <h1>Crea un nou GRUF</h1>
                         <div className="input-title">
-                            <input name="name" placeholder={defaultTitle.current} />
+                            Titol: <input name="name" placeholder={defaultTitle.current} autoComplete="false" />
                         </div>                        
                     </div>
                     <div className="estacions-list">
-                        <h3>Estacions Triades:</h3>
+                        <h3>Estacions de la sessió:</h3>
                         <div className="selected-cards">
                             {estacionsSelected.map((tipusEstacio, i) => (
                                 <div className="card" key={tipusEstacio + '_' + i}>
@@ -156,6 +156,8 @@ export const NovaSessio = () => {
                                     }
                                 </div>
                             ))}
+                            <div className="card" key={'computer_'}>Mixer</div>
+                            <div className="card" key={'computer_'}>Computer</div>
                         </div>
                         {estacionsSelected.length < 10 ?
                             < EstacioAdder handleAddStation={handleAddStation}/> :
@@ -189,7 +191,7 @@ const EstacioAdder = ({handleAddStation}) => {
                     <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
                 ))}
             </select>
-            <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>Afegir Estació</button>
+            <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>+ Afegir Estació</button>
         </div>
     )
 }

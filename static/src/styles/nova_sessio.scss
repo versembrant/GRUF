@@ -16,8 +16,8 @@
     padding: 20px;
     background-color: $black;
     border-radius: 15px;
-    width: 700px;
-    max-width: 700px;
+    width: 900px;
+    max-width: 900px;
     margin: 40px auto;
     color: $white;
     min-height: 400px;
@@ -32,7 +32,7 @@
         }
 
         .input-title input {
-            width: 100%;
+            width: 90%;
             overflow:visible;
             padding: 10px;
             font-size: 1.2rem;
@@ -40,6 +40,7 @@
             border-radius: 10px;
             background-color: transparent;
             color: $white;
+            margin-left:10px;
         }
     }
 
@@ -58,11 +59,9 @@
 
         .selected-cards {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-direction: row;
             margin-bottom: 20px;
-
-            height: calc((48px + 10px) * 5 + 10px);
+            flex-wrap: wrap;
             overflow-y: auto;
 
             .card {
@@ -74,7 +73,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                width: 100%;
+                width: 32%;
+                margin: 4px;
 
                 .delete-btn {
                     color: $red;
