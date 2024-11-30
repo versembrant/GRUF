@@ -8,9 +8,14 @@
     background-image: url("../img/home intro.jpg");
     background-size: cover;
     background-repeat: no-repeat;
-    padding-top: 100px;
-    padding-bottom: 100px;
+    //padding-top: 100px;
+    //padding-bottom: 100px;
     border-radius: 15px;
+    height: 50vh;
+    min-height: 250px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     
     h1 {
         color: $black;
@@ -31,6 +36,7 @@
     .connect-error {
         position: absolute;
         left: 50%;
+        top: 25%;
         transform: translate(-50%, -10px);
         margin: auto;
         color: $white;

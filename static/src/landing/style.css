@@ -735,16 +735,6 @@ summary::before {
   transition: all 0.3s ease-out;
 }
 
-.footer-no-border {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  justify-content: space-between;
-  padding: 2rem;
-  align-items: center;
-  transition: all 0.3s ease-out;
-}
-
 .footer:hover {
   background: var(--verd-clar);
 }

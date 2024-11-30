@@ -5,11 +5,19 @@
 {% endblock %}
 
 {% block content %}
-{% include 'header_no_sticky.html' %}
-<main>
-    <div id="root"></div>
-</main>
-{% include 'footer_no_border.html' %}
+<div class="flex-content-grows-wrapper">
+    <div class="flex-header">
+        {% include 'header_no_sticky.html' %}
+    </div>
+    <div class="flex-content">
+        <main>
+            <div id="root"></div>
+        </main>
+    </div>
+    <div class="flex-footer">
+        {% include 'footer.html' %}
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
