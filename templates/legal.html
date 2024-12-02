@@ -2,45 +2,34 @@
 
 {% block extra_head %}
 <link href="{{ url_for('static', filename='dist/landing/style.css') }}" rel="stylesheet">
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-</style>
 {% endblock %}
 
 {% block content %}
 {% include 'header_no_sticky.html' %}
-<main>
-    <h1>Termes i Condicions</h1>
+<main class="legal">
+    <h2>Avís legal</h2>
 
-    <div class="legal-section">
-        <h2>Introducció</h2>
-        <p>Benvingut a la nostra pàgina web. En accedir o utilitzar aquest lloc web, acceptes els termes i condicions següents. Si no estàs d'acord amb aquests termes, et demanem que no utilitzis aquest lloc web.</p>
-    </div>
+    <h3>1. Introducció</h3>
+    <p>El GRUF és una aplicació web per a la creació musical desenvolupada per la cooperativa Versembrant. Aquesta plataforma està dissenyada per permetre als usuaris crear música de manera fàcil i intuïtiva, amb una àmplia gamma d'eines i recursos. El present apartat legal regula l'ús de l'aplicació web GRUF i defineix els drets i responsabilitats dels usuaris.</p>
 
-    <div class="legal-section">
-        <h2>Propietat Intel·lectual</h2>
-        <p>Tots els drets de propietat intel·lectual sobre el contingut d'aquesta pàgina web (textos, imatges, logotips, gràfics, etc.) són propietat exclusiva de [Nom de l'empresa] o dels seus respectius titulars de drets. Queda prohibit qualsevol ús no autoritzat del contingut d'aquesta pàgina.</p>
-    </div>
+    <h3>2. Dades personals i privacitat</h3>
+    <p>GRUF respecta la privacitat dels seus usuaris i es compromet a no recopilar ni emmagatzemar cap tipus de dada personal. Així mateix, l'aplicació no utilitza cookies ni cap altra tecnologia de seguiment que pugui identificar als usuaris de manera individual.</p>
 
-    <div class="legal-section">
-        <h2>Protecció de Dades</h2>
-        <p>La nostra pàgina web compleix amb la normativa vigent de protecció de dades personals. Per obtenir més informació sobre com recollim, utilitzem i protegim la teva informació personal, et recomanem llegir la nostra <a href="#">Política de Privacitat</a>.</p>
-    </div>
+    <h3>3. Drets d'ús de la música creada</h3>
+    <p>Els usuaris de GRUF tenen total llibertat per crear, guardar i publicar la música que desenvolupin utilitzant l'aplicació. GRUF no imposa cap restricció sobre l'ús, distribució o publicació de la música creada pels usuaris. Els usuaris poden utilitzar la seva música de manera comercial o no comercial segons desitgin, sense cap limitació per part de GRUF.</p>
 
-    <div class="legal-section">
-        <h2>Exempció de Responsabilitat</h2>
-        <p>La informació proporcionada en aquest lloc web és només de caràcter informatiu. [Nom de l'empresa] no es fa responsable de cap dany directe o indirecte derivat de l'ús d'aquesta pàgina web ni de les seves fonts d'informació.</p>
-    </div>
+    <h3>4. Sons i recursos de l'aplicació</h3>
+    <p>Tots els sons disponibles a GRUF, incloent-hi els presets del Sampler, sons del Groovebox i altres recursos sonors, han estat creats per la cooperativa Versembrant i són de domini públic. Això vol dir que els usuaris poden utilitzar aquests sons lliurement en les seves creacions musicals, així com compartir-los o distribuir-los sense restriccions. No obstant això, els usuaris han de respectar els drets d'autor i altres normatives aplicables en cas que incorporin sons d'altres fonts en les seves composicions.</p>
 
-    <div class="legal-section">
-        <h2>Canvis en els Termes i Condicions</h2>
-        <p>[Nom de l'empresa] es reserva el dret a modificar aquests termes i condicions en qualsevol moment. Els canvis entraran en vigor en el moment de la seva publicació al lloc web. Et recomanem revisar aquests termes periòdicament.</p>
-    </div>
+    <h3>5. Contacte</h3>
+    <p>Per a qualsevol dubte o qüestió legal relacionada amb l'ús de GRUF, podeu contactar amb nosaltres a través del correu electrònic <a href="mailto:administracio@versembrant.cat">administracio@versembrant.cat</a> o utilitzant el <a href="https://versembrant.cat/contacta/">formulari de contacte</a> disponible a <a href="https://versembrant.cat/contacta/">https://versembrant.cat/contacta/</a>.</p>
 
-    <div class="legal-section">
-        <h2>Llei Aplicable</h2>
-        <p>Aquests termes i condicions es regiran per la legislació vigent a [indica el país o la regió], i qualsevol conflicte derivat d'aquests termes serà sotmès als tribunals competents d'aquesta jurisdicció.</p>
-    </div>
+    <h3>6. Modificacions dels termes legals</h3>
+    <p>Versembrant es reserva el dret de modificar els termes d'aquest apartat legal en qualsevol moment. Totes les modificacions seran efectives des del moment de la seva publicació a la pàgina web de GRUF. Els usuaris es comprometen a revisar aquest apartat legal periòdicament per estar al corrent de qualsevol canvi.</p>
+
+    <h3>7. Llei aplicable i jurisdicció</h3>
+    <p>Els presents termes i condicions es regiran per la legislació vigent a Espanya. Qualsevol disputa derivada de l'ús de l'aplicació GRUF serà resolta pels tribunals competents de la localitat de la seu de Versembrant, d'acord amb la legislació espanyola.</p>
+
 </main>
 {% include 'footer.html' %}
 {% endblock %}

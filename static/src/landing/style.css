@@ -880,3 +880,7 @@ summary::before {
   }
   
 }
+
+.legal p {
+  margin-bottom: 35px;
+}
