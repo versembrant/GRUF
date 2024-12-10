@@ -7,7 +7,7 @@ You need [Docker](https://www.docker.com/products/docker-desktop/) to be running
 1. Clone and `cd` to repo
 
 ```shell
-git clone git@github.com:ffont/versembrant-gruf.git
+git clone git@github.com:versembrant/GRUF.git
 cd versembrant-gruf/
 ```
 
