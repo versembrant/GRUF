@@ -1,42 +1,43 @@
-# versembrant-gruf
+# GRUF
 
-## Installation instructions
+## Instruccions d'instal·lació
 
-You need [Docker](https://www.docker.com/products/docker-desktop/) to be running in your machine. Assuming it is both installed and running, follow these instructions:
+Necessites que [Docker](https://www.docker.com/products/docker-desktop/) estigui funcionant al teu ordinador. Suposant que està instal·lat i en execució, segueix aquestes instruccions:
 
-1. Clone and `cd` to repo
+1. Clona i fes `cd` al repositori
 
 ```shell
 git clone git@github.com:versembrant/GRUF.git
 cd versembrant-gruf/
 ```
 
-2. Build Docker images:
+2. Construeix les imatges de Docker:
 
 ```shell
 docker compose build
 ```
 
-3. Build sample library: audio files for sampler and groovebox should be copied in `static/audio` folder, inside the corresponding `/sampler` and `/groovebox` subfolders, and the the following python script should be run to create `sampleLibrary.js` file (note that this needs to be run once, even if just to create an empty sound library). Audio files can be downloaded here: https://drive.google.com/file/d/1evpcD3svnlILLIfc8wSDF1PQrzoufyrb/view?usp=share_link
+3. Construeix la biblioteca de mostres: els fitxers d'àudio per al sampler i el groovebox s'han de copiar a la carpeta `static/audio`, dins de les subcarpetes corresponents `/sampler` i `/groovebox`, i després s'ha d'executar el següent script de Python per crear el fitxer `sampleLibrary.js (tingues en compte que això s'ha d'executar una vegada, encara que sigui només per crear una biblioteca de sons buida). Els fitxers d'àudio es poden descarregar aquí: https://drive.google.com/file/d/1evpcD3svnlILLIfc8wSDF1PQrzoufyrb/view?usp=share_link
 
 ```shell
 docker compose run --rm server python make_sample_library.py
 ```
 
-4. Install static dependencies and build static:
+4. Instal·la les dependències estàtiques i construeix els estàtics:
 
 ```shell
 docker compose run --rm server yarn install
 docker compose run --rm server yarn build
 ```
 
-5. Run server (this also includes a static build watcher so that static files will be automatically rebuilt when modifying files):
+5. Executa l'aplicació (això també inclou un observador de compilació estàtica perquè els fitxers estàtics es tornin a construir automàticament quan es modifiqui el codi font):
 
 ```shell
 docker compose up
 ```
 
-6. Open running application by poiting the browser at `http://localhost:5555/gruf/`
+6. Accedeix a l'aplicació amb el navegador a: `http://localhost:5555/gruf/`
+
 
 ## Diagrames
 
