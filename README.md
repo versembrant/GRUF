@@ -1,4 +1,6 @@
-# GRUF
+<p align="center">
+  <img src="_docs/logo_readme.png" alt="logo">
+</p>
 
 ## Instruccions d'instal·lació
 
@@ -43,12 +45,12 @@ docker compose up
 
 ### Diagrama de blocs general
 
-![alt text](_docs/Diagrama_de_blocs_general.png)
+![diagrama de blocs general](_docs/Diagrama_de_blocs_general.png)
 
 ### Diagrama de blocs del model de dades
 
-![alt text](_docs/Diagrama_de_blocs_model.png)
+![diagrama models](_docs/Diagrama_de_blocs_model.png)
 
 ### Diagrama de l'aplicació
 
-![alt text](_docs/Diagrama_aplicacio.png)
+![diagrama aplicació](_docs/Diagrama_aplicacio.png)
