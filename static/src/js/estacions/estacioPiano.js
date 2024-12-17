@@ -40,7 +40,7 @@ export class EstacioPiano extends EstacioBase {
         }
     }
 
-    onSequencerTick(currentMainSequencerStep, time) {
+    onSequencerStep(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes');

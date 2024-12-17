@@ -203,7 +203,7 @@ export class EstacioGrooveBox extends EstacioBase {
         }
     }
 
-    onSequencerTick(currentMainSequencerStep, time) {
+    onSequencerStep(currentMainSequencerStep, time) {
         // Check if sounds should be played in the current step and do it
         const currentStep = currentMainSequencerStep % (this.getNumSteps());
         const pattern = this.getParameterValue('pattern');

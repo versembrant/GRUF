@@ -206,7 +206,7 @@ export class EstacioSampler extends EstacioBase {
         buffer.onload = (loadedBuffer) => this.bufferLoadMap.get(buffer).forEach(mapTarget => mapTarget.buffer = loadedBuffer);
     }
 
-    onSequencerTick(currentMainSequencerStep, time) {
+    onSequencerStep(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
         const notes = this.getParameterValue('notes');

@@ -321,7 +321,7 @@ export class AudioGraph {
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
-            if (this.isPlaying()) this.onMainSequencerTick(time);
+            if (this.isPlaying()) this.onMainSequencerStep(time);
         }, "16n").start(0);
 
         // Inicialitzem els efectes
@@ -395,16 +395,16 @@ export class AudioGraph {
         this.updateParametreAudioGraph('isPlayingArranjament', false);
     }
 
-    onMainSequencerTick(time) {
+    onMainSequencerStep(time) {
         this.setMainSequencerCurrentStep(this.mainSequencerCurrentStep + 1); // primer, actualitzem el current step
         // després, enviem aquesta dada a on calgui
         if (this.isPlayingLive()){
-            // En mode live, trigueja el tick del sequenciador a totes les estacions
+            // En mode live, trigueja el step del sequenciador a totes les estacions
             // amb el referent de temps actual i el beat general. Les estacions s'encarreguen
             // de transformar el número de beat global a la seva duració interna
             getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
-                estacio.onSequencerTick(this.mainSequencerCurrentStep, time);
+                estacio.onSequencerStep(this.mainSequencerCurrentStep, time);
             });
         } else if (this.isPlayingArranjament()) {
             // Primer settejem la propietat arranjamentPreset de totes les estacions a -1, més tard canviarem aquest valor si hi ha clips que s'han de 
@@ -424,7 +424,7 @@ export class AudioGraph {
                         estacio.setCurrentPreset(clip.preset)
                     }
                     estacio.arranjamentPreset = clip.preset // Això només ho fem servir per saber quan hem de pintar el playhead vermell a les estacions quan estiguem en mode arranjament.
-                    estacio.onSequencerTick(beatIntern, time);
+                    estacio.onSequencerStep(beatIntern, time);
                 }
             })
 

@@ -335,8 +335,8 @@ export class EstacioBase {
         // Called when audio graph is stopped
     }
 
-    onSequencerTick(currentMainSequencerStep, time) {
-        // Called at each tick (16th note) of the main sequencer so the station can trigger notes, etc.
+    onSequencerSteo(currentMainSequencerStep, time) {
+        // Called at each step (16th note) of the main sequencer so the station can trigger notes, etc.
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
