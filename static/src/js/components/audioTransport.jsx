@@ -4,6 +4,7 @@ import icona_play_live from "../../img/play_button.svg"
 import icona_play_arranjament from "../../img/play_button_grid.svg"
 import icona_stop_live from "../../img/stop_button.svg"
 import icona_stop_arranjament from "../../img/stop_button_grid.svg"
+import { useEffect } from "react";
 
 const handlePlayButton = async (playMode) => {
     if (playMode !== 'live' && playMode !== 'arranjament') throw new Error(`Unknown playMode: ${playMode}`)
@@ -22,13 +23,25 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
     subscribeToStoreChanges(getAudioGraphInstance());
     const imgSrc = !getAudioGraphInstance().isPlaying() ? playMode === 'live' ? icona_play_live : icona_play_arranjament :
         getAudioGraphInstance().isPlayingArranjament() ? icona_stop_arranjament : icona_stop_live;
+    
+    const handleKbPress = (e) => {
+        if (e.key !== " ") return; // only interested about space
+        e.preventDefault(); // per defecte, la barra d'espai fa scroll vertical
+        document.querySelector("#transport-toggle").click();
+    }
+    useEffect(()=> {
+        document.addEventListener('keydown', handleKbPress);
+        return () => document.removeEventListener('keydown', handleKbPress);
+    }, [])
+
     return (
-        <div>
-            <button disabled={!getAudioGraphInstance().isGraphBuilt()}
-            className="btn-white btn-petit"
-            onClick={() => handlePlayButton(playMode)}>
-                <img height="16px" src={imgSrc}/>
-            </button>
-        </div>
+    <div>
+        <button id="transport-toggle"
+        disabled={!getAudioGraphInstance().isGraphBuilt()}
+        className="btn-white btn-petit"
+        onClick={() => handlePlayButton(playMode)}>
+            <img height="16px" src={imgSrc}/>
+        </button>
+    </div>
     )
 };
