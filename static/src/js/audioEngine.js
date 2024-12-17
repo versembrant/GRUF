@@ -366,11 +366,11 @@ export class AudioGraph {
         console.log("Transport start")
         this.setParametreInStore('isPlaying', true);
 
-        // Posiciona el current step del sequenciador a 0 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
+        // Posiciona el current step del sequenciador a -1 (o a un altre valor si l'audio engine no és master i està synced amb un altre audio engine que sí que ho és)
         if (this.isMasterAudioEngine() || !this.isAudioEngineSyncedToRemote()){
-            this.setMainSequencerCurrentStep(0);
+            this.setMainSequencerCurrentStep(-1);
         } else {
-            this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : 0);
+            this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : -1);
         }
 
         // Trigueja el transport start a totes les estacions i el transport general
