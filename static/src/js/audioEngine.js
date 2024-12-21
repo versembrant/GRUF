@@ -293,7 +293,9 @@ export class AudioGraph {
     }
 
     applyEffectParameters(effectParams) {
+        if (this.useAudioEffects !== true) return;
         if (!this.isGraphBuilt()) return;
+        
         this.reverb.wet.value = effectParams.reverbWet;
         this.reverb.decay = effectParams.reverbDecay;
         this.delay.wet.value = effectParams.delayWet;
@@ -391,6 +393,13 @@ export class AudioGraph {
 
     transportStart() {
         if (!this.isGraphBuilt()) return;
+
+        // Optimize global tone context for playback (mightier latency and use less CPU (?))
+        if (!(location.href.indexOf("interativelatency=1") != -1)){
+            const context = new Tone.Context({ latencyHint: "playback" });
+            Tone.setContext(context);
+        }
+
         console.log("Transport start")
         this.setParametreInStore('isPlaying', true);
 
