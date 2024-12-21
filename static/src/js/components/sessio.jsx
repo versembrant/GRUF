@@ -134,7 +134,7 @@ export const Sessio = () => {
     const [estacioSelected, setEstacioSelected] = useState(estacioSelectedURLParam);  // Local state for component Sessio
 
     let showMainUI = true;
-    if(location.href.indexOf("minimalui=1") != -1){
+    if (location.href.indexOf("minimalui=1") != -1) {
         showMainUI = false;
     }
 
