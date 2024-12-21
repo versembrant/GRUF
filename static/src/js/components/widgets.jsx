@@ -1046,3 +1046,38 @@ export const SpectrumGraph = () => {
         </div>
     )
 }
+
+export const IkigaiMetronome = ({ isMetronomeActive }) => {
+    const [bpm, setBpm] = useState(getAudioGraphInstance().getBpm());
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const newBpm = getAudioGraphInstance().getBpm();
+        if (newBpm !== bpm) {
+          setBpm(newBpm);
+        }
+      }, 100); 
+  
+      return () => clearInterval(interval); 
+    }, [bpm]);
+  
+    const animationDuration = 60 / bpm; 
+  
+    return (
+      <div className="metronome-ikigai-container">
+        <div
+          className={`circle-left ${isMetronomeActive ? 'circle-alternate' : ''}`}
+          style={{
+            animationDuration: `${animationDuration}s`,
+          }}
+        ></div>
+        <div
+          className={`circle-right ${isMetronomeActive ? 'circle-alternate' : ''}`}
+          style={{
+            animationDuration: `${animationDuration}s`,
+            animationDelay: `${animationDuration / 2}s`, // Retardo para alternar la iluminación
+          }}
+        ></div>
+      </div>
+    );
+  };
