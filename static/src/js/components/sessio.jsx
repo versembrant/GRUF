@@ -132,13 +132,20 @@ export const Sessio = () => {
         estacioSelectedURLParam = undefined
     };
     const [estacioSelected, setEstacioSelected] = useState(estacioSelectedURLParam);  // Local state for component Sessio
+
+    let showMainUI = true;
+    if(location.href.indexOf("minimalui=1") != -1){
+        showMainUI = false;
+    }
+
+    const mainUI = estacioSelected ? <EstacioUI estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/> : <SelectorEstacions setEstacioSelected={setEstacioSelected}/>
     
     return (
         <div className="sessio-wrapper">
             <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
             <div className="sessio">
                 <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
-                {estacioSelected ? <EstacioUI estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/> : <SelectorEstacions setEstacioSelected={setEstacioSelected}/>}
+                {showMainUI ? mainUI: ""}
                 <SessioFooter />
             </div>
         </div>
