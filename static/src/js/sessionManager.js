@@ -264,6 +264,11 @@ export class EstacioBase {
 
     addEffectChainNodes (audioInput, audioOutput){
         // Create nodes for the effect chain
+        if (getAudioGraphInstance().useAudioEffects !== true){
+            audioInput.chain(audioOutput);
+            return;
+        }
+
         const effects = {
             reverb: new Tone.Reverb({
                 decay: 0.5,

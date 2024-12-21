@@ -17,6 +17,7 @@ export class AudioGraph {
         this.estacionsMasterChannelNodes = {};
         this.estacionsMeterNodes = {};
         this.spectrumSize = 64;
+        this.useAudioEffects = !(location.href.indexOf("noeffects=1") != -1);
 
         this.parametersDescription = {
             bpm: {type: 'float', min: 40, max: 300, initial: 90},
@@ -272,6 +273,8 @@ export class AudioGraph {
 
     //Creem uns efectes
     initEffects(){
+        if (this.useAudioEffects !== true) return;
+
         this.reverb = new Tone.Reverb().connect(this.masterGainNode);
         this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
         this.reverbChannel.receive("reverb");
