@@ -41,6 +41,7 @@ docker compose up
 6. Accedeix a l'aplicació amb el navegador a: `http://localhost:5555/gruf/`
 
 
+
 ## Diagrames
 
 ### Diagrama de blocs general
@@ -54,3 +55,13 @@ docker compose up
 ### Diagrama de l'aplicació
 
 ![diagrama aplicació](_docs/Diagrama_aplicacio.png)
+
+
+
+## Debug
+
+Es poden utlizar alguns paràmetres opcionals a la URL per poder testejar temes relacionats amb performance:
+
+* `minimalui=1`: no renderitza la UI principal, només el títol de la sessió i el botó de play.
+* `interativelatency=1`: optimiza el contexe the tone js per interactivity (pot tenir pitjor performance però fa servir un lookAhead menor).
+* `noeffects=1`: no utlitzis efectes ni a les estacions ni els generals (tot i que els controls si que seran visibles). Si no hi ha efectes, la performance por pujar.
