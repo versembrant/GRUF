@@ -34,26 +34,20 @@
     <section> <!-- seccio frase en moviment + què és + video-->
         <div class="moviment">
             <h3 class="frase-gran title-moving-forward">· crea · grava · comparteix <h3>
-                
                 <div class="reel">
-                    
                     <div class="marge centre-vertical container">
-                        
                         <div class="explicacio tipo-blanc paragraf-important">
                             <p><b>GRUF</b> és un programari lliure de producció musical, en versió web i aplicació, dissenyat especialment per a l'aprenentatge de <strong>competències musicals i artístiques</strong>.</p>
                             <p>GRUF integra els principals instruments que s'utilitzen en l'àmbit de la producció musical actual (sàmpler, seqüenciador, sintetitzador, mesclador…).</p>
                             <p>Amb GRUF podràs aprendre a produir els teus pròpis beats o crear en comunitat de forma col·laborativa. </p>
                         </div>
-                        
                         <div class="video">
-                            <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1031105927?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="record"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+                            <video class="background-video" controls>
+                                <source src="{{ url_for('static', filename='dist/landing/images/video_gruf.mp4') }}" type="video/mp4">
+                            </video>
                         </div>
-                        
-                    </div>
-                    
+                    </div>    
                 </div>
-                
-                
                 <h3 class="frase-gran title-moving-backward">· crea · comparteix · grava · crea </h3>
             </div>
         </div>
@@ -136,7 +130,7 @@
             
     <section> <!-- testimonis -->
         
-        <div class="testimonis">
+        <!--div class="testimonis">
             <div class="container-testimonis">
                 
                 <div class="container-testimonis_sm">
@@ -177,7 +171,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div-->
     </section>
 </main>
 {% include 'footer.html' %}
