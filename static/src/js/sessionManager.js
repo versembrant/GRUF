@@ -229,14 +229,19 @@ export class EstacioBase {
             return;
         }
         if (name == "fxReverbWet"){
+            if (getAudioGraphInstance().useReverbDelay === false){ return; }
             this.audioNodes.effects['reverb'].set({'wet': value});
         } else if (name == "fxReverbDecay"){
+            if (getAudioGraphInstance().useReverbDelay === false){ return; }
             this.audioNodes.effects['reverb'].set({'decay': value});
         } else if (name == "fxDelayTime"){
+            if (getAudioGraphInstance().useReverbDelay === false){ return; }
             this.audioNodes.effects['delay'].set({'delayTime': this.getDelayTimeValue(value)});
         } else if (name == "fxDelayFeedback"){
+            if (getAudioGraphInstance().useReverbDelay === false){ return; }
             this.audioNodes.effects['delay'].set({'feedback': value});
         } else if (name == "fxDelayWet"){
+            if (getAudioGraphInstance().useReverbDelay === false){ return; }
             this.audioNodes.effects['delay'].set({'wet': value});
         } else if (name == "fxDrive"){
             this.audioNodes.effects['drive'].set({'wet': 1.0});
@@ -270,15 +275,6 @@ export class EstacioBase {
         }
 
         const effects = {
-            reverb: new Tone.Reverb({
-                decay: 0.5,
-                wet: 0,
-            }),
-            delay: new Tone.FeedbackDelay({
-                wet: 0,
-                feedback: 0.5,
-                delayTime: this.getDelayTimeValue('1/4'),
-            }),
             drive: new Tone.Distortion({
                 distortion: 0,
             }),
@@ -291,12 +287,26 @@ export class EstacioBase {
                 high: 0,
             }),
         }
+        let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3];
+
+        if (getAudioGraphInstance().useReverbDelay === true){
+            effects['reverb'] = new Tone.Reverb({
+                decay: 0.5,
+                wet: 0,
+            });
+            effects['delay'] = new Tone.FeedbackDelay({
+                wet: 0,
+                feedback: 0.5,
+                delayTime: this.getDelayTimeValue('1/4'),
+            })
+            effectsChain = [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
+        }
 
         // Add the nodes to the station's audioNodes dictionary
         this.audioNodes.effects = effects;
 
         // Connect the nodes in the effect chain
-        audioInput.chain( ...[effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3], audioOutput);
+        audioInput.chain( ...effectsChain, audioOutput);
     }
     
     // UI stuff

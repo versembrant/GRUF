@@ -18,6 +18,7 @@ export class AudioGraph {
         this.estacionsMeterNodes = {};
         this.spectrumSize = 64;
         this.useAudioEffects = !(location.href.indexOf("noeffects=1") != -1);
+        this.useReverbDelay = !(location.href.indexOf("noreverbdelay=1") != -1);
 
         this.parametersDescription = {
             bpm: {type: 'float', min: 40, max: 300, initial: 90},
@@ -275,13 +276,15 @@ export class AudioGraph {
     initEffects(){
         if (this.useAudioEffects !== true) return;
 
-        this.reverb = new Tone.Reverb().connect(this.masterGainNode);
-        this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-        this.reverbChannel.receive("reverb");
+        if (this.useReverbDelay === true) {
+            this.reverb = new Tone.Reverb().connect(this.masterGainNode);
+            this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
+            this.reverbChannel.receive("reverb");
 
-        this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
-        this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
-        this.delayChannel.receive("delay");
+            this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
+            this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
+            this.delayChannel.receive("delay");
+        }
 
         this.drive = new Tone.Distortion().connect(this.masterGainNode);
         this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
@@ -296,11 +299,13 @@ export class AudioGraph {
         if (this.useAudioEffects !== true) return;
         if (!this.isGraphBuilt()) return;
         
-        this.reverb.wet.value = effectParams.reverbWet;
-        this.reverb.decay = effectParams.reverbDecay;
-        this.delay.wet.value = effectParams.delayWet;
-        this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
-        this.delay.feedback.value = effectParams.delayFeedback;
+        if (this.useReverbDelay === true) {
+            this.reverb.wet.value = effectParams.reverbWet;
+            this.reverb.decay = effectParams.reverbDecay;
+            this.delay.wet.value = effectParams.delayWet;
+            this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
+            this.delay.feedback.value = effectParams.delayFeedback;
+        }
         this.drive.distortion = effectParams.drive;
         this.eq3.set({
             low: effectParams.eq3LowGain,
