@@ -54,7 +54,7 @@ export class EstacioBase {
     tipus = 'base'
     versio = '0.0'
     static parametersDescription = {
-        gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1, initial: 1},
+        gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1.0, initial: 0.75},
         pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
         isRecording:{type: 'bool', initial: false, local: true},
         fxDrive:{type: 'float', label: 'Drive', min: 0.0, max: 1.0, initial: 0.0},
@@ -213,9 +213,9 @@ export class EstacioBase {
        
         // FX propis de l'estació
         if (name == "fxDrive"){
-            this.audioNodes.effects['drive'].set({'wet': 1.0});
+            this.audioNodes.effects['drive'].set({'wet': 0.5});
             this.audioNodes.effects['drive'].set({'distortion': value});
-            const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
+            const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 6);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
             this.audioNodes.effects['driveMakeupGain'].set({'gain': makeupGain});
         } else if (name == "fxLow"){
             this.audioNodes.effects['eq3'].set({'low': this.getParameterValue("fxEqOnOff", preset) ? value: 0});
@@ -257,6 +257,9 @@ export class EstacioBase {
                 mid: 0,
                 high: 0,
             }),
+            eqMakeupGain: new Tone.Gain({
+                gain: Tone.dbToGain(3),
+            }),
             reverbASendChannel: new Tone.Channel({ 
                 volume: -100 
             }),
@@ -264,7 +267,7 @@ export class EstacioBase {
                 volume: -100 
             })
         }
-        let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3];
+        let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3, effects.eqMakeupGain];
         effects.reverbASendChannel.send("reverbA");
         effects.delayASendChannel.send("delayA");
         getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);

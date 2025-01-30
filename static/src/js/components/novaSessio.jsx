@@ -117,7 +117,7 @@ export const NovaSessio = () => {
             const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
             estacio.initialize();
             sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
-            sessionData.live.gainsEstacions[nomEstacio] = 1.0;
+            sessionData.live.gainsEstacions[nomEstacio] = 0.75;
             sessionData.live.pansEstacions[nomEstacio] = 0.0;
             sessionData.live.mutesEstacions[nomEstacio] = false;
             sessionData.live.solosEstacions[nomEstacio] = false;
