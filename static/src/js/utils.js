@@ -547,3 +547,12 @@ export const getDiatonicIntervalEZ = (note1, note2) => {
 export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
     return midiPitch - (midiPitch % 12) + pitchClass + (midiPitch % 12 <= pitchClass ? 0 : 12);
 }
+
+// Util function to set a master effects parameter
+
+export const setMasterEffectsParameter = (effectKey, value) => {
+    const parsedValue = effectKey === 'delayATime' ? value : parseFloat(value);
+    let newEffectParameters = {...getAudioGraphInstance().getEffectParameters() , [effectKey]: parsedValue};
+    getAudioGraphInstance().updateParametreAudioGraph('effectParameters', newEffectParameters);
+};
+
