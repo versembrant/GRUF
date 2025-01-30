@@ -49,8 +49,8 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                 <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio}/>
 
                 <GrufModulEQ className="col-start-3 row-start-3" estacio={estacio} />
-                <GrufModulDelay className="col-start-4 row-start-2 row-span-2"estacio={estacio} />
-                <GrufModulReverb className="col-start-3 row-start-1 row-span-2"estacio={estacio} />
+                <GrufModulDelay className="col-start-4 row-start-2 row-span-2" estacio={estacio} />
+                <GrufModulReverb className="col-start-3 row-start-1 row-span-2" estacio={estacio} />
 
 
                 <fieldset className="col-start-1 col-span-4 flex justify-between gap-10">

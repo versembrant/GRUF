@@ -56,19 +56,14 @@ export class EstacioBase {
     static parametersDescription = {
         gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1, initial: 1},
         pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
-
-        // FX
-        fxReverbWet: {type: 'float', label: 'Reverb Wet', min: 0.0, max: 0.5, initial: 0.0},
-        fxReverbDecay: {type: 'float', label:'Reverb Decay', unit: units.second, min: 0.1, max: 15, initial: 1.0},
-        fxDelayWet: {type: 'float', label: 'Delay Wet', min: 0.0, max: 1, initial: 0.0},
-        fxDelayFeedback:{type: 'float', label: 'Delay Feedback', min: 0.0, max: 1.0, initial: 0.5},
-        fxDelayTime:{type: 'enum', label: 'Delay Time', options: ['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'], initial: '1/8'},
+        isRecording:{type: 'bool', initial: false, local: true},
         fxDrive:{type: 'float', label: 'Drive', min: 0.0, max: 1.0, initial: 0.0},
         fxEqOnOff: {type : 'bool', label: 'EQ On/Off', initial: true},
         fxLow:{type: 'float', label: 'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
-        isRecording:{type: 'bool', initial: false, local: true}
+        fxReverbASend: {type: 'float', label: 'Reverb A Send', min: -60, max: 6, initial: -60},
+        fxDelayASend: {type: 'float', label: 'Delay A Wet', min: -60, max: 6, initial: -60},
     }
     store = undefined
     audioNodes = {}
@@ -195,19 +190,6 @@ export class EstacioBase {
         }
     }
 
-    getDelayTimeValue(delayTime){
-        if      (delayTime === '1/4') 
-            return 60/ (1*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/8') 
-            return 60/ (2*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/16') 
-            return 60/ (4*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/8T') 
-            return 60/ (3*(getAudioGraphInstance().getBpm()));
-        else if (delayTime === '1/16T') 
-            return 60/ (6*(getAudioGraphInstance().getBpm()));
-    }
-
     setParametersInAudioGraph(parametersDict, preset) {
         for (const [name, value] of Object.entries(parametersDict)) {
             if (name.startsWith('fx')){
@@ -228,22 +210,9 @@ export class EstacioBase {
             // If estacio has no effect nodes, don't try tu update anything
             return;
         }
-        if (name == "fxReverbWet"){
-            if (getAudioGraphInstance().useReverbDelay === false){ return; }
-            this.audioNodes.effects['reverb'].set({'wet': value});
-        } else if (name == "fxReverbDecay"){
-            if (getAudioGraphInstance().useReverbDelay === false){ return; }
-            this.audioNodes.effects['reverb'].set({'decay': value});
-        } else if (name == "fxDelayTime"){
-            if (getAudioGraphInstance().useReverbDelay === false){ return; }
-            this.audioNodes.effects['delay'].set({'delayTime': this.getDelayTimeValue(value)});
-        } else if (name == "fxDelayFeedback"){
-            if (getAudioGraphInstance().useReverbDelay === false){ return; }
-            this.audioNodes.effects['delay'].set({'feedback': value});
-        } else if (name == "fxDelayWet"){
-            if (getAudioGraphInstance().useReverbDelay === false){ return; }
-            this.audioNodes.effects['delay'].set({'wet': value});
-        } else if (name == "fxDrive"){
+       
+        // FX propis de l'estació
+        if (name == "fxDrive"){
             this.audioNodes.effects['drive'].set({'wet': 1.0});
             this.audioNodes.effects['drive'].set({'distortion': value});
             const makeupGain = Tone.dbToGain(-1 * Math.pow(value, 0.25) * 8);  // He ajustat aquests valors manualment perquè el crossfade em sonés bé
@@ -265,15 +234,17 @@ export class EstacioBase {
                 this.audioNodes.effects['eq3'].set({'high': 0});
             }
         }
+
+        // FX globals
+        if (name == "fxReverbASend"){
+            this.audioNodes.effects.reverbASendChannel.volume.value = value == -60 ? -100 : value;
+        } else if (name == "fxDelayASend"){
+            this.audioNodes.effects.delayASendChannel.volume.value = value == -60 ? -100 : value;
+        }
     }
 
     addEffectChainNodes (audioInput, audioOutput){
         // Create nodes for the effect chain
-        if (getAudioGraphInstance().useAudioEffects !== true){
-            audioInput.chain(audioOutput);
-            return;
-        }
-
         const effects = {
             drive: new Tone.Distortion({
                 distortion: 0,
@@ -286,21 +257,18 @@ export class EstacioBase {
                 mid: 0,
                 high: 0,
             }),
+            reverbASendChannel: new Tone.Channel({ 
+                volume: -100 
+            }),
+            delayASendChannel: new Tone.Channel({ 
+                volume: -100 
+            })
         }
         let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3];
-
-        if (getAudioGraphInstance().useReverbDelay === true){
-            effects['reverb'] = new Tone.Reverb({
-                decay: 0.5,
-                wet: 0,
-            });
-            effects['delay'] = new Tone.FeedbackDelay({
-                wet: 0,
-                feedback: 0.5,
-                delayTime: this.getDelayTimeValue('1/4'),
-            })
-            effectsChain = [effects.drive, effects.driveMakeupGain, effects.delay, effects.reverb, effects.eq3];
-        }
+        effects.reverbASendChannel.send("reverbA");
+        effects.delayASendChannel.send("delayA");
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayASendChannel);
 
         // Add the nodes to the station's audioNodes dictionary
         this.audioNodes.effects = effects;

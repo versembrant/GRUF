@@ -1,4 +1,4 @@
-import { GrufKnob, GrufSlider, GrufToggle, GrufLegend, GrufEnum2Columns, GrufReverbTime, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufToggle, GrufLegend, GrufDelayFeedback, GrufReverbDecay, GrufDelayTime, ADSRGraph } from "./widgets";
 import React from "react";
 import { capitalize } from "../utils";
 
@@ -41,29 +41,31 @@ export const GrufModulEQ = ({className, estacio, top, left}) => {
 
 export const GrufModulDelay = ({className, estacio, top, left}) => {
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
+    
     return(
         <fieldset className={`gruf-modul gruf-modul-delay ${className}`} style={{position, top, left}}>
             <GrufLegend text="Delay" />
             <div>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayWet" label="Send" /> 
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayFeedback" label="Feedback" /> 
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayASend" label="Send" /> 
+                <GrufDelayFeedback send="A" /> 
             </div>
             <fieldset className="items-center">
                 <GrufLegend text="Durada" bare="true" />
-                <GrufEnum2Columns estacio={estacio} parameterName="fxDelayTime" />
+                <GrufDelayTime send="A" />
             </fieldset>
     </fieldset>
     )
 }
 
 export const GrufModulReverb = ({className, estacio, style={}}) => {
+
     return(
         <fieldset className={`gruf-modul gruf-modul-reverb ${className}`} style={style}>
             <GrufLegend text="Reverb" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbWet" position="absolute" label="Send" />
+            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbASend" position="absolute" label="Send" />
             <fieldset>
                 <GrufLegend text="Durada" style={{alignSelf: 'flex-start'}} bare="true"></GrufLegend>
-                <GrufReverbTime estacio={estacio} parameterName="fxReverbDecay" />
+                <GrufReverbDecay send="A" />
             </fieldset>
         </fieldset>
     )

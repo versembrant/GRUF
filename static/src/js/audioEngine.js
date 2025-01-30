@@ -16,9 +16,8 @@ export class AudioGraph {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
         this.estacionsMasterChannelNodes = {};
         this.estacionsMeterNodes = {};
+        this.effectNodes = {};
         this.spectrumSize = 64;
-        this.useAudioEffects = !(location.href.indexOf("noeffects=1") != -1);
-        this.useReverbDelay = !(location.href.indexOf("noreverbdelay=1") != -1);
 
         this.parametersDescription = {
             bpm: {type: 'float', min: 40, max: 300, initial: 90},
@@ -54,15 +53,11 @@ export class AudioGraph {
                 initial: 'cminor'},
             effectParameters: {
                 initial: {
-                    reverbWet:0,
-                    reverbDecay: 0.1,
-                    delayWet: 0,
-                    delayTime: 1,
-                    delayFeedback:0,
-                    drive: 0,
-                    eq3HighGain: 0,
-                    eq3MidGain: 0,
-                    eq3LowGain: 0,
+                    reverbAWet: 1.0,
+                    reverbADecay: 0.1,
+                    delayAWet: 1.0,
+                    delayATime: '1/8',
+                    delayAFeedback:0
                 }
             }
         }
@@ -272,46 +267,55 @@ export class AudioGraph {
         }).toDestination();
     }
 
-    //Creem uns efectes
+    // Creem els efectes
     initEffects(){
-        if (this.useAudioEffects !== true) return;
-
-        if (this.useReverbDelay === true) {
-            this.reverb = new Tone.Reverb().connect(this.masterGainNode);
-            this.reverbChannel = new Tone.Channel({ volume: 0 }).connect(this.reverb);
-            this.reverbChannel.receive("reverb");
-
-            this.delay = new Tone.FeedbackDelay().connect(this.masterGainNode);
-            this.delayChannel = new Tone.Channel({ volume: 0 }).connect(this.delay);
-            this.delayChannel.receive("delay");
+        this.effectNodes = {
+            reverbA: new Tone.Reverb(),
+            reverbAChannel: new Tone.Channel({ volume: 0 }),
+            delayA: new Tone.FeedbackDelay(),
+            delayAChannel: new Tone.Channel({ volume: 0 }),
         }
 
-        this.drive = new Tone.Distortion().connect(this.masterGainNode);
-        this.driveChannel = new Tone.Channel({ volume: 0 }).connect(this.drive);
-        this.driveChannel.receive("drive");
+        this.effectNodes.reverbA.connect(this.masterGainNode)
+        this.effectNodes.reverbAChannel.connect(this.effectNodes.reverbA);
+        this.effectNodes.reverbAChannel.receive("reverbA");
 
-        this.eq3 = new Tone.EQ3().connect(this.masterGainNode);
-        this.eq3Channel = new Tone.Channel({ volume: 0 }).connect(this.eq3);
-        this.eq3Channel.receive("eq3");
+        this.effectNodes.delayA.connect(this.masterGainNode);
+        this.effectNodes.delayAChannel.connect(this.effectNodes.delayA);
+        this.effectNodes.delayAChannel.receive("delayA");
+    }
+
+    getDelayTimeValue(delayTime) {
+        if      (delayTime === '1/4') 
+            return 60/ (1*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/8') 
+            return 60/ (2*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/16') 
+            return 60/ (4*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/8T') 
+            return 60/ (3*(getAudioGraphInstance().getBpm()));
+        else if (delayTime === '1/16T') 
+            return 60/ (6*(getAudioGraphInstance().getBpm()));
     }
 
     applyEffectParameters(effectParams) {
-        if (this.useAudioEffects !== true) return;
         if (!this.isGraphBuilt()) return;
         
-        if (this.useReverbDelay === true) {
-            this.reverb.wet.value = effectParams.reverbWet;
-            this.reverb.decay = effectParams.reverbDecay;
-            this.delay.wet.value = effectParams.delayWet;
-            this.delay.delayTime.value = 60/ (this.getBpm() * effectParams.delayTime);
-            this.delay.feedback.value = effectParams.delayFeedback;
+        if (effectParams.reverbAWet !== undefined){
+            this.effectNodes.reverbA.wet.value = effectParams.reverbAWet;
         }
-        this.drive.distortion = effectParams.drive;
-        this.eq3.set({
-            low: effectParams.eq3LowGain,
-            mid: effectParams.eq3MidGain,
-            high: effectParams.eq3HighGain
-        });
+        if (effectParams.reverbADecay !== undefined){
+            this.effectNodes.reverbA.decay = effectParams.reverbADecay;
+        }
+        if (effectParams.delayAWet !== undefined){
+            this.effectNodes.delayA.wet.value = effectParams.delayAWet;
+        }
+        if (effectParams.delayATime !== undefined){
+            //this.effectNodes.delayA.delayTime.value = this.getDelayTimeValue(effectParams.delayATime);
+        }
+        if (effectParams.delayAFeedback !== undefined){
+            this.effectNodes.delayA.feedback.value = effectParams.delayAFeedback;
+        }
     }
 
     setEffectParameters(newEffectParameters) {
@@ -368,12 +372,12 @@ export class AudioGraph {
             const estacioMasterChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
             const estacioPremuteChannel = new Tone.Channel();
             const estacioMeterNode = new Tone.Meter();
+            this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
+            this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
             estacioPremuteChannel.connect(estacioMasterChannel);
             estacioPremuteChannel.connect(estacioMeterNode);
             estacio.buildEstacioAudioGraph(estacioPremuteChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
-            this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
-            this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
         })
         
         // Marca el graph com a construït

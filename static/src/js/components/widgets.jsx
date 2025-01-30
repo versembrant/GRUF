@@ -18,6 +18,7 @@ import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import throttle from 'lodash.throttle'
 import { AudioRecorder } from "../components/audioRecorder";
+import { setMasterEffectsParameter } from "../utils";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -168,31 +169,95 @@ export const GrufEnum2Columns = ({estacio, parameterName, top, left}) => {
     )
 }
 
-export const GrufReverbTime = ({estacio, parameterName, top, left}) => {
-    subscribeToParameterChanges(estacio, parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName);
-    const nomEstacio=estacio.nom;
-    
+export const GrufReverbDecay = ({send, top, left}) => {
+    const parameterName = "reverb" + send + "Decay";
+    subscribeToAudioGraphParameterChanges("effectParameters")
+    const parameterValue=getAudioGraphInstance().getEffectParameters()[parameterName];
     return (
         <div className="gruf-reverb-time" style={{top: top, left: left}}>
             <div>Curta</div><div><button
                 style={{width: "20%"}}
-                className={parameterValue == "1.0" ? 'selected' : ''} 
-                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "1.0")}
+                className={parameterValue == 1.0 ? 'selected' : ''} 
+                onClick={() => setMasterEffectsParameter(parameterName, '1.0')}
             ></button></div>
             <div>Mitja</div><div><button
                 style={{width: "50%"}}
-                className={parameterValue == "5.0" ? 'selected' : ''} 
-                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "5.0")}
+                className={parameterValue == 5.0 ? 'selected' : ''} 
+                onClick={() => setMasterEffectsParameter(parameterName, '5.0')}
             ></button></div>
             <div>Llarga</div><div><button
                 style={{width: "100%"}}
-                className={parameterValue == "12.0" ? 'selected' : ''} 
-                onClick={() => getCurrentSession().getEstacio(nomEstacio).updateParametreEstacio(parameterName, "12.0")}
+                className={parameterValue == 12.0 ? 'selected' : ''} 
+                onClick={() => setMasterEffectsParameter(parameterName, '12.0')}
             ></button></div>
         </div>
     )
 }
+
+export const GrufDelayTime = ({send, top, left}) => {
+    const parameterName = "delay" + send + "Time";
+    subscribeToAudioGraphParameterChanges("effectParameters")
+    const parameterValue=getAudioGraphInstance().getEffectParameters()[parameterName];
+    const enumOptions=['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'];
+    return (
+        <div className="gruf-enum-2-columns" style={{top: top, left: left}}>
+            {enumOptions.map((option, index) => {
+                return (
+                    <button 
+                        key={index} 
+                        className={parameterValue == option ? 'selected' : ''} 
+                        onClick={() => setMasterEffectsParameter(parameterName, option)}
+                    >
+                        {option}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
+
+export const GrufDelayFeedback = ({send, top, left}) => {
+
+    // Aquest widget és un hack sobre Knob perquè ha de controlar un dels paràmetres dels efectes de l'audioGraph i això no es pot fer només amb parameterParent.
+    // Segurament hauriem de millorar Knob pq també pugui setejar parametres d'efectes de l'audio graph
+
+    const parameterName = "delay" + send + "Feedback";
+    const parameterValue = getAudioGraphInstance().getEffectParameters()[parameterName];
+    subscribeToAudioGraphParameterChanges("effectParameters")
+    const angleMin = -145;
+    const angleMax = 145;
+    const angle = parameterValue * (angleMax - angleMin) + angleMin;
+
+    const parameterDescription = {type: 'float', label: 'Delay ' + send + ' Feedback', min: 0.0, max: 1.0, initial: 0.5}
+    const knobctrlId = useId();
+    const numValue = real2Num(parameterValue, parameterDescription);
+    const handleKnobChange = (newNumValue) => {
+        const newRealValue = num2Real(newNumValue, parameterDescription);
+        setMasterEffectsParameter(parameterName, newRealValue);
+    }
+    
+    return (
+        <div className={ `knob knob-petit` }>
+            <div className="knobctrl-wrapper">
+                <KnobHeadless id={knobctrlId} className="knobctrl" style={{rotate: `${angle}deg`}}
+                    valueRaw={numValue}
+                    valueMin={getParameterNumericMin(parameterDescription)}
+                    valueMax={getParameterNumericMax(parameterDescription)}
+                    mapTo01={(x) => num2Norm(x, parameterDescription)}
+                    mapFrom01={(x) => norm2Num(x, parameterDescription)}
+                    onValueRawChange={throttle(newNumValue => handleKnobChange(newNumValue), getCurrentSession().continuousControlThrottleTime)}
+                    valueRawRoundFn={(value)=>value.toFixed(2)}
+                    valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
+                    dragSensitivity="0.009"
+                    orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
+                />
+            </div>
+            <label htmlFor={knobctrlId}>Feedback</label>
+            {<output htmlFor={knobctrlId}>{real2String(parameterValue, parameterDescription)}</output>}
+    </div>
+    )
+}
+
 
 export const GrufSlider = ({ estacio, parameterName, top, left, orientation='horizontal', size, label, labelSize="12px", markStart, markEnd, noLabel=false, noOutput=false }) => {
     [activeThumbIndex, setActiveThumbIndex] = useState(0);
