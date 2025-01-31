@@ -86,24 +86,30 @@ subgraph Sessió
     Identificador
     Nom
     usuaris["Usuaris connectats"]
-    Bpm
+    subgraph audioparams [Paràmetres d'àudio]
+      Bpm
     volum["Volum estacions"]
+    end
     llista_estacions["Llista d'estacions"]
 end
+subgraph AudioGraph
+  params_audio["Llista de paràmetres"]
+end
 subgraph Estació
-    tipus["Tipus (e.g. 'synth')"]
+    tipus_estacio["Tipus (e.g. 'synth')"]
     Versió
-    llista_params["Llista de paràmetres"]
+    params_estacio["Llista de paràmetres"]
 end
 subgraph Paràmetre
     direction LR
-    tipus2["Tipus (e.g. 'float')"]
-    Etiqueta
+    tipus_parametre["Tipus (e.g. 'float')"]
     valor["Valor inicial"]
-    altres_items["...altres items en funció del tipus de paràmetre (e.g. mínim, màxim, nombre de passos de seqüenciador...)"]
+    altres_items["...altres items en funció del tipus de paràmetre (e.g. mínim, màxim, etiqueta, nombre de passos de seqüenciador...)"]
 end
+audioparams-->AudioGraph
 llista_estacions-->Estació
-llista_params-->Paràmetre
+params_audio-->Paràmetre
+params_estacio-->Paràmetre
 ```
 
 ### Diagrama de l'aplicació
