@@ -4,14 +4,11 @@ import { getAudioGraphInstance } from '../audioEngine';
 import { EstacioSynthUI } from "../components/estacioSynth";
 import { units } from "../utils";
 
-export class Synth extends EstacioBase {
-
-    tipus = 'synth'
-    versio = '0.1'
-    parametersDescription = {
+export class BaseSynth extends EstacioBase {
+    static parametersDescription = {
         ...EstacioBase.parametersDescription,
         // Notes
-        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true, notaMesBaixaTipica: 60, notaMesAltaTipica: 83},
+        notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         // Synth params
         attack: {type: 'float', label:'Attack', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
         decay: {type: 'float', label:'Decay', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
@@ -23,19 +20,15 @@ export class Synth extends EstacioBase {
         harmonicity: {type: 'float', label: 'Detune', min: 0.95, max: 1.05, initial: 1.0},
     }
 
-    getUserInterfaceComponent() {
-        return EstacioSynthUI
-    }
-
-    buildEstacioAudioGraph(estacioMasterChannel) {
+    buildEstacioAudioGraph(estacioMasterChannel, {poly}) {
         // Creem els nodes del graph i els connectem entre ells
         const hpf = new Tone.Filter(6000, "highpass", -24);
         const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
-        const synth = new Tone.PolySynth(Tone.DuoSynth).connect(lpf);
-        
+        const synth = poly ? new Tone.PolySynth(Tone.DuoSynth) : new Tone.DuoSynth();
+        synth.connect(lpf);
+
         // Settejem alguns paràmetres inicials que no canviaran
         synth.set({
-            maxPolyphony: 8, 
             vibratoAmount: 0.0,
             voice0: {
                 attackCurve: "exponential",
@@ -50,7 +43,8 @@ export class Synth extends EstacioBase {
             volume: -20 // Avoid clipping, specially when using sine
         });
 
-    
+        if (poly) synth.set({maxPolyphony: 8});
+
         // Adegeix els nodes al diccionari de nodes de l'estació
         this.audioNodes = {
             synth: synth,
@@ -63,29 +57,32 @@ export class Synth extends EstacioBase {
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        if (name == "lpf") {
+        switch (name) {
+            case "lpf":
             this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-        } else if (name == "hpf") {
+            break;
+            case "hpf":
             this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-        } else if (name == "harmonicity") {
-            this.audioNodes.synth.set({
-                'harmonicity': value,
-            });
-        } else if ((name == "attack")
-                || (name == "decay")
-                || (name == "sustain")
-                || (name == "release")
-        ){
-            this.audioNodes.synth.set({
-                voice0: {'envelope': {[name]: value}},
-                voice1: {'envelope': {[name]: value}},
-            })
-        } else if (name == "waveform"){
+            break;
+            case "harmonicity":
+            this.audioNodes.synth.set({'harmonicity': value});
+            break;
+            case "attack":
+            case "decay":
+            case "sustain":
+            case "release":
+                this.audioNodes.synth.set({
+                    voice0: {'envelope': {[name]: value}},
+                    voice1: {'envelope': {[name]: value}},
+                })
+            break;
+            case "waveform":
             this.audioNodes.synth.set({
                 voice0: {'oscillator': { type: value }},
                 voice1: {'oscillator': { type: value }},
             })
-        }  
+            break;
+        }
     }
 
     onSequencerStep(currentMainSequencerStep, time) {
@@ -101,9 +98,37 @@ export class Synth extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                this.audioNodes.synth.triggerAttackRelease([Tone.Frequency(note.n, "midi").toNote()], note.d * Tone.Time("16n").toSeconds(), time);
+                let midiNote = note.n;
+                if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(midiNote)
+                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
             }
         }
+    }
+
+    adjustNoteForWaveform(note) {
+        const waveform = this.getParameterValue('waveform');
+        if (waveform === 'sine' || waveform === 'triangle') {
+            return note + 12;
+        }
+        return note;
+    }
+}
+
+export class Synth extends BaseSynth {
+
+    tipus = 'synth'
+    versio = '0.1'
+    parametersDescription = {
+        ...BaseSynth.parametersDescription,
+        notes: {...BaseSynth.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83}
+    }
+
+    getUserInterfaceComponent() {
+        return EstacioSynthUI
+    }
+
+    buildEstacioAudioGraph(estacioMasterChannel) {
+        super.buildEstacioAudioGraph(estacioMasterChannel, {poly: true})
     }
 
     onTransportStop() {
@@ -116,7 +141,7 @@ export class Synth extends EstacioBase {
 
         if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
-        
+
         if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }
