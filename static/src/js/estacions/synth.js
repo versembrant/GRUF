@@ -72,8 +72,8 @@ export class BaseSynth extends EstacioBase {
             case "sustain":
             case "release":
                 this.audioNodes.synth.set({
-                    voice0: {'envelope': {[name]: value}},
-                    voice1: {'envelope': {[name]: value}},
+                    voice0: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
+                    voice1: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
                 })
             break;
             case "waveform":
