@@ -1,4 +1,5 @@
-import { GrufKnob, GrufToggle, GrufLegend, GrufDelayFeedback, GrufReverbDecay, GrufDelayTime, ADSRGraph } from "./widgets";
+import { GrufKnob, GrufToggle, GrufLegend, GrufDelayFeedback, GrufReverbDecay, GrufDelayTime, ADSRGraph, GrufEnum2Columns } from "./widgets";
+import { subscribeToParameterChanges } from "../utils"; // subscriptions
 import React from "react";
 import { capitalize } from "../utils";
 
@@ -40,32 +41,41 @@ export const GrufModulEQ = ({className, estacio, top, left}) => {
 }
 
 export const GrufModulDelay = ({className, estacio, top, left}) => {
+    subscribeToParameterChanges(estacio, "fxDelaySelect");
+    const select = estacio.getParameterValue("fxDelaySelect");
     const position = (top || left) ? "absolute" : "static"; // TODO: remove
     
     return(
         <fieldset className={`gruf-modul gruf-modul-delay ${className}`} style={{position, top, left}}>
             <GrufLegend text="Delay" />
-            <div>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelayASend" label="Send" /> 
-                <GrufDelayFeedback send="A" /> 
-            </div>
-            <fieldset className="items-center">
+            <fieldset>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelaySend" label="Send" /> 
+                <GrufEnum2Columns estacio={estacio} parameterName="fxDelaySelect" />
+            </fieldset>
+            <fieldset>
+                <GrufDelayFeedback send={select} /> 
+            </fieldset>
+            <fieldset>
                 <GrufLegend text="Durada" bare="true" />
-                <GrufDelayTime send="A" />
+                <GrufDelayTime send={select} />
             </fieldset>
     </fieldset>
     )
 }
 
 export const GrufModulReverb = ({className, estacio, style={}}) => {
-
+    subscribeToParameterChanges(estacio, "fxReverbSelect");
+    const select = estacio.getParameterValue("fxReverbSelect");
     return(
         <fieldset className={`gruf-modul gruf-modul-reverb ${className}`} style={style}>
             <GrufLegend text="Reverb" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbASend" position="absolute" label="Send" />
+            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbSend" position="absolute" label="Send" />
+            <div className={'w-90'}>
+                <GrufEnum2Columns estacio={estacio} parameterName="fxReverbSelect" />
+            </div>
             <fieldset>
                 <GrufLegend text="Durada" style={{alignSelf: 'flex-start'}} bare="true"></GrufLegend>
-                <GrufReverbDecay send="A" />
+                <GrufReverbDecay send={select} />
             </fieldset>
         </fieldset>
     )

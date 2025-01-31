@@ -105,7 +105,7 @@ export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
 export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
-
+    
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
 
     const realValue =  parameterParent.getParameterValue(parameterName);
@@ -195,8 +195,8 @@ export const GrufReverbDecay = ({send, top, left}) => {
 }
 
 export const GrufDelayTime = ({send, top, left}) => {
-    const parameterName = "delay" + send + "Time";
     subscribeToAudioGraphParameterChanges("effectParameters")
+    const parameterName = "delay" + send + "Time";
     const parameterValue=getAudioGraphInstance().getEffectParameters()[parameterName];
     const enumOptions=['1/4', '1/4T', '1/8', '1/8T', '1/16', '1/16T'];
     return (

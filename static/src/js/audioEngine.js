@@ -54,10 +54,15 @@ export class AudioGraph {
             effectParameters: {
                 initial: {
                     reverbAWet: 1.0,
-                    reverbADecay: 0.1,
+                    reverbADecay: 1.0,
+                    reverbBWet: 1.0,
+                    reverbBDecay: 5.0,
                     delayAWet: 1.0,
                     delayATime: '1/8',
-                    delayAFeedback:0
+                    delayAFeedback:0,
+                    delayBWet: 1.0,
+                    delayBTime: '1/4',
+                    delayBFeedback: 0.5
                 }
             }
         }
@@ -272,17 +277,29 @@ export class AudioGraph {
         this.effectNodes = {
             reverbA: new Tone.Reverb(),
             reverbAChannel: new Tone.Channel({ volume: 0 }),
+            reverbB: new Tone.Reverb(),
+            reverbBChannel: new Tone.Channel({ volume: 0 }),
             delayA: new Tone.FeedbackDelay(),
             delayAChannel: new Tone.Channel({ volume: 0 }),
+            delayB: new Tone.FeedbackDelay(),
+            delayBChannel: new Tone.Channel({ volume: 0 }),
         }
 
         this.effectNodes.reverbA.connect(this.masterGainNode)
         this.effectNodes.reverbAChannel.connect(this.effectNodes.reverbA);
         this.effectNodes.reverbAChannel.receive("reverbA");
 
+        this.effectNodes.reverbB.connect(this.masterGainNode)
+        this.effectNodes.reverbBChannel.connect(this.effectNodes.reverbB);
+        this.effectNodes.reverbBChannel.receive("reverbB");
+
         this.effectNodes.delayA.connect(this.masterGainNode);
         this.effectNodes.delayAChannel.connect(this.effectNodes.delayA);
         this.effectNodes.delayAChannel.receive("delayA");
+
+        this.effectNodes.delayB.connect(this.masterGainNode);
+        this.effectNodes.delayBChannel.connect(this.effectNodes.delayB);
+        this.effectNodes.delayBChannel.receive("delayB");
     }
 
     getDelayTimeValue(delayTime) {
@@ -301,20 +318,46 @@ export class AudioGraph {
     applyEffectParameters(effectParams) {
         if (!this.isGraphBuilt()) return;
         
-        if (effectParams.reverbAWet !== undefined){
-            this.effectNodes.reverbA.wet.value = effectParams.reverbAWet;
+        if (this.effectNodes.hasOwnProperty('reverbA')){
+            if (effectParams.reverbAWet !== undefined){
+                this.effectNodes.reverbA.wet.value = effectParams.reverbAWet;
+            }
+            if (effectParams.reverbADecay !== undefined){
+                this.effectNodes.reverbA.decay = effectParams.reverbADecay;
+            }
         }
-        if (effectParams.reverbADecay !== undefined){
-            this.effectNodes.reverbA.decay = effectParams.reverbADecay;
+
+        if (this.effectNodes.hasOwnProperty('reverbB')){
+            if (effectParams.reverbBWet !== undefined){
+                this.effectNodes.reverbB.wet.value = effectParams.reverbBWet;
+            }
+            if (effectParams.reverbBDecay !== undefined){
+                this.effectNodes.reverbB.decay = effectParams.reverbBDecay;
+            }
         }
-        if (effectParams.delayAWet !== undefined){
-            this.effectNodes.delayA.wet.value = effectParams.delayAWet;
+       
+        if (this.effectNodes.hasOwnProperty('delayA')){
+            if (effectParams.delayAWet !== undefined){
+                this.effectNodes.delayA.wet.value = effectParams.delayAWet;
+            }
+            if (effectParams.delayATime !== undefined){
+                this.effectNodes.delayA.delayTime.value = this.getDelayTimeValue(effectParams.delayATime);
+            }
+            if (effectParams.delayAFeedback !== undefined){
+                this.effectNodes.delayA.feedback.value = effectParams.delayAFeedback;
+            }
         }
-        if (effectParams.delayATime !== undefined){
-            //this.effectNodes.delayA.delayTime.value = this.getDelayTimeValue(effectParams.delayATime);
-        }
-        if (effectParams.delayAFeedback !== undefined){
-            this.effectNodes.delayA.feedback.value = effectParams.delayAFeedback;
+
+        if (this.effectNodes.hasOwnProperty('delayB')){
+            if (effectParams.delayBWet !== undefined){
+                this.effectNodes.delayB.wet.value = effectParams.delayBWet;
+            }
+            if (effectParams.delayBTime !== undefined){
+                this.effectNodes.delayB.delayTime.value = this.getDelayTimeValue(effectParams.delayBTime);
+            }
+            if (effectParams.delayBFeedback !== undefined){
+                this.effectNodes.delayB.feedback.value = effectParams.delayBFeedback;
+            }
         }
     }
 
