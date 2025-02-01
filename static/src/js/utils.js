@@ -59,6 +59,7 @@ export const roundToStep = (value, step) => {
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+export const lerp = (value1, value2, t) => value1 + (value2-value1) * t;
 
 export const distanceToAbsolute = (distanceArray, startOffset=0) => {
     return distanceArray.reduce((absoluteArray, distanceValue, index) => {
