@@ -552,7 +552,7 @@ export const getNextPitchClassAfterPitch = (pitchClass, midiPitch) => {
 // Util function to set a master effects parameter
 
 export const setMasterEffectsParameter = (effectKey, value) => {
-    const parsedValue = effectKey === 'delayATime' ? value : parseFloat(value);
+    const parsedValue = (effectKey === 'delayATime' || effectKey === 'delayBTime') ? value : parseFloat(value);
     let newEffectParameters = {...getAudioGraphInstance().getEffectParameters() , [effectKey]: parsedValue};
     getAudioGraphInstance().updateParametreAudioGraph('effectParameters', newEffectParameters);
 };

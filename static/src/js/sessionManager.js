@@ -62,8 +62,10 @@ export class EstacioBase {
         fxLow:{type: 'float', label: 'Low', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
-        fxReverbASend: {type: 'float', label: 'Reverb A Send', min: -60, max: 6, initial: -60},
-        fxDelayASend: {type: 'float', label: 'Delay A Wet', min: -60, max: 6, initial: -60},
+        fxReverbSelect: {type: 'enum', label: 'Reverb Select', options: ['A', 'B'], initial: 'A'},
+        fxReverbSend: {type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        fxDelaySelect: {type: 'enum', label: 'Delay Select', options: ['A', 'B'], initial: 'A'},
+        fxDelaySend: {type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
     }
     store = undefined
     audioNodes = {}
@@ -210,7 +212,7 @@ export class EstacioBase {
             // If estacio has no effect nodes, don't try tu update anything
             return;
         }
-       
+        
         // FX propis de l'estació
         if (name == "fxDrive"){
             this.audioNodes.effects['drive'].set({'wet': 0.5});
@@ -236,10 +238,18 @@ export class EstacioBase {
         }
 
         // FX globals
-        if (name == "fxReverbASend"){
-            this.audioNodes.effects.reverbASendChannel.volume.value = value == -60 ? -100 : value;
-        } else if (name == "fxDelayASend"){
-            this.audioNodes.effects.delayASendChannel.volume.value = value == -60 ? -100 : value;
+        if ((name == "fxReverbSend") || (name == "fxReverbSelect")){
+            const selectValue = name == "fxReverbSelect" ? value : this.getParameterValue("fxReverbSelect", preset);
+            const valueA = name == "fxReverbSelect" ? this.getParameterValue("fxReverbSend", preset) : (value == -60 ? -100 : value)
+            const valueB = name == "fxReverbSelect" ? this.getParameterValue("fxReverbSend", preset) : (value == -60 ? -100 : value)
+            this.audioNodes.effects.reverbASendChannel.volume.value = selectValue == "A" ?  valueA: -100;
+            this.audioNodes.effects.reverbBSendChannel.volume.value = selectValue == "B" ?  valueB: -100;
+        }  else if ((name == "fxDelaySend") || (name == "fxDelaySelect")){
+            const selectValue = name == "fxDelaySelect" ? value : this.getParameterValue("fxDelaySelect", preset);
+            const valueA = name == "fxDelaySelect" ? this.getParameterValue("fxDelaySend", preset) : (value == -60 ? -100 : value)
+            const valueB = name == "fxDelaySelect" ? this.getParameterValue("fxDelaySend", preset) : (value == -60 ? -100 : value)
+            this.audioNodes.effects.delayASendChannel.volume.value = selectValue == "A" ?  valueA: -100;
+            this.audioNodes.effects.delayBSendChannel.volume.value = selectValue == "B" ?  valueB: -100;
         }
     }
 
@@ -263,21 +273,33 @@ export class EstacioBase {
             reverbASendChannel: new Tone.Channel({ 
                 volume: -100 
             }),
+            reverbBSendChannel: new Tone.Channel({ 
+                volume: -100 
+            }),
             delayASendChannel: new Tone.Channel({ 
+                volume: -100 
+            }),
+            delayBSendChannel: new Tone.Channel({ 
                 volume: -100 
             })
         }
-        let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3, effects.eqMakeupGain];
-        effects.reverbASendChannel.send("reverbA");
-        effects.delayASendChannel.send("delayA");
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayASendChannel);
 
         // Add the nodes to the station's audioNodes dictionary
         this.audioNodes.effects = effects;
-
+        
         // Connect the nodes in the effect chain
+        let effectsChain = [effects.drive, effects.driveMakeupGain, effects.eq3, effects.eqMakeupGain];
         audioInput.chain( ...effectsChain, audioOutput);
+
+        // Connect global effect sends
+        effects.reverbASendChannel.send("reverbA");
+        effects.reverbBSendChannel.send("reverbB");
+        effects.delayASendChannel.send("delayA");
+        effects.delayBSendChannel.send("delayB");
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbBSendChannel);
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayASendChannel);
+        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayBSendChannel);
     }
     
     // UI stuff
