@@ -4,7 +4,7 @@ import { getAudioGraphInstance } from '../audioEngine';
 import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, getPatroPredefinitAmbNom, capitalizeFirstLetter, subscribeToEstacioParameterChanges}  from "../utils";
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
-import { clamp, distanceToAbsolute, euclid, sample, weightedSample, }  from "../utils"; // math related
+import { clamp, distanceToAbsolute, euclid, sample, weightedSample, lerp }  from "../utils"; // math related
 import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
@@ -983,13 +983,51 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const ADSRGraph = ({estacio, adsrParameterNames}) => {
+export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
+    useEffect(()=> {
+        if (dynamicHighlight) {
+            document.addEventListener("midiNote-" + estacio.nom , onMidiNote);
+            () => document.removeEventListener("midiNote-" + estacio.nom, onMidiNote)
+        }
+    }, []);
+
+    const lastNoteInfoRef = useRef({});
+    const onMidiNote = (evt) => {
+        const {a, d, r} = adsrRef.current;
+        let lastNoteInfo = lastNoteInfoRef.current;
+        const {type, note} = evt.detail;
+        if (type === "noteOff") {
+            if (note !== lastNoteInfo.note && !estacio.getParameterDescription('notes').isMono) return;
+            lastNoteInfo = {stage: 'release', duration: r*1000};
+        } else lastNoteInfo = {stage: 'pre-sustain', duration: (a+d)*1000, note};
+        lastNoteInfo = {...lastNoteInfo, initTime: Date.now()};
+        lastNoteInfoRef.current = lastNoteInfo;
+        checkLastNoteStatus();
+    }
+
+    const [lastNoteStatus, setLastNoteStatus] = useState({stage: 'finished', progress: '1'})
+    const checkLastNoteStatus = () => {
+        const lastNoteInfo = lastNoteInfoRef.current;
+        const elapsedTime = Date.now() - lastNoteInfo.initTime;
+        const progress = Math.min(lastNoteInfo.duration === 0 ? 1 : elapsedTime / lastNoteInfo.duration, 1);
+        let stage = lastNoteInfo.stage;
+        if (progress === 1) {
+            if (stage === 'pre-sustain') stage = 'sustain';
+            if (stage === 'release') stage = 'finished';
+        }
+        setLastNoteStatus({progress, stage})
+        if (progress < 1) setTimeout(checkLastNoteStatus, 30);
+    }
+
+
     adsrParameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
 
     const a = estacio.getParameterValue(adsrParameterNames[0]);
     const d = estacio.getParameterValue(adsrParameterNames[1]);
     const s = estacio.getParameterValue(adsrParameterNames[2]);
     const r = estacio.getParameterValue(adsrParameterNames[3]);
+    const adsrRef = useRef({});
+    adsrRef.current = {a, d, s, r};
 
     const strokeWidthPx = 3;
 
@@ -1012,7 +1050,7 @@ export const ADSRGraph = ({estacio, adsrParameterNames}) => {
         adsrPoints[index].y = 75 - levelValue * 50;
     });
 
-    const sustainPoints = { x1: adsrPoints[2].x, x2: adsrPoints[3].x, y1: adsrPoints[2].y, y2: adsrPoints[3].y };
+    const sustainPoints = [adsrPoints[2], adsrPoints[3]];
 
     const adsrPathString = adsrPoints.reduce((pathString, point) => {
         return pathString + ` L ${point.x} ${point.y}`;
@@ -1027,7 +1065,25 @@ export const ADSRGraph = ({estacio, adsrParameterNames}) => {
         bgLineItems.push(hLine, vLine);
     }
 
+    const getEnvStatusLine = () => {
+        const {stage, progress} = lastNoteStatus;
+        if (stage === 'finished') return undefined;
+        let endPoints = [{}, {}];
+        if (stage === 'pre-sustain' || 'sustain') endPoints = [adsrPoints[0], sustainPoints[0]];
+        if (stage === 'release') endPoints = [sustainPoints[1], adsrPoints[adsrPoints.length - 1]];
+        const x = lerp(endPoints[0].x, endPoints[1].x, progress);
+        const lastPoint = adsrPoints.reduce((result, current) => (current.x >= x || current.x < result.x) ? result : current);
+        const nextPoint = adsrPoints[adsrPoints.indexOf(lastPoint)+1];
+        const segmentDuration = nextPoint.x - lastPoint.x;
+        const segmentProgress = segmentDuration === 0 ? 1 : (x - lastPoint.x) / segmentDuration;
+        const y = lerp(lastPoint.y, nextPoint.y, segmentProgress);
+        return <g>
+            <rect x={x-20} y="25" width="20" height="50" vectorEffect="non-scaling-stroke" fill="url(#grad)" mask="url(#adsr-mask)"/>
+            <circle cx={x} cy={y} r="0.9" fill="var(--accent-color)"/>
+        </g>
+    }
 
+    const envStatusLine = getEnvStatusLine()
     return (
         <div className="adsr-graph">
             <svg viewBox={"0 0 100 100"} preserveAspectRatio="none">
@@ -1036,29 +1092,38 @@ export const ADSRGraph = ({estacio, adsrParameterNames}) => {
                 </g>
 
                 <defs>
-                    <mask id="adsr-mask">
+                    <mask id="sustain-mask">
                         <rect x="0" y="0" width="100" height="100" fill="white"/>
                         <g fill="black" stroke="black">
                             <line
-                            x1={sustainPoints.x1} x2={sustainPoints.x2}
-                            y1={sustainPoints.y1} y2={sustainPoints.y2}
+                            x1={sustainPoints[0].x} x2={sustainPoints[1].x}
+                            y1={sustainPoints[0].y} y2={sustainPoints[1].y}
                             vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
                             strokeLinecap="round" />
                             <g fill="white" stroke="white">
                                 <line
-                                    x1={sustainPoints.x1} x2={sustainPoints.x2}
-                                    y1={sustainPoints.y1} y2={sustainPoints.y2}
+                                    x1={sustainPoints[0].x} x2={sustainPoints[1].x}
+                                    y1={sustainPoints[0].y} y2={sustainPoints[1].y}
                                     vectorEffect="non-scaling-stroke" strokeWidth={strokeWidthPx}
                                     strokeLinecap="round" strokeDasharray="8"/>
                             </g>
                         </g>
                     </mask>
+                    <mask id="adsr-mask">
+                        <path d={adsrPathString + " Z"} fill="white" stroke="white" strokeWidth={strokeWidthPx} vectorEffect="non-scaling-stroke" strokeLinejoin="round"></path>
+                    </mask>
+                    <linearGradient id="grad">
+                        <stop offset="0%" stopColor="transparent"/>
+                        <stop offset="80%" stopColor="color-mix(in srgb, var(--accent-color) 10%, transparent)"/>
+                        <stop offset="90%" stopColor="color-mix(in srgb, var(--accent-color) 30%, transparent)"/>
+                        <stop offset="100%" stopColor="var(--accent-color)"/>
+                    </linearGradient>
                 </defs>
 
-                <g fill="none" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round">
-                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#adsr-mask)" strokeLinejoin="round"></path>
+                <g fill="color-mix(in srgb, var(--accent-color) 10%, transparent)" stroke="var(--accent-color)" strokeWidth={strokeWidthPx} strokeLinecap="round" strokeLinejoin="round">
+                    <path d={adsrPathString} vectorEffect="non-scaling-stroke" mask="url(#sustain-mask)" stroke="color-mix(in srgb, var(--accent-color) 90%, transparent)"></path>
                 </g>
-
+                {envStatusLine && envStatusLine}
             </svg>
         </div>
     )

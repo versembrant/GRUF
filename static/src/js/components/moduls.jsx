@@ -5,7 +5,7 @@ import { capitalize } from "../utils";
 export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"]}) => {
 
     const knobs = availableParameters.map(parameter=> {
-        return <GrufKnob mida="petit" parameterParent={estacio}
+        return <GrufKnob key={parameter} mida="petit" parameterParent={estacio}
             parameterName={parameter + soundNumber} label={capitalize(parameter)} />
     })
     const attackParamName = `attack${soundNumber}`;
@@ -15,7 +15,7 @@ export const GrufModulADSR = ({className, estacio, soundNumber="", height, avail
 
     return (
         <div className={`gruf-adsr-widget ${className}`} style={{height}}>
-            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
+            <ADSRGraph estacio={estacio} dynamicHighlight={false} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
                 {knobs}
             </div>

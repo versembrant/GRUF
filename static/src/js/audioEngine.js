@@ -516,6 +516,7 @@ export class AudioGraph {
 
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
         // i en el grid de pads del sampler per seleccionar el pad de l'última nota que s'ha tocat
+        // i en el ADSR graph per marcar l'envolupant de l'última nota
         if (!data.skipTriggerEvent) {    
             const event = new CustomEvent("midiNote-" + nomEstacio, { detail: {note: data.noteNumber, velocity: data.noteVelocity, type: data.type }});
             document.dispatchEvent(event);

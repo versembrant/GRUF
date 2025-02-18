@@ -59,6 +59,7 @@ export const roundToStep = (value, step) => {
 // Make sure numeric value is within min/max boundaries
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+export const lerp = (value1, value2, t) => value1 + (value2-value1) * t;
 
 export const distanceToAbsolute = (distanceArray, startOffset=0) => {
     return distanceArray.reduce((absoluteArray, distanceValue, index) => {
@@ -263,14 +264,17 @@ export const num2Norm = (numValue, parameterDescription) => {
     return Math.pow((numValue - numMin)/(numMax-numMin), 1/exponent);
 }
 
+const throwUnknownParameterError = (parameterDescription) => {
+    throw new Error(`Unknown parameter type (${parameterDescription.type}) for parameter ${parameterDescription.nom}`);
+}
+
 export const real2Num = (realValue, parameterDescription) => {
     switch(parameterDescription.type) {
         case 'float':
             return realValue;
         case 'enum':
             return parameterDescription.options.indexOf(realValue);
-        default:
-            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+        default: throwUnknownParameterError(parameterDescription);
     }
 }
 
@@ -281,8 +285,7 @@ export const num2Real = (numValue, parameterDescription) => {
             return discreteValue;
         case 'enum':
             return parameterDescription.options[discreteValue];
-        default:
-            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+        default: throwUnknownParameterError(parameterDescription);
     }
 }
 
@@ -292,8 +295,7 @@ export const getParameterNumericMin = (parameterDescription) => {
             return parameterDescription.min;
         case 'enum':
             return 0;
-        default:
-            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+        default: throwUnknownParameterError(parameterDescription);
     }
 }
 
@@ -303,8 +305,7 @@ export const getParameterNumericMax = (parameterDescription) => {
             return parameterDescription.max;
         case 'enum':
             return parameterDescription.options.length - 1;
-        default:
-            throw new Error(`Unknown parameter type: ${parameterDescription.type}`);
+        default: throwUnknownParameterError(parameterDescription);
     }
 }
 
