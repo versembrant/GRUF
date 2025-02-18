@@ -983,10 +983,12 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const ADSRGraph = ({estacio, adsrParameterNames}) => {
+export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
     useEffect(()=> {
-        document.addEventListener("midiNote-" + estacio.nom , onMidiNote);
-        () => document.removeEventListener("midiNote-" + estacio.nom, onMidiNote)
+        if (dynamicHighlight) {
+            document.addEventListener("midiNote-" + estacio.nom , onMidiNote);
+            () => document.removeEventListener("midiNote-" + estacio.nom, onMidiNote)
+        }
     }, []);
 
     const lastNoteInfoRef = useRef({});

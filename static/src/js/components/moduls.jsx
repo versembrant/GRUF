@@ -15,7 +15,7 @@ export const GrufModulADSR = ({className, estacio, soundNumber="", height, avail
 
     return (
         <div className={`gruf-adsr-widget ${className}`} style={{height}}>
-            <ADSRGraph estacio={estacio} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
+            <ADSRGraph estacio={estacio} dynamicHighlight={false} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
             <div className="adsr-knobs">
                 {knobs}
             </div>
