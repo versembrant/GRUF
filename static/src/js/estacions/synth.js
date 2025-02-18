@@ -11,7 +11,7 @@ export class BaseSynth extends EstacioBase {
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], followsPreset: true},
         // Synth params
         attack: {type: 'float', label:'Attack', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
-        decay: {type: 'float', label:'Decay', unit: units.second, min: 0.0, max: 2.0, initial: 0.01},
+        decay: {type: 'float', label:'Decay', unit: units.second, min: 0.0, max: 5.0, initial: 0.01},
         sustain: {type: 'float', label:'Sustain', min: 0.0, max: 1.0, initial: 1.0},
         release: {type: 'float', label:'Release', unit: units.second, min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sawtooth', 'triangle', 'square', 'sine'], initial: 'sawtooth'},
