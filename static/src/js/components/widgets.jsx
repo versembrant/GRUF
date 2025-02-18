@@ -1111,10 +1111,10 @@ export const ADSRGraph = ({estacio, adsrParameterNames}) => {
                         <path d={adsrPathString + " Z"} fill="white" stroke="white" strokeWidth={strokeWidthPx} vectorEffect="non-scaling-stroke" strokeLinejoin="round"></path>
                     </mask>
                     <linearGradient id="grad">
-                        <stop offset="0%" stop-color="transparent"/>
-                        <stop offset="80%" stop-color="color-mix(in srgb, var(--accent-color) 10%, transparent)"/>
-                        <stop offset="90%" stop-color="color-mix(in srgb, var(--accent-color) 30%, transparent)"/>
-                        <stop offset="100%" stop-color="var(--accent-color)"/>
+                        <stop offset="0%" stopColor="transparent"/>
+                        <stop offset="80%" stopColor="color-mix(in srgb, var(--accent-color) 10%, transparent)"/>
+                        <stop offset="90%" stopColor="color-mix(in srgb, var(--accent-color) 30%, transparent)"/>
+                        <stop offset="100%" stopColor="var(--accent-color)"/>
                     </linearGradient>
                 </defs>
 

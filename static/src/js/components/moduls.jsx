@@ -5,7 +5,7 @@ import { capitalize } from "../utils";
 export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"]}) => {
 
     const knobs = availableParameters.map(parameter=> {
-        return <GrufKnob mida="petit" parameterParent={estacio}
+        return <GrufKnob key={parameter} mida="petit" parameterParent={estacio}
             parameterName={parameter + soundNumber} label={capitalize(parameter)} />
     })
     const attackParamName = `attack${soundNumber}`;
