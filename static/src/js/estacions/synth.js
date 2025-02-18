@@ -120,7 +120,7 @@ export class Synth extends BaseSynth {
     versio = '0.1'
     parametersDescription = {
         ...BaseSynth.parametersDescription,
-        notes: {...BaseSynth.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83}
+        notes: {...BaseSynth.parametersDescription.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83}
     }
 
     getUserInterfaceComponent() {
