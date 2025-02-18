@@ -43,17 +43,14 @@ export class EstacioSampler extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         ...EstacioBase.parametersDescription,
-        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 20000, initial: 20000, logarithmic: true},
-
-
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
             followsPreset: true, 
             notaMesBaixaPermesa: 0,
             notaMesAltaPermesa: 15,
         },
+        sound: {type: 'text', initial: 'adagio strings'},
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
-            // [`sound${i + 1}`]: {type: 'text', label: `Sample${i + 1}`, initial: 'adagio strings'},
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
             [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
             [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, unit: units.second, min: 0, max: 2, initial: 0.01},
@@ -65,11 +62,7 @@ export class EstacioSampler extends EstacioBase {
             [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
             [`playerMode${i + 1}`]: {type: 'enum', options: ['oneshot', 'loop'], initial: 'oneshot'}
         }), {}),
-
-        lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 20, max: 3000, initial: 20, logarithmic: true},
-
-        sound: {type: 'text', initial: 'adagio strings'}
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 20000, initial: 20000, logarithmic: true},
     }
 
     getTempsBeat = () => {
@@ -106,15 +99,15 @@ export class EstacioSampler extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
 
-        const hpf = new Tone.Filter(6000, "highpass", -24);
-        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
+        
 
         this.loadedSounds = {}
         if (this.soundsPendingLoading) this.soundsPendingLoading.forEach(sound => this.carregaSoDeLaLlibreria(sound));
         this.soundsPendingLoading = []
 
         // Creem els nodes del graph
-        this.audioNodes = {lpf: lpf, hpf: hpf};
+        const lpf = new Tone.Filter(500, "lowpass", -24);
+        
 
         this.samplePlayers = Array(16).fill(null).map(el=> new SamplePlayer());
         for (let i = 0; i < 16; i++) {
@@ -146,7 +139,13 @@ export class EstacioSampler extends EstacioBase {
 
         }
         
-        this.addEffectChainNodes(hpf, estacioMasterChannel);
+        
+        
+        this.audioNodes = {
+            lpf: lpf
+        };
+
+        this.addEffectChainNodes(lpf, estacioMasterChannel);
         this.isGraphBuilt = true;
         this.bufferLoadMap = new Map();
     }
@@ -177,11 +176,9 @@ export class EstacioSampler extends EstacioBase {
             }
         }
 
-        if(name == 'lpf'){
+        if(name == 'cutoff'){
             this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-        } else if (name == "hpf") {
-            this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-        }
+        } 
 
         if (name.match(/^sound\d*$/)) {
             const buffer = this.carregaSoDeLaLlibreria(value);
