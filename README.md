@@ -38,7 +38,7 @@ docker compose run --rm server yarn build
 docker compose up
 ```
 
-6. Accedeix a l'aplicació amb el navegador a: `http://localhost:5555/gruf/`
+6. Accedeix a l'aplicació amb el navegador a: `http://localhost:5555/`
 
 
 
