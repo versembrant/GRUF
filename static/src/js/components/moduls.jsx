@@ -49,10 +49,10 @@ export const GrufModulDelay = ({className, estacio, top, left}) => {
         <fieldset className={`gruf-modul gruf-modul-delay ${className}`} style={{position, top, left}}>
             <GrufLegend text="Delay" />
             <fieldset>
-                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelaySend" label="Send" /> 
                 <GrufEnum2Columns estacio={estacio} parameterName="fxDelaySelect" />
             </fieldset>
-            <fieldset>
+            <fieldset style={{flexDirection: "row"}}>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelaySend" label="Send" /> 
                 <GrufDelayFeedback send={select} /> 
             </fieldset>
             <fieldset>
@@ -69,9 +69,11 @@ export const GrufModulReverb = ({className, estacio, style={}}) => {
     return(
         <fieldset className={`gruf-modul gruf-modul-reverb ${className}`} style={style}>
             <GrufLegend text="Reverb" />
-            <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxReverbSend" position="absolute" label="Send" />
-            <div className={'w-90'}>
+            <div style={{position: "absolute", top: 15, right: 17}}>
                 <GrufEnum2Columns estacio={estacio} parameterName="fxReverbSelect" />
+            </div>
+            <div style={{position: "absolute", top: 35, right: 5}}>
+                <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxReverbSend" position="absolute" label="Send" />
             </div>
             <fieldset>
                 <GrufLegend text="Durada" style={{alignSelf: 'flex-start'}} bare="true"></GrufLegend>
