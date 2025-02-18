@@ -884,9 +884,10 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
         const inputId = useId();
         return {
         input: <input type="radio" key={i} id={inputId} name={parameterName}
-        value={playerModeOption} checked={playerModeOption===parameterValue}
-        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>,
-        label: <label htmlFor={inputId}>{playerModeOption}</label>
+            value={playerModeOption} checked={playerModeOption===parameterValue}
+            onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}
+        />,
+        label: <label key={i} htmlFor={inputId}>{playerModeOption}</label>
         }   
     })
     return(

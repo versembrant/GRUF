@@ -164,6 +164,10 @@ export class EstacioBase {
         return getCurrentSession().getLivePresetsEstacions()[this.nom]
     }
 
+    getTempsBeat = () => {
+        return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+    };
+
     updateParametreEstacio(nomParametre, valor) {
 
         if (this.getParameterDescription(nomParametre).live) {

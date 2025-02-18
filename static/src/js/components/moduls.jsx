@@ -3,11 +3,11 @@ import { subscribeToParameterChanges } from "../utils"; // subscriptions
 import React from "react";
 import { capitalize } from "../utils";
 
-export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"]}) => {
+export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"], renameSustainToVolume=false}) => {
 
     const knobs = availableParameters.map(parameter=> {
         return <GrufKnob key={parameter} mida="petit" parameterParent={estacio}
-            parameterName={parameter + soundNumber} label={capitalize(parameter)} />
+            parameterName={parameter + soundNumber} label={renameSustainToVolume && parameter == "sustain" ? "Volume" : capitalize(parameter)} />
     })
     const attackParamName = `attack${soundNumber}`;
     const decayParamName = `decay${soundNumber}`;

@@ -413,7 +413,7 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
-            const estacioPremuteChannel = new Tone.Channel();
+            const estacioPremuteChannel = new Tone.Channel({channelCount: 2});
             const estacioMeterNode = new Tone.Meter();
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
