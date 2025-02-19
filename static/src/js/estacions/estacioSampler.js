@@ -70,7 +70,7 @@ export class EstacioSampler extends EstacioBase {
         return EstacioSamplerUI
     }
 
-    numVoices = 4;
+    numVoices = 3;
     soundBuffers = {};
 
     getFreeSoundPlayer() {
@@ -199,7 +199,7 @@ export class EstacioSampler extends EstacioBase {
                     // Also next time we do play, we'll trigger release at this point
                     soundPlayer.player.loopEnd = value * soundPlayer.player.buffer.duration;
                 } else if (type === 'playerMode') {
-                    soundPlayer.player.loopStart = value;
+                    soundPlayer.player.loop = value === 'loop';
                 }
             });
         } else if (name == 'cutoff'){
