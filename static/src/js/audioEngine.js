@@ -28,6 +28,7 @@ export class AudioGraph {
             mutesEstacions: {initial: {}},
             solosEstacions: {initial: {}},
             mainSequencerCurrentStep: {type: 'int', initial: -1},
+            usesAudioEngine: { type: 'bool', initial: true },
             isGraphBuilt: {type: 'bool', initial: false},
             isMasterAudioEngine: {type: 'bool', initial: true},
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
@@ -100,6 +101,10 @@ export class AudioGraph {
         const methodName =  nomParametre.startsWith('is') ? nomParametre : // for booleans
         `get${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`; // for the rest
         return this[methodName]();
+    }
+
+    usesAudioEngine() {
+        return this.store.getState().usesAudioEngine;
     }
 
     isPlaying() {
@@ -443,8 +448,9 @@ export class AudioGraph {
         audioContextIsReady = true;
     }
 
-    transportStart() {
+    async transportStart() {
         if (!this.isGraphBuilt()) return;
+        await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
 
         // Optimize global tone context for playback (mightier latency and use less CPU (?))
         if (!(location.href.indexOf("interativelatency=1") != -1)){

@@ -194,3 +194,4 @@ Es poden utlizar alguns paràmetres opcionals a la URL per poder testejar temes 
 * `interativelatency=1`: optimiza el contexe the tone js per interactivity (pot tenir pitjor performance però fa servir un lookAhead menor).
 * `noeffects=1`: no utlitzis efectes ni a les estacions ni els generals (tot i que els controls si que seran visibles). Si no hi ha efectes, la performance por pujar.
 * `noreverbdelay=1`: utilitza els efectes menys la reverb i el delay (és a dir, només eq i drive)
+* `audio=1`: connecta l'àudio per defecte, sense preguntar-ho a l'usuario.
