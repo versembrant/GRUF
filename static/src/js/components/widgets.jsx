@@ -346,7 +346,7 @@ export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }
 
     const handleMouseUp = () => {
         document.removeEventListener('mouseup', handleMouseUp);
-        sendNoteOff(estacio.nom, playerIndex, 0, {force: true});
+        sendNoteOff(estacio.nom, playerIndex, 0);
     };
 
 
@@ -365,7 +365,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
     useEffect(()=> {
         document.addEventListener("midiNote-" + estacio.nom , (evt) => {
             if (evt.detail.type == 'noteOff') return;
-            setSelectedPad(evt.detail.note)
+            setSelectedPad(evt.detail.note % 16)
         });
     })
    

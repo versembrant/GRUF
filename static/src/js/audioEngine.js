@@ -555,14 +555,14 @@ export class AudioGraph {
             // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
         }
-
+        
         // If a nomEstacio is provided, only send to the estacio with that name. Otherwise send to all estacions
         const targetStationsNoms = nomEstacio ? [nomEstacio] : getCurrentSession().getNomsEstacions();
         targetStationsNoms.forEach(nomEstacio => {
                 const {noteNumber, velocity, type, ...extras} = data;
                 getCurrentSession().getEstacio(nomEstacio).onMidiNote(noteNumber, velocity, type === 'noteOff', {...extras, skipRecording: false});
         });
-
+        
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
         // i en el grid de pads del sampler per seleccionar el pad de l'última nota que s'ha tocat
         // i en el ADSR graph per marcar l'envolupant de l'última nota

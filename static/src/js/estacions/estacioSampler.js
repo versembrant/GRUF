@@ -24,14 +24,14 @@ const getSoundURL = (soundName) => {
 
 
 const getInitialStartValue = (numSound) => {
-    const totalSlices = 20;
+    const totalSlices = 16;
     const sliceNum = numSound % totalSlices;
     return sliceNum / totalSlices;
 }
 
 const getInitialEndValue = (numSound) => {
-    const totalSlices = 20;
-    const sliceSpan = 5;
+    const totalSlices = 16;
+    const sliceSpan = 1;
     const sliceNum = numSound % totalSlices;
     return (sliceNum + sliceSpan) / totalSlices;
 }
@@ -55,15 +55,16 @@ export class EstacioSampler extends EstacioBase {
             [`end${i + 1}`]: {type: 'float', label: `End${i + 1}`, min: 0, max: 1, initial: getInitialEndValue(i)},
             [`attack${i + 1}`]: {type: 'float', label: `Attack${i + 1}`, unit: units.second, min: 0, max: 2, initial: 0.01},
             [`decay${i + 1}`]: {type: 'float', label: `Decay${i + 1}`, unit: units.second, min: 0, max: 1, initial: 0.1},
-            [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 1.0},
-            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, unit: units.second, min: 0, max: 4, initial: 0.01},
-            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: 0},
+            [`sustain${i + 1}`]: {type: 'float', label: `Sustain${i + 1}`, min: 0, max: 1, initial: 1.0},  // Now used, but needed for ADSR graph
+            [`release${i + 1}`]: {type: 'float', label: `Release${i + 1}`, unit: units.second, min: 0, max: 4, initial: 0.01},  // Now used, but needed for ADSR graph
+            [`volume${i + 1}`]: {type: 'float', label: `Volume${i + 1}`, unit: units.decibel, min: -60, max: 6, initial: -6},
             [`pan${i + 1}`]: {type: 'float', label: `Pan${i + 1}`, min: -1, max: 1, initial: 0},
             [`pitch${i + 1}`]: {type: 'float', label: `Pitch${i + 1}`, min: -12, max: 12, step: 1, initial: 0},
             [`playerMode${i + 1}`]: {type: 'enum', options: ['oneshot', 'loop'], initial: 'oneshot'}
         }), {}),
         cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 20000, initial: 20000, logarithmic: true},
     }
+    usePitchShifter = true;
 
     getUserInterfaceComponent() {
         return EstacioSamplerUI
@@ -72,11 +73,12 @@ export class EstacioSampler extends EstacioBase {
     numVoices = 4;
     soundBuffers = {};
 
-    getFreesoundPlayer() {
-        const freeSoundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.player.state === "stopped");
+    getFreeSoundPlayer() {
+        const freeSoundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.playingPadIndex === -1);
         if (!freeSoundPlayer) {
             // Return randomly one of the players
             const randomSoundPlayer = this.audioNodes.soundPlayers[Math.floor(Math.random() * this.numVoices)];
+            randomSoundPlayer.player.fadeOut = 0;
             randomSoundPlayer.player.stop();
             return randomSoundPlayer;
         }
@@ -105,13 +107,15 @@ export class EstacioSampler extends EstacioBase {
         if (!this.audioNodes.hasOwnProperty('soundPlayers')) return;
         this.audioNodes.soundPlayers.forEach(soundPlayer => {
             soundPlayer.player.buffer = this.obteBufferPerSo(soundName);
-            console.log("So ", soundName, "carregat a buffer de player ");
         });
     }
 
     stopAllPlayers() {
         if (!this.audioNodes.hasOwnProperty('soundPlayers')) return;
-        this.audioNodes.soundPlayers.forEach(soundPlayer => soundPlayer.player.stop());
+        this.audioNodes.soundPlayers.forEach(soundPlayer => {
+            soundPlayer.player.fadeOut = 0;  // Set fade out to 0 to avoid release time
+            soundPlayer.player.stop();
+        });
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
@@ -119,25 +123,37 @@ export class EstacioSampler extends EstacioBase {
 
         const soundPlayers = [];
         for (let i = 0; i < this.numVoices; i++) {
+
+            const soundPlayerNodes = {
+                playerIdx: i,
+                playingPadIndex: -1,
+                playingOneShot: false,
+            }
             
-            const channel = new Tone.Channel({
-                volume: -6,
-                pan: 0,
-            }).connect(lpf);
-            
-            const envelope = new Tone.AmplitudeEnvelope().connect(channel);        
+            const channel = new Tone.Channel().connect(lpf);
+            soundPlayerNodes.channel = channel;
+
+            if (this.usePitchShifter) {
+                const pitchShift = new Tone.PitchShift().connect(soundPlayerNodes.channel);
+                soundPlayerNodes.pitchShift = pitchShift;
+            }
 
             const player = new Tone.Player({
                 fadeIn: 0.01,
                 fadeOut: 0.01
-            }).connect(envelope);
+            }).connect(this.usePitchShifter ? soundPlayerNodes.pitchShift : soundPlayerNodes.channel);
+            player.onstop = () => {
+                // After the release time, finally set the sound player as being "free"
+                setTimeout(() => {
+                    soundPlayerNodes.playingPadIndex = -1;
+                    soundPlayerNodes.playingOneShot = false;
+                }, player.fadeOut);
+                
+            }
+
+            soundPlayerNodes.player = player;
             
-            soundPlayers.push({
-                player: player,
-                envelope: envelope,
-                channel: channel,
-                playingPadIndex: -1
-            })
+            soundPlayers.push(soundPlayerNodes)
         }
         
         this.audioNodes = {
@@ -157,8 +173,10 @@ export class EstacioSampler extends EstacioBase {
 
             const affectedsoundPlayers = this.getsoundPlayersWithPadPlaying(padIndex);
             affectedsoundPlayers.forEach(soundPlayer => {
-                if (type === 'attack' || type === 'decay' || type === 'sustain' || type === 'release') {
-                    soundPlayer.envelope[type] = value;
+                if (type === 'attack') {
+                    soundPlayer.player.fadeIn = value;
+                } else if (type === 'release') {
+                    soundPlayer.player.fadeOut = value;
                 } else if (type === 'volume'|| type === 'pan') {
                     const channel = soundPlayer.channel;
                     if (type === 'volume'){
@@ -169,8 +187,11 @@ export class EstacioSampler extends EstacioBase {
                     }
                 } else if (type === 'pitch') {
                     const integerPitch = parseInt(value);
-                    // TODO: set playbackRate accordingly (?)
-                    soundPlayer.player.playbackRate = Math.pow(2, integerPitch / 12);
+                    if (this.usePitchShifter) {
+                        soundPlayer.pitchShift.pitch = integerPitch;
+                    } else {
+                        soundPlayer.player.playbackRate = Math.pow(2, integerPitch / 12);
+                    }
                 }else if (type === 'start') {
                     // Also next time we do play, we'll start from this point
                     soundPlayer.player.loopStart = value * soundPlayer.player.buffer.duration;
@@ -191,36 +212,47 @@ export class EstacioSampler extends EstacioBase {
         }
     }
 
-    triggerPad(padIndex, time, duration) {
-        const soundPlayer = this.getFreesoundPlayer();
+    triggerPad(padIndex, time) {
+        const soundPlayer = this.getFreeSoundPlayer();
         soundPlayer.playingPadIndex = padIndex;
-        soundPlayer.envelope.triggerAttack(time);
-        // TODO: compute proper duration:
-        // think about how to do that...
-        const soundDuration = soundPlayer.player.buffer.duration;
-        
-        soundPlayer.player.loopStart = this.getParameterValue(`start${padIndex + 1}`) * soundDuration;
-        soundPlayer.player.loopEnd = this.getParameterValue(`end${padIndex + 1}`) * soundDuration;
+        soundPlayer.playingOneShot = this.getParameterValue(`playerMode${padIndex + 1}`) === 'oneshot';
+        const fullSoundDuration = soundPlayer.player.buffer.duration;
+        const soundSliceStartSeconds = this.getParameterValue(`start${padIndex + 1}`) * fullSoundDuration;
+        const soundSliceEndSeconds = this.getParameterValue(`end${padIndex + 1}`) * fullSoundDuration;      
+        soundPlayer.player.loopStart = soundSliceStartSeconds;
+        soundPlayer.player.loopEnd = soundSliceEndSeconds;
         soundPlayer.player.loop = this.getParameterValue(`playerMode${padIndex + 1}`) === 'loop';
-        soundPlayer.envelope.attack = this.getParameterValue(`attack${padIndex + 1}`);
-        soundPlayer.envelope.decay = this.getParameterValue(`decay${padIndex + 1}`);
-        soundPlayer.envelope.sustain = this.getParameterValue(`sustain${padIndex + 1}`);
-        soundPlayer.envelope.release = this.getParameterValue(`release${padIndex + 1}`);
+        soundPlayer.player.fadeIn = this.getParameterValue(`attack${padIndex + 1}`);
+        soundPlayer.player.fadeOut = this.getParameterValue(`release${padIndex + 1}`);
         soundPlayer.channel.volume.value = this.getParameterValue(`volume${padIndex + 1}`);
         soundPlayer.channel.pan.value = this.getParameterValue(`pan${padIndex + 1}`);
         const integerPitch = parseInt(this.getParameterValue(`pitch${padIndex + 1}`));
-        soundPlayer.player.playbackRate = Math.pow(2, integerPitch / 12);
-        
-        soundPlayer.player.start(time, soundPlayer.player.loopStart);
+        if (this.usePitchShifter) {
+            soundPlayer.pitchShift.pitch = integerPitch;
+        } else {
+            soundPlayer.player.playbackRate = Math.pow(2, integerPitch / 12);
+        }
+        soundPlayer.player.start(time, soundSliceStartSeconds);
+
+        if (soundPlayer.playingOneShot) { 
+            // For one shots, we stop the player manually at the stopping point of the slice
+            const sliceSoundDuration = soundSliceEndSeconds - soundSliceStartSeconds;
+            soundPlayer.player.stop(time + sliceSoundDuration);
+        }
     }
 
     stopPad(padIndex, time) {
         const soundPlayers = this.getsoundPlayersWithPadPlaying(padIndex);
         soundPlayers.forEach(soundPlayer => {
-            soundPlayer.playingPadIndex = -1;
-            soundPlayer.envelope.triggerRelease(time);
-            soundPlayer.player.stop(time + soundPlayer.envelope.release);  // Trigger full player stop after release
+            if (!soundPlayer.playingOneShot) {  // One shots are played until the end of the slice and don't need to be stopepd manually
+                soundPlayer.player.stop(time);  // Triggering stop will add the fadeOut (release) time
+            }
         });
+    }
+
+    triggerAttackRelease(padIndex, time, duration) {
+        this.triggerPad(padIndex, time);
+        this.stopPad(padIndex, time + duration);
     }
 
     onSequencerStep(currentMainSequencerStep, time) {
@@ -237,7 +269,7 @@ export class EstacioSampler extends EstacioBase {
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const padIndex = note.n;
-                this.triggerPad(padIndex, time, note.d * Tone.Time("16n").toSeconds());
+                this.triggerAttackRelease(padIndex, time + i * 0.001, note.d * Tone.Time("16n").toSeconds());  // We add micro time difference in notes that start exactly at the same time to avoid potential errors with start times
             }
         }
     }
@@ -249,11 +281,9 @@ export class EstacioSampler extends EstacioBase {
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
-
         const padIndex = midiNoteNumber % 16;
         if (!noteOff) this.triggerPad(padIndex, Tone.now());
         else this.stopPad(padIndex, Tone.now());
-
         if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }
