@@ -53,8 +53,11 @@ export class EstacioPiano extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                this.audioNodes.piano.keyDown({note:Tone.Frequency(note.n, "midi").toNote(), time:time})
-                this.audioNodes.piano.keyUp({note:Tone.Frequency(note.n, "midi").toNote(), time:time + note.d * Tone.Time("16n").toSeconds()})
+                const pitch = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();;
+                this.audioNodes.piano.keyDown({note:Tone.Frequency(pitch, "midi").toNote(), time:time});
+                this.audioNodes.piano.keyUp({note:Tone.Frequency(pitch, "midi").toNote(), time:time + duration});
+                this.sendNote({ pitch, duration });
             }
         }
     }

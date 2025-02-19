@@ -194,12 +194,14 @@ export class EstacioGrooveBox extends EstacioBase {
     playSoundFromPlayer(playerName, time) {
         if (this.playerNames.includes(playerName) && this.audioNodes[playerName].buffer.loaded) {
             this.audioNodes[playerName].start(time);
+            // sendNote missing
         }
     }
     
     stopSoundFromPlayer(playerName, time) {
         if (this.playerNames.includes(playerName) && this.audioNodes[playerName].state === "started") {
             this.audioNodes[playerName].stop(time);
+            // sendNote missing
         }
     }
 

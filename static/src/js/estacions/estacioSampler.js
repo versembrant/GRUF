@@ -219,8 +219,10 @@ export class EstacioSampler extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                const playerIndex = note.n
-                this.samplePlayers[playerIndex].trigger(time, note.d * Tone.Time("16n").toSeconds());
+                const playerIndex = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();
+                this.samplePlayers[playerIndex].trigger(time, duration);
+                this.sendNote({ pitch: playerIndex, duration })
             }
         }
     }

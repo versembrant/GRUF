@@ -98,9 +98,11 @@ export class BaseSynth extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                let midiNote = note.n;
-                if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(midiNote)
-                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
+                const pitch = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();
+                if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(pitch)
+                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(pitch, "midi").toNote(), duration, time);
+                this.sendNote({ pitch, duration });
             }
         }
     }

@@ -351,6 +351,13 @@ export class EstacioBase {
         // Called everytime a note message is received from a live stream of notes (could be MIDI input or virtual input)
     }
 
+    sendNote({ pitch, duration }) {
+        const noteOn = new CustomEvent("midiNote-" + this.nom, { detail: { pitch, type: 'noteOn', origin: 'sequencer' } });
+        const noteOff = new CustomEvent("midiNote-" + this.nom, { detail: { pitch, type: 'noteOff', origin: 'sequencer' } });
+        document.dispatchEvent(noteOn);
+        setTimeout(() => document.dispatchEvent(noteOff), duration * 1000);
+    }
+
     unfinishedNotesOnsets = new Map();
     handlePianoRollRecording(pitch, noteOff) {
         if (!this.getParameterValue('isRecording')) return;
