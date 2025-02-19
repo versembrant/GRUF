@@ -621,6 +621,6 @@ clean_existing_connected_users()
 
 if __name__ == '__main__':
     # Start server
-    log('Starting server listening in port ' + str(port))
+    log(f"Server running at: http://localhost:{port}")
     debug_mode = os.getenv('DEPLOY') == None
     socketio.run(app, debug=debug_mode, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) # logger=True, engineio_logger=True
