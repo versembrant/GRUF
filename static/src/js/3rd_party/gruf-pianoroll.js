@@ -757,9 +757,10 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             }
         };
         this.onmidinote=function(e) {
-            const noteNumber = e.detail.note;
-            if (e.detail.type == 'noteOff') this.externalnoteons.delete(noteNumber);
-            else this.externalnoteons.add(noteNumber);
+            if (e.detail.origin !== 'midiinput') return;  // només es resalta quan rep un live stream
+            const pitch = e.detail.pitch;
+            if (e.detail.type == 'noteOff') this.externalnoteons.delete(pitch);
+            else this.externalnoteons.add(pitch);
             this.redrawKeyboard();
         };
         this.longtapcountup=function(){
@@ -963,7 +964,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 const noteSquenceData =  this.sequence[ht.i];
                 if (noteSquenceData !== undefined){
                     const event = new CustomEvent("pianoRollNoteSelectedOrCreated", { detail: {
-                        midiNote: noteSquenceData.n,
+                        pitch: noteSquenceData.n,
                         durationInBeats: noteSquenceData.g,
          
                     }});

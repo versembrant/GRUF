@@ -243,22 +243,22 @@ export class EstacioGrooveBox extends EstacioBase {
 
         }
     }
-    onMidiNote (midiNoteNumber, midiVelocity, noteOff, extras){
+    onMidiNote ({ pitch, type }){
         if (!getAudioGraphInstance().isGraphBuilt()){return;}
         
-        const playerName = this.playerNames[midiNoteNumber % 4];
+        const playerName = this.playerNames[pitch % 4];
 
-        if (!noteOff){
-            const recEnabled = !extras.skipRecording && this.getParameterValue('isRecording');
+        if (type === 'noteOn'){
+            const recEnabled = this.getParameterValue('isRecording');
             // Si Rec està ON
             if (recEnabled) {   
                 const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
                 const currentStep = currentMainSequencerStep % this.getNumSteps();
                 const pattern = this.getParameterValue('pattern');
-                const index = indexOfArrayMatchingObject(pattern, {'i': (midiNoteNumber % 4), 'j': currentStep});
+                const index = indexOfArrayMatchingObject(pattern, {'i': (pitch % 4), 'j': currentStep});
                 if (index === -1) {
                     // Si la nota no està en el patró, l'afegeix
-                    pattern.push({'i': (midiNoteNumber % 4), 'j': currentStep});
+                    pattern.push({'i': (pitch % 4), 'j': currentStep});
                     this.updateParametreEstacio('pattern', pattern); // save change in server!
                 };
             }

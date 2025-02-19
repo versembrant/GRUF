@@ -136,12 +136,12 @@ export class Synth extends BaseSynth {
         this.audioNodes.synth.releaseAll()
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
-        else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+        if (type === 'noteOn') this.audioNodes.synth.triggerAttack([Tone.Frequency(pitch, "midi").toNote()], Tone.now());
+        else this.audioNodes.synth.triggerRelease([Tone.Frequency(pitch, "midi").toNote()], Tone.now());
 
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }

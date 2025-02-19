@@ -337,16 +337,20 @@ export const GrufBpmCounter = ({ top, left }) => {
 };
 
 export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }) => {
+    const nomEstacio = estacio.nom;
+    const velocity = 127;
+    const pitch = playerIndex;
+    const origin = 'mouseinput';
 
     const handleMouseDown = () => {
         setSelected();
-        sendNoteOn(estacio.nom, playerIndex, 127);
+        sendNoteOn({ nomEstacio, pitch, velocity, origin });
         document.addEventListener('mouseup', handleMouseUp);
     }
 
     const handleMouseUp = () => {
         document.removeEventListener('mouseup', handleMouseUp);
-        sendNoteOff(estacio.nom, playerIndex, 0, {force: true});
+        sendNoteOff({ nomEstacio, pitch, velocity, origin, force: true });
     };
 
 
@@ -365,7 +369,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
     useEffect(()=> {
         document.addEventListener("midiNote-" + estacio.nom , (evt) => {
             if (evt.detail.type == 'noteOff') return;
-            setSelectedPad(evt.detail.note)
+            setSelectedPad(evt.detail.pitch)
         });
     })
    
@@ -550,6 +554,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
     const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
 
     useEffect(() => {
+        const nomEstacio = estacio.nom;
         const jsElement = document.getElementById(uniqueId + "_id")
         if (jsElement.dataset.alreadyBinded === undefined){
             jsElement.dataset.lastTonality = tonality;
@@ -563,32 +568,36 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             });
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
+                    const pitch = evt.detail.pitch;
+                    const velocity = 127;
+                    const origin = 'mouseinput';
                     // When a note is created or selected, we will trigger a callback
-                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=true);
+                    sendNoteOn({ nomEstacio, pitch, velocity, origin });
                     setTimeout(() => {
-                        sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
+                        sendNoteOff({ nomEstacio, pitch, velocity, origin });
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
                 });
             }
             if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
                 document.addEventListener("midiNote-" + estacio.nom , (evt) => {
-                    const noteNumber = evt.detail.note;
+                    if (evt.detail.origin !== 'midiinput') return; // només es resalta quan rep un live stream
+                    const pitch = evt.detail.pitch;
                     if (evt.detail.type == 'noteOff') {
-                        const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
+                        const noteMarker = document.querySelector(`.noteMarker[data-pitch='${pitch}']`);
                         if (!noteMarker) return;
                         noteMarker.remove();
                         return;
                     }
     
                     const noteHeight = jsElement.height/jsElement.yrange;
-                    let bottomPosition = noteHeight * noteNumber;
+                    let bottomPosition = noteHeight * pitch;
                     const canvasOffset = jsElement.yoffset*noteHeight;
                     bottomPosition = bottomPosition - canvasOffset;
     
                     if ((bottomPosition >= 0) && (bottomPosition <= jsElement.height - 10)) {
                         const noteMarker = document.createElement('div');
                         noteMarker.className = 'noteMarker'
-                        noteMarker.dataset.notenumber = noteNumber;
+                        noteMarker.dataset.pitch = pitch;
                         noteMarker.style.position = 'absolute';
                         noteMarker.style.bottom = bottomPosition + 'px';
                         noteMarker.style.left = modeSampler ? '0px': '22px';
@@ -995,11 +1004,11 @@ export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
     const onMidiNote = (evt) => {
         const {a, d, r} = adsrRef.current;
         let lastNoteInfo = lastNoteInfoRef.current;
-        const {type, note} = evt.detail;
+        const {type, pitch} = evt.detail;
         if (type === "noteOff") {
-            if (note !== lastNoteInfo.note && !estacio.getParameterDescription('notes').isMono) return;
+            if (pitch !== lastNoteInfo.pitch && !estacio.getParameterDescription('notes').isMono) return;
             lastNoteInfo = {stage: 'release', duration: r*1000};
-        } else lastNoteInfo = {stage: 'pre-sustain', duration: (a+d)*1000, note};
+        } else lastNoteInfo = {stage: 'pre-sustain', duration: (a+d)*1000, pitch};
         lastNoteInfo = {...lastNoteInfo, initTime: Date.now()};
         lastNoteInfoRef.current = lastNoteInfo;
         checkLastNoteStatus();

@@ -64,12 +64,12 @@ export class EstacioPiano extends EstacioBase {
         this.audioNodes.piano.stopAll()
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
-        else this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
+        if (type === 'noteOn') this.audioNodes.piano.keyDown({note:Tone.Frequency(pitch, "midi").toNote(), time:Tone.now()});
+        else this.audioNodes.piano.keyUp({note:Tone.Frequency(pitch, "midi").toNote(), time:Tone.now()});
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }

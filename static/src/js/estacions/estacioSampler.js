@@ -230,14 +230,14 @@ export class EstacioSampler extends EstacioBase {
         this.samplePlayers.forEach(player => player.stop(true));
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type, force }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        const playerIndex = midiNoteNumber % 16;
-        if (!noteOff) this.samplePlayers[playerIndex].trigger(Tone.now());
-        else this.samplePlayers[playerIndex].stop(extras.force);
+        const playerIndex = pitch % 16;
+        if (type === 'noteOn') this.samplePlayers[playerIndex].trigger(Tone.now());
+        else this.samplePlayers[playerIndex].stop(force);
 
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }
 
