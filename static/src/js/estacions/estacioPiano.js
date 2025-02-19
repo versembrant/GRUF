@@ -53,8 +53,11 @@ export class EstacioPiano extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                this.audioNodes.piano.keyDown({note:Tone.Frequency(note.n, "midi").toNote(), time:time})
-                this.audioNodes.piano.keyUp({note:Tone.Frequency(note.n, "midi").toNote(), time:time + note.d})
+                const pitch = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();;
+                this.audioNodes.piano.keyDown({note:Tone.Frequency(pitch, "midi").toNote(), time:time});
+                this.audioNodes.piano.keyUp({note:Tone.Frequency(pitch, "midi").toNote(), time:time + duration});
+                this.sendNote({ pitch, duration });
             }
         }
     }
@@ -64,12 +67,12 @@ export class EstacioPiano extends EstacioBase {
         this.audioNodes.piano.stopAll()
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
-        else this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), time:Tone.now()});
+        if (type === 'noteOn') this.audioNodes.piano.keyDown({note:Tone.Frequency(pitch, "midi").toNote(), time:Tone.now()});
+        else this.audioNodes.piano.keyUp({note:Tone.Frequency(pitch, "midi").toNote(), time:Tone.now()});
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }

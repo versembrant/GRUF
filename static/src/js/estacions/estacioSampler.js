@@ -219,8 +219,10 @@ export class EstacioSampler extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                const playerIndex = note.n
-                this.samplePlayers[playerIndex].trigger(time, note.d * Tone.Time("16n").toSeconds());
+                const playerIndex = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();
+                this.samplePlayers[playerIndex].trigger(time, duration);
+                this.sendNote({ pitch: playerIndex, duration })
             }
         }
     }
@@ -230,14 +232,14 @@ export class EstacioSampler extends EstacioBase {
         this.samplePlayers.forEach(player => player.stop(true));
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type, force }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        const playerIndex = midiNoteNumber % 16;
-        if (!noteOff) this.samplePlayers[playerIndex].trigger(Tone.now());
-        else this.samplePlayers[playerIndex].stop(extras.force);
+        const playerIndex = pitch % 16;
+        if (type === 'noteOn') this.samplePlayers[playerIndex].trigger(Tone.now());
+        else this.samplePlayers[playerIndex].stop(force);
 
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }
 

@@ -98,9 +98,11 @@ export class BaseSynth extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                let midiNote = note.n;
-                if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(midiNote)
-                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
+                const pitch = note.n;
+                const duration = note.d * Tone.Time("16n").toSeconds();
+                if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(pitch)
+                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(pitch, "midi").toNote(), duration, time);
+                this.sendNote({ pitch, duration });
             }
         }
     }
@@ -136,12 +138,12 @@ export class Synth extends BaseSynth {
         this.audioNodes.synth.releaseAll()
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, type }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
-        else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
+        if (type === 'noteOn') this.audioNodes.synth.triggerAttack([Tone.Frequency(pitch, "midi").toNote()], Tone.now());
+        else this.audioNodes.synth.triggerRelease([Tone.Frequency(pitch, "midi").toNote()], Tone.now());
 
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }

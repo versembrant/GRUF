@@ -33,25 +33,25 @@ export class MonoSynth extends BaseSynth {
     }
 
     unfinishedNotes = [];
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
+    onMidiNote({ pitch, velocity, type, force }) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
-        if (!noteOff) {
-            if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);
+        const adjustedNote = this.adjustNoteForWaveform(pitch);
+        if (type === 'noteOn') {
+            if (!extras.skipStack) this.unfinishedNotes.push(pitch);
             this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
         }
         else {
-            const removedIndex = this.unfinishedNotes.indexOf(midiNoteNumber);
+            const removedIndex = this.unfinishedNotes.indexOf(pitch);
             this.unfinishedNotes.splice(removedIndex, 1);
             const newStackLength = this.unfinishedNotes.length;
             if (removedIndex === newStackLength) { // if removed note was the last one (sounding...)
                 this.audioNodes.synth.triggerRelease(Tone.now()); // release it
                 // ...and if there were other notes pressed, play the newest one among them
-                if (newStackLength > 0) this.onMidiNote(this.unfinishedNotes[newStackLength-1], midiVelocity, false, {...extras, skipStack: true})
+                if (newStackLength > 0) this.onMidiNote(this.unfinishedNotes[newStackLength-1], velocity, false, {force, skipStack: true})
             }
         }
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        this.handlePianoRollRecording(pitch, type === 'noteOff');
     }
 }

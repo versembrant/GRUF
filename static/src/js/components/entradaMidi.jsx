@@ -6,37 +6,30 @@ import Checkbox from '@mui/material/Checkbox';
 import NativeSelect from '@mui/material/NativeSelect';
 
 
-export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
-    const messageData =  {
-        noteNumber: noteNumber,
-        velocity: noteVelocity,
-        type: 'noteOn',
-        skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
-    }
-    document.notesActivades[nomEstacio].add(noteNumber);
+export const sendNoteOn = ({ nomEstacio, pitch, velocity, origin }) => {
+    const messageData =  { pitch, velocity, type: 'noteOn', origin };
+    document.notesActivades[nomEstacio].add(pitch);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
 }
 
-export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {
-    const messageData =  {
-        noteNumber: noteNumber,
-        velocity: noteVelocity,
-        type: 'noteOff',
-        ...extras
-    }
-    document.notesActivades[nomEstacio].delete(noteNumber);
+export const sendNoteOff = ({ nomEstacio, pitch, velocity, origin, force }) => {
+    const messageData =  { pitch, velocity, type: 'noteOff', origin, force };
+    document.notesActivades[nomEstacio].delete(pitch);
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getCurrentSession().usesAudioEngine());
 }
 
 const bindMidiInputDevice = (nomDevice, nomEstacio) => {
     console.log("Binding MIDI input device: " + nomDevice);
+    const origin = 'midiinput';
     bindMidiInputOnMidiMessage(nomDevice, (midiMessage) => {
+        const pitch = midiMessage.data[1];
+        const velocity = midiMessage.data[2];
         if (midiMessage.data[0] === 144) {
             // Note on
-            sendNoteOn(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOn({ nomEstacio, pitch, velocity, origin });
         } else if (midiMessage.data[0] === 128) {
             // Note off
-            sendNoteOff(nomEstacio, midiMessage.data[1], midiMessage.data[2]);
+            sendNoteOff({ nomEstacio, pitch, velocity, origin });
         }
     })
 }
@@ -44,7 +37,7 @@ const bindMidiInputDevice = (nomDevice, nomEstacio) => {
 export const EntradaMidi = ({estacio}) => {
     useEffect(()=>{
         return () => { // es dispara al canviar d'estació, per treure les notes penjades que no han rebut noteoff
-            document.notesActivades[estacio.nom]?.forEach(nota => sendNoteOff(estacio.nom, nota, 0, {force: true}))
+            document.notesActivades[estacio.nom]?.forEach(pitch => sendNoteOff({ nomEstacio: estacio.nom, pitch, velocity: 127, force: true, origin: 'midiinput' }))
         }
     })
 
@@ -113,6 +106,9 @@ const EntradaMidiExternal = ({estacio}) => {
 
 const EntradaMidiTeclatQWERTY = ({estacio}) => {
     const notesDescription = estacio.getParameterDescription('notes');
+    const nomEstacio = estacio.nom;
+    const velocity = 127; // és fixa
+    const origin = 'midiinput';
 
     if (document.baseNotes === undefined) {
         document.baseNotes = {};
@@ -139,34 +135,35 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
             const kbdNotes = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k"];
             if (kbdNotes.includes(evt.key.toLowerCase())) {
                 if (evt.type === 'keyup') {
-                    const midiNote = boundKeys.get(evt.key.toLowerCase());
-                    sendNoteOff(estacio.nom, midiNote, 0);
+                    const pitch = boundKeys.get(evt.key.toLowerCase());
+                    sendNoteOff({ nomEstacio, pitch, velocity, origin });
                     boundKeys.delete(evt.key.toLowerCase())
                     return;
                 }
                 // so, it's keydown
-                let midiNote;
+                let pitch;
                 while (true) {
-                    midiNote = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
-                    if (notesDescription && midiNote < notesDescription.notaMesBaixaPermesa) {
+                    pitch = document.baseNotes[estacio.nom] + kbdNotes.indexOf(evt.key.toLowerCase());
+                    if (notesDescription && pitch < notesDescription.notaMesBaixaPermesa) {
                         handleOctaveUp();
                         continue;    
                     }
-                    else if (notesDescription && midiNote > notesDescription.notaMesAltaPermesa) {
+                    else if (notesDescription && pitch > notesDescription.notaMesAltaPermesa) {
                         handleOctaveDown();
                         continue;
                     }
                     break;
                 }
-                boundKeys.set(evt.key.toLowerCase(), midiNote);
-                sendNoteOn(estacio.nom, midiNote, 127);
+                boundKeys.set(evt.key.toLowerCase(), pitch);
+                sendNoteOn({ nomEstacio, pitch, velocity, origin });
             }
 
             // Drum and sampler pads
             const padNotes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
             if (padNotes.includes(evt.key)) {
-                if (evt.type === 'keydown') sendNoteOn(estacio.nom, padNotes.indexOf(evt.key), 127);
-                else sendNoteOff(estacio.nom, padNotes.indexOf(evt.key), 127);
+                const pitch = padNotes.indexOf(evt.key);
+                if (evt.type === 'keydown') sendNoteOn({ nomEstacio, pitch, velocity, origin });
+                else sendNoteOff({ nomEstacio, pitch, velocity, origin });
             }
 
             if (evt.type === 'keyup') return;

@@ -347,28 +347,34 @@ export class EstacioBase {
         // Called at each step (16th note) of the main sequencer so the station can trigger notes, etc.
     }
 
-    onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
-        // Called everytime a note message is received from a live stream of notes (could be MIDI input or virtual input
-        // noteOff = boolean which will be true if the message is a noteOff
+    onMidiNote(data) {
+        // Called everytime a note message is received from a live stream of notes (could be MIDI input or virtual input)
+    }
+
+    sendNote({ pitch, duration }) {
+        const noteOn = new CustomEvent("midiNote-" + this.nom, { detail: { pitch, type: 'noteOn', origin: 'sequencer' } });
+        const noteOff = new CustomEvent("midiNote-" + this.nom, { detail: { pitch, type: 'noteOff', origin: 'sequencer' } });
+        document.dispatchEvent(noteOn);
+        setTimeout(() => document.dispatchEvent(noteOff), duration * 1000);
     }
 
     unfinishedNotesOnsets = new Map();
-    handlePianoRollRecording(midiNoteNumber, noteOff) {
+    handlePianoRollRecording(pitch, noteOff) {
         if (!this.getParameterValue('isRecording')) return;
         const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
         const currentStep = currentMainSequencerStep % this.getNumSteps();
     
-        if (!noteOff) return this.unfinishedNotesOnsets.set(midiNoteNumber, currentStep);
+        if (!noteOff) return this.unfinishedNotesOnsets.set(pitch, currentStep);
         
-        const noteOnset = this.unfinishedNotesOnsets.get(midiNoteNumber)
-        this.unfinishedNotesOnsets.delete(midiNoteNumber)
+        const noteOnset = this.unfinishedNotesOnsets.get(pitch)
+        this.unfinishedNotesOnsets.delete(pitch)
         if (noteOnset === undefined) return; // if we don't have a time for the last note on, don't do anything
         if (noteOnset >= currentStep) return; // likewise, don't save the note if the noteoff insn't bigger than the noteon
         
         // now yes, create a note object
         const notes = this.getParameterValue('notes');
         const jsPianoRollEl = document.getElementById(this.nom + "_" + "notes_id");
-        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset, 'id': jsPianoRollEl.getNextAvailableID()});
+        notes.push({'n': pitch, 'b': noteOnset, 'd': currentStep - noteOnset, 'id': jsPianoRollEl.getNextAvailableID()});
         this.updateParametreEstacio('notes', notes); // and save change in server!
     }
 
