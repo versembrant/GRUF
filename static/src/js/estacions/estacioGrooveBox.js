@@ -71,10 +71,6 @@ export class EstacioGrooveBox extends EstacioBase {
         return getAudioGraphInstance().getNumSteps(1);
     }
 
-    getTempsBeat = () => {
-        return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
-    };
-
     getUserInterfaceComponent() {
         return EstacioGrooveBoxUI
     }

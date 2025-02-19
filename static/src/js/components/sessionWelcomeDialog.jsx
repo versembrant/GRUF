@@ -8,11 +8,15 @@ import { getCurrentSession } from '../sessionManager';
 export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
 
     useEffect(() => {
-        // call api or anything
         if (!document.hasOwnProperty("welcomeDialogShown")){
-            showDialog();
+            if (location.href.indexOf("audio=1") != -1) {
+                // If url has audio=1, connect with audio without showing the modal
+                document.welcomeDialogShown = true;
+                connectaAmbAudio();
+            } else {
+                showDialog();
+            }
         }
-        
      });
 
     const connectaAmbAudio = () => {
