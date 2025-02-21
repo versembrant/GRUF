@@ -10,11 +10,11 @@ def get_tonality_from_filename(filename):
     try:
         tonality_raw = filename.split(' -')[1].split('.wav')[0].replace('(', '').replace(')', '').strip().lower()
         name = filename.split(' -')[0].strip().lower()
-        if "min" or "maj" in tonality_raw:
-            tonality_raw = tonality_raw.replace('min', 'minor').replace('maj', 'major').replace(' ', '')
-            tonality_raw = tonality_raw.replace('gb', 'f#')
-            tonality_raw = tonality_raw.replace('g#', 'ab')
-            tonality_raw = tonality_raw.replace('a#', 'bb')
+        #if "min" or "maj" in tonality_raw:
+        #    tonality_raw = tonality_raw.replace('min', 'minor').replace('maj', 'major').replace(' ', '')
+        #    tonality_raw = tonality_raw.replace('gb', 'f#')
+        #    tonality_raw = tonality_raw.replace('g#', 'ab')
+        #    tonality_raw = tonality_raw.replace('a#', 'bb')
         tonality_options = ['cmajor', 'cminor', 'c#major', 'c#minor', 'dmajor', 'dminor', 'ebmajor', 'ebminor', 'emajor', 'eminor', 'fmajor', 'fminor', 'f#major', 'f#minor', 'gmajor', 'gminor', 'abmajor', 'abminor', 'amajor', 'aminor', 'bbmajor', 'bbminor', 'bmajor', 'bminor']
         if tonality_raw in tonality_options:
             return tonality_raw, name
