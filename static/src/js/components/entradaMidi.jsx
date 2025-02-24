@@ -7,6 +7,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 
 
 export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
+    noteNumber = getCurrentSession().getEstacio(nomEstacio).adjustMidiNoteToEstacioRange(noteNumber);
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
@@ -18,6 +19,7 @@ export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEven
 }
 
 export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {
+    noteNumber = getCurrentSession().getEstacio(nomEstacio).adjustMidiNoteToEstacioRange(noteNumber);
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,

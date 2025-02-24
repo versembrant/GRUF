@@ -357,6 +357,10 @@ export class EstacioBase {
         // noteOff = boolean which will be true if the message is a noteOff
     }
 
+    adjustMidiNoteToEstacioRange(noteNumber) {
+        return noteNumber;
+    }
+
     unfinishedNotesOnsets = new Map();
     handlePianoRollRecording(midiNoteNumber, noteOff) {
         if (!this.getParameterValue('isRecording')) return;
