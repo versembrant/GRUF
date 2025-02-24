@@ -992,7 +992,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
+export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight, volumeParamName}) => {
     useEffect(()=> {
         if (dynamicHighlight) {
             document.addEventListener("midiNote-" + estacio.nom , onMidiNote);
@@ -1028,15 +1028,19 @@ export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
         if (progress < 1) setTimeout(checkLastNoteStatus, 30);
     }
 
-
     adsrParameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
-
     const a = estacio.getParameterValue(adsrParameterNames[0]);
     const d = estacio.getParameterValue(adsrParameterNames[1]);
     const s = estacio.getParameterValue(adsrParameterNames[2]);
     const r = estacio.getParameterValue(adsrParameterNames[3]);
     const adsrRef = useRef({});
     adsrRef.current = {a, d, s, r};
+
+    if (volumeParamName) subscribeToParameterChanges(estacio, volumeParamName);
+    const v = volumeParamName ? estacio.getParameterValue(volumeParamName) : 0;  // in dB units, minimum -60, maximum 6
+    const minv = -60;
+    const maxv = 6;
+    const v01 = (v - minv) / (maxv - minv);
 
     const strokeWidthPx = 3;
 
@@ -1056,7 +1060,7 @@ export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
     const levelValues = [0, 1, s, s, 0];
 
     levelValues.forEach((levelValue, index) => {
-        adsrPoints[index].y = 75 - levelValue * 50;
+        adsrPoints[index].y = 75 - levelValue * 50 * v01;
     });
 
     const sustainPoints = [adsrPoints[2], adsrPoints[3]];
