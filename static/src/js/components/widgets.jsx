@@ -901,12 +901,16 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
 
 export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
+    for (let i = 0; i < 16; i++) {
+        subscribeToParameterChanges(estacio, `pitch${i + 1}`);
+    }
     subscribeToAudioGraphParameterChanges('tonality');
     [inputMeterPercent, setInputMeterPercent] = useState(0);
 
     const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const tonalitat = getAudioGraphInstance().getTonality();
+    const algunSliceAmbPitchAlerat = estacio.algunSliceTePitchAlterat()
 
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
@@ -953,17 +957,26 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
+        const tonalitatIncorrecta = (tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)
+        let optionTonalitatClass = "";
+        if (tonalitatIncorrecta) optionTonalitatClass = "text-red";
+        if (algunSliceAmbPitchAlerat) optionTonalitatClass = "text-orange";
         return (
-            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
+            <span className={optionTonalitatClass}>{option.label}</span>
         );
     };
+
+    const tonalitatIncorrecta = (tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)
+    let tonalitatClass = "";
+    if (tonalitatIncorrecta) tonalitatClass = "text-red";
+    if (algunSliceAmbPitchAlerat) tonalitatClass = "text-orange";
 
     return (
         <div>
             <div className="flex justify-between gap-10">
                 <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
                     <Dropdown
-                        className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                        className= {tonalitatClass}
                         itemTemplate={optionTemplate}
                         value={selectedSoundName}
                         onChange={(evt) => {
