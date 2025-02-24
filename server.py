@@ -449,8 +449,6 @@ def upload_file(session_id):
             recording_number = 0
             for ffilename in os.listdir(folder_path):
                 try:
-                    print(ffilename.split('.wav')[0])
-                    print(ffilename.split('.wav')[0].split('_num_')[1])
                     num = int(ffilename.split('.wav')[0].split('_num_')[1])
                     if num > recording_number:
                         recording_number = num
@@ -464,7 +462,7 @@ def upload_file(session_id):
             os.remove(file_path)
 
             # Correct loudness
-            correct_loudness_method = 'acompressor' #'compand' #'dynaudnorm' # 'loudnorm' or None
+            correct_loudness_method = 'peak' #'dynaudnorm' #'compand' #'dynaudnorm' # 'loudnorm' or None
             if correct_loudness_method is not None:
                 print('Correcting loudness...')
                 wav_file_path2 = wav_file_path.replace(".wav", "_2.wav")
@@ -483,20 +481,28 @@ def upload_file(session_id):
                         measured_LRA = float(ffmpeg_loudnorm_stats['input_lra'])
                         measured_thresh = float(ffmpeg_loudnorm_stats['input_thresh'])
                         offset = float(ffmpeg_loudnorm_stats['target_offset'])
-                        subprocess.run(['ffmpeg', '-i', wav_file_path, '-af', f'loudnorm=I={target_i}:TP={target_tp}:LRA={target_lra}:measured_I={measured_I}:measured_TP={measured_TP}:measured_LRA={measured_LRA}:measured_thresh={measured_thresh}:offset={offset}:linear=true', wav_file_path2])
+                        subprocess.run(['ffmpeg', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'loudnorm=I={target_i}:TP={target_tp}:LRA={target_lra}:measured_I={measured_I}:measured_TP={measured_TP}:measured_LRA={measured_LRA}:measured_thresh={measured_thresh}:offset={offset}:linear=true', wav_file_path2])
                        
                 elif correct_loudness_method == 'dynaudnorm':
-                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-af', f'dynaudnorm=compress=0:targetrms=1', wav_file_path])
+                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'dynaudnorm=p=0.9:s=5', wav_file_path2])
 
                 elif correct_loudness_method == 'compand':
-                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-af', f'compand=attacks=0:points=-80/-900|-45/-15|-27/-9|-5/-5|20/20', wav_file_path2])
+                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'compand=attacks=0:points=-80/-900|-45/-15|-27/-9|-5/-5|20/20', wav_file_path2])
                 
                 elif correct_loudness_method == 'acompressor':
-                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-af', f'acompressor=threshold=-20dB:ratio=2:attack=200:release=1000:makeup=6', wav_file_path2])
+                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'acompressor=threshold=-20dB:ratio=2:attack=200:release=1000:makeup=0', wav_file_path2])
 
-                os.chmod(wav_file_path2, 0o0777)
-                os.remove(wav_file_path)
-                os.rename(wav_file_path2, wav_file_path)
+                elif correct_loudness_method == 'peak':
+                    result = subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'volumedetect', '-f', 'null', '-'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    output = result.stderr.decode('utf-8')
+                    max_volume = float(output.split('max_volume: ')[1].split(' ')[0])
+                    subprocess.run(['ffmpeg', '-y', '-i', wav_file_path, '-c:a', 'pcm_s16le', '-ar', '44100', '-af', f'volume={min(max_volume * -1, 18)}', wav_file_path2])
+                    
+                if os.path.exists(wav_file_path2):
+                    os.chmod(wav_file_path2, 0o0777)
+                    os.remove(wav_file_path)
+                    os.rename(wav_file_path2, wav_file_path)
+
             # Update all clients with list of recorded audio files
             recorded_files = s.get_recorded_files_from_disk()
             s.update_parametre_sessio('recorded_files', recorded_files, no_context=True)
