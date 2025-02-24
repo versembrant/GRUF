@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
+import { getAudioGraphInstance } from "../audioEngine";
+import { GrufPianoRoll, GrufKnob, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSelectorPitch, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -31,7 +32,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                     <fieldset className="flex justify-between">
                         {/* <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} label='Vol' /> */}
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} label='Pan' colorizeLabel />
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' colorizeLabel />
+                        <GrufSelectorPitch estacio={estacio} selectedPad={selectedPad} />
                         <GrufSelectorPlayerMode estacio={estacio} parameterName={`playerMode${selectedPad + 1}`} />
                     </fieldset>
                 </fieldset>

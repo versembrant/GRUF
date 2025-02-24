@@ -423,16 +423,59 @@ export const units = {
 }
 
 // Tonalitat
+const getRootnoteNumber = (rootnote) => {
+    return {
+        'c': 0, 
+        'c#': 1, 'db': 1,
+        'd': 2, 
+        'd#': 3, 'eb': 3,
+        'e': 4, 
+        'f': 5, 
+        'f#': 6, 'gb': 6,
+        'g': 7, 
+        'g#': 8, 'ab': 8,
+        'a': 9, 
+        'a#': 10, 'bb': 10,
+        'b': 11
+    }[rootnote.toLowerCase()];
+}
+
+const getRootnoteName = (rootnoteNumber) => {
+    return {
+        0: 'c',
+        1: 'c#',
+        2: 'd',
+        3: 'd#',
+        4: 'e',
+        5: 'f',
+        6: 'f#',
+        7: 'g',
+        8: 'g#',
+        9: 'a',
+        10: 'a#',
+        11: 'b'
+    }[rootnoteNumber];
+}
+
+const getRootAndMode = (tonality) => {
+    const root = tonality.slice(0, -5);
+    const mode = tonality.slice(-5);
+    return {root, mode};
+}
+
+const getTonalityName = (root, mode) => {
+    return `${root}${mode}`;
+}
+
 export const transformaNomTonalitat = (nomTonalitat) => {
     //let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
     //nomActualitzat = nomActualitzat.replace("minor", " Minor");
     //nomActualitzat = nomActualitzat.replace("major", " Major");
     //nomActualitzat = nomActualitzat.replace("b ", "♭ ");
     //return nomActualitzat;
-    const root = nomTonalitat.slice(0, -5).replace(/^(.)b$/, '$1♭');
+    const {root, mode} = getRootAndMode(nomTonalitat);
     const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
-    const catRoot = root.split('').map(char => rootTranslations[char] || char).join('');
-    const mode = nomTonalitat.slice(-5);
+    const catRoot = root.replace(/^(.)b$/, '$1♭').split('').map(char => rootTranslations[char] || char).join('');
     const catMode = mode.replace('minor', 'menor');
     return capitalizeFirstLetter(`${catRoot} ${catMode}`)
 }
@@ -442,10 +485,8 @@ export const tonalitatsCompatibles = (tonalitat1, tonalitat2) => {
         return false;
     }
     // Retorna true si les tonalitats són compatibles, false si no ho són
-    const root1 = tonalitat1.slice(0, -5);
-    const root2 = tonalitat2.slice(0, -5);
-    const mode1 = tonalitat1.slice(-5);
-    const mode2 = tonalitat2.slice(-5);
+    const {root:root1, mode:mode1} = getRootAndMode(tonalitat1);
+    const {root:root2, mode:mode2} = getRootAndMode(tonalitat2);
     
     // Cas les dues tonalitats siguin la mateixa
     if ((root1 === root2) && (mode1 === mode2)) {
@@ -455,6 +496,18 @@ export const tonalitatsCompatibles = (tonalitat1, tonalitat2) => {
     // TODO: cas relatiu menor
 
     return false;
+}
+
+export const modificaTonalitatPerSemitons = (tonalitat, semitons) => {
+    if (tonalitat === undefined) {
+        return undefined;
+    }
+    const {root, mode} = getRootAndMode(tonalitat);
+    let newRootNumber = (getRootnoteNumber(root) + semitons) % 12;
+    if (newRootNumber < 0) {
+        newRootNumber += 12;
+    }
+    return getTonalityName(getRootnoteName(newRootNumber), mode);
 }
 
 

@@ -5,7 +5,7 @@ import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, get
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, lerp }  from "../utils"; // math related
-import { transformaNomTonalitat, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
+import { subscribeToParameterChanges, modificaTonalitatPerSemitons, transformaNomTonalitat, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -102,7 +102,7 @@ export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
 }
 
 
-export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, colorizeLabel=false, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, colorizeLabel=false, markLabelRed=false, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
     
@@ -122,6 +122,10 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
         updateParametre(parameterParent, parameterName, newRealValue);
     }
 
+    let labelClass = "";
+    if (colorizeLabel) labelClass = "text-accent"
+    if (markLabelRed) labelClass = "text-red"
+
     position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
     return (
@@ -140,7 +144,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
-                <label htmlFor={knobctrlId} className={colorizeLabel ? "text-accent": ""}>{label || parameterDescription.label}</label>
+                <label htmlFor={knobctrlId} className={labelClass}>{label || parameterDescription.label}</label>
                 {!noOutput && <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>}
         </div>
     )
@@ -896,16 +900,12 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
 
 export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, width}) => {
     subscribeToParameterChanges(estacio, parameterName);
-    for (let i = 0; i < 16; i++) {
-        subscribeToParameterChanges(estacio, `pitch${i + 1}`);
-    }
     subscribeToAudioGraphParameterChanges('tonality');
     [inputMeterPercent, setInputMeterPercent] = useState(0);
 
     const selectedSoundName = estacio.getParameterValue(parameterName);
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const tonalitat = getAudioGraphInstance().getTonality();
-    const algunSliceAmbPitchAlerat = estacio.algunSliceTePitchAlterat()
 
     const extractUserRecordingNumberFromFilename = (filename) => {
         return parseInt(filename.split('_num_')[1].split('.')[0], 10);
@@ -992,6 +992,24 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
             <div id="inputMeterInner" style={{width: inputMeterPercent + "%", height: '5px', marginTop: '3px', backgroundColor:'green'}}></div>
         </div>
     )
+}
+
+export const GrufSelectorPitch = ({estacio, selectedPad}) => {
+    const tonalitat = getAudioGraphInstance().getTonality();
+    const tonalitatSample = getTonalityForSamplerLibrarySample(estacio.getParameterValue('sound'));
+    const valorPitchSelectedSlice = estacio.getParameterValue(`pitch${selectedPad + 1}`);
+    const tonalitatSampleModificada = modificaTonalitatPerSemitons(tonalitatSample, valorPitchSelectedSlice);
+    let sliceTonalitatCorrecta = tonalitatsCompatibles(tonalitat, tonalitatSampleModificada);
+    if (tonalitatSample === undefined) {
+        sliceTonalitatCorrecta = true  // Si no sabem la tonalitat del sample, no la marquem vermella mai
+    }
+    
+    subscribeToParameterChanges(estacio, `sound`);
+    for (let i = 0; i < 16; i++) {
+        subscribeToParameterChanges(estacio, `pitch${i + 1}`);
+    }
+
+    return <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' colorizeLabel markLabelRed={!sliceTonalitatCorrecta} />
 }
 
 export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight, volumeParamName}) => {

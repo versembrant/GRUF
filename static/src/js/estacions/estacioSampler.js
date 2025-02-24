@@ -73,13 +73,6 @@ export class EstacioSampler extends EstacioBase {
     numVoices = 3;
     soundBuffers = {};
 
-    algunSliceTePitchAlterat() {
-        for (let i = 0; i < 16; i++) {
-            if (this.getParameterValue(`pitch${i + 1}`) !== 0) return true;
-        }
-        return false;
-    }
-
     getFreeSoundPlayer() {
         const freeSoundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.playingPadIndex === -1);
         if (!freeSoundPlayer) {
