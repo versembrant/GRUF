@@ -5,7 +5,7 @@ import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, get
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, lerp }  from "../utils"; // math related
-import { subscribeToParameterChanges, modificaTonalitatPerSemitons, transformaNomTonalitat, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
+import { subscribeToParameterChanges, modificaTonalitatPerSemitons, getTonalityDisplayName, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -849,7 +849,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
-        return {label: transformaNomTonalitat(option), value: option}
+        return {label: getTonalityDisplayName(option), value: option}
     });
     
     const currentTonality = getAudioGraphInstance().getTonality();
@@ -918,10 +918,10 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
             'tonality': undefined
         })),
         ...sampleLibrary.sampler.map(item => ({
-            'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
+            'label': item.name + ' (' + getTonalityDisplayName(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
+        }))//.sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
     
     const optionNames = options.map(item => item.value);
