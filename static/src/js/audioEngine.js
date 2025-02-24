@@ -268,7 +268,7 @@ export class AudioGraph {
 
     initMetronome() {
         this.metronome = new Tone.NoiseSynth({
-            volume: -16, 
+            volume: -6, 
             envelope: {
                 attack: 0.001,
                 decay: 0.1,

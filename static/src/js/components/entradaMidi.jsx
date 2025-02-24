@@ -15,7 +15,8 @@ export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEven
         skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
     }
     document.notesActivades[nomEstacio].add(noteNumber);
-    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    const doSendToServer = document.getElementById("forwardToServer").checked || false;
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, doSendToServer);
 }
 
 export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {

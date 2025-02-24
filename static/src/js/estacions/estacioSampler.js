@@ -48,7 +48,7 @@ export class EstacioSampler extends EstacioBase {
             notaMesBaixaPermesa: 0,
             notaMesAltaPermesa: 15,
         },
-        sound: {type: 'text', initial: 'adagio strings'},
+        sound: {type: 'text', initial: 'soulguitar02'},
         ...Array.from({ length: 16 }).reduce((acc, _, i) => ({
             ...acc,
             [`start${i + 1}`]: {type: 'float', label: `Start${i + 1}`, min: 0, max: 1, initial: getInitialStartValue(i)},
@@ -268,7 +268,7 @@ export class EstacioSampler extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                const padIndex = note.n;
+                const padIndex = note.n % 16;
                 this.triggerAttackRelease(padIndex, time + i * 0.001, note.d * Tone.Time("16n").toSeconds());  // We add micro time difference in notes that start exactly at the same time to avoid potential errors with start times
             }
         }
@@ -277,6 +277,10 @@ export class EstacioSampler extends EstacioBase {
     onTransportStop() {
         // Stop all notes that are still playing
         this.stopAllPlayers()
+    }
+
+    adjustMidiNoteToEstacioRange(midiNoteNumber) {
+        return midiNoteNumber % 16;
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
