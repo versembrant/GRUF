@@ -564,7 +564,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=true);
+                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=false);
                     setTimeout(() => {
                         sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
@@ -572,7 +572,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             }
             if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
                 document.addEventListener("midiNote-" + estacio.nom , (evt) => {
-                    const noteNumber = evt.detail.note;
+                    const noteNumber = evt.detail.note % 16;
                     if (evt.detail.type == 'noteOff') {
                         const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
                         if (!noteMarker) return;
