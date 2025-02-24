@@ -136,7 +136,12 @@ export class Synth extends BaseSynth {
     versio = '0.1'
     parametersDescription = {
         ...BaseSynth.parametersDescription,
-        notes: {...BaseSynth.parametersDescription.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83}
+        notes: {...BaseSynth.parametersDescription.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83},
+        attack: {...BaseSynth.parametersDescription.attack, initial: 1.2},
+        decay: {...BaseSynth.parametersDescription.decay, initial: 2.0},
+        sustain: {...BaseSynth.parametersDescription.sustain, initial: 0.8},
+        release: {...BaseSynth.parametersDescription.release, initial: 2.0},
+        lpf: {...BaseSynth.parametersDescription.lpf, initial: 1400}
     }
 
     getUserInterfaceComponent() {

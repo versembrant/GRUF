@@ -12,6 +12,11 @@ export class EstacioBaix extends MonoSynth {
             notaMesAltaPermesa: 47,
         },
         waveform: {...MonoSynth.parametersDescription.waveform, initial: 'square'},
+        attack: {...MonoSynth.parametersDescription.attack, initial: 0.0},
+        decay: {...MonoSynth.parametersDescription.decay, initial: 3.0},
+        sustain: {...MonoSynth.parametersDescription.sustain, initial: 0.0},
+        release: {...MonoSynth.parametersDescription.release, initial: 0.0},
+        harmonicity: {...MonoSynth.parametersDescription.harmonicity, initial: 1.01},
     }
 
     getUserInterfaceComponent() {
