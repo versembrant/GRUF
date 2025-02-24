@@ -394,11 +394,12 @@ export class AudioGraph {
         // Crea els nodes master  (per tenir un controls general)
         this.masterMeterNode = new Tone.Meter({ channels:2, channelCount: 2 });
         this.masterLimiter = new Tone.Limiter(-1).toDestination();
+        this.masterGainPreLimiter = new Tone.Gain(Tone.dbToGain(6));
         this.masterGainNode = new Tone.Channel({
             channelCount: 2,
             volume: this.getMasterGain(),
             pan: this.getMasterPan(),
-        }).chain(this.masterMeterNode, this.masterLimiter);
+        }).chain(this.masterMeterNode, this.masterGainPreLimiter, this.masterLimiter);
 
         this.masterSpectrum = new Tone.Analyser('fft', this.spectrumSize);
         this.masterGainNode.connect(this.masterSpectrum);

@@ -130,7 +130,7 @@ export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
                 value={masterGain}
                 step={0.01}
                 min={0.0}
-                max={1.0}
+                max={2.0}
                 marks={marks}
                 onChange={handleGainChange}
             />
