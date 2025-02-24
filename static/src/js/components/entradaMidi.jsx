@@ -7,6 +7,7 @@ import NativeSelect from '@mui/material/NativeSelect';
 
 
 export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
+    noteNumber = getCurrentSession().getEstacio(nomEstacio).adjustMidiNoteToEstacioRange(noteNumber);
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
@@ -14,10 +15,12 @@ export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEven
         skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
     }
     document.notesActivades[nomEstacio].add(noteNumber);
-    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer").checked);
+    const doSendToServer = document.getElementById("forwardToServer").checked || false;
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, doSendToServer);
 }
 
 export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => {
+    noteNumber = getCurrentSession().getEstacio(nomEstacio).adjustMidiNoteToEstacioRange(noteNumber);
     const messageData =  {
         noteNumber: noteNumber,
         velocity: noteVelocity,
@@ -25,7 +28,7 @@ export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => 
         ...extras
     }
     document.notesActivades[nomEstacio].delete(noteNumber);
-    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getCurrentSession().usesAudioEngine());
+    getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getAudioGraphInstance().usesAudioEngine());
 }
 
 const bindMidiInputDevice = (nomDevice, nomEstacio) => {
@@ -94,7 +97,7 @@ const EntradaMidiExternal = ({estacio}) => {
                     <Checkbox 
                         style={{display:"none"}}
                         id="forwardToServer" 
-                        defaultChecked={!getCurrentSession().usesAudioEngine()}
+                        defaultChecked={!getAudioGraphInstance().usesAudioEngine()}
                         title="Marca per enviar notes al servidor" 
                         sx={{
                             color: "#fff",
@@ -188,7 +191,7 @@ const EntradaMidiTeclatQWERTY = ({estacio}) => {
     return (
         <div>
             <input id="entradaMidiNomEstacio" type="hidden" value={estacio.nom}/>
-            <input id="forwardToServer" type="checkbox" defaultChecked={!getCurrentSession().usesAudioEngine()} style={{display:"none"}} />
+            <input id="forwardToServer" type="checkbox" defaultChecked={!getAudioGraphInstance().usesAudioEngine()} style={{display:"none"}} />
         </div>
     )
 }

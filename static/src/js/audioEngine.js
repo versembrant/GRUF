@@ -28,6 +28,7 @@ export class AudioGraph {
             mutesEstacions: {initial: {}},
             solosEstacions: {initial: {}},
             mainSequencerCurrentStep: {type: 'int', initial: -1},
+            usesAudioEngine: { type: 'bool', initial: true },
             isGraphBuilt: {type: 'bool', initial: false},
             isMasterAudioEngine: {type: 'bool', initial: true},
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
@@ -100,6 +101,10 @@ export class AudioGraph {
         const methodName =  nomParametre.startsWith('is') ? nomParametre : // for booleans
         `get${nomParametre.charAt(0).toUpperCase() + nomParametre.slice(1)}`; // for the rest
         return this[methodName]();
+    }
+
+    usesAudioEngine() {
+        return this.store.getState().usesAudioEngine;
     }
 
     isPlaying() {
@@ -263,7 +268,7 @@ export class AudioGraph {
 
     initMetronome() {
         this.metronome = new Tone.NoiseSynth({
-            volume: -16, 
+            volume: -6, 
             envelope: {
                 attack: 0.001,
                 decay: 0.1,
@@ -389,11 +394,12 @@ export class AudioGraph {
         // Crea els nodes master  (per tenir un controls general)
         this.masterMeterNode = new Tone.Meter({ channels:2, channelCount: 2 });
         this.masterLimiter = new Tone.Limiter(-1).toDestination();
+        this.masterGainPreLimiter = new Tone.Gain(Tone.dbToGain(6));
         this.masterGainNode = new Tone.Channel({
             channelCount: 2,
             volume: this.getMasterGain(),
             pan: this.getMasterPan(),
-        }).chain(this.masterMeterNode, this.masterLimiter);
+        }).chain(this.masterMeterNode, this.masterGainPreLimiter, this.masterLimiter);
 
         this.masterSpectrum = new Tone.Analyser('fft', this.spectrumSize);
         this.masterGainNode.connect(this.masterSpectrum);
@@ -413,7 +419,7 @@ export class AudioGraph {
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
             const estacioMasterChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
-            const estacioPremuteChannel = new Tone.Channel();
+            const estacioPremuteChannel = new Tone.Channel({channelCount: 2});
             const estacioMeterNode = new Tone.Meter();
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
@@ -443,8 +449,9 @@ export class AudioGraph {
         audioContextIsReady = true;
     }
 
-    transportStart() {
+    async transportStart() {
         if (!this.isGraphBuilt()) return;
+        await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
 
         // Optimize global tone context for playback (mightier latency and use less CPU (?))
         if (!(location.href.indexOf("interativelatency=1") != -1)){
@@ -549,14 +556,14 @@ export class AudioGraph {
             // If message comes from same client, ignore it (see comment in sendMidiEvent)
             return;
         }
-
+        
         // If a nomEstacio is provided, only send to the estacio with that name. Otherwise send to all estacions
         const targetStationsNoms = nomEstacio ? [nomEstacio] : getCurrentSession().getNomsEstacions();
         targetStationsNoms.forEach(nomEstacio => {
                 const {noteNumber, velocity, type, ...extras} = data;
                 getCurrentSession().getEstacio(nomEstacio).onMidiNote(noteNumber, velocity, type === 'noteOff', {...extras, skipRecording: false});
         });
-
+        
         //Aquest event s'utilitza en el piano roll per dibuixar els requadres sobre les notes que s'estan tocant
         // i en el grid de pads del sampler per seleccionar el pad de l'última nota que s'ha tocat
         // i en el ADSR graph per marcar l'envolupant de l'última nota

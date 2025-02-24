@@ -36,6 +36,8 @@ export class MonoSynth extends BaseSynth {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
+        midiNoteNumber = this.adjustMidiNoteToEstacioRange(midiNoteNumber);
+
         const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
         if (!noteOff) {
             if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);

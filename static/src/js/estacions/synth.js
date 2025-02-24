@@ -112,6 +112,22 @@ export class BaseSynth extends EstacioBase {
         }
         return note;
     }
+
+    adjustMidiNoteToEstacioRange(noteNumber) {
+        const minNote = this.parametersDescription.notes.notaMesBaixaPermesa || 0;
+        const maxNote =  this.parametersDescription.notes.notaMesAltaPermesa || 127;
+
+        // If note is outside range, make it be inside the range by wraping octaves
+        if (noteNumber < minNote) {
+            const semitonesBelow = (noteNumber - minNote) % 12;
+            noteNumber = minNote + semitonesBelow + 12;
+        }
+        if (noteNumber > maxNote) {
+            const semitonesAbove = (noteNumber - maxNote) % 12;
+            noteNumber = maxNote + semitonesAbove - 12;
+        } 
+        return noteNumber;
+    }
 }
 
 export class Synth extends BaseSynth {
@@ -120,7 +136,12 @@ export class Synth extends BaseSynth {
     versio = '0.1'
     parametersDescription = {
         ...BaseSynth.parametersDescription,
-        notes: {...BaseSynth.parametersDescription.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83}
+        notes: {...BaseSynth.parametersDescription.notes, notaMesBaixaTipica: 60, notaMesAltaTipica: 83},
+        attack: {...BaseSynth.parametersDescription.attack, initial: 1.2},
+        decay: {...BaseSynth.parametersDescription.decay, initial: 2.0},
+        sustain: {...BaseSynth.parametersDescription.sustain, initial: 0.8},
+        release: {...BaseSynth.parametersDescription.release, initial: 2.0},
+        lpf: {...BaseSynth.parametersDescription.lpf, initial: 1400}
     }
 
     getUserInterfaceComponent() {
@@ -138,6 +159,8 @@ export class Synth extends BaseSynth {
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
+
+        midiNoteNumber = this.adjustMidiNoteToEstacioRange(midiNoteNumber);
 
         if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());
         else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()], Tone.now());

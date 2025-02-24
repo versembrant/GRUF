@@ -7,7 +7,7 @@ import { sampleLibrary} from "./sampleLibrary";
 
 export const buildAudioGraphIfNotBuilt = async () => {  
     if (!getAudioGraphInstance().isGraphBuilt()) {
-        await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
+        //await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
         getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
     }
 }
@@ -423,12 +423,112 @@ export const units = {
 }
 
 // Tonalitat
-export const transformaNomTonalitat = (nomTonalitat) => {
-    let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
-    nomActualitzat = nomActualitzat.replace("minor", " Minor");
-    nomActualitzat = nomActualitzat.replace("major", " Major");
-    nomActualitzat = nomActualitzat.replace("b ", "♭ ");
-    return nomActualitzat;
+const getPCNumber = (pcName) => {
+    return {
+        'c': 0, 
+        'c#': 1, 'db': 1,
+        'd': 2, 
+        'd#': 3, 'eb': 3,
+        'e': 4, 
+        'f': 5, 
+        'f#': 6, 'gb': 6,
+        'g': 7, 
+        'g#': 8, 'ab': 8,
+        'a': 9, 
+        'a#': 10, 'bb': 10,
+        'b': 11
+    }[pcName.toLowerCase()];
+}
+
+const wrappedPCNumber = (pcNumber) => {
+    pcNumber = pcNumber % 12;
+    if (pcNumber < 0) {
+        return pcNumber + 12;
+    }
+    if (pcNumber >= 12) {
+        return pcNumber - 12;
+    }
+    return pcNumber;
+}
+
+const getPCName = (pcNumber) => {
+    return {
+        0: 'c',
+        1: 'c#',
+        2: 'd',
+        3: 'd#',
+        4: 'e',
+        5: 'f',
+        6: 'f#',
+        7: 'g',
+        8: 'g#',
+        9: 'a',
+        10: 'a#',
+        11: 'b'
+    }[pcNumber];
+}
+
+const getPCNameAndMode = (tonality) => {
+    const pcName = tonality.slice(0, -5);
+    const mode = tonality.slice(-5);
+    return {pcName, mode};
+}
+
+const getTonalityName = (pcName, mode) => {
+    return `${pcName}${mode}`;
+}
+
+export const getTonalityDisplayName = (nomTonalitat) => {
+    //let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
+    //nomActualitzat = nomActualitzat.replace("minor", " Minor");
+    //nomActualitzat = nomActualitzat.replace("major", " Major");
+    //nomActualitzat = nomActualitzat.replace("b ", "♭ ");
+    //return nomActualitzat;
+    const {pcName, mode} = getPCNameAndMode(nomTonalitat);
+    const pcNameTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
+    const catPCName = pcName.replace(/^(.)b$/, '$1♭').split('').map(char => pcNameTranslations[char] || char).join('');
+    const catMode = mode.replace('minor', 'menor');
+    return capitalizeFirstLetter(`${catPCName} ${catMode}`)
+}
+
+export const tonalitatsCompatibles = (tonalitat1, tonalitat2) => {
+    if (tonalitat1 === undefined || tonalitat2 === undefined) {
+        return false;
+    }
+    // Retorna true si les tonalitats són compatibles, false si no ho són
+    const {pcName:pcName1, mode:mode1} = getPCNameAndMode(tonalitat1);
+    const {pcName:pcName2, mode:mode2} = getPCNameAndMode(tonalitat2);
+    
+    // Cas les dues tonalitats siguin la mateixa
+    if ((pcName1 === pcName2) && (mode1 === mode2)) {
+        return true;
+    }
+
+    // Cas relatiu menor
+    if (mode1 !== mode2) {
+        if (mode1 === 'major') {
+            const relativeMinorPCNumber = wrappedPCNumber(getPCNumber(pcName1) - 3);
+            if (relativeMinorPCNumber === getPCNumber(pcName2) && mode2 === 'minor') {
+                return true;
+            }
+        } else if (mode2 === 'major') {
+            const relativeMinorPCNumber = wrappedPCNumber(getPCNumber(pcName2) - 3);
+            if (relativeMinorPCNumber === getPCNumber(pcName1) && mode1 === 'minor') {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+export const modificaTonalitatPerSemitons = (tonalitat, semitons) => {
+    if (tonalitat === undefined) {
+        return undefined;
+    }
+    const {pcName, mode} = getPCNameAndMode(tonalitat);
+    let newPCNumber = wrappedPCNumber(getPCNumber(pcName) + semitons);
+    return getTonalityName(getPCName(newPCNumber), mode);
 }
 
 
@@ -452,12 +552,12 @@ export const getPCsFromScaleName = (scale) => {
         const rootNote = scale.slice(0, -5).toLowerCase(); 
         const isMinor = scale.toLowerCase().includes('minor'); 
         
-        if (!getPCOfNoteClass === undefined) {
+        if (!getPCNumber(rootNote) === undefined) {
             throw new Error(`Root no vàlida: ${rootNote}`);
         }
 
         return {
-            rootPC: getPCOfNoteClass(rootNote), 
+            rootPC: getPCNumber(rootNote), 
             isMinor: isMinor                   
         };
     };
@@ -471,17 +571,6 @@ export const getPCsFromScaleName = (scale) => {
 
     return scaleIntervals.map(interval=>(interval+rootPC)%12);
 };
-
-const getPCOfNoteClass = noteClass => {
-    return {
-        'c': 0,  'c#': 1, 'db': 1,
-        'd': 2,  'd#': 3, 'eb': 3,
-        'e': 4,  'f': 5,  'f#': 6, 'gb': 6,
-        'g': 7,  'g#': 8, 'ab': 8,
-        'a': 9,  'a#': 10, 'bb': 10,
-        'b': 11
-    }[noteClass];
-}
 
 const ascii = a => a.charCodeAt(0);
 
@@ -499,7 +588,7 @@ const separateNoteClassAndOctave = compoundNote => {
 
 const noteStrToMidi = (noteStr) => {
     [noteClass, octave] = separateNoteClassAndOctave(noteStr);
-    return getPCOfNoteClass(noteClass) + (octave + 1) * 12;
+    return getPCNumber(noteClass) + (octave + 1) * 12;
 }
 
 export const getDiatonicInterval = (note1, note2) => {

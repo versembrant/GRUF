@@ -4,6 +4,7 @@ import { makePartial } from 'redux-partial';
 import { sendMessageToServer, getSocketID } from "./serverComs";
 import { ensureValidValue, units } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
+import { getInputAdornmentUtilityClass } from '@mui/material';
 
 var currentSession = undefined; 
 
@@ -163,6 +164,10 @@ export class EstacioBase {
     getCurrentLivePreset() {
         return getCurrentSession().getLivePresetsEstacions()[this.nom]
     }
+
+    getTempsBeat = () => {
+        return 60.0 / getAudioGraphInstance().getBpm() / 4.0;
+    };
 
     updateParametreEstacio(nomParametre, valor) {
 
@@ -352,6 +357,10 @@ export class EstacioBase {
         // noteOff = boolean which will be true if the message is a noteOff
     }
 
+    adjustMidiNoteToEstacioRange(noteNumber) {
+        return noteNumber;
+    }
+
     unfinishedNotesOnsets = new Map();
     handlePianoRollRecording(midiNoteNumber, noteOff) {
         if (!this.getParameterValue('isRecording')) return;
@@ -376,7 +385,6 @@ export class EstacioBase {
 
 export class Session {
     constructor(data, local=false) {
-        this.useAudioEngine = true
         this.localMode = local
         this.continuousControlThrottleTime = 50
         
@@ -411,11 +419,7 @@ export class Session {
     }
 
     setAudioOff() {
-        this.useAudioEngine = false;
-    }
-
-    usesAudioEngine() {
-        return this.useAudioEngine;
+        getAudioGraphInstance().setParametreInStore('usesAudioEngine', false);
     }
 
     setParametreInStore(nomParametre, valor) {

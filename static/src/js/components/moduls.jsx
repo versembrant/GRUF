@@ -3,20 +3,28 @@ import { subscribeToParameterChanges } from "../utils"; // subscriptions
 import React from "react";
 import { capitalize } from "../utils";
 
-export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"]}) => {
+export const GrufModulADSR = ({className, estacio, soundNumber="", height, availableParameters=["attack", "decay", "sustain", "release"], includeVolume=false, colorizeLabel=false}) => {
 
     const knobs = availableParameters.map(parameter=> {
         return <GrufKnob key={parameter} mida="petit" parameterParent={estacio}
-            parameterName={parameter + soundNumber} label={capitalize(parameter)} />
+            parameterName={parameter + soundNumber} label={capitalize(parameter)} colorizeLabel={colorizeLabel} />
     })
+
     const attackParamName = `attack${soundNumber}`;
     const decayParamName = `decay${soundNumber}`;
     const sustainParamName = `sustain${soundNumber}`;
     const releaseParamName = `release${soundNumber}`;
 
+    let volumeParamName = undefined;
+    if (includeVolume) {
+        volumeParamName = `volume${soundNumber}`;
+        knobs.push(<GrufKnob key="volume" mida="petit" parameterParent={estacio}
+            parameterName={volumeParamName} label="Volume" colorizeLabel={colorizeLabel} />)
+    }
+
     return (
         <div className={`gruf-adsr-widget ${className}`} style={{height}}>
-            <ADSRGraph estacio={estacio} dynamicHighlight={false} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]}/>
+            <ADSRGraph estacio={estacio} dynamicHighlight={false} adsrParameterNames={[attackParamName, decayParamName, sustainParamName, releaseParamName]} volumeParamName={volumeParamName}/>
             <div className="adsr-knobs">
                 {knobs}
             </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { GrufPianoRoll, GrufKnob, GrufButtonBorder, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
+import { getAudioGraphInstance } from "../audioEngine";
+import { GrufPianoRoll, GrufKnob, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSelectorPitch, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -23,20 +24,20 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
                 <fieldset className="modul-border modul-bg flex flex-col gap-10 col-start-1 row-start-3">
                     <fieldset>
                         <GrufSlider estacio={estacio} parameterName={[`start${selectedPad + 1}`, `end${selectedPad + 1}`]} noLabel noOutput />
-                        <fieldset className="flex justify-between text-12" aria-hidden>
+                        <fieldset className="flex justify-between text-12 text-accent" aria-hidden>
                             <span>Start</span>
                             <span>End</span>
                         </fieldset>
                     </fieldset>
                     <fieldset className="flex justify-between">
                         {/* <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${selectedPad + 1}`} label='Vol' /> */}
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} label='Pan' />
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' />
+                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pan${selectedPad + 1}`} label='Pan' colorizeLabel />
+                        <GrufSelectorPitch estacio={estacio} selectedPad={selectedPad} />
                         <GrufSelectorPlayerMode estacio={estacio} parameterName={`playerMode${selectedPad + 1}`} />
                     </fieldset>
                 </fieldset>
 
-                <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio} soundNumber={selectedPad + 1} availableParameters={["attack", "release"]}/>
+                <GrufModulADSR className="col-start-2 row-start-1 row-span-3" estacio={estacio} soundNumber={selectedPad + 1} availableParameters={["attack", "release"]} includeVolume={true} colorizeLabel />
 
                 <GrufModulEQ className="col-start-3 row-start-3" estacio={estacio}/>
                 <GrufModulDelay className="col-start-4 row-start-2 row-span-2" estacio={estacio}/>

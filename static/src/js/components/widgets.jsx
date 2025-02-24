@@ -5,7 +5,7 @@ import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, get
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, lerp }  from "../utils"; // math related
-import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
+import { subscribeToParameterChanges, modificaTonalitatPerSemitons, getTonalityDisplayName, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -39,7 +39,7 @@ export const GrufSeparatorLine = () => {
         <svg xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1 1"
             preserveAspectRatio="none" // so that the viewBox doesn't need to scale evenly
-            width="2px" height="80%">
+            width="2px" height="80px">
             <line x1="0" x2="0" y1="0" y2="1"
             stroke={cssVariables.lightGrey}/>
         </svg>
@@ -102,7 +102,7 @@ export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
 }
 
 
-export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, colorizeLabel=false, markLabelRed=false, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
     
@@ -122,6 +122,10 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
         updateParametre(parameterParent, parameterName, newRealValue);
     }
 
+    let labelClass = "";
+    if (colorizeLabel) labelClass = "text-accent"
+    if (markLabelRed) labelClass = "text-red"
+
     position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
     return (
@@ -140,7 +144,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
-                <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
+                <label htmlFor={knobctrlId} className={labelClass}>{label || parameterDescription.label}</label>
                 {!noOutput && <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>}
         </div>
     )
@@ -346,7 +350,7 @@ export const GrufPad = ({ estacio, playerIndex, isSelected, setSelected, label }
 
     const handleMouseUp = () => {
         document.removeEventListener('mouseup', handleMouseUp);
-        sendNoteOff(estacio.nom, playerIndex, 0, {force: true});
+        sendNoteOff(estacio.nom, playerIndex, 0);
     };
 
 
@@ -365,7 +369,7 @@ export const GrufPadGrid = ({ estacio, width="200px", height="200px", selectedPa
     useEffect(()=> {
         document.addEventListener("midiNote-" + estacio.nom , (evt) => {
             if (evt.detail.type == 'noteOff') return;
-            setSelectedPad(evt.detail.note)
+            setSelectedPad(evt.detail.note % 16)
         });
     })
    
@@ -564,7 +568,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
                     // When a note is created or selected, we will trigger a callback
-                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=true);
+                    sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=false);
                     setTimeout(() => {
                         sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
                     }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
@@ -572,7 +576,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             }
             if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
                 document.addEventListener("midiNote-" + estacio.nom , (evt) => {
-                    const noteNumber = evt.detail.note;
+                    const noteNumber = evt.detail.note % 16;
                     if (evt.detail.type == 'noteOff') {
                         const noteMarker = document.querySelector(`.noteMarker[data-notenumber='${noteNumber}']`);
                         if (!noteMarker) return;
@@ -845,12 +849,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
-        const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
-        const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
-        const catRoot = root.split('').map(char => rootTranslations[char] || char).join('');
-        const mode = option.slice(-5);
-        const catMode = mode.replace('minor', 'menor');
-        return {label: capitalizeFirstLetter(`${catRoot} ${catMode}`), value: option}
+        return {label: getTonalityDisplayName(option), value: option}
     });
     
     const currentTonality = getAudioGraphInstance().getTonality();
@@ -884,15 +883,16 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
         const inputId = useId();
         return {
         input: <input type="radio" key={i} id={inputId} name={parameterName}
-        value={playerModeOption} checked={playerModeOption===parameterValue}
-        onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}/>,
-        label: <label htmlFor={inputId}>{playerModeOption}</label>
+            value={playerModeOption} checked={playerModeOption===parameterValue}
+            onChange={(e) => estacio.updateParametreEstacio(parameterName, e.target.value)}
+        />,
+        label: <label key={i} htmlFor={inputId}>{playerModeOption}</label>
         }   
     })
     return(
         <fieldset className="gruf-selector-playermode">
             <div className="inputs">{inputsLabels.map(inputLabel=> inputLabel.input)}</div>
-            <div className="labels">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
+            <div className="labels text-accent">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
         </fieldset>
     )
     
@@ -907,17 +907,21 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     const showTrashOption = getCurrentSession().getRecordedFiles().indexOf(selectedSoundName) > -1;
     const tonalitat = getAudioGraphInstance().getTonality();
 
+    const extractUserRecordingNumberFromFilename = (filename) => {
+        return parseInt(filename.split('_num_')[1].split('.')[0], 10);
+    }
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
-            'label': 'Gravació usuari ' + (i + 1), 
+            'label': 'Gravació usuari ' + extractUserRecordingNumberFromFilename(item), 
             'value': item,
             'tonality': undefined
         })),
         ...sampleLibrary.sampler.map(item => ({
-            'label': item.name + ' (' + transformaNomTonalitat(item.tonality) + ')', 
+            'label': item.name + ' (' + getTonalityDisplayName(item.tonality) + ')', 
             'value': item.name,
             'tonality': item.tonality
-        })).sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
+        }))//.sort((item1, item2)=>(item2.tonality === tonalitat ? 1 : 0) - (item1.tonality === tonalitat ? 1 : 0)) // make the options in the current tonality show first
     ];
     
     const optionNames = options.map(item => item.value);
@@ -952,17 +956,24 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
+        let optionTonalitatClass = "";
+        if (!tonalitatsCompatibles(tonalitat, tonalitatSampleLlista)) optionTonalitatClass = "text-red";
+        if (tonalitatSampleLlista === undefined) optionTonalitatClass = "text-orange";
         return (
-            <span className={((tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)) ? "text-red": ""}>{option.label}</span>
+            <span className={optionTonalitatClass}>{option.label}</span>
         );
     };
+
+    let tonalitatClass = "";
+    if (!tonalitatsCompatibles(tonalitat, tonalitatSample)) tonalitatClass = "text-red";
+    if (tonalitatSample === undefined) tonalitatClass = "text-orange";
 
     return (
         <div>
             <div className="flex justify-between gap-10">
-                <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
+                <div className="gruf-selector-patrons-grid flex" style={{top: top, left: left, width: width}}>
                     <Dropdown
-                        className= {((tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)) ? "text-red": ""}
+                        className= {tonalitatClass}
                         itemTemplate={optionTemplate}
                         value={selectedSoundName}
                         onChange={(evt) => {
@@ -971,7 +982,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
                         options={options}
                         placeholder="Cap"
                     />
-                    {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+                    {showTrashOption ? <div><button className="trash-button" onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img  style={{width: "20px"}} src={appPrefix + "/static/src/img/trash.svg"}></img></button></div>: ''}
                 </div>
                 <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
                     console.log("Sound uploaded to server: ", data.url);
@@ -983,7 +994,25 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     )
 }
 
-export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
+export const GrufSelectorPitch = ({estacio, selectedPad}) => {
+    const tonalitat = getAudioGraphInstance().getTonality();
+    const tonalitatSample = getTonalityForSamplerLibrarySample(estacio.getParameterValue('sound'));
+    const valorPitchSelectedSlice = estacio.getParameterValue(`pitch${selectedPad + 1}`);
+    const tonalitatSampleModificada = modificaTonalitatPerSemitons(tonalitatSample, valorPitchSelectedSlice);
+    let sliceTonalitatCorrecta = tonalitatsCompatibles(tonalitat, tonalitatSampleModificada);
+    if (tonalitatSample === undefined) {
+        sliceTonalitatCorrecta = true  // Si no sabem la tonalitat del sample, no la marquem vermella mai
+    }
+    
+    subscribeToParameterChanges(estacio, `sound`);
+    for (let i = 0; i < 16; i++) {
+        subscribeToParameterChanges(estacio, `pitch${i + 1}`);
+    }
+
+    return <GrufKnob mida="petit" parameterParent={estacio} parameterName={`pitch${selectedPad + 1}`} label='Pitch' colorizeLabel markLabelRed={!sliceTonalitatCorrecta} />
+}
+
+export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight, volumeParamName}) => {
     useEffect(()=> {
         if (dynamicHighlight) {
             document.addEventListener("midiNote-" + estacio.nom , onMidiNote);
@@ -1019,15 +1048,19 @@ export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
         if (progress < 1) setTimeout(checkLastNoteStatus, 30);
     }
 
-
     adsrParameterNames.forEach(parameterName => subscribeToParameterChanges(estacio, parameterName));
-
     const a = estacio.getParameterValue(adsrParameterNames[0]);
     const d = estacio.getParameterValue(adsrParameterNames[1]);
     const s = estacio.getParameterValue(adsrParameterNames[2]);
     const r = estacio.getParameterValue(adsrParameterNames[3]);
     const adsrRef = useRef({});
     adsrRef.current = {a, d, s, r};
+
+    if (volumeParamName) subscribeToParameterChanges(estacio, volumeParamName);
+    const v = volumeParamName ? estacio.getParameterValue(volumeParamName) : 0;  // in dB units, minimum -60, maximum 6
+    const minv = -60;
+    const maxv = 6;
+    const v01 = (v - minv) / (maxv - minv);
 
     const strokeWidthPx = 3;
 
@@ -1047,7 +1080,7 @@ export const ADSRGraph = ({estacio, adsrParameterNames, dynamicHighlight}) => {
     const levelValues = [0, 1, s, s, 0];
 
     levelValues.forEach((levelValue, index) => {
-        adsrPoints[index].y = 75 - levelValue * 50;
+        adsrPoints[index].y = 75 - levelValue * 50 * v01;
     });
 
     const sustainPoints = [adsrPoints[2], adsrPoints[3]];

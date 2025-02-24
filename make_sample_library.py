@@ -6,23 +6,33 @@ audio_folder = 'static/audio'
 
 
 def get_tonality_from_filename(filename):
+    tonality_raw = None
     try:
-        tonality_raw = filename.split(' - ')[1].split('.wav')[0]
+        tonality_raw = filename.split(' -')[1].split('.wav')[0].replace('(', '').replace(')', '').strip().lower()
+        name = filename.split(' -')[0].strip().lower()
+        #if "min" or "maj" in tonality_raw:
+        #    tonality_raw = tonality_raw.replace('min', 'minor').replace('maj', 'major').replace(' ', '')
+        #    tonality_raw = tonality_raw.replace('gb', 'f#')
+        #    tonality_raw = tonality_raw.replace('g#', 'ab')
+        #    tonality_raw = tonality_raw.replace('a#', 'bb')
         tonality_options = ['cmajor', 'cminor', 'c#major', 'c#minor', 'dmajor', 'dminor', 'ebmajor', 'ebminor', 'emajor', 'eminor', 'fmajor', 'fminor', 'f#major', 'f#minor', 'gmajor', 'gminor', 'abmajor', 'abminor', 'amajor', 'aminor', 'bbmajor', 'bbminor', 'bmajor', 'bminor']
         if tonality_raw in tonality_options:
-            return tonality_raw
+            return tonality_raw, name
     except IndexError:
-        pass    
-    return None
+        pass
+    print(f'Cannot find tonality for {filename} - {tonality_raw}')
+    return None, ''
 
 def load_files_for_sampler(library, sampler_folder):
     for filename in os.listdir(sampler_folder):
         if filename.endswith('.wav'):
-            tonality = get_tonality_from_filename(filename)
+            tonality, name = get_tonality_from_filename(filename)
             if tonality is not None:
+                new_filename = f'{name} - {tonality}.wav'
+                os.rename(os.path.join(sampler_folder, filename), os.path.join(sampler_folder, new_filename))
                 library['sampler'].append({
-                    'name': filename.split(' - ')[0],
-                    'url': f'/{app_prefix}/static/audio/sampler/{filename.replace('#', '%23')}',
+                    'name': new_filename.split(' - ')[0],
+                    'url': f'/{app_prefix}/static/audio/sampler/{new_filename.replace('#', '%23')}',
                     'tonality': tonality,
                 })
 

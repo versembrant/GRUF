@@ -6,6 +6,10 @@
     color: $red!important;
 }
 
+.text-orange {
+    color: $orange!important;
+}
+
 .text-green {
     color: $green;
 }
@@ -14,4 +18,8 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+}
+
+.text-accent {
+    color: var(--accent-color)!important;
 }
