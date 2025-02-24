@@ -192,4 +192,4 @@ Es poden utlizar alguns paràmetres opcionals a la URL per poder testejar temes 
 
 * `minimalui=1`: no renderitza la UI principal, només el títol de la sessió i el botó de play.
 * `interativelatency=1`: optimiza el contexe the tone js per interactivity (pot tenir pitjor performance però fa servir un lookAhead menor).
-* `audio=1`: connecta l'àudio per defecte, sense preguntar-ho a l'usuario.
+* `audio=1`: connecta l'àudio per defecte, sense preguntar-ho a l'usuari (`audio=0` connectarà sense audio).

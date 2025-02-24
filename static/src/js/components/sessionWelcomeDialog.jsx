@@ -13,6 +13,10 @@ export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
                 // If url has audio=1, connect with audio without showing the modal
                 document.welcomeDialogShown = true;
                 connectaAmbAudio();
+            } else if (location.href.indexOf("audio=0") != -1) {
+                // If url has audio=1, connect with audio without showing the modal
+                document.welcomeDialogShown = true;
+                connectaSenseAudio();
             } else {
                 showDialog();
             }
