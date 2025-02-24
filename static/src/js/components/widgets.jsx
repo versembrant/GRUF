@@ -39,7 +39,7 @@ export const GrufSeparatorLine = () => {
         <svg xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1 1"
             preserveAspectRatio="none" // so that the viewBox doesn't need to scale evenly
-            width="2px" height="80%">
+            width="2px" height="80px">
             <line x1="0" x2="0" y1="0" y2="1"
             stroke={cssVariables.lightGrey}/>
         </svg>
@@ -969,7 +969,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     return (
         <div>
             <div className="flex justify-between gap-10">
-                <div className="gruf-selector-patrons-grid" style={{top: top, left: left, width:(showTrashOption ? parseInt(width.replace("px", "")) -20: width)}}>
+                <div className="gruf-selector-patrons-grid flex" style={{top: top, left: left, width: width}}>
                     <Dropdown
                         className= {tonalitatClass}
                         itemTemplate={optionTemplate}
@@ -980,7 +980,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
                         options={options}
                         placeholder="Cap"
                     />
-                    {showTrashOption ? <button style={{width: "22px", verticalAlign: "bottom" }} onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img src={appPrefix + "/static/src/img/trash.svg"}></img></button>: ''}
+                    {showTrashOption ? <div><button class="trash-button" onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img  style={{width: "20px"}} src={appPrefix + "/static/src/img/trash.svg"}></img></button></div>: ''}
                 </div>
                 <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
                     console.log("Sound uploaded to server: ", data.url);
