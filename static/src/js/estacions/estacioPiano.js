@@ -22,12 +22,14 @@ export class EstacioPiano extends EstacioBase {
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
         const timbre = new Tone.Filter(500, 'lowpass', -24);
-        const piano = new Piano({velocities: 2}).connect(timbre);
+        const gainFixPiano = new Tone.Gain(Tone.dbToGain(-8)).connect(timbre);
+        const piano = new Piano({velocities: 2}).connect(gainFixPiano);
         piano.load().then(() => { console.log('Mostres del piano carregades!') })
 
         this.audioNodes = {
             piano: piano,
             timbre: timbre,
+            gainFixPiano: gainFixPiano,
         };
 
         // Crea els nodes d'efectes (això també els afegirà al diccionari de nodes de l'estació)
