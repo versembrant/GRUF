@@ -437,6 +437,26 @@ export const transformaNomTonalitat = (nomTonalitat) => {
     return capitalizeFirstLetter(`${catRoot} ${catMode}`)
 }
 
+export const tonalitatsCompatibles = (tonalitat1, tonalitat2) => {
+    if (tonalitat1 === undefined || tonalitat2 === undefined) {
+        return false;
+    }
+    // Retorna true si les tonalitats són compatibles, false si no ho són
+    const root1 = tonalitat1.slice(0, -5);
+    const root2 = tonalitat2.slice(0, -5);
+    const mode1 = tonalitat1.slice(-5);
+    const mode2 = tonalitat2.slice(-5);
+    
+    // Cas les dues tonalitats siguin la mateixa
+    if ((root1 === root2) && (mode1 === mode2)) {
+        return true;
+    }
+
+    // TODO: cas relatiu menor
+
+    return false;
+}
+
 
 export const getTonalityForSamplerLibrarySample = (soundName) => {
     let tonalityFound = undefined;

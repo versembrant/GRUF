@@ -5,7 +5,7 @@ import { indexOfArrayMatchingObject, hasPatronsPredefinits, getNomPatroOCap, get
 import { subscribeToStoreChanges, subscribeToParameterChanges, subscribeToAudioGraphParameterChanges, subscribeToPresetChanges} from "../utils"; // subscriptions
 import { updateParametre, num2Norm, norm2Num, real2Num, num2Real, real2String, getParameterNumericMin, getParameterNumericMax, getParameterStep, } from "../utils"; // parameter related
 import { clamp, distanceToAbsolute, euclid, sample, weightedSample, lerp }  from "../utils"; // math related
-import { transformaNomTonalitat, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
+import { transformaNomTonalitat, tonalitatsCompatibles, getTonalityForSamplerLibrarySample, getPCsFromScaleName, getNextPitchClassAfterPitch, getDiatonicIntervalEZ } from "../utils"; // music theory related
 import { KnobHeadless } from 'react-knob-headless';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -907,9 +907,13 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     const tonalitat = getAudioGraphInstance().getTonality();
     const algunSliceAmbPitchAlerat = estacio.algunSliceTePitchAlterat()
 
+    const extractUserRecordingNumberFromFilename = (filename) => {
+        return parseInt(filename.split('_num_')[1].split('.')[0], 10);
+    }
+
     const options = 
         [...getCurrentSession().getRecordedFiles().map((item, i) => ({
-            'label': 'Gravació usuari ' + (i + 1), 
+            'label': 'Gravació usuari ' + extractUserRecordingNumberFromFilename(item), 
             'value': item,
             'tonality': undefined
         })),
@@ -952,19 +956,17 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
     const tonalitatSample = getTonalityForSamplerLibrarySample(selectedSoundName);
     const optionTemplate = (option) => {
         const tonalitatSampleLlista = option.tonality
-        const tonalitatIncorrecta = (tonalitatSampleLlista !== undefined) && (tonalitat !== tonalitatSampleLlista)
         let optionTonalitatClass = "";
-        if (tonalitatIncorrecta) optionTonalitatClass = "text-red";
-        if (algunSliceAmbPitchAlerat) optionTonalitatClass = "text-orange";
+        if (!tonalitatsCompatibles(tonalitat, tonalitatSampleLlista)) optionTonalitatClass = "text-red";
+        if (tonalitatSampleLlista === undefined) optionTonalitatClass = "text-orange";
         return (
             <span className={optionTonalitatClass}>{option.label}</span>
         );
     };
 
-    const tonalitatIncorrecta = (tonalitatSample !== undefined) && (tonalitat !== tonalitatSample)
     let tonalitatClass = "";
-    if (tonalitatIncorrecta) tonalitatClass = "text-red";
-    if (algunSliceAmbPitchAlerat) tonalitatClass = "text-orange";
+    if (!tonalitatsCompatibles(tonalitat, tonalitatSample)) tonalitatClass = "text-red";
+    if (tonalitatSample === undefined) tonalitatClass = "text-orange";
 
     return (
         <div>

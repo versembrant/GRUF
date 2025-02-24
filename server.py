@@ -445,7 +445,19 @@ def upload_file(session_id):
 
             # Convert to wav
             print('Converting to wav...')
-            wav_filename = filename.split('.')[0] + '.wav'
+            # Generate name for the wavfile, find biggest "user recording number"
+            recording_number = 0
+            for ffilename in os.listdir(folder_path):
+                try:
+                    print(ffilename.split('.wav')[0])
+                    print(ffilename.split('.wav')[0].split('_num_')[1])
+                    num = int(ffilename.split('.wav')[0].split('_num_')[1])
+                    if num > recording_number:
+                        recording_number = num
+                except (IndexError, ValueError) as e:
+                    continue
+   
+            wav_filename = filename.split('.')[0] + f'_num_{recording_number + 1}.wav'
             wav_file_path = os.path.join(folder_path, wav_filename)
             os.system(f'ffmpeg -y -i {file_path} -c:a pcm_s16le -ar 44100 {wav_file_path}')
             os.chmod(wav_file_path, 0o0777)
