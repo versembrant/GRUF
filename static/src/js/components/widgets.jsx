@@ -845,12 +845,7 @@ export const GrufSelectorPatronsGrid = ({estacio, parameterName, top, left, widt
 export const GrufSelectorTonalitat = ({ className, label="Tonalitat" }) => {
     subscribeToParameterChanges(getAudioGraphInstance(), 'tonality');
     const dropdownOptions = getAudioGraphInstance().getParameterDescription('tonality').options.map(option=> {
-        const root = option.slice(0, -5).replace(/^(.)b$/, '$1♭');
-        const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
-        const catRoot = root.split('').map(char => rootTranslations[char] || char).join('');
-        const mode = option.slice(-5);
-        const catMode = mode.replace('minor', 'menor');
-        return {label: capitalizeFirstLetter(`${catRoot} ${catMode}`), value: option}
+        return {label: transformaNomTonalitat(option), value: option}
     });
     
     const currentTonality = getAudioGraphInstance().getTonality();

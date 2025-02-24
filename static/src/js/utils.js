@@ -424,11 +424,17 @@ export const units = {
 
 // Tonalitat
 export const transformaNomTonalitat = (nomTonalitat) => {
-    let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
-    nomActualitzat = nomActualitzat.replace("minor", " Minor");
-    nomActualitzat = nomActualitzat.replace("major", " Major");
-    nomActualitzat = nomActualitzat.replace("b ", "♭ ");
-    return nomActualitzat;
+    //let nomActualitzat = nomTonalitat.charAt(0).toUpperCase() + nomTonalitat.slice(1);
+    //nomActualitzat = nomActualitzat.replace("minor", " Minor");
+    //nomActualitzat = nomActualitzat.replace("major", " Major");
+    //nomActualitzat = nomActualitzat.replace("b ", "♭ ");
+    //return nomActualitzat;
+    const root = nomTonalitat.slice(0, -5).replace(/^(.)b$/, '$1♭');
+    const rootTranslations = {"c": "do", "d": "re", "e": "mi", "f": "fa", "g": "sol","a": "la", "b": "si"};
+    const catRoot = root.split('').map(char => rootTranslations[char] || char).join('');
+    const mode = nomTonalitat.slice(-5);
+    const catMode = mode.replace('minor', 'menor');
+    return capitalizeFirstLetter(`${catRoot} ${catMode}`)
 }
 
 
