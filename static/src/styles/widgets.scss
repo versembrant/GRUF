@@ -185,6 +185,8 @@
     }
 
     &.horizontal {
+        margin-left: 8px;
+
         .MuiSlider-thumb {
             border-radius: 5px;
             height: 27px;

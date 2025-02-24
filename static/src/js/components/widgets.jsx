@@ -102,7 +102,7 @@ export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
 }
 
 
-export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
+export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, colorizeLabel=false, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
     
@@ -140,7 +140,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
                     />
                 </div>
-                <label htmlFor={knobctrlId}>{label || parameterDescription.label}</label>
+                <label htmlFor={knobctrlId} className={colorizeLabel ? "text-accent": ""}>{label || parameterDescription.label}</label>
                 {!noOutput && <output htmlFor={knobctrlId}>{real2String(realValue, parameterDescription)}</output>}
         </div>
     )
@@ -888,7 +888,7 @@ export const GrufSelectorPlayerMode = ({estacio, parameterName, top, left}) => {
     return(
         <fieldset className="gruf-selector-playermode">
             <div className="inputs">{inputsLabels.map(inputLabel=> inputLabel.input)}</div>
-            <div className="labels">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
+            <div className="labels text-accent">{inputsLabels.map(inputLabel=> inputLabel.label)}</div>
         </fieldset>
     )
     
