@@ -980,7 +980,7 @@ export const GrufSelectorSonsSampler = ({estacio, parameterName, top, left, widt
                         options={options}
                         placeholder="Cap"
                     />
-                    {showTrashOption ? <div><button class="trash-button" onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img  style={{width: "20px"}} src={appPrefix + "/static/src/img/trash.svg"}></img></button></div>: ''}
+                    {showTrashOption ? <div><button className="trash-button" onClick={() => {handleRemoveFileButton(selectedSoundName)}}><img  style={{width: "20px"}} src={appPrefix + "/static/src/img/trash.svg"}></img></button></div>: ''}
                 </div>
                 <AudioRecorder setInputMeterPercent={setInputMeterPercent} onRecordUploadedCallback={(data) => {
                     console.log("Sound uploaded to server: ", data.url);
