@@ -286,8 +286,8 @@ export class EstacioSampler extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
         const padIndex = midiNoteNumber % 16;
-        if (!noteOff) this.triggerPad(padIndex, Tone.now());
-        else this.stopPad(padIndex, Tone.now());
+        if (!noteOff) this.triggerPad(padIndex);
+        else this.stopPad(padIndex);
         if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
     }
 }

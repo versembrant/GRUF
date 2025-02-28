@@ -259,7 +259,7 @@ export class EstacioGrooveBox extends EstacioBase {
                 };
             }
             // Play
-            else  this.playSoundFromPlayer(playerName, Tone.now());
+            this.playSoundFromPlayer(playerName);
         } 
         else {
             // Stop

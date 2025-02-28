@@ -29,7 +29,7 @@ export class MonoSynth extends BaseSynth {
 
     onTransportStop() {
         // Stop all notes that are still playing
-        this.audioNodes.synth.triggerRelease(Tone.now())
+        this.audioNodes.synth.triggerRelease()
     }
 
     unfinishedNotes = [];
@@ -41,14 +41,14 @@ export class MonoSynth extends BaseSynth {
         const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
         if (!noteOff) {
             if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);
-            this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote(), Tone.now());
+            this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote());
         }
         else {
             const removedIndex = this.unfinishedNotes.indexOf(midiNoteNumber);
             this.unfinishedNotes.splice(removedIndex, 1);
             const newStackLength = this.unfinishedNotes.length;
             if (removedIndex === newStackLength) { // if removed note was the last one (sounding...)
-                this.audioNodes.synth.triggerRelease(Tone.now()); // release it
+                this.audioNodes.synth.triggerRelease(); // release it
                 // ...and if there were other notes pressed, play the newest one among them
                 if (newStackLength > 0) this.onMidiNote(this.unfinishedNotes[newStackLength-1], midiVelocity, false, {...extras, skipStack: true})
             }
