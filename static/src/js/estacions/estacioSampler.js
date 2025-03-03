@@ -232,13 +232,21 @@ export class EstacioSampler extends EstacioBase {
         } else {
             soundPlayer.player.playbackRate = Math.pow(2, integerPitch / 12);
         }
+        
+        if (!soundPlayer.player.buffer.loaded){
+            // If buffer is not loaded yet, don't trigger the sound and return false
+            return false;
+        }
+
         soundPlayer.player.start(time, soundSliceStartSeconds);
 
         if (soundPlayer.playingOneShot) { 
             // For one shots, we stop the player manually at the stopping point of the slice
             const sliceSoundDuration = soundSliceEndSeconds - soundSliceStartSeconds;
-            soundPlayer.player.stop(time + sliceSoundDuration);
+            soundPlayer.player.stop(time ? time + sliceSoundDuration: "+" + parseFloat(sliceSoundDuration, 10));
         }
+
+        return true;
     }
 
     stopPad(padIndex, time) {
@@ -251,8 +259,11 @@ export class EstacioSampler extends EstacioBase {
     }
 
     triggerAttackRelease(padIndex, time, duration) {
-        this.triggerPad(padIndex, time);
-        this.stopPad(padIndex, time + duration);
+        const triggered = this.triggerPad(padIndex, time);
+        if (triggered){
+            // Don't trigger stop if buffer not loaded, this could cause problems
+            this.stopPad(padIndex, time + duration);
+        }
     }
 
     onSequencerStep(currentMainSequencerStep, time) {
@@ -269,7 +280,7 @@ export class EstacioSampler extends EstacioBase {
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 const padIndex = note.n % 16;
-                this.triggerAttackRelease(padIndex, time + i * 0.001, note.d * Tone.Time("16n").toSeconds());  // We add micro time difference in notes that start exactly at the same time to avoid potential errors with start times
+                this.triggerAttackRelease(padIndex, time + i * 0.001, note.d * getAudioGraphInstance().get16BeatTime());  // We add micro time difference in notes that start exactly at the same time to avoid potential errors with start times
             }
         }
     }

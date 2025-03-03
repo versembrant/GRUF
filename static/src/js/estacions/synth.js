@@ -101,7 +101,7 @@ export class BaseSynth extends EstacioBase {
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 let midiNote = note.n;
                 if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(midiNote)
-                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * Tone.Time("16n").toSeconds(), time);
+                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * getAudioGraphInstance().get16BeatTime(), time);
             }
         }
     }

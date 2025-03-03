@@ -308,16 +308,20 @@ export class AudioGraph {
     }
 
     getDelayTimeValue(delayTime) {
-        if      (delayTime === '1/4') 
-            return 60/ (1*(getAudioGraphInstance().getBpm()));
+        if (delayTime === '1/4') 
+            return 60/ (1*(this.getBpm()));
         else if (delayTime === '1/8') 
-            return 60/ (2*(getAudioGraphInstance().getBpm()));
+            return 60/ (2*(this.getBpm()));
         else if (delayTime === '1/16') 
-            return 60/ (4*(getAudioGraphInstance().getBpm()));
+            return 60/ (4*(this.getBpm()));
         else if (delayTime === '1/8T') 
-            return 60/ (3*(getAudioGraphInstance().getBpm()));
+            return 60/ (3*(this.getBpm()));
         else if (delayTime === '1/16T') 
-            return 60/ (6*(getAudioGraphInstance().getBpm()));
+            return 60/ (6*(this.getBpm()));
+    }
+
+    get16BeatTime() {
+        return 60 / (this.getBpm() * 4);
     }
 
     applyEffectParameters(effectParams) {

@@ -571,7 +571,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
                     sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=false);
                     setTimeout(() => {
                         sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
-                    }, evt.detail.durationInBeats * Tone.Time("16n").toSeconds() * 1000);
+                    }, evt.detail.durationInBeats * getAudioGraphInstance().get16BeatTime() * 1000);
                 });
             }
             if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
