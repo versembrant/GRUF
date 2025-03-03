@@ -54,6 +54,6 @@ export class MonoSynth extends BaseSynth {
             }
         }
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, noteOff);
     }
 }

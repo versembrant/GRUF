@@ -362,7 +362,7 @@ export class EstacioBase {
     }
 
     unfinishedNotesOnsets = new Map();
-    handlePianoRollRecording(midiNoteNumber, noteOff) {
+    handlePianoRollRecording(midiNoteNumber, midiVelocity, noteOff) {
         if (!this.getParameterValue('isRecording')) return;
         const currentMainSequencerStep = getAudioGraphInstance().getMainSequencerCurrentStep();
         const currentStep = currentMainSequencerStep % this.getNumSteps();
@@ -377,7 +377,7 @@ export class EstacioBase {
         // now yes, create a note object
         const notes = this.getParameterValue('notes');
         const jsPianoRollEl = document.getElementById(this.nom + "_" + "notes_id");
-        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset, 'id': jsPianoRollEl.getNextAvailableID()});
+        notes.push({'n': midiNoteNumber, 'b': noteOnset, 'd': currentStep - noteOnset, 'v': midiVelocity, 'id': jsPianoRollEl.getNextAvailableID()});
         this.updateParametreEstacio('notes', notes); // and save change in server!
     }
 

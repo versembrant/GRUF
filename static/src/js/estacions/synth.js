@@ -165,6 +165,6 @@ export class Synth extends BaseSynth {
         if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()]);
         else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()]);
 
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, noteOff);
     }
 }

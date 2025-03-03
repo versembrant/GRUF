@@ -21,9 +21,9 @@ export class EstacioPiano extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         // Creem els nodes del graph i els guardem
-        const timbre = new Tone.Filter(500, 'lowpass', -24);
+        const timbre = new Tone.Filter(500, 'lowpass', -12);
         const gainFixPiano = new Tone.Gain(Tone.dbToGain(-10)).connect(timbre);
-        const piano = new Piano({velocities:2, maxPolyphony:6}).connect(gainFixPiano);
+        const piano = new Piano({velocities:4, maxPolyphony:6}).connect(gainFixPiano);
         piano.load().then(() => { console.log('Mostres del piano carregades!') })
 
         this.audioNodes = {
@@ -55,7 +55,7 @@ export class EstacioPiano extends EstacioBase {
             // n = midi note number
             // d = duration of the note in beats (or steps)
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
-                this.audioNodes.piano.keyDown({note:Tone.Frequency(note.n, "midi").toNote(), time:time})
+                this.audioNodes.piano.keyDown({note:Tone.Frequency(note.n, "midi").toNote(), velocity:(note.v || 127) / 127, time:time})
                 this.audioNodes.piano.keyUp({note:Tone.Frequency(note.n, "midi").toNote(), time:time + note.d})
             }
         }
@@ -69,9 +69,9 @@ export class EstacioPiano extends EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
-        if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote()});
+        if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), velocity:midiVelocity/127});
         else this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote()});
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, noteOff);
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, midiVelocity, noteOff);
     }
 }
