@@ -29,6 +29,7 @@ export class BaseSynth extends EstacioBase {
 
         // Settejem alguns paràmetres inicials que no canviaran
         synth.set({
+
             vibratoAmount: 0.0,
             voice0: {
                 attackCurve: "exponential",
@@ -43,9 +44,9 @@ export class BaseSynth extends EstacioBase {
             volume: -20 // Avoid clipping, specially when using sine
         });
 
-        if (poly) synth.set({maxPolyphony: 8});
+        if (poly) synth.maxPolyphony = 6;  // Maximum 6 voice polyphony per synth
 
-        // Adegeix els nodes al diccionari de nodes de l'estació
+        // Afegeix els nodes al diccionari de nodes de l'estació
         this.audioNodes = {
             synth: synth,
             lpf: lpf,
