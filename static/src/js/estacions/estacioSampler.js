@@ -74,15 +74,17 @@ export class EstacioSampler extends EstacioBase {
     soundBuffers = {};
 
     getFreeSoundPlayer() {
-        const freeSoundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.playingPadIndex === -1);
-        if (!freeSoundPlayer) {
+        let soundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.playingPadIndex === -1);
+        if (soundPlayer === undefined) {
             // Return randomly one of the players
-            const randomSoundPlayer = this.audioNodes.soundPlayers[Math.floor(Math.random() * this.numVoices)];
-            randomSoundPlayer.player.fadeOut = 0;
-            randomSoundPlayer.player.stop();
-            return randomSoundPlayer;
+            const freeSoundPlayerIdx = Math.floor(Math.random() * this.numVoices);
+            soundPlayer = this.audioNodes.soundPlayers[freeSoundPlayerIdx];
+            // NOTE: looks like it is not necessary to stop it first so we comment next lines
+            //soundPlayer.playingPadIndex = -1;
+            //soundPlayer.player.fadeOut = 0;
+            //soundPlayer.player.stop();
         }
-        return freeSoundPlayer;
+        return soundPlayer;
     }
 
     getsoundPlayersWithPadPlaying(padIndex) {
@@ -214,7 +216,10 @@ export class EstacioSampler extends EstacioBase {
 
     triggerPad(padIndex, time) {
         const soundPlayer = this.getFreeSoundPlayer();
-        soundPlayer.playingPadIndex = padIndex;
+        if (soundPlayer === undefined){
+            // If no sound player can be found, don't trigger the sound and return false
+            return false;
+        }
         soundPlayer.playingOneShot = this.getParameterValue(`playerMode${padIndex + 1}`) === 'oneshot';
         const fullSoundDuration = soundPlayer.player.buffer.duration;
         const soundSliceStartSeconds = this.getParameterValue(`start${padIndex + 1}`) * fullSoundDuration;
@@ -238,14 +243,14 @@ export class EstacioSampler extends EstacioBase {
             return false;
         }
 
-        soundPlayer.player.start(time, soundSliceStartSeconds);
-
+        soundPlayer.playingPadIndex = padIndex;
         if (soundPlayer.playingOneShot) { 
             // For one shots, we stop the player manually at the stopping point of the slice
             const sliceSoundDuration = soundSliceEndSeconds - soundSliceStartSeconds;
-            soundPlayer.player.stop(time ? time + sliceSoundDuration: "+" + parseFloat(sliceSoundDuration, 10));
+            soundPlayer.player.start(time, soundSliceStartSeconds, sliceSoundDuration);
+        } else {
+            soundPlayer.player.start(time, soundSliceStartSeconds);
         }
-
         return true;
     }
 
@@ -253,7 +258,9 @@ export class EstacioSampler extends EstacioBase {
         const soundPlayers = this.getsoundPlayersWithPadPlaying(padIndex);
         soundPlayers.forEach(soundPlayer => {
             if (!soundPlayer.playingOneShot) {  // One shots are played until the end of the slice and don't need to be stopepd manually
-                soundPlayer.player.stop(time);  // Triggering stop will add the fadeOut (release) time
+                if (soundPlayer.player.state === 'started') {
+                    soundPlayer.player.stop(time);  // Triggering stop will add the fadeOut (release) time
+                }
             }
         });
     }
