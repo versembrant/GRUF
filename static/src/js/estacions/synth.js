@@ -5,6 +5,7 @@ import { EstacioSynthUI } from "../components/estacioSynth";
 import { units } from "../utils";
 
 export class BaseSynth extends EstacioBase {
+    poly = false;
     static parametersDescription = {
         ...EstacioBase.parametersDescription,
         // Notes
@@ -16,41 +17,59 @@ export class BaseSynth extends EstacioBase {
         release: {type: 'float', label:'Release', unit: units.second, min: 0.0, max: 5.0, initial: 0.01},
         waveform: {type: 'enum', label:'Waveform', options: ['sawtooth', 'triangle', 'square', 'sine'], initial: 'sawtooth'},
         lpf: {type: 'float', label: 'LPF', unit: units.hertz, min: 100, max: 15000, initial: 15000, logarithmic: true},
-        hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 20, max: 3000, initial: 20, logarithmic: true},
+        ressonance: {type: 'float', label: 'Ressonance', min: 0.0, max: 100.0, initial: 0.0},
+        hpf: {type: 'float', label: 'HPF', unit: units.hertz, min: 10, max: 3000, initial: 10, logarithmic: true},
         harmonicity: {type: 'float', label: 'Detune', min: 0.95, max: 1.05, initial: 1.0},
+        lfo_rate: {type: 'float', label: 'LFO Rate', unit: units.hertz, min: 0.1, max: 50.0, initial: 0.5, logarithmic: true},
+        lfo_depth: {type: 'float', label: 'LFO Depth', min: 0.0, max: 1.0, initial: 0.0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel, {poly}) {
+        this.poly = poly;
+
         // Creem els nodes del graph i els connectem entre ells
         const hpf = new Tone.Filter(6000, "highpass", -24);
-        const lpf = new Tone.Filter(500, "lowpass", -24).connect(hpf);
-        const synth = poly ? new Tone.PolySynth(Tone.DuoSynth) : new Tone.DuoSynth();
+        const lpf = new Tone.Filter(15000, "lowpass", -24);
+        const synth = poly ? new Tone.PolySynth(Tone.MonoSynth) : new Tone.DuoSynth();
+        const lfo = new Tone.LFO({amplitude: 1.0, max: 15000, min: 0});
+        lpf.connect(hpf);
         synth.connect(lpf);
-
+        
         // Settejem alguns paràmetres inicials que no canviaran
-        synth.set({
-
-            vibratoAmount: 0.0,
-            voice0: {
+        if (poly) {
+            synth.maxPolyphony = 6;  // Maximum 6 voice polyphony per synth
+            synth.set({
                 attackCurve: "exponential",
                 decayCurve: "exponential",
-                releaseCurve: "exponential"
-            },
-            voice1: {
-                attackCurve: "exponential",
-                decayCurve: "exponential",
-                releaseCurve: "exponential"
-            },
-            volume: -20 // Avoid clipping, specially when using sine
-        });
-
-        if (poly) synth.maxPolyphony = 6;  // Maximum 6 voice polyphony per synth
+                releaseCurve: "exponential",
+                volume: -20 // Avoid clipping, specially when using sine
+            });
+        } else {
+            synth.set({
+                vibratoAmount: 0.0,
+                voice0: {
+                    attackCurve: "exponential",
+                    decayCurve: "exponential",
+                    releaseCurve: "exponential"
+                },
+                voice1: {
+                    attackCurve: "exponential",
+                    decayCurve: "exponential",
+                    releaseCurve: "exponential"
+                },
+                volume: -10 
+            });
+        }
+        // LFO can't be connected to an underlying voice of a poly synth, so we connect it to the main lpf filter
+        lfo.connect(lpf.frequency);
+        lfo.start();
 
         // Afegeix els nodes al diccionari de nodes de l'estació
         this.audioNodes = {
             synth: synth,
-            lpf: lpf,
             hpf: hpf,
+            lpf: lpf,
+            lfo: lfo
         };
 
         // Crea els nodes d'efectes (això també els afegirà al diccionari de nodes de l'estació)
@@ -60,29 +79,78 @@ export class BaseSynth extends EstacioBase {
     setParameterInAudioGraph(name, value, preset) {
         switch (name) {
             case "lpf":
-            this.audioNodes.lpf.frequency.rampTo(value, 0.01);
-            break;
+                if (this.poly) {
+                    this.audioNodes.synth.set({
+                        'filterEnvelope': {'baseFrequency': value},
+                    })
+                    this.audioNodes.lpf.set({
+                        'frequency': value,
+                    })
+                } else {
+                    this.audioNodes.synth.set({
+                        voice0: {'filterEnvelope': {'baseFrequency': value}},
+                        voice1: {'filterEnvelope': {'baseFrequency': value}},
+                    })
+                }
+                break;
             case "hpf":
-            this.audioNodes.hpf.frequency.rampTo(value, 0.01);
-            break;
+                this.audioNodes.hpf.frequency.rampTo(value, 0.01);
+                break;
+            case "ressonance":
+                if (this.poly) {
+                    this.audioNodes.synth.set({
+                        'filter': {'Q': value},
+                    })
+                } else {
+                    this.audioNodes.synth.set({
+                        voice0: {'filter': {'Q': value}},
+                        voice1: {'filter': {'Q': value}},
+                    })
+                }
+                break;
+            case "lfo_rate":
+                this.audioNodes.lfo.set({
+                    'frequency': value,
+                })
+                break;
+            case "lfo_depth":
+                this.audioNodes.lfo.set({
+                    'amplitude': value,
+                })
+                break;
             case "harmonicity":
-            this.audioNodes.synth.set({'harmonicity': value});
-            break;
+                if (!this.poly) {
+                    // This is only available when using DuoSynth
+                    this.audioNodes.synth.set({'harmonicity': value});
+                }
+                break;
             case "attack":
             case "decay":
             case "sustain":
             case "release":
-                this.audioNodes.synth.set({
-                    voice0: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
-                    voice1: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
-                })
-            break;
+                if (this.poly) {
+                    this.audioNodes.synth.set({
+                        'envelope': {[name]: value}, 'filterEnvelope': {[name]: value},
+                    })
+                } else {
+                    this.audioNodes.synth.set({
+                        voice0: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
+                        voice1: {'envelope': {[name]: value}, 'filterEnvelope': {[name]: value}},
+                    })
+                }
+                break;
             case "waveform":
-            this.audioNodes.synth.set({
-                voice0: {'oscillator': { type: value }},
-                voice1: {'oscillator': { type: value }},
-            })
-            break;
+                if (this.poly) {
+                    this.audioNodes.synth.set({
+                        'oscillator': { type: value },
+                    })
+                } else {
+                    this.audioNodes.synth.set({
+                        voice0: {'oscillator': { type: value }},
+                        voice1: {'oscillator': { type: value }},
+                    })
+                }
+                break;
         }
     }
 

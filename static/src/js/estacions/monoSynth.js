@@ -10,8 +10,6 @@ export class MonoSynth extends BaseSynth {
     static parametersDescription = {
         ...BaseSynth.parametersDescription,
         notes: {...BaseSynth.parametersDescription.notes, isMono: true},
-        lpf: {...BaseSynth.parametersDescription.lpf, min: 300, max: 12000, initial: 12000},
-        hpf: {...BaseSynth.parametersDescription.hpf, min: 200, max: 3000, initial: 200},
         portamento: {type: 'float', label: 'Glide', unit: units.second, min: 0.0, max: 0.3, initial: 0.0},
     }
 
@@ -20,11 +18,15 @@ export class MonoSynth extends BaseSynth {
     }
 
     setParameterInAudioGraph(name, value, preset) {
-        if (name == "portamento"){
-            this.audioNodes.synth.set({
-                'portamento': value,
-            }) 
-        } else super.setParameterInAudioGraph(name, value, preset);
+        switch (name) {
+            case "portamento":
+                this.audioNodes.synth.set({
+                    'portamento': value,
+                }) 
+                break;
+            default:
+                super.setParameterInAudioGraph(name, value, preset);
+        } 
     }
 
     onTransportStop() {

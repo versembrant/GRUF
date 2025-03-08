@@ -21,7 +21,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                     <fieldset className="flex justify-between">
                         <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                         <GrufSeparatorLine />
-                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="fxDrive" />
+                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="lpf" label="Cutoff" />
                     </fieldset>
                 <GrufSelectorTonalitat label={null}/>
                 </fieldset>
@@ -37,12 +37,16 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                                 <img src={waveform_saw} alt="Forma d'ona de dent de serra" />
                             </div>
                         </div>
-                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="harmonicity" />
                     </fieldset>
                     <GrufSeparatorLine />
                     <fieldset className="flex flex-col justify-between items-center">
+                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={estacio.tipus === "synth_bass" ? "harmonicity":"fxDrive"} />
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName="hpf" />
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="lpf" />
+                    </fieldset>
+                    <GrufSeparatorLine />
+                    <fieldset className="flex flex-col justify-between items-center">
+                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_rate" label="Mod rate"/>
+                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_depth" label="Mod depth" />
                     </fieldset>
                 </fieldset>
                 
