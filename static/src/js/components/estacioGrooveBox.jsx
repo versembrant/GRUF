@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLogoEstacio, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine } from "./widgets";
+import { GrufKnob, GrufLogoEstacio, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine, GrufLabelPetit } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { getAudioGraphInstance } from "../audioEngine";
 import { grey } from "@mui/material/colors";
@@ -39,9 +39,10 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 <fieldset className="grid col-start-1 row-start-4 col-span-3" style={{ height: 350}}>
 
                     {/* Contenidor de TonVol */}
-                    <fieldset className="col-start-1 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRows: "repeat(4, auto)", width:100, alignItems:'center'}}>
+                    <fieldset className="col-start-1 row-start-1" style={{display: "grid", gridTemplateColumns: "30px 1fr 1fr", gridTemplateRows: "repeat(4, auto)", width:130, alignItems:'center'}}>
                         {["1", "2", "3", "4"].map(i => (
                             <>
+                                <div style={{fontSize:"70%", transform:"rotate(-90deg)", textAlign:"center"}}>{['Open hat', 'Closed hat', 'Snare', 'Kick'][parseInt(i, 10) - 1]}</div>
                                 <GrufKnob mida="petit" parameterParent={estacio} parameterName={`volume${i}`} label="Vol" />
                                 <GrufKnob mida="petit" parameterParent={estacio} parameterName={`tone${i}`} label="Tone" />
                             </>
