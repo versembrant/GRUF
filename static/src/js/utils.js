@@ -419,7 +419,8 @@ export const units = {
     second: 's',
     hertz: 'Hz',
     decibel: 'dB',
-    percent: '%'
+    percent: '%',
+    semitone: 'st'
 }
 
 // Tonalitat

@@ -38,7 +38,7 @@ export class EstacioGrooveBox extends EstacioBase {
         
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[
             {'nom': 'Hip Hop Classic 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}]}, 
-            {'nom': 'Hip Hop classic 2' , 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}]},
+            {'nom': 'Hip Hop Classic 2' , 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":3,"j":9},{"i":1,"j":14},{"i":2,"j":15}]},
             {'nom': 'Reggae Roots', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":15},{"i":2,"j":2},{"i":3,"j":4},{"i":0,"j":11},{"i":3,"j":11},{"i":1,"j":13},{"i":3,"j":13}]},
             {'nom': 'Dub Reggae', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":3,"j":4},{"i":1,"j":2},{"i":3,"j":2},{"i":2,"j":4},{"i":3,"j":6},{"i":0,"j":8},{"i":3,"j":8},{"i":3,"j":10},{"i":2,"j":12},{"i":3,"j":12},{"i":3,"j":14}]},
             {'nom': 'Soul Pop', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":1,"j":12},{"i":1,"j":14},{"i":2,"j":4},{"i":3,"j":8},{"i":2,"j":12}]},
@@ -49,17 +49,17 @@ export class EstacioGrooveBox extends EstacioBase {
             {'nom': 'Urban Reggaeton', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":10},{"i":1,"j":4},{"i":3,"j":4},{"i":2,"j":3},{"i":1,"j":6},{"i":2,"j":6},{"i":1,"j":8},{"i":3,"j":8},{"i":2,"j":11},{"i":1,"j":12},{"i":3,"j":12},{"i":2,"j":14},{"i":0,"j":14}]}
         ], followsPreset: true},
 
-        drumkit: {type: 'text', initial: 'Hip hop Classic 1'},
+        drumkit: {type: 'text', initial: 'Hip Hop Classic 1'},
 
         ...Object.fromEntries(
             sounds.flatMap((sound, index) => {
                 const i = index + 1;
                 return [
                     [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
-                    [`tone${i}`, { type: 'float', label: `${sound}Tone`, unit: units.decibel, min: -12, max: 12, step: 1, initial: 0 }],
+                    [`tone${i}`, { type: 'float', label: `${sound}Tone`, unit: units.semitone, min: -12, max: 12, step: 1, initial: 0 }],
                     [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: 0 }],
-                    [`attack${i}`, { type: 'float', label: `${sound}Attack`, unit: units.second, min: 0, max: 1, step: 0.1, initial: 0 }],
-                    [`release${i}`, { type: 'float', label: `${sound}Release`, unit: units.second, min: 0, max: 1, step: 0.1, initial: 0 }],
+                    [`attack${i}`, { type: 'float', label: `${sound}Attack`, unit: units.percent, min: 0, max: 100, step:1, initial: 0 }],
+                    [`release${i}`, { type: 'float', label: `${sound}Release`, unit: units.percent, min: 0, max: 100, step: 1, initial: 100 }],
                     [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, unit: units.decibel, min: -30, max: 6, initial: -30 }]
                 ]
             })
@@ -155,11 +155,11 @@ export class EstacioGrooveBox extends EstacioBase {
                 });
             } else if (type === 'attack') {
                 this.audioNodes[playerName].set({
-                    'fadeIn': value*this.getTempsBeat(),
+                    'fadeIn': value/100*this.getTempsBeat(),
                 });
             } else if (type === 'release') {
                 this.audioNodes[playerName].set({
-                    'fadeOut': value*this.getTempsBeat(),
+                    'fadeOut': value/100*this.getTempsBeat()*2,
                 });
             } else if (type === 'tone') {
                 this.audioNodes[playerName].set({
@@ -221,22 +221,32 @@ export class EstacioGrooveBox extends EstacioBase {
             modificatorTempsSwing4 = tempsBeat * this.getParameterValue('swing4');
         }
         if (shouldPlaySound1) {
-            this.playSoundFromPlayer('open_hat', time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing1, 0, 1))
-            this.stopSoundFromPlayer('open_hat', time + tempsBeat)
-
+            const timeStart = time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing1, 0, 1);
+            const tempsAttack = this.getParameterValue('attack1') / 100 * tempsBeat;
+            const timeEnd = timeStart + tempsAttack; // timeStart + tempsBeat;  // We immediately trigger the stop, if release it at maximum sound will still be heard
+            this.playSoundFromPlayer('open_hat', timeStart);
+            this.stopSoundFromPlayer('open_hat', timeEnd);
         }
         if (shouldPlaySound2) {
-            this.playSoundFromPlayer('closed_hat', time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing2, 0, 1))
-            this.stopSoundFromPlayer('closed_hat', time + tempsBeat)
+            const timeStart = time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing2, 0, 1);
+            const tempsAttack = this.getParameterValue('attack2') / 100 * tempsBeat;
+            const timeEnd = timeStart + tempsAttack; // timeStart + tempsBeat;  // We immediately trigger the stop, if release it at maximum sound will still be heard
+            this.playSoundFromPlayer('closed_hat', timeStart);
+            this.stopSoundFromPlayer('closed_hat', timeEnd);
         }
         if (shouldPlaySound3) {
-            this.playSoundFromPlayer('snare', time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing3, 0, 1))
-            this.stopSoundFromPlayer('snare', time + tempsBeat)
+            const timeStart = time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing3, 0, 1);
+            const tempsAttack = this.getParameterValue('attack3') / 100 * tempsBeat;
+            const timeEnd = timeStart + tempsAttack; // timeStart + tempsBeat;  // We immediately trigger the stop, if release it at maximum sound will still be heard
+            this.playSoundFromPlayer('snare', timeStart);
+            this.stopSoundFromPlayer('snare', timeEnd);
         }
         if (shouldPlaySound4) {
-            this.playSoundFromPlayer('kick', time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing4, 0, 1))
-            this.stopSoundFromPlayer('kick', time + tempsBeat)
-
+            const timeStart = time + clamp(modificadorTempsSwingGeneral + modificatorTempsSwing4, 0, 1);
+            const tempsAttack = this.getParameterValue('attack4') / 100* tempsBeat;
+            const timeEnd = timeStart + tempsAttack; // timeStart + tempsBeat;  // We immediately trigger the stop, if release it at maximum sound will still be heard
+            this.playSoundFromPlayer('kick', timeStart);
+            this.stopSoundFromPlayer('kick', timeEnd);
         }
     }
     onMidiNote (midiNoteNumber, midiVelocity, noteOff, extras){
