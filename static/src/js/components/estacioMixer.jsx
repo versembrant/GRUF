@@ -7,7 +7,9 @@ import Slider from '@mui/material/Slider';
 
 export const GrufMuteCheckbox = ({ estacio, isIndirectMute, setIsDirectMute }) => {
     const parameterValue = getCurrentSession().getLiveMutesEstacions()[estacio.nom];
-    setIsDirectMute(parameterValue);
+    useEffect(() => {
+        setIsDirectMute(parameterValue);
+    });
 
     const handleMuteToggle = (evt) => {
         const isDirectMute =  evt.target.checked;
@@ -16,8 +18,6 @@ export const GrufMuteCheckbox = ({ estacio, isIndirectMute, setIsDirectMute }) =
         getCurrentSession().setLiveMutesEstacions(currentMutes);
         setIsDirectMute(parameterValue);
     };
-
-    
 
     return (
         <label className="gruf-mute-checkbox">
@@ -34,7 +34,9 @@ export const GrufMuteCheckbox = ({ estacio, isIndirectMute, setIsDirectMute }) =
 
 export const GrufSoloCheckbox = ({ estacio, changeSoloState }) => {
     const parameterValue = getCurrentSession().getLiveSolosEstacions()[estacio.nom];
-    changeSoloState(parameterValue);
+    useEffect(() => {
+        changeSoloState(parameterValue);
+    });
 
     const handleSoloToggle = (evt) => {
         const isSolo = evt.target.checked;
@@ -138,6 +140,40 @@ export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
     );
 };
 
+export const GrufFxReturnSliderVertical = ({ top, left, height, fxNom }) => {
+
+    const gain = getAudioGraphInstance().getFxReturnGain(fxNom) 
+
+    const marks = [];
+
+    const style = { top: top, left: left };
+    if (height !== undefined) {
+        style.height = height;
+    }
+
+    const handleGainChange = (evt, value) => {
+        const gain = parseFloat(value, 10);
+        if (fxNom === 'reverbA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbAGain: gain});
+        if (fxNom === 'reverbB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbBGain: gain});
+        if (fxNom === 'delayA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayAGain: gain});
+        if (fxNom === 'delayB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayBGain: gain});
+    };
+
+    return (
+        <div className="gruf-gain-slider-vertical" style={style}>
+            <Slider
+                orientation="vertical"
+                value={gain}
+                step={0.01}
+                min={0.0}
+                max={2.0}
+                marks={marks}
+                onChange={handleGainChange}
+            />
+        </div>
+    );
+};
+
 export const GrufMasterMeter = ({showLevelMeters}) => {
 
     const [levelData, setLevelData] = useState([-Infinity, -Infinity]);
@@ -166,7 +202,7 @@ export const GrufMasterMeter = ({showLevelMeters}) => {
     );
 };
 
-const GrufGainMeter = ({isMute, id, levelData}) => {
+const GrufGainMeter = ({isMute, levelData}) => {
     const minDB = -60;
     const maxDB = 6;
     const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
@@ -174,7 +210,6 @@ const GrufGainMeter = ({isMute, id, levelData}) => {
 
     return (
         <div
-            id={id}
             className={`volume-meter ${isMute ? 'grayscale' : ""}`}
             style={{'--meter-level': `${meterLevel}%`}}
         >
@@ -212,11 +247,7 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
                 <GrufKnob mida='gran' parameterParent={estacio} parameterName='pan' noOutput="true" customWidth="50px" customHeight="50px"/>
                 <div className="slider-wrapper">
                     <GrufGainSliderVertical estacio={estacio} top='500px' left='50px' height='400px'/>
-                    <GrufGainMeter
-                        id={`meter-${estacio.nom}`}
-                        isMute={isMute}
-                        levelData={levelData}
-                    />
+                    <GrufGainMeter isMute={isMute} levelData={levelData}/>
                 </div>
                 <div className="mute-solo-container">
                     <GrufMuteCheckbox estacio={estacio} setIsDirectMute={setIsDirectMute} isIndirectMute={isIndirectMute}/>
@@ -226,6 +257,31 @@ export const EstacioMixerTrack = ({estacio, isAnySolo, reportSoloChange, showLev
             <GrufLabelEstacio className= 'label'estacio={estacio}/>
         </div>
     )
+}
+
+export const FxReturnFader = ({ label, fxNom, showLevelMeters }) => {
+    const [levelData, setLevelData] = useState(-Infinity);
+
+    useEffect(() => {
+        if (!showLevelMeters) return;
+        const interval = setInterval(() => {
+            const newLevelData = getAudioGraphInstance().getCurrentLevelFxReturn(fxNom);
+            setLevelData(newLevelData);
+        }, 100);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [showLevelMeters]);
+
+    return (<div className="estacio-mixer-columna estacio-mixer-fx-columna">
+        <div className="track-controls">
+            <div className="slider-wrapper" style={{marginTop:78}}>
+                <GrufFxReturnSliderVertical top='500px' left='50px' height='400px' fxNom={fxNom}/>
+                <GrufGainMeter isMute={false} levelData={levelData}/>
+            </div>
+        </div>
+        <div className="label">{label}</div>
+    </div>)
 }
 
 
@@ -262,6 +318,10 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             );
                         })}
                         </div>
+                        <FxReturnFader label="Rev A" fxNom="reverbA" showLevelMeters={showLevelMeters}/>
+                        <FxReturnFader label="Rev B" fxNom="reverbB" showLevelMeters={showLevelMeters}/>
+                        <FxReturnFader label="Delay A" fxNom="delayA" showLevelMeters={showLevelMeters}/>
+                        <FxReturnFader label="Delay B" fxNom="delayB" showLevelMeters={showLevelMeters}/>
                         <div className="estacio-mixer-columna estacio-mixer-master-columna">
                             <div className="track-controls">
                                 <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>

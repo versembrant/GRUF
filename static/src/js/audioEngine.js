@@ -56,14 +56,18 @@ export class AudioGraph {
                 initial: {
                     reverbAWet: 1.0,
                     reverbADecay: 1.0,
+                    reverbAGain: 1.0,
                     reverbBWet: 1.0,
                     reverbBDecay: 5.0,
+                    reverbBGain: 1.0,
                     delayAWet: 1.0,
                     delayATime: '1/8',
                     delayAFeedback:0,
+                    delayAGain: 1.0,
                     delayBWet: 1.0,
                     delayBTime: '1/4',
-                    delayBFeedback: 0.5
+                    delayBFeedback: 0.5,
+                    delayBGain: 1.0,
                 }
             }
         }
@@ -141,6 +145,13 @@ export class AudioGraph {
         this.setParametreInStore('masterPan', pan);
         if (!this.isGraphBuilt()) return;
         this.masterGainNode.pan.setValueAtTime(pan, 0.05);
+    }
+
+    getFxReturnGain(fxName) {
+        if (fxName === 'reverbA') return this.store.getState().effectParameters.reverbAGain;
+        if (fxName === 'reverbB') return this.store.getState().effectParameters.reverbBGain;
+        if (fxName === 'delayA') return this.store.getState().effectParameters.delayAGain;
+        if (fxName === 'delayB') return this.store.getState().effectParameters.delayBGain;
     }
 
     getMasterSpectrumSize() {
@@ -233,6 +244,20 @@ export class AudioGraph {
         const gainLevel = Tone.dbToGain(dBFSLevel)
         return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
     }
+    
+    getCurrentLevelFxReturn(nomFx) {
+        if (!this.isGraphBuilt()) return {"db": -60, "gain": 0};
+        let node = undefined;
+        if (nomFx === 'reverbA') node = this.effectNodes.reverbAMeter;
+        if (nomFx === 'reverbB') node = this.effectNodes.reverbBMeter;
+        if (nomFx === 'delayA') node = this.effectNodes.delayAMeter;
+        if (nomFx === 'delayB') node = this.effectNodes.delayBMeter;
+        if (node === undefined) return {"db": -60, "gain": 0};
+        const dBFSLevel = node.getValue();
+        const dBuLevel = dBFSLevel + 18;
+        const gainLevel = Tone.dbToGain(dBFSLevel)
+        return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
+    }
 
     getCurrentMasterLevelStereo() {
         if (!this.isGraphBuilt()) return {
@@ -282,27 +307,43 @@ export class AudioGraph {
         this.effectNodes = {
             reverbA: new Tone.Reverb(),
             reverbAChannel: new Tone.Channel({ volume: 0 }),
+            reverbAPostChannel: new Tone.Channel({ volume: 0 }),
+            reverbAMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
             reverbB: new Tone.Reverb(),
             reverbBChannel: new Tone.Channel({ volume: 0 }),
+            reverbBPostChannel: new Tone.Channel({ volume: 0 }),
+            reverbBMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
             delayA: new Tone.FeedbackDelay(),
             delayAChannel: new Tone.Channel({ volume: 0 }),
+            delayAPostChannel: new Tone.Channel({ volume: 0 }),
+            delayAMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
             delayB: new Tone.FeedbackDelay(),
             delayBChannel: new Tone.Channel({ volume: 0 }),
+            delayBPostChannel: new Tone.Channel({ volume: 0 }),
+            delayBMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
         }
 
-        this.effectNodes.reverbA.connect(this.masterGainNode)
+        this.effectNodes.reverbAPostChannel.connect(this.masterGainNode);
+        this.effectNodes.reverbA.connect(this.effectNodes.reverbAPostChannel);
+        this.effectNodes.reverbA.connect(this.effectNodes.reverbAMeter);
         this.effectNodes.reverbAChannel.connect(this.effectNodes.reverbA);
         this.effectNodes.reverbAChannel.receive("reverbA");
 
-        this.effectNodes.reverbB.connect(this.masterGainNode)
+        this.effectNodes.reverbBPostChannel.connect(this.masterGainNode);
+        this.effectNodes.reverbB.connect(this.effectNodes.reverbBPostChannel)
+        this.effectNodes.reverbB.connect(this.effectNodes.reverbBMeter);
         this.effectNodes.reverbBChannel.connect(this.effectNodes.reverbB);
         this.effectNodes.reverbBChannel.receive("reverbB");
 
-        this.effectNodes.delayA.connect(this.masterGainNode);
+        this.effectNodes.delayAPostChannel.connect(this.masterGainNode);
+        this.effectNodes.delayA.connect(this.effectNodes.delayAPostChannel);
+        this.effectNodes.delayA.connect(this.effectNodes.delayAMeter);
         this.effectNodes.delayAChannel.connect(this.effectNodes.delayA);
         this.effectNodes.delayAChannel.receive("delayA");
 
-        this.effectNodes.delayB.connect(this.masterGainNode);
+        this.effectNodes.delayBPostChannel.connect(this.masterGainNode);
+        this.effectNodes.delayB.connect(this.effectNodes.delayBPostChannel);
+        this.effectNodes.delayB.connect(this.effectNodes.delayBMeter);
         this.effectNodes.delayBChannel.connect(this.effectNodes.delayB);
         this.effectNodes.delayBChannel.receive("delayB");
     }
@@ -334,6 +375,9 @@ export class AudioGraph {
             if (effectParams.reverbADecay !== undefined){
                 this.effectNodes.reverbA.decay = effectParams.reverbADecay;
             }
+            if (effectParams.reverbAGain !== undefined){
+                this.effectNodes.reverbAPostChannel.volume.linearRampTo(Tone.gainToDb(effectParams.reverbAGain), 0.01);
+            }
         }
 
         if (this.effectNodes.hasOwnProperty('reverbB')){
@@ -342,6 +386,9 @@ export class AudioGraph {
             }
             if (effectParams.reverbBDecay !== undefined){
                 this.effectNodes.reverbB.decay = effectParams.reverbBDecay;
+            }
+            if (effectParams.reverbBGain !== undefined){
+                this.effectNodes.reverbBPostChannel.volume.linearRampTo(Tone.gainToDb(effectParams.reverbBGain), 0.01);
             }
         }
        
@@ -355,6 +402,9 @@ export class AudioGraph {
             if (effectParams.delayAFeedback !== undefined){
                 this.effectNodes.delayA.feedback.value = effectParams.delayAFeedback;
             }
+            if (effectParams.delayAGain !== undefined){
+                this.effectNodes.delayAPostChannel.volume.linearRampTo(Tone.gainToDb(effectParams.delayAGain), 0.01);
+            }
         }
 
         if (this.effectNodes.hasOwnProperty('delayB')){
@@ -366,6 +416,9 @@ export class AudioGraph {
             }
             if (effectParams.delayBFeedback !== undefined){
                 this.effectNodes.delayB.feedback.value = effectParams.delayBFeedback;
+            }
+            if (effectParams.delayBGain !== undefined){
+                this.effectNodes.delayBPostChannel.volume.linearRampTo(Tone.gainToDb(effectParams.delayBGain), 0.01);
             }
         }
     }

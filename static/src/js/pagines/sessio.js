@@ -19,7 +19,6 @@ const onSessionDataLoaded = () => {
     const isMasterAudioEngine = currentSession.localMode || sessionElement.dataset.masterAudioEngine === 'true';
     getAudioGraphInstance().setMasterAudioEngine(isMasterAudioEngine);
 
-
     if (currentSession.rawData.effectParameters) { 
         // Only set parameters in store if there are any in the session. This is for compatibility with older sessions
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);

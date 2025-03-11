@@ -270,10 +270,13 @@
 
     &.estacio-mixer-master-columna { 
         .track-controls {
+            height:100%;
             --accent-color: #{$light-grey}
         }
         .slider-wrapper {
             margin-bottom: 30px; //per compensar la mancança de botons MS
+            min-width: 50px;
+
             .volume-meter {
                 width: 5px;
             }
@@ -286,6 +289,16 @@
                 gap: 0px;  
                 height: 400px;        
             }
+        }
+    }
+
+    &.estacio-mixer-fx-columna { 
+        .track-controls {
+            height:100%;
+            --accent-color: #{$light-grey}
+        }
+        .slider-wrapper {
+            min-width: 50px;
         }
     }
     
