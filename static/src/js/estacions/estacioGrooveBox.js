@@ -34,7 +34,7 @@ export class EstacioGrooveBox extends EstacioBase {
     versio = '0.1'
     parametersDescription = {
         ...EstacioBase.parametersDescription,
-        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 12000, initial: 12000, logarithmic: true},
+        cutoff: {type: 'float', label: 'Cutoff', unit: units.hertz, min: 200, max: 20000, initial: 20000, logarithmic: true},
         
         pattern: {type: 'grid', label:'Pattern', numRows: 4, initial:[], showRecButton: true, patronsPredefinits :[
             {'nom': 'Hip Hop Classic 1', 'patro': [{"i":3,"j":0},{"i":1,"j":0},{"i":1,"j":2},{"i":1,"j":4},{"i":2,"j":4},{"i":1,"j":6},{"i":1,"j":8},{"i":1,"j":10},{"i":3,"j":10},{"i":1,"j":12},{"i":2,"j":12},{"i":0,"j":14},{"i":3,"j":15}]}, 
@@ -96,6 +96,7 @@ export class EstacioGrooveBox extends EstacioBase {
 
     buildEstacioAudioGraph(estacioMasterChannel) {
         const cutoff = new Tone.Filter(500, 'lowpass', -24);
+        cutoff.set({'Q': 1.0,})  // Afegeix un punt de ressonància que li dona vidilla
 
         const mainChannel = new Tone.Channel({
             volume: 0
