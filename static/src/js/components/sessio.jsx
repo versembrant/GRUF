@@ -152,10 +152,16 @@ export const Sessio = () => {
     return (
         <div className="sessio-wrapper">
             <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
-            <div className="sessio">
-                <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
-                {showMainUI ? mainUI: ""}
-                <SessioFooter estacioSelected={estacioSelected} />
+            <div>
+                <div className="sessio">
+                    <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
+                    {showMainUI ? mainUI: ""}
+                    <SessioFooter estacioSelected={estacioSelected} />
+                </div>
+                <div className="sessio-logos">
+                    <img src="/static/dist/landing/images/logo_versembrant_blanc.svg" alt="logo versembrant"/>
+                    <img src="/static/dist/landing/images/logo_gene_blanc.svg" alt="logo generalitat"/>
+                </div>
             </div>
         </div>
     )
