@@ -26,21 +26,23 @@
     .grid-estacions {
         display: grid;
         grid-template-columns: auto auto auto auto;
+        grid-gap: 10px;
 
         .grid-estacio-element {
             padding:10px;
             text-align: center;
             color: $white;
             border-radius: 10px;
+            border: 2px solid var(--accent-color);
 
             cursor: pointer;
 
             &:hover {
-                background-color: $dark-grey;
+                background-color: var(--accent-color); 
             }
 
             img {
-                height: 180px;
+                height: 160px;
                 margin-bottom: 5px;
             }
         }
@@ -292,9 +294,6 @@
 
 .estacio-computer {
     --accent-color: #{$pale-orange};
-    .estacio-main {
-        //background-image: url("../img/computer_bg.svg");
-    }
-}
+ }
 
 
