@@ -34,6 +34,12 @@ export const GrufLogoEstacio = ({tipusEstacio, setEstacioSelected, className=""}
     )
 }
 
+export const GrufCanviaInstrument = ({setEstacioSelected, className=""}) => {
+    return(
+        <button className={`btn-white ${className}`} style={{fontSize: 14, fontWeight:400, padding:0, height:35, minWidth:150}} onClick={() => setEstacioSelected(undefined)}>Canvia instrument</button>
+    )
+}
+
 export const GrufSeparatorLine = () => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg"

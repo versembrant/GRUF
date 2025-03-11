@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio, GrufLogoEstacio } from "../components/widgets";
+import { GrufKnob, GrufButtonNoBorder, GrufLabelEstacio, GrufLogoEstacio, GrufCanviaInstrument } from "../components/widgets";
 import Slider from '@mui/material/Slider';
 
 export const GrufMuteCheckbox = ({ estacio, isIndirectMute, setIsDirectMute }) => {
@@ -242,32 +242,36 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
 
     return (
         <div key="mixer1" className="estacio estacio-mixer" id="mixerObject">
-            <div className="estacio-main p-4 flex flex-col justify-between">
-                <GrufLogoEstacio tipusEstacio='mixer' setEstacioSelected={setEstacioSelected}/>
-                <div className="estacio-mixer-tracks">
-                    <div className="estacio-mixer-normal-tracks">
-                    {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
-                        const estacio = getCurrentSession().getEstacio(nomEstacio);
-                        return (
-                            <EstacioMixerTrack
-                                key={nomEstacio}
-                                estacio={estacio}
-                                isAnySolo = {isAnySolo}
-                                reportSoloChange = {reportSoloChange}
-                                showLevelMeters = {showLevelMeters}
-                            />
-                        );
-                    })}
-                    </div>
-                    <div className="estacio-mixer-columna estacio-mixer-master-columna">
-                        <div className="track-controls">
-                            <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
-                            <div className="slider-wrapper">
-                                <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                                <GrufMasterMeter showLevelMeters={showLevelMeters} />
-                            </div>
+            <div className="estacio-main p-4">
+                <div className="" style={{textAlign:'right'}}>
+                    <GrufCanviaInstrument setEstacioSelected={setEstacioSelected}/>
+                </div>
+                <div className="flex flex-col justify-between">
+                    <div className="estacio-mixer-tracks">
+                        <div className="estacio-mixer-normal-tracks">
+                        {getCurrentSession().getNomsEstacions().map((nomEstacio) => {
+                            const estacio = getCurrentSession().getEstacio(nomEstacio);
+                            return (
+                                <EstacioMixerTrack
+                                    key={nomEstacio}
+                                    estacio={estacio}
+                                    isAnySolo = {isAnySolo}
+                                    reportSoloChange = {reportSoloChange}
+                                    showLevelMeters = {showLevelMeters}
+                                />
+                            );
+                        })}
                         </div>
-                        <div className="label">Master</div>
+                        <div className="estacio-mixer-columna estacio-mixer-master-columna">
+                            <div className="track-controls">
+                                <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
+                                <div className="slider-wrapper">
+                                    <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                                    <GrufMasterMeter showLevelMeters={showLevelMeters} />
+                                </div>
+                            </div>
+                            <div className="label">Master</div>
+                        </div>
                     </div>
                 </div>
             </div>

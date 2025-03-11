@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
-import { GrufPianoRoll, GrufKnob, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSelectorPitch, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio} from "./widgets";
+import { GrufPianoRoll, GrufKnob, GrufPadGrid, GrufSlider, GrufSelectorSonsSampler, GrufSelectorPlayerMode, GrufSelectorPitch, GrufSeparatorLine, GrufNoteControls, GrufLogoEstacio, GrufCanviaInstrument} from "./widgets";
 import { GrufModulADSR, GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 
 export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
@@ -10,7 +10,7 @@ export const EstacioSamplerUI = ({estacio, setEstacioSelected}) => {
     return (
         <div key={estacio.nom} className="estacio estacio-sampler">
             <div className="estacio-main grid gap-10 p-4">
-                <GrufLogoEstacio className="col-start-4 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
+                <GrufCanviaInstrument className="col-start-4 row-start-1" setEstacioSelected={setEstacioSelected}/>
                 
                 <fieldset className="modul-border modul-bg flex flex-col gap-10 justify-between col-start-1 row-start-1 row-span-2">
                     <div className="flex justify-between" >

@@ -42,6 +42,36 @@
     }
 }
 
+.logo-estacio-no-hover {
+    background-size: auto 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 35px;
+    width: 150px;
+
+    &.estacio-computer-logo {
+        background-image: url("../img/computer_logo.svg");
+    }
+    &.estacio-piano-logo {
+        background-image: url("../img/piano_logo.svg");
+    }
+    &.estacio-groovebox-logo {
+        background-image: url("../img/groovebox_logo.svg");
+    }
+    &.estacio-synth-logo {
+        background-image: url("../img/synth_logo.svg");
+    }
+    &.estacio-sampler-logo {
+        background-image: url("../img/sampler_logo.svg");
+    }
+    &.estacio-mixer-logo {
+        background-image: url("../img/mixer_logo.svg");
+    }
+    &.estacio-synth_bass-logo {
+        background-image: url("../img/synth_bass_logo.svg");
+    }
+}
+
 .gruf-label {
     position: absolute;
     font-size: 14px;

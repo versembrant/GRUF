@@ -72,9 +72,17 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
     )
 }
 
-const SessioFooter = () => {
+const SessioFooter = ({estacioSelected}) => {
 
     const masterMode = document.getElementsByTagName('session')[0].dataset.masterAudioEngine === 'true'
+
+    const estacio = estacioSelected ? getCurrentSession().getEstacio(estacioSelected) : undefined;
+    let estacioTipus = estacio ? estacio.tipus : undefined;
+    if (estacioSelected === "mixer") {
+        estacioTipus = "mixer";
+    } else if (estacioSelected === "computer") {
+        estacioTipus = "computer";
+    }
 
     return(
         <div className="footer flex justify-between items-center">
@@ -82,6 +90,7 @@ const SessioFooter = () => {
                 {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
                 {getCurrentSession().localMode ? "": <SessionConnectedUsers />}{masterMode ? <div style={{marginLeft:5}}>{"(M)"}</div>:""}
             </div>
+            <div className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
             <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
         </div>
     )
@@ -146,7 +155,7 @@ export const Sessio = () => {
             <div className="sessio">
                 <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
                 {showMainUI ? mainUI: ""}
-                <SessioFooter />
+                <SessioFooter estacioSelected={estacioSelected} />
             </div>
         </div>
     )

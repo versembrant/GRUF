@@ -1,4 +1,4 @@
-import { GrufKnob, GrufLogoEstacio, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine, GrufLabelPetit } from "./widgets";
+import { GrufKnob, GrufLogoEstacio, GrufCanviaInstrument, GrufOnOffGridContainer, GrufBpmCounter, GrufButtonBorder, GrufNoteControls, GrufSelectorPatronsGrid, GrufSeparatorLine, GrufLabelPetit } from "./widgets";
 import { GrufModulEQ, GrufModulDelay, GrufModulReverb } from "./moduls";
 import { getAudioGraphInstance } from "../audioEngine";
 import { grey } from "@mui/material/colors";
@@ -23,7 +23,7 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                 {/* Módul de Reverb */}
                 <GrufModulReverb className="col-start-2 row-start-1 row-span-2" estacio={estacio} style={{width: 320}}/>
 
-                <GrufLogoEstacio className="col-start-3 row-start-1" tipusEstacio={estacio.tipus} setEstacioSelected={setEstacioSelected}/>
+                <GrufCanviaInstrument className="col-start-3 row-start-1" setEstacioSelected={setEstacioSelected}/>
 
 
                 <GrufNoteControls className="flex flex-col gap-10 flex-wrap col-start-1 row-start-3" maxHeight="150px" estacio={estacio} ExtraComponent={GrufSelectorPatronsGrid} parameterName={"pattern"}/>

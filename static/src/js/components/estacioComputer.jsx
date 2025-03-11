@@ -1,7 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, SpectrumGraph, GrufLogoEstacio } from "../components/widgets";
+import { GrufButtonNoBorder, SpectrumGraph, GrufLogoEstacio, GrufCanviaInstrument } from "../components/widgets";
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -70,17 +70,21 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
     }
 
     return (<div key="computer1" className="estacio estacio-computer">
-        <div className="estacio-main p-4 flex flex-col gap-10 items-center">
-            <GrufLogoEstacio tipusEstacio='computer' setEstacioSelected={setEstacioSelected}/>
-            <div className="modul-border flex flex-col gap-10 p-4">
-                <GrufButtonNoBorder text="Elimina arranjament" style={{alignSelf: 'flex-end', padding: 0}} onClick={handleClearClips}/>  
-                <div className="grid-computer">
-                    {stepsElementsPerEstacio.map(function(stepsElements, i){
-                        return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
-                    })}
-                </div>
+        <div className="estacio-main p-4">
+            <div className="" style={{textAlign:'right', marginBottom: 20}}>
+                <GrufCanviaInstrument setEstacioSelected={setEstacioSelected}/>
             </div>
-            <SpectrumGraph />
+            <div className="flex flex-col gap-10 items-center p-10">
+                <div className="modul-border flex flex-col gap-10 p-4">
+                    <GrufButtonNoBorder text="Elimina arranjament" style={{alignSelf: 'flex-end', padding: 0}} onClick={handleClearClips}/>  
+                    <div className="grid-computer">
+                        {stepsElementsPerEstacio.map(function(stepsElements, i){
+                            return <div className="grid-row-computer" key={'row_' + i}><div className="estacio-nom">{nomsEstacions[i]}</div>{stepsElements}</div>;
+                        })}
+                    </div>
+                </div>
+                <SpectrumGraph />
+            </div>
         </div>
     </div>)
 };
