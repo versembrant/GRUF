@@ -1197,3 +1197,9 @@
   .circle-right.circle-alternate {
     animation-delay: 0.5s;
   }
+
+  .session-recording {
+    color: $red;
+    border-color: $red;
+    animation: alternate-light 1s infinite;
+  }

@@ -1,7 +1,8 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges } from "../utils";
-import { GrufButtonNoBorder, SpectrumGraph, GrufLogoEstacio, GrufCanviaInstrument } from "../components/widgets";
+import { GrufButtonNoBorder, SpectrumGraph, GrufCanviaInstrument } from "../components/widgets";
+import { SessionAudioRecorder } from "./sessionAudioRecorder"
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
     subscribeToStoreChanges(getAudioGraphInstance());
@@ -71,7 +72,8 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
 
     return (<div key="computer1" className="estacio estacio-computer">
         <div className="estacio-main p-4">
-            <div className="" style={{textAlign:'right', marginBottom: 20}}>
+            <div className="flex justify-between" style={{ marginBottom: 20}}>
+                <div></div>
                 <GrufCanviaInstrument setEstacioSelected={setEstacioSelected}/>
             </div>
             <div className="flex flex-col gap-10 items-center p-10">
@@ -84,6 +86,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                     </div>
                 </div>
                 <SpectrumGraph />
+                <SessionAudioRecorder />
             </div>
         </div>
     </div>)

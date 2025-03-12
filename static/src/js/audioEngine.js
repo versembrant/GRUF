@@ -4,6 +4,7 @@ import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
+import { initSessionAudioRecorder } from './components/sessionAudioRecorder'
 
 var audioContextIsReady = false;
 
@@ -465,6 +466,9 @@ export class AudioGraph {
 
         this.masterSpectrum = new Tone.Analyser('fft', this.spectrumSize);
         this.masterGainNode.connect(this.masterSpectrum);
+
+        this.sessionRecorder = new Tone.Recorder();
+        this.masterGainNode.connect(this.sessionRecorder);
 
         // Crea el node "loop" principal per marcar passos a les estacions que segueixen el sequenciador
         this.mainSequencer = new Tone.Loop(time => {
