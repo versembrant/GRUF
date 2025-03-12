@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { createRoot } from "react-dom/client";
 import { createElement, useState, useEffect, StrictMode } from "react";
 import { getCurrentSession } from './sessionManager';
@@ -318,8 +319,12 @@ export const real2String = (realValue, parameterDescription) => {
         const stepDecimals = stepSize ? stepSize.toString().split('.')[1]?.length || 0 : undefined;
         const precision = 4; // but integers can have more ciphers
         const maxDecimals = stepSize ? stepDecimals : 2; // for continous values, we show a maximum of 2 decimals. for stepped ones, the ones corresponding to the step size.
-        const decimals = Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
-        displayValue = realValue.toFixed(decimals);
+        const decimals = parameterDescription.displayAsDb ? 1 :Math.max(Math.min(precision - valueTenExponent, maxDecimals), 0);
+        if (parameterDescription.displayAsDb) {
+            displayValue = Tone.gainToDb(displayValue);
+        }
+        displayValue = displayValue.toFixed(decimals);
+        displayValue = displayValue.toString().replace("Infinity", "∞");
     }
         
     const THINSPACE = " ";

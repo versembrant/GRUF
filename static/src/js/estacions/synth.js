@@ -57,7 +57,7 @@ export class BaseSynth extends EstacioBase {
                     decayCurve: "exponential",
                     releaseCurve: "exponential"
                 },
-                volume: -10 
+                volume: -20 
             });
         }
         // LFO can't be connected to an underlying voice of a poly synth, so we connect it to the main lpf filter

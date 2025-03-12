@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { useEffect, useState, useRef } from "react";
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
@@ -104,9 +105,11 @@ export const GrufGainSliderVertical = ({ estacio, top, left, height }) => {
                 value={parameterValue}
                 step={0.01}
                 min={0.0}
-                max={1.0}
+                max={2.0}
                 marks={marks}
                 onChange={handleGainChange}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
             />
         </div>
     );
@@ -135,6 +138,8 @@ export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
                 max={2.0}
                 marks={marks}
                 onChange={handleGainChange}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
             />
         </div>
     );
@@ -169,6 +174,8 @@ export const GrufFxReturnSliderVertical = ({ top, left, height, fxNom }) => {
                 max={2.0}
                 marks={marks}
                 onChange={handleGainChange}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
             />
         </div>
     );

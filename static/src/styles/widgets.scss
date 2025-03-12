@@ -421,7 +421,6 @@
     .MuiSlider-vertical {
         margin-right: 0px!important;
         padding: 0 3.5px!important;
-        z-index: 1;
     }
    
     .MuiSlider-thumb {
@@ -429,16 +428,36 @@
         height: 6px; 
         width: 24px;
         color: $white;
+        z-index: 1;
 
         &:hover {
             -webkit-box-shadow: none;
             box-shadow: none;
             animation: none;
+            z-index: 2;
         }
     }
    
     .MuiSlider-dragging {
         background-color: transparent; // Seems to be needed to remove blue hihglight when moving the slider all the way to the top or bottom ??
+    }
+
+    .MuiSlider-valueLabel {
+        left: 30px;
+        top: 3px;
+        font-feature-settings: "tnum"; // tabular (monospaced) numerals to avoid jitter
+        text-align: center;
+        text-wrap: nowrap;
+        padding: 0 0.7em;
+        width: fit-content;
+        height: fit-content;
+        border: 1px solid $font-color;
+        border-radius: 5px;
+        background-color: $background-color;
+    }
+
+    .MuiSlider-valueLabel::before {
+        content: none;
     }
     
     .Mui-focusVisible {

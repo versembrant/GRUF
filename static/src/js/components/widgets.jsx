@@ -134,6 +134,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
 
     position = position ?? (top || left) ? "absolute" : "relative" // TODO: remove when all knobs are relative
     const knobctrlId = useId();
+
     return (
         <div className={ `knob knob-${mida}` } style={{ top, left, position }}>
                 <div className="knobctrl-wrapper" style={(customWidth !== undefined && customHeight !== undefined)?{width:customWidth, height:customHeight}:{}}>

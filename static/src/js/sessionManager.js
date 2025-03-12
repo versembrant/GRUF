@@ -55,7 +55,7 @@ export class EstacioBase {
     tipus = 'base'
     versio = '0.0'
     static parametersDescription = {
-        gain: {type: 'float', label: 'Volume', live: true, min: 0, max: 1.0, initial: 0.75},
+        gain: {type: 'float', label: 'Volume', displayAsDb: true, unit: units.decibel, live: true, min: 0, max: 2.0, initial: 1.0},
         pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
         isRecording:{type: 'bool', initial: false, local: true},
         fxDrive:{type: 'float', label: 'Drive', min: 0.0, max: 1.0, initial: 0.0},
