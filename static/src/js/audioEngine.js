@@ -32,6 +32,8 @@ export class AudioGraph {
             mainSequencerCurrentStep: {type: 'int', initial: -1},
             usesAudioEngine: { type: 'bool', initial: true },
             isGraphBuilt: {type: 'bool', initial: false},
+            isRecordingSession: {type: 'bool', initial: false},
+            recordArmed: {type: 'bool', initial: false},
             isMasterAudioEngine: {type: 'bool', initial: true},
             isAudioEngineSyncedToRemote: {type: 'bool', initial: true},
             isPlaying: {type: 'bool', initial: false},
@@ -127,6 +129,48 @@ export class AudioGraph {
 
     isPlayingLive() {
         return !this.isPlayingArranjament();
+    }
+
+    isRecording() {
+        return this.store.getState().isRecordingSession;
+    }
+
+    setIsRecording(value) {
+        this.setParametreInStore('isRecordingSession', value);    
+    }
+    
+    isRecordArmed() {
+        return this.store.getState().recordArmed;
+    }
+
+    setIsRecordArmed(value) {
+        this.setParametreInStore('recordArmed', value);    
+    }
+
+    startRecordingSession() {
+        if (!this.isGraphBuilt()) return;
+        if (this.isRecording()) return;
+        if (this.isRecordArmed()) return;
+        if (this.isPlaying()) {
+            this.sessionRecorder.start();
+            this.setIsRecording(true);
+        } else {
+            this.setIsRecordArmed(true);
+        }
+    }
+
+    async stopRecordingSession(downloadFilename) {
+        if (!this.isGraphBuilt()) return;
+        if (!this.isRecording()) return;
+        const recording = await getAudioGraphInstance().sessionRecorder.stop();
+        this.setIsRecording(false);
+        this.setIsRecordArmed(false);
+        const url = URL.createObjectURL(recording);
+        const anchor = document.createElement("a");
+        const date = new Date();
+        anchor.download = downloadFilename;
+        anchor.href = url;
+        anchor.click();
     }
 
     getMasterGain() {
@@ -536,6 +580,13 @@ export class AudioGraph {
             this.setMainSequencerCurrentStep(this.remoteMainSequencerCurrentStep > -1 ? this.remoteMainSequencerCurrentStep : -1);
         }
 
+        // Comença a gravar si estava record armed
+        if (this.isRecordArmed()) {
+            this.sessionRecorder.start();
+            this.setIsRecordArmed(false);
+            this.setIsRecording(true);
+        }
+        
         // Trigueja el transport start a totes les estacions i el transport general
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
@@ -553,8 +604,13 @@ export class AudioGraph {
             estacio.onTransportStop();
         });
         Tone.Transport.stop()
-        this.setMainSequencerCurrentStep(-1);
 
+        // Atura la gravació si estava gravant
+        if (this.isRecording()) {
+            this.stopRecordingSession();
+        }
+
+        this.setMainSequencerCurrentStep(-1);
         this.updateParametreAudioGraph('isPlayingArranjament', false);
     }
 

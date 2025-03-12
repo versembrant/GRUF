@@ -1153,6 +1153,15 @@
     }
 }
 
+@keyframes alternate-light {
+    0%, 100% {
+      opacity: 1; 
+    }
+    50% {
+      opacity: 0.6; 
+    }
+  }
+
 .metronome-ikigai-container {
     position: relative;
     width: 28px; 
@@ -1160,7 +1169,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
   
   .circle-left,
   .circle-right {
@@ -1185,21 +1193,17 @@
     animation: alternate-light 1s infinite;
   }
   
-  @keyframes alternate-light {
-    0%, 100% {
-      opacity: 1; 
-    }
-    50% {
-      opacity: 0.6; 
-    }
-  }
-  
   .circle-right.circle-alternate {
     animation-delay: 0.5s;
   }
+}
 
-  .session-recording {
+.session-recording {
     color: $red;
     border-color: $red;
     animation: alternate-light 1s infinite;
-  }
+}
+
+.session-armed-recording {
+    animation: alternate-light 1s infinite;
+}

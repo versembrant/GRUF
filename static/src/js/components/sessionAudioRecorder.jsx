@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { subscribeToParameterChanges } from "../utils"; // subscriptions
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 
@@ -10,9 +10,6 @@ let recBufferR = [];
 let recLength = 0;
 let recNode;
 let nRecordings = 0;
-
-
-
 
 export function initSessionAudioRecorder() {
     if (!window.audioContext.createScriptProcessor) {
@@ -124,25 +121,17 @@ function slugify(str) {
 
 export const SessionAudioRecorder = ({}) => {
 
-    const [isRecording, setIsRecording] = useState(false);
+    subscribeToParameterChanges(getAudioGraphInstance(), 'isRecordArmed');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'isRecordigSession');
 
     const handleStartRecording = () => {
-        getAudioGraphInstance().sessionRecorder.start();
-        setIsRecording(true);
+        getAudioGraphInstance().startRecordingSession();
     }
 
     const handleStoptRecording = async () => {
-        setIsRecording(false);
-
-        const recording = await getAudioGraphInstance().sessionRecorder.stop();
-        // download the recording by creating an anchor element and blob url
-        const url = URL.createObjectURL(recording);
-        const anchor = document.createElement("a");
         const date = new Date();
         const downloadFilename = `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.webm`;
-        anchor.download = downloadFilename;
-        anchor.href = url;
-        anchor.click();
+        await getAudioGraphInstance().stopRecordingSession(downloadFilename);
 
         /*
         // Process audio and download
@@ -167,10 +156,18 @@ export const SessionAudioRecorder = ({}) => {
 
     }
 
-    return (<div>
-        {!isRecording ? 
-            <button className="btn-white" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>:
-            <button className="btn-white session-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStoptRecording}>Atura la gravació</button>}
-    </div>)
+    const isRecording = getAudioGraphInstance().isRecording();
+    const isRecordArmed = getAudioGraphInstance().isRecordArmed();
 
+    let button;
+    if (isRecording) {
+      button = <button className="btn-white session-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStoptRecording}>Atura la gravació</button>
+    } else {
+      if (isRecordArmed) {
+        button = <button className="btn-white session-armed-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Esperant que començi l'àudio...</button>
+      } else {
+        button = <button className="btn-white" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
+      }
+    }
+    return <div>{button}</div>
 }
