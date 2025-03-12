@@ -15,6 +15,7 @@ export class AudioGraph {
     constructor() {
         this.remoteMainSequencerCurrentStep = -1;  // Aquest parametre no el posem a l'store perquè no volem que es propagui a la UI
         this.estacionsMasterChannelNodes = {};
+        this.estacionsMuteChannelNodes = {};
         this.estacionsMeterNodes = {};
         this.effectNodes = {};
         this.spectrumSize = 64;
@@ -237,6 +238,10 @@ export class AudioGraph {
         return this.estacionsMasterChannelNodes[nomEstacio]
     }
 
+    getMuteChannelNodeForEstacio(nomEstacio) {
+        return this.estacionsMuteChannelNodes[nomEstacio]
+    }
+
     getCurrentLevelEstacio(nomEstacio) {
         if (!this.isGraphBuilt()) return {"db": -60, "gain": 0};
         const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
@@ -286,7 +291,7 @@ export class AudioGraph {
 
     isMutedEstacio(nomEstacio) {
         if (!this.isGraphBuilt()) return false;
-        return this.getMasterChannelNodeForEstacio(nomEstacio).mute;
+        return this.getMuteChannelNodeForEstacio(nomEstacio).mute;
     }
 
     //Creem un metronom
@@ -325,25 +330,25 @@ export class AudioGraph {
 
         this.effectNodes.reverbAPostChannel.connect(this.masterGainNode);
         this.effectNodes.reverbA.connect(this.effectNodes.reverbAPostChannel);
-        this.effectNodes.reverbA.connect(this.effectNodes.reverbAMeter);
+        this.effectNodes.reverbAPostChannel.connect(this.effectNodes.reverbAMeter);
         this.effectNodes.reverbAChannel.connect(this.effectNodes.reverbA);
         this.effectNodes.reverbAChannel.receive("reverbA");
 
         this.effectNodes.reverbBPostChannel.connect(this.masterGainNode);
         this.effectNodes.reverbB.connect(this.effectNodes.reverbBPostChannel)
-        this.effectNodes.reverbB.connect(this.effectNodes.reverbBMeter);
+        this.effectNodes.reverbBPostChannel.connect(this.effectNodes.reverbBMeter);
         this.effectNodes.reverbBChannel.connect(this.effectNodes.reverbB);
         this.effectNodes.reverbBChannel.receive("reverbB");
 
         this.effectNodes.delayAPostChannel.connect(this.masterGainNode);
         this.effectNodes.delayA.connect(this.effectNodes.delayAPostChannel);
-        this.effectNodes.delayA.connect(this.effectNodes.delayAMeter);
+        this.effectNodes.delayAPostChannel.connect(this.effectNodes.delayAMeter);
         this.effectNodes.delayAChannel.connect(this.effectNodes.delayA);
         this.effectNodes.delayAChannel.receive("delayA");
 
         this.effectNodes.delayBPostChannel.connect(this.masterGainNode);
         this.effectNodes.delayB.connect(this.effectNodes.delayBPostChannel);
-        this.effectNodes.delayB.connect(this.effectNodes.delayBMeter);
+        this.effectNodes.delayBPostChannel.connect(this.effectNodes.delayBMeter);
         this.effectNodes.delayBChannel.connect(this.effectNodes.delayB);
         this.effectNodes.delayBChannel.receive("delayB");
     }
@@ -475,14 +480,15 @@ export class AudioGraph {
         // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
         getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
             const estacio = getCurrentSession().getEstacio(nomEstacio);
-            const estacioMasterChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
-            const estacioPremuteChannel = new Tone.Channel({channelCount: 2});
+            const estacioMasterChannel = new Tone.Channel({channelCount: 2});
+            const estacioMuteChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
             const estacioMeterNode = new Tone.Meter();
             this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
+            this.estacionsMuteChannelNodes[nomEstacio] = estacioMuteChannel;
             this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
-            estacioPremuteChannel.connect(estacioMasterChannel);
-            estacioPremuteChannel.connect(estacioMeterNode);
-            estacio.buildEstacioAudioGraph(estacioPremuteChannel);
+            estacioMasterChannel.connect(estacioMeterNode);
+            estacioMasterChannel.connect(estacioMuteChannel);
+            estacio.buildEstacioAudioGraph(estacioMasterChannel);
             estacio.updateAudioGraphFromState(estacio.currentPreset);
         })
         

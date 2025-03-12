@@ -301,10 +301,10 @@ export class EstacioBase {
         effects.reverbBSendChannel.send("reverbB");
         effects.delayASendChannel.send("delayA");
         effects.delayBSendChannel.send("delayB");
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.reverbBSendChannel);
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayASendChannel);
-        getAudioGraphInstance().getMasterChannelNodeForEstacio(this.nom).connect(effects.delayBSendChannel);
+        getAudioGraphInstance().getMuteChannelNodeForEstacio(this.nom).connect(effects.reverbASendChannel);
+        getAudioGraphInstance().getMuteChannelNodeForEstacio(this.nom).connect(effects.reverbBSendChannel);
+        getAudioGraphInstance().getMuteChannelNodeForEstacio(this.nom).connect(effects.delayASendChannel);
+        getAudioGraphInstance().getMuteChannelNodeForEstacio(this.nom).connect(effects.delayBSendChannel);
     }
     
     // UI stuff
@@ -624,7 +624,7 @@ export class Session {
         if (!getAudioGraphInstance().isGraphBuilt()){ return; };
         const someAreSoloed = Object.values(solos).some(solo => solo === true);
         Object.keys(mutes).forEach(nomEstacio => {
-            const channelNode = getAudioGraphInstance().getMasterChannelNodeForEstacio(nomEstacio);
+            const channelNode = getAudioGraphInstance().getMuteChannelNodeForEstacio(nomEstacio);
             const channelIsSoloed = solos[nomEstacio];
             const channelIsDirectMuted = mutes[nomEstacio];
             const channelIsIndirectMuted = someAreSoloed && !channelIsSoloed;

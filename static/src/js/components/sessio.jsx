@@ -35,7 +35,7 @@ const GuardarSessionWidget = () => {
 
 const estacioEstaDisponible = (nomEstacio) => {
     // TODO: afegir una comprovació (potser amb el servidor) per veure si l'usuari pot accedir a l'estació
-    return getCurrentSession().getNomsEstacions().includes(nomEstacio) || nomEstacio == "mixer" || nomEstacio == "computer" || nomEstacio == undefined;
+    return getCurrentSession().getNomsEstacions().includes(nomEstacio) || nomEstacio == "Mixer" || nomEstacio == "Computer" || nomEstacio == undefined;
 }
 
 const onEstacioNoDisponible = (nomEstacio) => {
@@ -59,14 +59,14 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
         <div className="header flex justify-between items-center">
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
-                {estacioSelected != undefined && estacioSelected != "mixer" && estacioSelected != "computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
+                {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
                 <button
                     onClick={toggleMetronome}
                     className={`btn-petit btn-white ${isMetronomeActive ? "active" : ""}`}
                     >
                     <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
                 </button>
-                <AudioTransportPlayStop playMode={estacioSelected === 'computer' ? 'arranjament' : 'live'} />
+                <AudioTransportPlayStop playMode={estacioSelected === 'Computer' ? 'arranjament' : 'live'} />
             </div>
         </div>
     )
@@ -78,9 +78,9 @@ const SessioFooter = ({estacioSelected}) => {
 
     const estacio = estacioSelected ? getCurrentSession().getEstacio(estacioSelected) : undefined;
     let estacioTipus = estacio ? estacio.tipus : undefined;
-    if (estacioSelected === "mixer") {
+    if (estacioSelected === "Mixer") {
         estacioTipus = "mixer";
-    } else if (estacioSelected === "computer") {
+    } else if (estacioSelected === "Computer") {
         estacioTipus = "computer";
     }
 
@@ -100,8 +100,8 @@ const EstacioUI = ({ estacioSelected, setEstacioSelected }) => {
     return(
         <div className="estacions">
             {[...getCurrentSession().getNomsEstacions().filter((nomEstacio) => ((estacioSelected === nomEstacio)))].map((nomEstacio, i) => <Estacio key={nomEstacio} estacio={getCurrentSession().getEstacio(nomEstacio)} setEstacioSelected={setEstacioSelected}/>)}
-            {estacioSelected == "mixer" ? <EstacioMixerUI setEstacioSelected={setEstacioSelected} showLevelMeters={true} />: ""}
-            {estacioSelected == "computer" ? <EstacioComputerUI setEstacioSelected={setEstacioSelected}/>: ""}
+            {estacioSelected == "Mixer" ? <EstacioMixerUI setEstacioSelected={setEstacioSelected} showLevelMeters={true} />: ""}
+            {estacioSelected == "Computer" ? <EstacioComputerUI setEstacioSelected={setEstacioSelected}/>: ""}
         </div>
     )
 }
@@ -123,12 +123,12 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
             <div className="grid-estacions">
                 {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <div key={nomEstacio} className={"grid-estacio-element" + " estacio-"+getCurrentSession().getEstacio(nomEstacio).tipus} data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}><img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/><div data-nom-estacio={nomEstacio}>{nomEstacio}</div></div>)}
                 <div className="grid-estacio-element estacio-mixer" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
-                    <img data-nom-estacio="mixer" src={appPrefix + "/static/src/img/mixer_miniature.jpg"} title="Mixer" />
-                    <div data-nom-estacio="mixer">Mixer</div>
+                    <img data-nom-estacio="Mixer" src={appPrefix + "/static/src/img/mixer_miniature.jpg"} title="Mixer" />
+                    <div data-nom-estacio="Mixer">Mixer</div>
                 </div>
                 <div className="grid-estacio-element estacio-computer" data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
-                    <img data-nom-estacio="computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
-                    <div data-nom-estacio="computer">Computer</div>
+                    <img data-nom-estacio="Computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
+                    <div data-nom-estacio="Computer">Computer</div>
                 </div>
             </div>
         </div>

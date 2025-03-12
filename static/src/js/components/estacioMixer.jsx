@@ -203,7 +203,7 @@ export const GrufMasterMeter = ({showLevelMeters}) => {
 };
 
 const GrufGainMeter = ({isMute, levelData}) => {
-    const minDB = -60;
+    const minDB = -30;  // A baix de tot del meter seràn -30db (o menys), així el nivell s'alinea una mica millor amb el fader
     const maxDB = 6;
     const db = Math.max(minDB, Math.min(levelData.db, maxDB)); // Limitar entre minDB i maxDB
     const meterLevel = ((db - minDB) / (maxDB - minDB) * 100); // Escalar entre 0 i 100%
@@ -275,12 +275,25 @@ export const FxReturnFader = ({ label, fxNom, showLevelMeters }) => {
 
     return (<div className="estacio-mixer-columna estacio-mixer-fx-columna">
         <div className="track-controls">
-            <div className="slider-wrapper" style={{marginTop:78}}>
+            <div className="slider-wrapper">
                 <GrufFxReturnSliderVertical top='500px' left='50px' height='400px' fxNom={fxNom}/>
                 <GrufGainMeter isMute={false} levelData={levelData}/>
             </div>
         </div>
         <div className="label">{label}</div>
+    </div>)
+}
+
+export const MasterFader = ({ showLevelMeters, showMasterPan }) => {
+    return (<div className="estacio-mixer-columna estacio-mixer-master-columna">
+        <div className="track-controls">
+            {showMasterPan ? <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/> : ""}
+            <div className="slider-wrapper" style={{marginTop: showMasterPan ? 0:78}}>
+                <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                <GrufMasterMeter showLevelMeters={showLevelMeters} />
+            </div>
+        </div>
+        <div className="label">Master</div>
     </div>)
 }
 
@@ -318,20 +331,11 @@ export const EstacioMixerUI = ({ setEstacioSelected, showLevelMeters }) => {
                             );
                         })}
                         </div>
-                        <FxReturnFader label="Rev A" fxNom="reverbA" showLevelMeters={showLevelMeters}/>
-                        <FxReturnFader label="Rev B" fxNom="reverbB" showLevelMeters={showLevelMeters}/>
+                        <FxReturnFader label="Reverb A" fxNom="reverbA" showLevelMeters={showLevelMeters}/>
+                        <FxReturnFader label="Reverb B" fxNom="reverbB" showLevelMeters={showLevelMeters}/>
                         <FxReturnFader label="Delay A" fxNom="delayA" showLevelMeters={showLevelMeters}/>
                         <FxReturnFader label="Delay B" fxNom="delayB" showLevelMeters={showLevelMeters}/>
-                        <div className="estacio-mixer-columna estacio-mixer-master-columna">
-                            <div className="track-controls">
-                                <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/>
-                                <div className="slider-wrapper">
-                                    <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
-                                    <GrufMasterMeter showLevelMeters={showLevelMeters} />
-                                </div>
-                            </div>
-                            <div className="label">Master</div>
-                        </div>
+                        <MasterFader showMasterPan={false} showLevelMeters={showLevelMeters}/>
                     </div>
                 </div>
             </div>

@@ -274,7 +274,6 @@
             --accent-color: #{$light-grey}
         }
         .slider-wrapper {
-            margin-bottom: 30px; //per compensar la mancança de botons MS
             min-width: 50px;
 
             .volume-meter {
@@ -299,6 +298,7 @@
         }
         .slider-wrapper {
             min-width: 50px;
+            margin-top: 78px;
         }
     }
     
