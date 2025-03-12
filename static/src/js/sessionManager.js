@@ -64,9 +64,9 @@ export class EstacioBase {
         fxMid:{type: 'float', label: 'Mid', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxHigh:{type: 'float', label: 'High', unit: units.decibel, min: -12, max: 12, initial: 0.0},
         fxReverbSelect: {type: 'enum', label: 'Reverb Select', options: ['A', 'B'], initial: 'A'},
-        fxReverbSend: {type: 'float', label: 'Reverb Send', min: -60, max: 6, initial: -60},
+        fxReverbSend: {type: 'float', label: 'Reverb Send', unit:units.decibel, min: -60, max: 6, initial: -60},
         fxDelaySelect: {type: 'enum', label: 'Delay Select', options: ['A', 'B'], initial: 'A'},
-        fxDelaySend: {type: 'float', label: 'Delay Send', min: -60, max: 6, initial: -60},
+        fxDelaySend: {type: 'float', label: 'Delay Send', unit:units.decibel, min: -60, max: 6, initial: -60},
     }
     store = undefined
     audioNodes = {}
