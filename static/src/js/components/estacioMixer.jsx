@@ -82,100 +82,58 @@ export const GrufGainSlider = ({ estacio }) => {
     );
 };
 
-export const GrufGainSliderVertical = ({ estacio, top, left, height }) => {
-    const nomEstacio = estacio.nom; 
-    const parameterValue = getCurrentSession().getLiveGainsEstacions()[nomEstacio]; 
-    const marks = [];
+export const GrufGainSliderVertical = ({ top, left, height, estacio, isMasterGain, fxNom }) => {
+    let parameterValue = 0.0;
+    if (estacio) {
+        parameterValue = getCurrentSession().getLiveGainsEstacions()[estacio.nom];
+    } else if (isMasterGain) {
+        parameterValue = getAudioGraphInstance().getMasterGain();
+    } else if (fxNom) {
+        parameterValue = getAudioGraphInstance().getFxReturnGain(fxNom);
+    }
 
+    const marks = [];
     const style = { top: top, left: left };
     if (height !== undefined) {
         style.height = height;
     }
 
+    const lin01ValueToGainValue = (linValue01) => {
+        return Math.pow(linValue01, 2) * 2;
+    }
+
+    const gainValueToLin01Value = (gainValue) => {
+        return Math.pow(gainValue / 2, 1/2);
+    }
+
     const handleGainChange = (evt, value) => {
-        const currentGains = getCurrentSession().getLiveGainsEstacions();
-        currentGains[nomEstacio] = parseFloat(value, 10);
-        getCurrentSession().setLiveGainsEstacions(currentGains);
+        if (estacio) {
+            const currentGains = getCurrentSession().getLiveGainsEstacions();
+            currentGains[estacio.nom] = lin01ValueToGainValue(parseFloat(value, 10));
+            getCurrentSession().setLiveGainsEstacions(currentGains);
+        } else if (isMasterGain) {
+            getAudioGraphInstance().setMasterGain(lin01ValueToGainValue(parseFloat(value, 10)));
+        } else if (fxNom) {
+            const gain = lin01ValueToGainValue(parseFloat(value, 10));
+            if (fxNom === 'reverbA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbAGain: gain});
+            if (fxNom === 'reverbB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbBGain: gain});
+            if (fxNom === 'delayA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayAGain: gain});
+            if (fxNom === 'delayB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayBGain: gain});
+        }
     };
 
     return (
         <div className="gruf-gain-slider-vertical" style={style}>
             <Slider
                 orientation="vertical"
-                value={parameterValue}
+                value={gainValueToLin01Value(parameterValue)}
                 step={0.01}
                 min={0.0}
-                max={2.0}
+                max={1.0}
                 marks={marks}
                 onChange={handleGainChange}
                 valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
-            />
-        </div>
-    );
-};
-
-export const GrufMasterGainSliderVertical = ({ top, left, height }) => {
-    const masterGain = getAudioGraphInstance().getMasterGain(); 
-    const marks = [];
-
-    const style = { top: top, left: left };
-    if (height !== undefined) {
-        style.height = height;
-    }
-
-    const handleGainChange = (evt, value) => {
-        getAudioGraphInstance().setMasterGain(parseFloat(value, 10));
-    };
-
-    return (
-        <div className="gruf-gain-slider-vertical" style={style}>
-            <Slider
-                orientation="vertical"
-                value={masterGain}
-                step={0.01}
-                min={0.0}
-                max={2.0}
-                marks={marks}
-                onChange={handleGainChange}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
-            />
-        </div>
-    );
-};
-
-export const GrufFxReturnSliderVertical = ({ top, left, height, fxNom }) => {
-
-    const gain = getAudioGraphInstance().getFxReturnGain(fxNom) 
-
-    const marks = [];
-
-    const style = { top: top, left: left };
-    if (height !== undefined) {
-        style.height = height;
-    }
-
-    const handleGainChange = (evt, value) => {
-        const gain = parseFloat(value, 10);
-        if (fxNom === 'reverbA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbAGain: gain});
-        if (fxNom === 'reverbB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), reverbBGain: gain});
-        if (fxNom === 'delayA') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayAGain: gain});
-        if (fxNom === 'delayB') getAudioGraphInstance().updateParametreAudioGraph('effectParameters', {...getAudioGraphInstance().getEffectParameters(), delayBGain: gain});
-    };
-
-    return (
-        <div className="gruf-gain-slider-vertical" style={style}>
-            <Slider
-                orientation="vertical"
-                value={gain}
-                step={0.01}
-                min={0.0}
-                max={2.0}
-                marks={marks}
-                onChange={handleGainChange}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${Tone.gainToDb(value).toFixed(1)} dB`.replace("Infinity", "∞")}
+                valueLabelFormat={(value) => `${Tone.gainToDb(lin01ValueToGainValue(parseFloat(value, 10))).toFixed(1)} dB`.replace("Infinity", "∞")}
             />
         </div>
     );
@@ -283,7 +241,7 @@ export const FxReturnFader = ({ label, fxNom, showLevelMeters }) => {
     return (<div className="estacio-mixer-columna estacio-mixer-fx-columna">
         <div className="track-controls">
             <div className="slider-wrapper">
-                <GrufFxReturnSliderVertical top='500px' left='50px' height='400px' fxNom={fxNom}/>
+                <GrufGainSliderVertical top='500px' left='50px' height='400px' fxNom={fxNom}/>
                 <GrufGainMeter isMute={false} levelData={levelData}/>
             </div>
         </div>
@@ -296,7 +254,7 @@ export const MasterFader = ({ showLevelMeters, showMasterPan }) => {
         <div className="track-controls">
             {showMasterPan ? <GrufKnob mida="gran" parameterParent={getAudioGraphInstance()} parameterName="masterPan" noOutput="true" customWidth="50px" customHeight="50px"/> : ""}
             <div className="slider-wrapper" style={{marginTop: showMasterPan ? 0:78}}>
-                <GrufMasterGainSliderVertical top='500px' left='50px' height='400px'/>
+                <GrufGainSliderVertical top='500px' left='50px' height='400px' isMasterGain={true}/>
                 <GrufMasterMeter showLevelMeters={showLevelMeters} />
             </div>
         </div>
