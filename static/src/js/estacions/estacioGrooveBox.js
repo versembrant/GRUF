@@ -57,7 +57,7 @@ export class EstacioGrooveBox extends EstacioBase {
                 return [
                     [`swing${i}`, { type: 'float', label: `${sound}Swing`, min: 0, max: 1, initial: 0, followsPreset: true }],
                     [`tone${i}`, { type: 'float', label: `${sound}Tone`, unit: units.semitone, min: -12, max: 12, step: 1, initial: 0 }],
-                    [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: -6 }],
+                    [`volume${i}`, { type: 'float', label: `${sound}Volume`, unit: units.decibel, min: -30, max: 6, initial: -3 }],
                     [`attack${i}`, { type: 'float', label: `${sound}Attack`, unit: units.percent, min: 0, max: 100, step:1, initial: 0 }],
                     [`release${i}`, { type: 'float', label: `${sound}Release`, unit: units.percent, min: 0, max: 100, step: 1, initial: 100 }],
                     [`reverbSend${i}`, { type: 'float', label: `${sound}Reverb`, unit: units.decibel, min: -30, max: 6, initial: -30 }]

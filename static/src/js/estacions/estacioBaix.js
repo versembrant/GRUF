@@ -11,6 +11,7 @@ export class EstacioBaix extends MonoSynth {
             notaMesBaixaPermesa: 24,
             notaMesAltaPermesa: 47,
         },
+        lpf: {...MonoSynth.parametersDescription.lpf, initial: 500},
         waveform: {...MonoSynth.parametersDescription.waveform, initial: 'square'},
         attack: {...MonoSynth.parametersDescription.attack, initial: 0.01},
         decay: {...MonoSynth.parametersDescription.decay, initial: 3.0},
