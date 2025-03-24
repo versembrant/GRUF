@@ -18,7 +18,7 @@ import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
 import throttle from 'lodash.throttle'
 import { AudioRecorder } from "../components/audioRecorder";
-import { setMasterEffectsParameter } from "../utils";
+import { setMasterEffectsParameter, getPatternPresetDisplayName } from "../utils";
 
 
 import cssVariables from '../../styles/exports.module.scss';
@@ -525,7 +525,7 @@ export const GrufSelectorPresets = ({ className, estacio, top, left, buttonWidth
                     onClick={() => { getCurrentSession().setLivePresetForEstacio(estacio.nom, i) }}
                     style={{width: buttonWidth}}
                 >
-                    {i + 1}
+                    {getPatternPresetDisplayName(i + 1)}
                 </div>
             )}
         </div>

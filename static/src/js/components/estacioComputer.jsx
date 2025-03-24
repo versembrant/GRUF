@@ -1,6 +1,6 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
-import { subscribeToStoreChanges } from "../utils";
+import { subscribeToStoreChanges, getPatternPresetDisplayName } from "../utils";
 import { GrufButtonNoBorder, SpectrumGraph, GrufCanviaInstrument } from "../components/widgets";
 import { SessionAudioRecorder } from "./sessionAudioRecorder"
 
@@ -63,7 +63,7 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                     }
 
                 }}>
-            {preset > -1 ? preset + 1 : ''}
+            {preset > -1 ? getPatternPresetDisplayName(preset + 1) : ''}
             </div>
             )
         }

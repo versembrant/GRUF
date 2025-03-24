@@ -652,3 +652,9 @@ export const setMasterEffectsParameter = (effectKey, value) => {
     getAudioGraphInstance().updateParametreAudioGraph('effectParameters', newEffectParameters);
 };
 
+// Util function to return the display name of a pattern preset
+
+export const getPatternPresetDisplayName = (patternPresetNumber) => {
+    // Returns the uppercase character corresponding to the pattern preset number
+    return String.fromCharCode(64 + patternPresetNumber);
+}
