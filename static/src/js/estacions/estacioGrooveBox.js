@@ -256,6 +256,10 @@ export class EstacioGrooveBox extends EstacioBase {
         const playerName = this.playerNames[midiNoteNumber % 4];
 
         if (!noteOff){
+            
+            // Play
+            this.playSoundFromPlayer(playerName);
+
             const recEnabled = !extras.skipRecording && this.getParameterValue('isRecording');
             // Si Rec està ON
             if (recEnabled) {   
@@ -269,8 +273,6 @@ export class EstacioGrooveBox extends EstacioBase {
                     this.updateParametreEstacio('pattern', pattern); // save change in server!
                 };
             }
-            // Play
-            this.playSoundFromPlayer(playerName);
         } 
         else {
             // Stop

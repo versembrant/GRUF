@@ -78,14 +78,15 @@ button, .btn {
 
 .btn-gris {
     --text-color: #{$grey};
-    &:hover {
+    // if hovering and button does not have class "recording"
+    &:not(.recording):hover {
         --text-color: #{$white};
     }
 }
 
 .btn-black {
     --text-color: #{$black};
-    &:hover {
+    &:hover  {
         --background-color: #{transparentize($grey, 0.5)};
         --text-color: #{$white};
     }
@@ -94,6 +95,6 @@ button, .btn {
 .btn-vermell {
     --text-color: #{$red};
     &:hover {
-    --text-color: #{lighten($red, 50%)};
+    --text-color: #{lighten($red, 20%)};
     }
 }

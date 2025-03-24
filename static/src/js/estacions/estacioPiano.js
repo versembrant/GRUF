@@ -72,6 +72,6 @@ export class EstacioPiano extends EstacioBase {
         if (!noteOff) this.audioNodes.piano.keyDown({note:Tone.Frequency(midiNoteNumber, "midi").toNote(), velocity:midiVelocity/127});
         else this.audioNodes.piano.keyUp({note:Tone.Frequency(midiNoteNumber, "midi").toNote()});
         
-        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, midiVelocity, noteOff);
+        if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, noteOff);
     }
 }
