@@ -39,6 +39,7 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
     return (
     <div>
         <button id="transport-toggle"
+        title={"Play/stop" + (playMode === 'live' ? '' : ' arranjament')}
         disabled={!getAudioGraphInstance().usesAudioEngine()}
         className="btn-white btn-petit"
         onClick={() => handlePlayButton(playMode)}>

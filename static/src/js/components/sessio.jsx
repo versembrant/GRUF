@@ -66,7 +66,7 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
                     >
                     <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
                 </button>
-                <AudioTransportPlayStop playMode={estacioSelected === 'Computer' ? 'arranjament' : 'live'} />
+                <AudioTransportPlayStop playMode="live" />
             </div>
         </div>
     )

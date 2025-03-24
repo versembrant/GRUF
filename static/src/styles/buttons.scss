@@ -79,7 +79,7 @@ button, .btn {
 .btn-gris {
     --text-color: #{$grey};
     &:hover {
-        --text-color: #{lighten($grey, 50%)};
+        --text-color: #{$white};
     }
 }
 

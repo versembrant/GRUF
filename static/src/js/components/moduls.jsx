@@ -36,7 +36,7 @@ export const GrufModulEQ = ({className, estacio, top, left}) => {
     const position = (top || left) ? "absolute" : "relative"; // TODO: remove
     return (
         <fieldset className={`gruf-modul gruf-modul-eq ${className}`} style={{position, top, left}}>
-            <GrufLegend text="EQ" />
+            <GrufLegend text="Equalització" />
             <GrufToggle className="self-start justify-self-end" estacio={estacio} parameterName="fxEqOnOff" />
             <div>
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxLow"/>
@@ -63,8 +63,8 @@ export const GrufModulDelay = ({className, estacio, top, left}) => {
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxDelaySend" label="Send" /> 
                 <GrufDelayFeedback send={select} /> 
             </fieldset>
-            <fieldset>
-                <GrufLegend text="Durada" bare="true" />
+            <fieldset style={{marginBottom: 10}}>
+                <GrufLegend text="Durada" simple={true} />
                 <GrufDelayTime send={select} />
             </fieldset>
     </fieldset>
@@ -80,11 +80,11 @@ export const GrufModulReverb = ({className, estacio, style={}}) => {
             <div style={{position: "absolute", top: 15, right: 17}}>
                 <GrufEnum2Columns estacio={estacio} parameterName="fxReverbSelect" />
             </div>
-            <div style={{position: "absolute", top: 35, right: 5}}>
+            <div style={{position: "absolute", top: 40, right: 5}}>
                 <GrufKnob mida="petit" parameterParent={estacio} parameterName="fxReverbSend" position="absolute" label="Send" />
             </div>
-            <fieldset>
-                <GrufLegend text="Durada" style={{alignSelf: 'flex-start'}} bare="true"></GrufLegend>
+            <fieldset style={{marginBottom: 10, marginLeft: 10, alignSelf: "flex-start"}}>
+                <GrufLegend text="Durada" style={{alignSelf: "flex-start"}} simple={true}></GrufLegend>
                 <GrufReverbDecay send={select} />
             </fieldset>
         </fieldset>

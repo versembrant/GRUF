@@ -18,12 +18,12 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                 <GrufCanviaInstrument className="col-start-4 row-start-1" setEstacioSelected={setEstacioSelected}/>
 
                 <fieldset className="modul-border modul-bg flex flex-col justify-between col-start-1 row-start-1 row-span-2" style={{width: 220}}>
-                    <fieldset className="flex justify-between">
+                    <fieldset className="flex justify-between" style={{marginBottom: 10}}>
                         <GrufKnob mida="gran" parameterParent={estacio} parameterName="gain" label="Vol" />
                         <GrufSeparatorLine />
                         <GrufKnob mida="gran" parameterParent={estacio} parameterName="lpf" label="Cutoff" />
                     </fieldset>
-                <GrufSelectorTonalitat label={null}/>
+                    <GrufSelectorTonalitat label={null}/>
                 </fieldset>
 
                 <fieldset className="modul-border modul-bg flex justify-between items-center col-start-1 row-start-3" style={{width: 220}}>

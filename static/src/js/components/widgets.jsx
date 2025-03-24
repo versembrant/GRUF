@@ -52,10 +52,10 @@ export const GrufSeparatorLine = () => {
     )
 }
 
-export const GrufLegend = ({ text, style={}, bare=false }) => {
+export const GrufLegend = ({ text, style={}, simple=false }) => {
     // we actually style the span element inside the legend element :)
     return (
-        <legend style={{display: 'contents'}}><span style={style}className={`gruf-legend ${bare ?  "bare" : ""}`}>{text}</span></legend> 
+        <legend style={{display: 'contents'}}><span style={style}className={`gruf-legend ${simple ?  "simple" : ""}`}>{text}</span></legend> 
     )
 }
 
@@ -808,7 +808,7 @@ export const NoteGenerator = ({ estacio, parameterName }) => {
     }
 
     return(
-        <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
+        <button className="btn-gris" style={{padding: '0', minHeight: '58px'}} onClick={generate}>Auto-generar <span>✨</span></button>
     )
 }
 
@@ -826,8 +826,8 @@ export const GrufNoteControls = ({ className, estacio, parameterName, width, max
             {ExtraComponent ? <ExtraComponent estacio={estacio} parameterName={parameterName}/> : null}
             <GrufSelectorPresets className="flex flex-auto flex-wrap gap-10 justify-between" estacio={estacio} buttonWidth="58px" />
             <fieldset className="flex flex-col gap-10">
-                <button className="btn-white" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Clear</button>
-                <button className={`btn-white ${isRecording ? 'recording' : ''}`} style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio('isRecording', !isRecording)}>Rec</button>
+                <button className={`btn-gris ${isRecording ? 'recording' : ''}`} style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio('isRecording', !isRecording)}>Rec</button>
+                <button className="btn-vermell" style={{padding: '0', minHeight: '58px'}} onMouseDown={(evt)=> estacio.updateParametreEstacio(parameterName, [])}>Esborra</button>
             </fieldset>
         </fieldset>
     );

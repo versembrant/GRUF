@@ -44,12 +44,15 @@ fieldset {
     padding: 4px 10px;
     min-width: 130px;
     align-self: flex-start;
+    font-weight: 800;
+    border: none;
 
-    &.bare {
+    &.simple {
+        font-weight: initial;
+        padding: 0;
         min-width: initial;
         align-self: auto;
-        border: none;
-        padding: 0;
+        font-size: 12px;
     }
 }
 
