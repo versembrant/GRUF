@@ -406,7 +406,7 @@ export const GrufToggle = ({ estacio, parameterName, className="", top, left}) =
     };
 
     return (
-        <div className={`gruf-toggle ${className}`}style={{ top: top, left: left }}>
+        <div className={`gruf-toggle ${className}`} style={{ top: top, left: left }}>
             <div
                 className={`p-toggle ${parameterValue ? 'on' : 'off'}`}
                 onClick={handleClick}

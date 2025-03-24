@@ -166,7 +166,7 @@ export const SessionAudioRecorder = ({}) => {
       if (isRecordArmed) {
         button = <button className="btn-white session-armed-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Esperant que començi l'àudio...</button>
       } else {
-        button = <button className="btn-white" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
+        button = <button className="btn-gris" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
       }
     }
     return <div>{button}</div>
