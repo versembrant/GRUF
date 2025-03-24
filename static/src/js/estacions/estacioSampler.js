@@ -267,9 +267,9 @@ export class EstacioSampler extends EstacioBase {
         const soundPlayers = this.getsoundPlayersWithPadPlaying(padIndex);
         soundPlayers.forEach(soundPlayer => {
             if (!soundPlayer.playingOneShot) {  // One shots are played until the end of the slice and don't need to be stopepd manually
-                if (soundPlayer.player.state === 'started') {
+                //if (soundPlayer.player.state === 'started') {
                     soundPlayer.player.stop(time);  // Triggering stop will add the fadeOut (release) time
-                }
+                //}
             }
         });
     }
