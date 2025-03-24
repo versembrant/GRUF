@@ -38,7 +38,7 @@ export const GrufModulEQ = ({className, estacio, top, left}) => {
         <fieldset className={`gruf-modul gruf-modul-eq ${className}`} style={{position, top, left}}>
             <GrufLegend text="Equalització" />
             <GrufToggle className="self-start justify-self-end" estacio={estacio} parameterName="fxEqOnOff" />
-            <div>
+            <div style={{marginLeft:20, marginRight:20}}>
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxLow"/>
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxMid" />
                 <GrufKnob mida="gran" customWidth="50px" customHeight="50px" parameterParent={estacio} parameterName="fxHigh" />
