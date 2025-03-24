@@ -73,7 +73,16 @@ export class EstacioSampler extends EstacioBase {
     numVoices = 3;
     soundBuffers = {};
 
-    getFreeSoundPlayer() {
+    getFreeSoundPlayer(padIndex) {
+        // First check if there's any player playing that pad, and if it is the case, immediately stop it
+        for (let soundPlayer of this.audioNodes.soundPlayers) {
+            if (soundPlayer.playingPadIndex === padIndex) {
+                soundPlayer.playingPadIndex = -1;
+                soundPlayer.player.fadeOut = 0;
+                soundPlayer.player.stop();
+            }
+        }
+
         let soundPlayer = this.audioNodes.soundPlayers.find(soundPlayer => soundPlayer.playingPadIndex === -1);
         if (soundPlayer === undefined) {
             // Return randomly one of the players
@@ -215,7 +224,7 @@ export class EstacioSampler extends EstacioBase {
     }
 
     triggerPad(padIndex, time) {
-        const soundPlayer = this.getFreeSoundPlayer();
+        const soundPlayer = this.getFreeSoundPlayer(padIndex);
         if (soundPlayer === undefined){
             // If no sound player can be found, don't trigger the sound and return false
             return false;
