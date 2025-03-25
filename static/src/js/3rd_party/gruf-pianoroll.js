@@ -79,6 +79,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 preload:            {type:Number, value:1.0},
                 tempo:              {type:Number, value:120, observer:'updateTimer'},
                 enable:             {type:Boolean, value:true},
+                blackWhiteKeyLengthEqual: {type:Boolean, value:true},
             },
         };
         this.defineprop();
@@ -123,11 +124,12 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
     position:absolute;
     left:0px;
     top:0px;
-    width:100px;
+    width:0px;
     height:100%;
     background: repeat-y;
     background-size:100% calc(100%*12/16);
     background-position:left bottom;
+    display:none;  /* not entirely sure what happens with wac-kb object, but if we don't hide it, it intercepts wanted pointer events */
 }
 #wac-cursor{
     width:3px;
@@ -726,6 +728,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             document.addEventListener("midiNote-" + this.nomestacio, this.onmidinote.bind(this))
             this.initialized=1;
             this.redraw();
+            this.currentlyPlayedNoteFromDisplayKeyboard = -1;
         };
         this.setupImage=function(){
         };
@@ -767,6 +770,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 clearInterval(this.longtaptimer);
             }
         };
+        this.checkDownPosIsKeyboard=function(pos){
+            return pos.x > this.yruler && pos.x < (this.kbwidth + this.yruler)
+        };
         this.pointerdown=function(ev) {
             let e;
             if(!this.enable)
@@ -779,6 +785,15 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.downpos=this.getPos(e);
             this.downht=this.hitTest(this.downpos);
 
+            // If the user clicked on the keyboard, send a noteOn event
+            if (this.checkDownPosIsKeyboard(this.downpos)) {
+                const midiNote = Math.round(this.downht.n);
+                console.log(midiNote)
+                this.currentlyPlayedNoteFromDisplayKeyboard = midiNote;
+                const event = new CustomEvent("pianoRollKeyboardNote", { detail: {midiNote: midiNote, noteOff: false} })
+                this.dispatchEvent(event);
+            }
+            
             // Save current data of the selected note, as it will be later used to determine if the note was dragged or not
             const selectedNoteIds = this.selectedNotes().map(note => note.i);
             if (selectedNoteIds.indexOf(this.downht.i) > -1) {
@@ -790,7 +805,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             } else {
                 this.hitNoteInitialData = undefined;
             }
-     
+
             this.longtapcount = 0;
             this.longtaptimer = setInterval(this.longtapcountup.bind(this),100);
             this.notesDueDuplicate = e.altKey;
@@ -945,6 +960,15 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
 
             var noteWasDeleted = false;
             const ht =this.hitTest(pos);
+
+            // If the user clicked on the keyboard, send a noteOn event
+            if (this.checkDownPosIsKeyboard(pos) || this.currentlyPlayedNoteFromDisplayKeyboard > -1) {
+                const midiNote = Math.round(ht.n)
+                this.currentlyPlayedNoteFromDisplayKeyboard = -1;
+                const event = new CustomEvent("pianoRollKeyboardNote", { detail: {midiNote: midiNote, noteOff: true} })
+                this.dispatchEvent(event);
+            }
+
             if (this.secondclickdelete){
                 if ((this.hitNoteInitialData !== undefined) && (this.hitNoteInitialData.idx  === ht.i)) {
                     // If duration, note or time position has not changed, the note has not been dragged and should be deleted
@@ -1134,9 +1158,9 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 this.ctx.fillStyle=this.colrulerfg;
                 if (this.kbstyle === "piano") {
                     for(let y=0;y<128;y+=12){
-                        const ys=this.height-this.steph*(y-this.yoffset);
+                        const ys=this.height-this.steph*(y-this.yoffset) ;
                         //this.ctx.fillRect(0,ys|0,this.yruler,-1);
-                        this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-2,ys-4);
+                        this.ctx.fillText("C"+(((y/12)|0)+this.octadj),this.yruler-2,ys-(this.blackWhiteKeyLengthEqual ? 1: 4));
                     }
                 } else {
                     for(let y=0;y<128;y+=1){
@@ -1157,43 +1181,63 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const octaveHeight = this.steph*12;
             const whiteKeyHeight = octaveHeight/7;
             const translucidAccentColor = this.colnote + "aa";
-            // first, white keys and grey lines
-            for(let pc=0; pc<12;pc++) {
-                const fsemi=this.semiflag[pc];
-                if (fsemi & 1) continue;
-                const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
-                for(let octave=0;;octave++) {
-                    const n = octave*12 + pc;
-                    if (n > 127) break;
-                    const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset;
-                    // white keys
-                    if (this.externalnoteons.has(n)) {
+
+            if (this.blackWhiteKeyLengthEqual) {
+                for(let n=0;n<128;++n){
+                    const midiNote = n
+                    const keyHeight = octaveHeight/12;  // only used if this.blackWhiteKeyLengthEqual is true         
+                    // Check if n (midiNote) corresponds to a black key form the piano
+                    const pc = midiNote % 12;
+                    const isWhiteKey = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1][pc] === 1;
+                    this.ctx.fillStyle=isWhiteKey ? this.externalnoteons.has(midiNote) ? translucidAccentColor: "white": "black";     
+                    let ys = this.height - (n - this.yoffset) * keyHeight;
+                    this.ctx.fillRect(this.yruler, ys, this.kbwidth,-keyHeight);
+                    if (this.externalnoteons.has(midiNote) && !isWhiteKey) {
                         this.ctx.fillStyle = translucidAccentColor;
-                        this.ctx.fillRect(this.yruler, ys, this.kbwidth, -whiteKeyHeight);
-                    };
-                    // grey lines
-                    if (pc === 0) continue; // don't do it for C, as it will be overwritten by white key B
-                    this.ctx.fillStyle = "grey";
-                    this.ctx.fillRect(this.yruler, ys, this.kbwidth, 0.5);
-                    if (pc === 11) this.ctx.fillRect(this.yruler, ys-whiteKeyHeight, this.kbwidth, 0.5); // do it for the missing C
+                        this.ctx.fillRect(this.yruler, ys, this.kbwidth, -keyHeight);
+                    }
+                    this.ctx.fillStyle=this.colgrid;
+                    this.ctx.fillRect(this.yruler, ys, this.kbwidth,1);
+                } 
+            } else {
+                // first, white keys and grey lines
+                for(let pc=0; pc<12;pc++) {
+                    const fsemi=this.semiflag[pc];
+                    if (fsemi & 1) continue;
+                    const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
+                    for(let octave=0;;octave++) {
+                        const n = octave*12 + pc;
+                        if (n > 127) break;
+                        const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset;
+                        // white keys
+                        if (this.externalnoteons.has(n)) {
+                            this.ctx.fillStyle = translucidAccentColor;
+                            this.ctx.fillRect(this.yruler, ys, this.kbwidth, -whiteKeyHeight);
+                        };
+                        // grey lines
+                        if (pc === 0) continue; // don't do it for C, as it will be overwritten by white key B
+                        this.ctx.fillStyle = "grey";
+                        this.ctx.fillRect(this.yruler, ys, this.kbwidth, 0.5);
+                        if (pc === 11) this.ctx.fillRect(this.yruler, ys-whiteKeyHeight, this.kbwidth, 0.5); // do it for the missing C
+                    }
                 }
-            }
-            // then, black keys. we do them separately so that they appear above the white ones
-            const blackKeyHeight = this.steph;
-            for(let pc=0; pc<12;pc++) {
-                const fsemi=this.semiflag[pc];
-                if (!(fsemi & 1)) continue;
-                const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
-                for(let octave=0;;octave++) {
-                    const n = octave*12 + pc;
-                    if (n > 127) break;
-                    const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset+blackKeyHeight/2;
-                    this.ctx.fillStyle = "black"; // we always draw the black key
-                    this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
-                    if (!this.externalnoteons.has(n)) continue;
-                    this.ctx.fillStyle = translucidAccentColor; // and then we draw the colored ones if needed
-                    this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
-                };
+                // then, black keys. we do them separately so that they appear above the white ones
+                const blackKeyHeight = this.steph;
+                for(let pc=0; pc<12;pc++) {
+                    const fsemi=this.semiflag[pc];
+                    if (!(fsemi & 1)) continue;
+                    const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
+                    for(let octave=0;;octave++) {
+                        const n = octave*12 + pc;
+                        if (n > 127) break;
+                        const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset+blackKeyHeight/2;
+                        this.ctx.fillStyle = "black"; // we always draw the black key
+                        this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
+                        if (!this.externalnoteons.has(n)) continue;
+                        this.ctx.fillStyle = translucidAccentColor; // and then we draw the colored ones if needed
+                        this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
+                    };
+                }
             }
         }
         this.redrawAreaSel=function(){
@@ -1208,7 +1252,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.ctx.clearRect(0,0,this.width,this.height);
             this.stepw = this.swidth/this.xrange;
             this.steph = this.sheight/this.yrange;
-            this.redrawKeyboard();
             this.redrawGrid();
             const l=this.sequence.length;
             for(let s=0; s<l; ++s){ // first, draw not selected events
@@ -1219,6 +1262,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 const ev=this.sequence[s];
                 if (ev.f === 1) this.redrawEvent(ev);
             }
+            this.redrawKeyboard();
             this.redrawYRuler();
             this.redrawXRuler();
             this.redrawMarker();

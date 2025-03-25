@@ -574,11 +574,19 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             });
             if (triggerNotes){
                 jsElement.addEventListener("pianoRollNoteSelectedOrCreated", evt => {
-                    // When a note is created or selected, we will trigger a callback
+                    // When a note is created or selected, we will trigger a midi note
                     sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=false);
                     setTimeout(() => {
                         sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
                     }, evt.detail.durationInBeats * getAudioGraphInstance().get16BeatTime() * 1000);
+                });
+                jsElement.addEventListener("pianoRollKeyboardNote", evt => {
+                    // When a note is played in the display keyboard, we will trigger a midi note
+                    if (evt.detail.noteOff == true) {
+                        sendNoteOff(estacio.nom, evt.detail.midiNote, 0);
+                    } else {
+                        sendNoteOn(estacio.nom, evt.detail.midiNote, 127, skipTriggerEvent=false);
+                    }
                 });
             }
             if (modeSampler) { // al mode keyboard, es gestiona a gruf-pianoroll.js directament
