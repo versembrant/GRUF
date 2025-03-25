@@ -785,15 +785,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             this.downpos=this.getPos(e);
             this.downht=this.hitTest(this.downpos);
 
-            // If the user clicked on the keyboard, send a noteOn event
-            if (this.checkDownPosIsKeyboard(this.downpos)) {
-                const midiNote = Math.round(this.downht.n);
-                console.log(midiNote)
-                this.currentlyPlayedNoteFromDisplayKeyboard = midiNote;
-                const event = new CustomEvent("pianoRollKeyboardNote", { detail: {midiNote: midiNote, noteOff: false} })
-                this.dispatchEvent(event);
-            }
-            
             // Save current data of the selected note, as it will be later used to determine if the note was dragged or not
             const selectedNoteIds = this.selectedNotes().map(note => note.i);
             if (selectedNoteIds.indexOf(this.downht.i) > -1) {
@@ -814,7 +805,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             window.addEventListener("touchend",this.bindcancel);
             window.addEventListener("mouseup",this.bindcancel);
             window.addEventListener("contextmenu",this.bindcontextmenu);
-
+            
             if(e.button==2||e.ctrlKey){
                 if(this.editmode=="dragmono"||this.editmode=="dragpoly")
                     this.dragging={o:"A",p:this.downpos,p2:this.downpos,t1:this.downht.t,n1:this.downht.n};
@@ -842,15 +833,24 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             }
             this.dragging={o:null,x:this.downpos.x,y:this.downpos.y,offsx:this.xoffset,offsy:this.yoffset};
             this.canvas.focus();
-            switch(this.editmode){
-            case "gridpoly":
-            case "gridmono":
-                this.editGridDown(this.downpos);
-                break;
-            case "dragpoly":
-            case "dragmono":
-                this.editDragDown(this.downpos);
-                break;
+
+            // If the user clicked on the keyboard, send a noteOn event
+            if (this.checkDownPosIsKeyboard(this.downpos)) {
+                const midiNote = Math.round(this.downht.n);
+                this.currentlyPlayedNoteFromDisplayKeyboard = midiNote;
+                const event = new CustomEvent("pianoRollKeyboardNote", { detail: {midiNote: midiNote, noteOff: false} })
+                this.dispatchEvent(event);
+            } else {
+                switch(this.editmode){
+                case "gridpoly":
+                case "gridmono":
+                    this.editGridDown(this.downpos);
+                    break;
+                case "dragpoly":
+                case "dragmono":
+                    this.editDragDown(this.downpos);
+                    break;
+                }
             }
             this.press = 1;
             if(ev.preventDefault)
