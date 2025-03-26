@@ -66,6 +66,11 @@ export class EstacioPiano extends EstacioBase {
         this.audioNodes.piano.stopAll()
     }
 
+    onStopAllSounds() {
+        // Stop all notes that are still playing
+        this.audioNodes.piano.stopAll()
+    }
+
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 

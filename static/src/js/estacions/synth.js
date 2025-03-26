@@ -6,6 +6,7 @@ import { units } from "../utils";
 
 export class BaseSynth extends EstacioBase {
     poly = false;
+    showPanicButton = true;
     static parametersDescription = {
         ...EstacioBase.parametersDescription,
         // Notes
@@ -224,6 +225,13 @@ export class Synth extends BaseSynth {
     onTransportStop() {
         // Stop all notes that are still playing
         this.audioNodes.synth.releaseAll()
+    }
+
+    onStopAllSounds() {
+        // Stop all notes, and set release time to 0
+        this.setParameterInAudioGraph('release', 0.0);
+        this.audioNodes.synth.releaseAll();
+        this.setParameterInAudioGraph('release', this.getParameterValue('release'));
     }
 
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {

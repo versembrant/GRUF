@@ -34,6 +34,13 @@ export class MonoSynth extends BaseSynth {
         this.audioNodes.synth.triggerRelease()
     }
 
+    onStopAllSounds() {
+        // Stop all notes, and set release time to 0
+        this.setParameterInAudioGraph('release', 0.0);
+        this.audioNodes.synth.triggerRelease();
+        this.setParameterInAudioGraph('release', this.getParameterValue('release'));
+    }
+
     unfinishedNotes = [];
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         if (!getAudioGraphInstance().isGraphBuilt()) return;

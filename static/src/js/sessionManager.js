@@ -51,9 +51,9 @@ export const shouldSaveSessionAfterLoad = () => {
 }
 
 export class EstacioBase {
-
     tipus = 'base'
     versio = '0.0'
+    showPanicButton = false
     static parametersDescription = {
         gain: {type: 'float', label: 'Volume', displayAsDb: true, unit: units.decibel, live: true, min: 0, max: 2.0, initial: 1.0},
         pan: {type: 'float', label: 'Pan', live: true, min: -1, max: 1, initial: 0},
@@ -355,6 +355,10 @@ export class EstacioBase {
     onMidiNote(midiNoteNumber, midiVelocity, noteOff, extras) {
         // Called everytime a note message is received from a live stream of notes (could be MIDI input or virtual input
         // noteOff = boolean which will be true if the message is a noteOff
+    }
+
+    onStopAllSounds() {
+        // Called when we want to immediately stop all sound produced by the station
     }
 
     adjustMidiNoteToEstacioRange(noteNumber) {

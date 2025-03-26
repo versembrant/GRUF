@@ -5,6 +5,9 @@ import { isWebMidiEnabled, getAvailableMidiInputNames, bindMidiInputOnMidiMessag
 import Checkbox from '@mui/material/Checkbox';
 import NativeSelect from '@mui/material/NativeSelect';
 
+export const clearAllNotesActivates = () => {
+    document.notesActivades = {}
+}
 
 export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEvent=false) => {
     noteNumber = getCurrentSession().getEstacio(nomEstacio).adjustMidiNoteToEstacioRange(noteNumber);

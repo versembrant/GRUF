@@ -60,9 +60,11 @@ const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
             <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
+                {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" && getCurrentSession().getEstacio(estacioSelected).showPanicButton === true ? <button className="btn-white btn-petit" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={() => getAudioGraphInstance().panic(estacioSelected)} title="Atura totes les notes que hagin quedat sonant">Pànic</button>:""}
                 <button
                     onClick={toggleMetronome}
                     className={`btn-petit btn-white ${isMetronomeActive ? "active" : ""}`}
+                    title="Activa/desactiva el metrònom"
                     >
                     <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
                 </button>
@@ -91,7 +93,9 @@ const SessioFooter = ({estacioSelected}) => {
                 {getCurrentSession().localMode ? "": <SessionConnectedUsers />}{masterMode ? <div style={{marginLeft:5}}>{"(M)"}</div>:""}
             </div>
             <div className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
-            <div><a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a></div>
+            <div>
+                <a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a>
+            </div>
         </div>
     )
 }

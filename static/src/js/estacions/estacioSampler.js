@@ -41,6 +41,7 @@ export class EstacioSampler extends EstacioBase {
     
     tipus = 'sampler'
     versio = '0.1'
+    showPanicButton = true
     parametersDescription = {
         ...EstacioBase.parametersDescription,
         notes: {type: 'piano_roll', label:'Notes', showRecButton: true, initial:[], 
@@ -306,6 +307,11 @@ export class EstacioSampler extends EstacioBase {
         this.stopAllPlayers()
     }
 
+    onStopAllSounds() {
+        // Stop all notes that are still playing
+        this.stopAllPlayers()
+    }
+    
     adjustMidiNoteToEstacioRange(midiNoteNumber) {
         return midiNoteNumber % 16;
     }

@@ -4,7 +4,7 @@ import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
 import { clamp } from './utils';
-import { initSessionAudioRecorder } from './components/sessionAudioRecorder'
+import { clearAllNotesActivates } from './components/entradaMidi';
 
 var audioContextIsReady = false;
 
@@ -333,7 +333,6 @@ export class AudioGraph {
         };
     }
 
-
     isMutedEstacio(nomEstacio) {
         if (!this.isGraphBuilt()) return false;
         return this.getMuteChannelNodeForEstacio(nomEstacio).mute;
@@ -658,6 +657,23 @@ export class AudioGraph {
                 this.transportStop();
             }
         }
+    }
+
+    panic(nomEstacio) {
+        if (!this.isGraphBuilt()) return;
+
+        if (nomEstacio === undefined) {
+            // Stop any notes/sounds being played in all stations, clear "caches" of current notes being played
+            getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
+                const estacio = getCurrentSession().getEstacio(nomEstacio);
+                estacio.onStopAllSounds();
+            });
+        } else {
+            // Stop any notes/sounds being played in the specified station, clear "caches" of current notes being played
+            const estacio = getCurrentSession().getEstacio(nomEstacio);
+            estacio.onStopAllSounds();
+        }
+        clearAllNotesActivates();
     }
 
     sendMidiEvent(nomEstacio, data, forwardToServer = false) {
