@@ -130,7 +130,7 @@ export const SessionAudioRecorder = ({}) => {
 
     const handleStoptRecording = async () => {
         const date = new Date();
-        const downloadFilename = `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.webm`;
+        const downloadFilename = `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.mp4`; // .webm
         await getAudioGraphInstance().stopRecordingSession(downloadFilename);
 
         /*
@@ -166,7 +166,7 @@ export const SessionAudioRecorder = ({}) => {
       if (isRecordArmed) {
         button = <button className="btn-white session-armed-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Esperant que començi l'àudio...</button>
       } else {
-        button = <button className="btn-gris" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
+        button = <button className="btn-white" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
       }
     }
     return <div>{button}</div>
