@@ -61,6 +61,7 @@
     {% endblock %}
     <script type="text/javascript">
         const appPrefix = "{{ app_prefix }}";
+        const appVersion = "{{ app_version }}";
     </script>
     <script type="text/javascript" src="{{ url_for('static', filename='dist/index.js') }}"></script>
     {% block js %}

@@ -658,3 +658,8 @@ export const getPatternPresetDisplayName = (patternPresetNumber) => {
     // Returns the uppercase character corresponding to the pattern preset number
     return String.fromCharCode(64 + patternPresetNumber);
 }
+
+// Util function to get the current version of GRUF
+export const getAppVersion = () => {
+    return appVersion;  // Defined in base.html
+}

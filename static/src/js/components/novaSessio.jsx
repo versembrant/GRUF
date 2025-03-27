@@ -1,6 +1,6 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState, useRef, useEffect } from "react";
-import { capitalizeFirstLetter, capitalize, sample } from "../utils";
+import { capitalizeFirstLetter, capitalize, sample, getAppVersion } from "../utils";
 
 const paraules = {
     "Mestre": { type: "name_prefix", gender: "masculine", number: "singular" },
@@ -107,6 +107,7 @@ export const NovaSessio = () => {
     const handleSubmitForm = (evt) => {
         const sessionData = {}
         sessionData.creation_timestamp = new Date().getTime();
+        sessionData.versio_gruf = getAppVersion();
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}

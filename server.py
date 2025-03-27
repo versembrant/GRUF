@@ -16,6 +16,8 @@ import redis
 from gevent import monkey
 monkey.patch_all()
 
+from app_version import VERSIO_GRUF
+
 app_prefix = os.getenv('APP_PREFIX', '')
 port = int(os.getenv('PORT', 5555))
 test = int(os.getenv('TEST', 0)) == 1
@@ -110,6 +112,10 @@ def inject_app_prefix():
     else:
         return dict(app_prefix='')
 
+
+@bp.context_processor
+def inject_app_version():
+    return dict(app_version=VERSIO_GRUF)
 
 class InvalidSessionDataException(Exception):
     pass

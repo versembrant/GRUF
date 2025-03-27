@@ -1,0 +1,1 @@
+VERSIO_GRUF = "1.0"
