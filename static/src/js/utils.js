@@ -663,3 +663,9 @@ export const getPatternPresetDisplayName = (patternPresetNumber) => {
 export const getAppVersion = () => {
     return appVersion;  // Defined in base.html
 }
+
+// Get download audio recording filename
+export const downloadedAudioRecordingFilename = () => {
+    const date = new Date();
+    return `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`; // .webm
+}

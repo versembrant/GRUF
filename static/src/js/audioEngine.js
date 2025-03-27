@@ -3,7 +3,7 @@ import { createStore, combineReducers } from "redux";
 import { makePartial } from 'redux-partial';
 import { getCurrentSession } from './sessionManager';
 import { sendMessageToServer, getSocketID } from './serverComs';
-import { clamp } from './utils';
+import { clamp, downloadedAudioRecordingFilename } from './utils';
 import { clearAllNotesActivates } from './components/entradaMidi';
 
 var audioContextIsReady = false;
@@ -159,7 +159,7 @@ export class AudioGraph {
         }
     }
 
-    async stopRecordingSession(downloadFilename) {
+    async stopRecordingSession() {
         if (!this.isGraphBuilt()) return;
         if (!this.isRecording()) return;
         const recording = await getAudioGraphInstance().sessionRecorder.stop();
@@ -168,7 +168,7 @@ export class AudioGraph {
         const url = URL.createObjectURL(recording);
         const anchor = document.createElement("a");
         const date = new Date();
-        anchor.download = downloadFilename;
+        anchor.download = downloadedAudioRecordingFilename();
         anchor.href = url;
         anchor.click();
     }
