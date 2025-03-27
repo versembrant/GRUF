@@ -1,18 +1,10 @@
-.connectat-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-
 .connectat {
     text-align: center;
-    background: url('../img/gruf_fons_verd.png'); // background-image: url("../img/home intro.jpg");
+    background: url('../img/gruf_instruments_bg_c.png'); // background-image: url("../img/home intro.jpg");
     background-size: cover;
     background-repeat: no-repeat;
-    //padding-top: 100px;
-    //padding-bottom: 100px;
     border-radius: 15px;
-    height: 50vh;
-    min-height: 250px; 
+    height: 710px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -36,7 +28,7 @@
     .connect-error {
         position: absolute;
         left: 50%;
-        top: 25%;
+        top: 30%;
         transform: translate(-50%, -10px);
         margin: auto;
         color: $white;
@@ -58,8 +50,9 @@
             margin-left: 20px;
         }
     }
-   
+    
 }
+
 
 @keyframes fadeout {
     0%   {opacity: 100%;}

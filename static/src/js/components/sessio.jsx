@@ -44,9 +44,8 @@ const onEstacioNoDisponible = (nomEstacio) => {
 }
 
 let estacioSelectedURLParam = getURLParamValue('e', undefined);
-// removeURLParam('e');
 
-const SessioHeader = ({ estacioSelected, setEstacioSelected }) => {
+const SessioHeader = ({ estacioSelected }) => {
     const [isMetronomeActive, setIsMetronomeActive] = useState(false);
     const bpm = getAudioGraphInstance().getBpm(); // Obtiene el BPM actual
 
@@ -158,7 +157,7 @@ export const Sessio = () => {
             <SessionWelcomeDialog sessionID={getCurrentSession().getID()} nomSessio={getCurrentSession().getNom()} />
             <div>
                 <div className="sessio">
-                    <SessioHeader estacioSelected={estacioSelected} setEstacioSelected={setEstacioSelected}/>
+                    <SessioHeader estacioSelected={estacioSelected} />
                     {showMainUI ? mainUI: ""}
                     <SessioFooter estacioSelected={estacioSelected} />
                 </div>
