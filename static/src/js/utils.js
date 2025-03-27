@@ -665,6 +665,16 @@ export const getAppVersion = () => {
 }
 
 // Get download audio recording filename
+
+function slugify(str) {
+    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+    str = str.toLowerCase(); // convert string to lowercase
+    str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+            .replace(/\s+/g, '-') // replace spaces with hyphens
+            .replace(/-+/g, '-'); // remove consecutive hyphens
+    return str;
+}
+
 export const downloadedAudioRecordingFilename = () => {
     const date = new Date();
     return `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`; // .webm
