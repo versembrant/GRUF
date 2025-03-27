@@ -1,26 +1,9 @@
 {% extends "base.html" %}
 
-{% block extra_head %}
-<link href="{{ url_for('static', filename='dist/landing/style.css') }}" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
-<div class="flex-content-grows-wrapper">
-    <div class="flex-header">
-        {% include 'header_no_sticky.html' %}
-    </div>
-    <div class="flex-content">
-        <main>
-            <div id="root"></div>
-        </main>
-    </div>
-    <div class="flex-footer">
-        {% include 'footer.html' %}
-    </div>
-</div>
+<div id="root" data-connect-error="{{ error }}"><div class="carregant"><div>Carregant...</div></div></div>
 {% endblock %}
 
 {% block js %}
     <script type="text/javascript" src="{{ url_for('static', filename='dist/pagines/novaSessio.js') }}"></script>
-    <script src="{{ url_for('static', filename='dist/landing/js/script.js') }}"></script>
 {% endblock %}

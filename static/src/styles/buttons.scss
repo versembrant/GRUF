@@ -69,6 +69,7 @@ button, .btn {
 .btn-verd--primary {
     --text-color: #{$black};
     --background-color: #{$green};
+    --border-color: #{darken($green, 20%)};
     &:hover {
         --text-color: #{lighten($black, 10%)};
         --background-color: #{lighten($green, 10%)};

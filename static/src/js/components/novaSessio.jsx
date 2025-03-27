@@ -1,6 +1,7 @@
 import { estacionsDisponibles } from "../sessionManager";
 import { useState, useRef, useEffect } from "react";
 import { capitalizeFirstLetter, capitalize, sample, getAppVersion } from "../utils";
+import { SessionLikeFrame } from "./connecta"
 
 const paraules = {
     "Mestre": { type: "name_prefix", gender: "masculine", number: "singular" },
@@ -136,14 +137,14 @@ export const NovaSessio = () => {
         form.submit();
     }
 
-    return(
+    return <SessionLikeFrame content={
         <div>
             <div className="nova-sessio-container">
                 <form className="nova-sessio-wrapper" method="POST" action=".">
                     <div className="sessio-header">
                         <h1>Crea un nou GRUF</h1>
                         <div className="input-title">
-                            Titol: <input name="name" placeholder={defaultTitle.current} autoComplete="false" />
+                            Títol: <input name="name" placeholder={defaultTitle.current} autoComplete="false" />
                         </div>                        
                     </div>
                     <div className="estacions-list">
@@ -162,7 +163,7 @@ export const NovaSessio = () => {
                         </div>
                         {estacionsSelected.length < 10 ?
                             < EstacioAdder handleAddStation={handleAddStation}/> :
-                            <div className="selector-add-row">Has arribat al límit d'estacions! Gaudeix de la teva mega-sessió ;)</div>}
+                            <div className="selector-add-row text-red">Has arribat al límit d'estacions! Gaudeix de la teva mega-sessió ;)</div>}
                     </div>
                     <div className="notificacio-controls">
                             Al crear el GRUF, envia un correu amb les dades del GRUF a la següent adreça de correu electrònic (opcional):
@@ -172,12 +173,12 @@ export const NovaSessio = () => {
                             />
                         </div>
                     <div className="footer-controls">
-                        <button type="button" className="btn-verd--primary" onClick={handleSubmitForm}>Crear GRUF!</button>
+                        <button type="button" className="btn btn-black--primary" onClick={handleSubmitForm}>Crear el GRUF!</button>
                     </div>
                 </form>
             </div>
         </div>
-    )
+    }/>
 };
 
 const EstacioAdder = ({handleAddStation}) => {
@@ -192,7 +193,7 @@ const EstacioAdder = ({handleAddStation}) => {
                     <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
                 ))}
             </select>
-            <button type="button" className="btn-gris" onClick={() => handleAddStation(selectedOption)}>+ Afegir Estació</button>
+            <button type="button" className="btn-black" onClick={() => handleAddStation(selectedOption)}>+ Afegir Estació</button>
         </div>
     )
 }
