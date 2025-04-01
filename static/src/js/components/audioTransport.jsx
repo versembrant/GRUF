@@ -36,12 +36,14 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
         return () => document.removeEventListener('keydown', handleKbPress);
     }, [])
 
+    const isRecording = getAudioGraphInstance().isRecording();
+
     return (
     <div>
         <button id="transport-toggle"
         title={"Play/stop" + (playMode === 'live' ? '' : ' arranjament')}
         disabled={!getAudioGraphInstance().usesAudioEngine()}
-        className="btn-white btn-petit"
+        className={"btn-white btn-petit " + (isRecording ? "session-recording btn-red" : "")}
         onClick={() => handlePlayButton(playMode)}>
             <img height="16px" src={imgSrc}/>
         </button>
