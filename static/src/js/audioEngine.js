@@ -28,7 +28,7 @@ const createRecorderNode = async () => {
         node.port.postMessage({eventType: 'startRecording'});
     }
     node.stopRecording = () => {
-        node.port.postMessage({eventType: 'stopRecording'});
+        node.port.postMessage({eventType: 'stopRecording', sampleRate: Tone.getContext().sampleRate});
     }
     return node
 }

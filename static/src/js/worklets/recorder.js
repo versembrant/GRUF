@@ -1,5 +1,3 @@
-const sampleRate = 44100;
-
 function interleave(inputL, inputR) {
     const length = inputL.length + inputR.length;
     const result = new Float32Array(length);
@@ -30,7 +28,7 @@ function writeString(view, offset, string) {
     }
 }
 
-function encodeWAV(samples, mono) {
+function encodeWAV(sampleRate, samples, mono) {
     const buffer = new ArrayBuffer(44 + (samples.length * 2));
     const view = new DataView(buffer);
     
@@ -80,6 +78,7 @@ class AudioRecorder extends AudioWorkletProcessor {
         if (evt.data.eventType === "startRecording") {
             this.recording = true;
         } else if (evt.data.eventType === "stopRecording") {
+            this.sampleRate = evt.data.sampleRate;
             this.recording = false;
             this.port.postMessage({
                 eventType: 'data',
@@ -111,7 +110,7 @@ class AudioRecorder extends AudioWorkletProcessor {
         const bufferL = Float32Array.from(this.recBufferL);
         const bufferR = Float32Array.from(this.recBufferR);
         const interleaved = interleave(bufferL, bufferR);
-        const dataview = encodeWAV(interleaved);       
+        const dataview = encodeWAV(this.sampleRate, interleaved);       
         return dataview;
     }
     
