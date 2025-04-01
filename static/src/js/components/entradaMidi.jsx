@@ -84,7 +84,7 @@ const EntradaMidiExternal = ({estacio}) => {
                         disableUnderline={true}
                         onChange={async (evt) => {
                             localStorage.setItem("lastMidiInputDevice", evt.target.value);
-                            bindMidiInputDevice(evt.target.value);
+                            bindMidiInputDevice(evt.target.value, estacio.nom);
                         }}
                         sx={{
                             color: "#fff",
