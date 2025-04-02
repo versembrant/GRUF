@@ -391,6 +391,8 @@ export class EstacioBase {
 export class Session {
     constructor(data, local=false) {
         this.localMode = local
+        this.saveToServerEnabled = true
+        this.editEstacionsEnabled = true
         this.continuousControlThrottleTime = 50
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades

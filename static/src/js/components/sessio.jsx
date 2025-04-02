@@ -88,8 +88,11 @@ const SessioFooter = ({estacioSelected}) => {
     return(
         <div className="footer flex justify-between items-center">
             <div className="flex justify-between items-center">
-                {getCurrentSession().localMode ?<GuardarSessionWidget /> : ""}
-                {getCurrentSession().localMode ? "": <SessionConnectedUsers />}{masterMode ? <div style={{marginLeft:5}}>{"(M)"}</div>:""}
+            {(masterMode && !getCurrentSession().localMode) ? <div className="marcaMaster" title="L'àudio d'aquesta sessió és en mode Master">{"M"}</div>:""}
+            {getCurrentSession().localMode ? <div className="marcaLocal" title="Aquesta sessió és en mode Local">{"L"}</div> : ""}
+            {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
+            {(getCurrentSession().localMode && getCurrentSession().saveToServerEnabled ) ? <GuardarSessionWidget /> : ""}
+                
             </div>
             <div className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
             <div>
