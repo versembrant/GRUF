@@ -109,6 +109,7 @@ export const NovaSessio = () => {
         const sessionData = {}
         sessionData.creation_timestamp = new Date().getTime();
         sessionData.versio_gruf = getAppVersion();
+        sessionData.token = Math.random().toString(36).substring(2, 15);
         sessionData.modBars = 4;
         sessionData.arranjament = {'numSteps': 32, 'beatsPerStep': 32, 'clips': []}
         sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}

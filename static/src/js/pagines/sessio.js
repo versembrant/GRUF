@@ -53,10 +53,10 @@ const onSessionDataLoaded = () => {
     reactRoot = renderReactComponentInElement(Sessio, 'root', {}, reactRoot)
 }
 
-const onSessionDataReceived = (data, localMode) => {
+const onSessionDataReceived = (data, localMode, token) => {
     if (getCurrentSession() === undefined){
         // If no session was ever loaded, just create the new session object
-        setCurrentSession(new Session(data, localMode)); 
+        setCurrentSession(new Session(data, localMode, token)); 
     } else {
         // If a session was already loaded, update all its state from the new data without
         // recreating objects
@@ -65,11 +65,12 @@ const onSessionDataReceived = (data, localMode) => {
 }
 
 const localMode = sessionElement.dataset.local === 'true';
+const token = sessionElement.dataset.token;
 const sessionID = sessionElement.dataset.id;
 if (localMode){
     // In local mode, session data is passed directly and server is not involved
     const data = JSON.parse(sessionElement.dataset.data);
-    onSessionDataReceived(data, localMode);
+    onSessionDataReceived(data, localMode, token);
     setTimeout(onSessionDataLoaded, 100)  // Use timeout here to give the app some time to initialize stuff. TODO: find a better way to do this
 } else {
     // For some reason, sometimes the ws connection is not properly set and no session data
@@ -83,7 +84,7 @@ if (localMode){
     joinSessionInServer(sessionID, (data) => {
         clearInterval(checkLoadedCorrectlyInterval);
         console.log('Session data received', data);
-        onSessionDataReceived(data, localMode);
+        onSessionDataReceived(data, localMode, token);
         onSessionDataLoaded();
     });
 }

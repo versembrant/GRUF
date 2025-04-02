@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-master-audio-engine="{{ master_audio_engine|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
+<session data-id="{{ session.id }}" data-local="{{ local_mode|tojson }}" data-token="{{ token }}" data-master-audio-engine="{{ master_audio_engine|tojson }}" data-data='{{ session.get_full_data()|tojson|safe }}'></session>
 <div id="root"><div class="carregant"><div>Carregant...</div></div></div>
 {% endblock %}
 

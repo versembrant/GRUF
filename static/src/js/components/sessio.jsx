@@ -87,15 +87,15 @@ const SessioFooter = ({estacioSelected}) => {
 
     return(
         <div className="footer flex justify-between items-center">
-            <div className="flex justify-between items-center">
-            {(masterMode && !getCurrentSession().localMode) ? <div className="marcaMaster" title="L'àudio d'aquesta sessió és en mode Master">{"M"}</div>:""}
-            {getCurrentSession().localMode ? <div className="marcaLocal" title="Aquesta sessió és en mode Local">{"L"}</div> : ""}
-            {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
-            {(getCurrentSession().localMode && getCurrentSession().saveToServerEnabled ) ? <GuardarSessionWidget /> : ""}
-                
+            <div style={{width: 300}} className="flex items-center">
+                {getCurrentSession().adminMode ? <div className="marcaAdmin" title="Ets administrador d'aquesta sessió">{"A"}</div> : ""}
+                {(masterMode && !getCurrentSession().localMode) ? <div className="marcaMaster" title="L'àudio d'aquesta sessió és en mode Master">{"M"}</div>:""}
+                {getCurrentSession().localMode ? <div className="marcaLocal" title="Aquesta sessió està carregada en mode Local">{"L"}</div> : ""}
+                {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
+                {(getCurrentSession().localMode && getCurrentSession().saveToServerEnabled ) ? <GuardarSessionWidget /> : ""} 
             </div>
-            <div className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
-            <div>
+            <div style={{width: 300}} className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
+            <div style={{width: 300, textAlign: "right"}}>
                 <a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a>
             </div>
         </div>
