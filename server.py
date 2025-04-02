@@ -76,6 +76,10 @@ Pots accedir al GRUF utilizant aquestes URLs:
 * {gruf_url_app_prefix}{session.id}/master/  (per connectar-te com a "màster")
 * {gruf_url_app_prefix}{session.id}/local/ (per connectar-te en mode local)
 
+Per administrar el GRUF (per exemple, per canviar el títol, els instruments o per eliminar-lo), pots accedir a la següent URL:
+
+* {gruf_url_app_prefix}{session.id}/?token={session.token}
+
 Gràcies per utilitzar el GRUF!
 
 - Versembrant
@@ -173,6 +177,10 @@ class Session(object):
     @property
     def id(self):
         return self.data['id']
+    
+    @property
+    def token(self):
+        return self.data.get('token', '')
     
     @property
     def name(self):
@@ -399,21 +407,21 @@ def old_gruf_address_redirect(session_id, rest=""):
 def session_master(session_id):
     s = get_session_by_id(session_id)
     if s is None: return redirect(url_for('app.connecta', error=True))
-    return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=True)
+    return render_template('sessio.html', session=s, local_mode=False, token=request.args.get("token", ""), master_audio_engine=True)
 
 
 @bp.route('/g/<session_id>/local/')
 def session_local(session_id):
     s = get_session_by_id(session_id)
     if s is None: return redirect(url_for('app.connecta', error=True))
-    return render_template('sessio.html', session=s, local_mode=True, master_audio_engine=True)
+    return render_template('sessio.html', session=s, local_mode=True, token=request.args.get("token", ""), master_audio_engine=True)
 
 
 @bp.route('/g/<session_id>/')
 def session(session_id):
     s = get_session_by_id(session_id)
     if s is None: return redirect(url_for('app.connecta', error=True))
-    return render_template('sessio.html', session=s, local_mode=False, master_audio_engine=False)
+    return render_template('sessio.html', session=s, local_mode=False, token=request.args.get("token", ""), master_audio_engine=False)
 
 
 @bp.route('/delete_session/<session_id>/')
