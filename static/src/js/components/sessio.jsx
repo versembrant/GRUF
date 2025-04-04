@@ -11,6 +11,7 @@ import logo_gruf from "../../img/logo_gruf.svg"
 import { IkigaiMetronome } from "./widgets";
 import { getAudioGraphInstance } from "../audioEngine";
 import { EditaSessioDialog } from "./editaSessioDialog";
+import { EliminaSessioDialog } from "./eliminaSessioDialog" 
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -58,7 +59,7 @@ const SessioHeader = ({ estacioSelected }) => {
     };
     return(
         <div className="header flex justify-between items-center">
-            <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }{getCurrentSession().adminMode ? <EditaSessioDialog/>: ""}</div>
+            <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }{getCurrentSession().adminMode ? <EditaSessioDialog/>: ""}{getCurrentSession().adminMode ? <EliminaSessioDialog/>: ""}</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
                 {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" && getCurrentSession().getEstacio(estacioSelected).showPanicButton === true ? <button className="btn-white btn-petit" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={() => getAudioGraphInstance().panic(estacioSelected)} title="Atura totes les notes que hagin quedat sonant">Pànic</button>:""}

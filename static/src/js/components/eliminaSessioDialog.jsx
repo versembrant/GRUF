@@ -2,26 +2,25 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { getCurrentSession } from '../sessionManager';
 
 
-export const EditaSessioDialog = () => {
+export const EliminaSessioDialog = () => {
 
     const handleCancel = () => {
     }
 
     const handleOk = () => {
-        const nom = document.getElementById("editaSessioNom").value;
-        getCurrentSession().updateParametreSessio("name", nom);
+        window.location.href = appPrefix + "/delete_session/" + getCurrentSession().getID();
     }
 
     const showDialog = () => {
-        confirmDialog({group: 'editSessio'});
+        confirmDialog({group: 'eliminaSessio'});
     };
 
     return (<div>
-        <button className="btn-petit btn-rosa btn-lletra-80" style={{marginLeft:8}} onClick={showDialog}>
-          Edita
+        <button className="btn-petit btn-vermell btn-lletra-80" style={{marginLeft:8}} onClick={showDialog}>
+          Elimina
         </button>
         <ConfirmDialog
-            group="editSessio"
+            group="eliminaSessio"
             content={({ hide }) => (
                 <div>
                     <div className="icona">
@@ -29,12 +28,10 @@ export const EditaSessioDialog = () => {
                     </div>
                     <div className="info">
                         <div className="titol">
-                            Edita la sessió <span className="text-grey">#{getCurrentSession().getID()}</span>
+                            Elimina la sessió <span className="text-grey">#{getCurrentSession().getID()}</span>
                         </div>
                         <div className="edita-sessio-dialog">
-                            <div className="input-title">
-                                Títol: <input id="editaSessioNom" name="name" defaultValue={getCurrentSession().getNom()} autoComplete="false" />
-                            </div>   
+                            Segur que la vols eliminar?
                         </div>
                     </div>
                     <div className="buttons">
@@ -45,8 +42,7 @@ export const EditaSessioDialog = () => {
                         <button className="btn-white" onClick={(evt) => {
                             hide(evt);
                             handleOk();
-                        }}>Guarda canvis</button>
-                        
+                        }}>Sí, elimina la sessió!</button>
                     </div>
                 </div>
             )}

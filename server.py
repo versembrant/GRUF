@@ -76,7 +76,7 @@ Pots accedir al GRUF utilizant aquestes URLs:
 * {gruf_url_app_prefix}{session.id}/master/  (per connectar-te com a "màster")
 * {gruf_url_app_prefix}{session.id}/local/ (per connectar-te en mode local)
 
-Per administrar el GRUF (per exemple, per canviar el títol, els instruments o per eliminar-lo), pots accedir a la següent URL:
+Per administrar el GRUF (per exemple, per canviar el títol o per eliminar-lo), pots accedir a la següent URL:
 
 * {gruf_url_app_prefix}{session.id}/?token={session.token}
 
