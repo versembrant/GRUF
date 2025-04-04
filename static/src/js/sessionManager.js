@@ -396,6 +396,7 @@ export class Session {
         if (token !== undefined) {
             this.adminMode = token === data.token;
         }
+        this.changeInstrumentsEnabled = this.adminMode
         this.continuousControlThrottleTime = 50
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades

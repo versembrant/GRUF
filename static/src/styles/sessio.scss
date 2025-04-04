@@ -104,3 +104,23 @@
     width: 20px;
     line-height: 20px;
 }
+
+.edita-sessio-dialog {
+    width: 70vw;
+
+    .input-title input {
+        width: 90%;
+        overflow:visible;
+        padding: 10px;
+        font-size: 1.2rem;
+        border: 2px solid $dark-grey;
+        border-radius: 10px;
+        background-color: transparent;
+        color: $white;
+        margin-left:10px;
+
+        &::placeholder {
+            color: $dark-grey;
+        }
+    }
+}

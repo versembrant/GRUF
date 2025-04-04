@@ -5,11 +5,12 @@ import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
 import { EstacioComputerUI } from "../components/estacioComputer";
 import { EntradaMidi } from "../components/entradaMidi";
-import { getURLParamValue, removeURLParam } from "../utils";
+import { getURLParamValue, removeURLParam, subscribeToPartialStoreChanges } from "../utils";
 import { SessionWelcomeDialog } from "../components/sessionWelcomeDialog";
 import logo_gruf from "../../img/logo_gruf.svg"
 import { IkigaiMetronome } from "./widgets";
 import { getAudioGraphInstance } from "../audioEngine";
+import { EditaSessioDialog } from "./editaSessioDialog";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -47,7 +48,8 @@ let estacioSelectedURLParam = getURLParamValue('e', undefined);
 
 const SessioHeader = ({ estacioSelected }) => {
     const [isMetronomeActive, setIsMetronomeActive] = useState(false);
-    const bpm = getAudioGraphInstance().getBpm(); // Obtiene el BPM actual
+
+    subscribeToPartialStoreChanges(getCurrentSession(), "name");
 
     const toggleMetronome = () => {
     const newState = !isMetronomeActive;
@@ -56,7 +58,7 @@ const SessioHeader = ({ estacioSelected }) => {
     };
     return(
         <div className="header flex justify-between items-center">
-            <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }</div>
+            <div className="titol ellipsis"><img src={logo_gruf} className="logo_gruf"/><span className="text-grey">#{ getCurrentSession().getID() }</span> { getCurrentSession().getNom() }{getCurrentSession().adminMode ? <EditaSessioDialog/>: ""}</div>
             <div className="flex justify-between items-center" style={{gap: '4px'}}>
                 {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" ? <EntradaMidi estacio={getCurrentSession().getEstacio(estacioSelected)}/>: ""}
                 {estacioSelected != undefined && estacioSelected != "Mixer" && estacioSelected != "Computer" && getCurrentSession().getEstacio(estacioSelected).showPanicButton === true ? <button className="btn-white btn-petit" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={() => getAudioGraphInstance().panic(estacioSelected)} title="Atura totes les notes que hagin quedat sonant">Pànic</button>:""}
@@ -65,7 +67,7 @@ const SessioHeader = ({ estacioSelected }) => {
                     className={`btn-petit btn-white ${isMetronomeActive ? "active" : ""}`}
                     title="Activa/desactiva el metrònom"
                     >
-                    <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={bpm} />
+                    <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={getAudioGraphInstance().getBpm()} />
                 </button>
                 <AudioTransportPlayStop playMode="live" />
             </div>

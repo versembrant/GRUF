@@ -32,12 +32,12 @@ export const SessionWelcomeDialog = ({sessionID, nomSessio}) => {
     }
 
     const showDialog = () => {
-        confirmDialog({group: 'headless'});
+        confirmDialog({group: 'triaAudio'});
     };
 
     return (
         <ConfirmDialog
-            group="headless"
+            group="triaAudio"
             content={({ hide }) => (
                 <div>
                     <div className="icona">

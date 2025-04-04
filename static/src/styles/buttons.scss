@@ -99,3 +99,14 @@ button, .btn {
     --text-color: #{lighten($red, 20%)};
     }
 }
+
+.btn-rosa {
+    --text-color: #{$pink};
+    &:hover {
+    --text-color: #{lighten($pink, 20%)};
+    }
+}
+
+.btn-lletra-80 {
+    font-size: 80%;
+}
