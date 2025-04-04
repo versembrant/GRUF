@@ -1,11 +1,11 @@
-import { subscribeToPartialStoreChanges, subscribeToStoreChanges } from "../utils";
+import { subscribeToStoreChanges, modelEditaSessioVisible } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import icona_play_live from "../../img/play_button.svg"
 import icona_play_arranjament from "../../img/play_button_grid.svg"
 import icona_stop_live from "../../img/stop_button.svg"
 import icona_stop_arranjament from "../../img/stop_button_grid.svg"
 import { useEffect } from "react";
-import { getCurrentSession } from "../sessionManager";
+
 
 const handlePlayButton = async (playMode) => {
     if (playMode !== 'live' && playMode !== 'arranjament') throw new Error(`Unknown playMode: ${playMode}`)
@@ -27,6 +27,9 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
         getAudioGraphInstance().isPlayingArranjament() ? icona_stop_arranjament : icona_stop_live;
     
     const handleKbPress = (e) => {
+        // Si el dialog d'esditar sessio està visible, no facis res
+        if (modalEditaSessioVisible())return;
+
         if (e.key !== " ") return; // only interested about space
         e.preventDefault(); // per defecte, la barra d'espai fa scroll vertical
         document.querySelector("#transport-toggle").click();

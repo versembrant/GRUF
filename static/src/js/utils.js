@@ -679,3 +679,7 @@ export const downloadedAudioRecordingFilename = () => {
     const date = new Date();
     return `GRUF_${getCurrentSession().getID()}_${slugify(getCurrentSession().getNom())}_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.wav`;
 }
+
+export const modalEditaSessioVisible = () => {
+    return document.querySelector("div[group='editSessio']") !== null 
+}
