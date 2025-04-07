@@ -1,13 +1,20 @@
 import { subscribeToParameterChanges } from "../utils"; // subscriptions
 import { getAudioGraphInstance } from "../audioEngine";
+import icona_recording from "../../img/record_button.svg"
+import icona_recording_vermell from "../../img/record_button_vermell.svg"
 
 export const SessionAudioRecorder = ({}) => {
     
-    subscribeToParameterChanges(getAudioGraphInstance(), 'isRecordArmed');
-    subscribeToParameterChanges(getAudioGraphInstance(), 'isRecordigSession');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'usesAudioEngine');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'recordArmed');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'isRecordingSession');
     
     const handleStartRecording = () => {
-        getAudioGraphInstance().startRecordingSession();
+        if (getAudioGraphInstance().isRecordArmed()) {
+            getAudioGraphInstance().setIsRecordArmed(false);
+        } else {
+            getAudioGraphInstance().startRecordingSession();
+        }
     }
     
     const handleStoptRecording = () => {
@@ -19,12 +26,12 @@ export const SessionAudioRecorder = ({}) => {
     
     let button;
     if (isRecording) {
-        button = <button className="btn-white session-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStoptRecording}>Atura la gravació</button>
+        button = <button className="btn-white btn-petit session-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStoptRecording} title="Atura la gravació"><img height="16px" src={icona_recording_vermell}/></button>
     } else {
         if (isRecordArmed) {
-            button = <button className="btn-white session-armed-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Esperant que començi l'àudio...</button>
+            button = <button className="btn-white btn-petit session-armed-recording" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording} title="Esperant que començi l'àudio..."><img height="16px" src={icona_recording}/></button>
         } else {
-            button = <button className="btn-white" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording}>Grava l'àudio</button>
+            button = <button className="btn-white btn-petit" disabled={!getAudioGraphInstance().usesAudioEngine()} onClick={handleStartRecording} title="Grava l'àudio"><img height="16px" src={icona_recording}/></button>
         }
     }
     return <div>{button}</div>

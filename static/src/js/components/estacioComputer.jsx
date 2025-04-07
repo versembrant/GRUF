@@ -1,8 +1,7 @@
 import { getAudioGraphInstance } from "../audioEngine";
 import { getCurrentSession } from "../sessionManager";
 import { subscribeToStoreChanges, getPatternPresetDisplayName } from "../utils";
-import { GrufButtonNoBorder, SpectrumGraph, GrufCanviaInstrument } from "../components/widgets";
-import { SessionAudioRecorder } from "./sessionAudioRecorder"
+import { SpectrumGraph, GrufCanviaInstrument } from "../components/widgets";
 import { AudioTransportPlayStop } from "./audioTransport"
 
 export const EstacioComputerUI = ({setEstacioSelected}) => {
@@ -80,7 +79,9 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
             <div className="flex flex-col gap-10 items-center p-10">
                 <div className="modul-border flex gap-10 flex-col p-4">
                     <div className="flex justify-between">
-                        <AudioTransportPlayStop playMode="arranjament" />
+                        <div className="flex gap-5">
+                            <AudioTransportPlayStop playMode="arranjament" />
+                        </div>
                         <button className="btn-vermell btn-petit" onClick={handleClearClips} title="Esborra arranjament">Esborra</button>
                     </div>
                     <div className="grid-computer">
@@ -90,7 +91,6 @@ export const EstacioComputerUI = ({setEstacioSelected}) => {
                     </div>
                 </div>
                 <SpectrumGraph />
-                <SessionAudioRecorder />
             </div>
         </div>
     </div>)

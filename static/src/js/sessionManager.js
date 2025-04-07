@@ -2,9 +2,8 @@ import * as Tone from 'tone';
 import { createStore, combineReducers } from "redux";
 import { makePartial } from 'redux-partial';
 import { sendMessageToServer, getSocketID } from "./serverComs";
-import { ensureValidValue, units } from "./utils";
+import { ensureValidValue, units, capitalizeFirstLetter, removeKeyFromDictionary } from "./utils";
 import { getAudioGraphInstance } from "./audioEngine";
-import { getInputAdornmentUtilityClass } from '@mui/material';
 
 var currentSession = undefined; 
 
@@ -326,6 +325,21 @@ export class EstacioBase {
         return {}
     }
 
+    destroyAudioGraph() {
+        this.onStopAllSounds()
+        for (const key of Object.keys(this.audioNodes)) {
+            if (key == "effects") {
+                for (const key2 of Object.keys(this.audioNodes.effects)) {
+                    const node = this.audioNodes.effects[key2];
+                    node.dispose();
+                }
+            } else {
+                const node = this.audioNodes[key];
+                node.dispose();
+            }
+        }
+    }
+
     updateAudioGraphFromState(preset) {
         // Called when we want to update the whole audio graph from the state (for example, to force syncing with the state)
         const parametersDict = {}
@@ -401,20 +415,9 @@ export class Session {
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data
-
-        // Crea objectes per cada estació i guardal's a la sessió
-        this.estacions = {}
-        Object.keys(this.rawData.estacions).forEach(nomEstacio => {
-            const estacioRawData = this.rawData.estacions[nomEstacio]
-            if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
-                const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
-                estacioObj.initialize(estacioRawData)
-                this.estacions[nomEstacio] = estacioObj
-            }
-        })
-
+    
         // Inicialitza un redux store amb les propietats de la sessió
-        this.propertiesInStore = ['id', 'name', 'connected_users', 'recorded_files', 'live', 'arranjament'];
+        this.propertiesInStore = ['id', 'name', 'connected_users', 'recorded_files', 'live', 'arranjament' ];
         const reducers = {};
         this.propertiesInStore.forEach(propertyName => {
             reducers[propertyName] = (state = this.rawData[propertyName], action) => {
@@ -426,7 +429,23 @@ export class Session {
                 }
             }
         });
+        // Afegeix una propietat "random_number" manualment, que només s'utilitza per si s'ha de forçar algun redraw d'algun component sense canviar cap paràmetre
+        reducers["random_number"] = (state = Math.random(), action) => {
+            switch (action.type) {
+                case 'SET_random_number':
+                return action.value;
+                default:
+                return state;
+            }
+        }
         this.store = makePartial(createStore(combineReducers(reducers)));
+
+        // Crea objectes per cada estació i guardal's a la sessió
+        this.estacions = {}
+        Object.keys(this.rawData.estacions).forEach(nomEstacio => {
+            const estacioRawData = this.rawData.estacions[nomEstacio]
+            this.afegeixEstacio(nomEstacio, estacioRawData)
+        })
     }
 
     setAudioOff() {
@@ -474,6 +493,7 @@ export class Session {
         this.getNomsEstacions().forEach(nomEstacio => {
             data.estacions[nomEstacio] = this.getEstacio(nomEstacio).getFullStateObject();
         })
+        data.token = this.rawData.token;
         data.bpm = getAudioGraphInstance().getBpm();
         data.swing = getAudioGraphInstance().getSwing();
         data.compas = getAudioGraphInstance().getCompas();
@@ -507,7 +527,69 @@ export class Session {
             console.error(error);
         });
     }
-    
+
+    afegeixEstacio(nomEstacio, estacioRawData, updateServer=false) {
+        // Crea l'objecte de l'estació i l'afegeix a la sessió
+        if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
+            const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
+            estacioObj.initialize(estacioRawData)
+            this.estacions[nomEstacio] = estacioObj
+        }
+
+        // Crea els objectes dels paràmetres "live" si no hi son
+        // Els paràmetres corresponents dins de live normalment ja hi seràn, a no ser que s'estigui afegint una estació nova, i en aquest cas es crearan al moment
+        const liveActualitzat = Object.assign({}, this.getLive());
+        if (!liveActualitzat.gainsEstacions.hasOwnProperty(nomEstacio)) {
+            addDefaultLiveParametersToLiveData(nomEstacio, liveActualitzat);
+            this.setParametreInStore('live', liveActualitzat);
+        }
+
+        // Si l'àudio graph ja està construït, afegeix l'estació si no hi és
+        // Això és útil quan afegim estacions que son noves a una sessió ja existent. Si no és el cas, l'àudio graph ja es crearà quan s'activi (si es necessita)
+        if (getAudioGraphInstance().isGraphBuilt()){
+            if (getAudioGraphInstance().estacionsMasterChannelNodes.hasOwnProperty(nomEstacio) === false){
+                getAudioGraphInstance().addEstacioToAudioGraph(nomEstacio);
+            }
+        }
+
+        // Trigueja  el redraw del component de triar instrument
+        this.setParametreInStore("random_number", Math.random());
+
+        // Guarda la nova sessió al servidor
+        // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
+        if (updateServer){
+            this.saveDataInServer();
+        }
+    }
+
+    eliminaEstacio(nomEstacio, updateServer=false) {
+        // Elimina l'estació de l'audio graph
+        if (getAudioGraphInstance().isGraphBuilt()){
+            getAudioGraphInstance().removeEstacioFromAudioGraph(nomEstacio);
+        }
+        // Elimina l'estació de l'objecte de la sessió i dels paràmetres "live" i "arranjement" relacionats
+        delete this.estacions[nomEstacio]
+        const liveActualitzat = this.getLive();
+        liveActualitzat.gainsEstacions = removeKeyFromDictionary(this.getLiveGainsEstacions(), nomEstacio);
+        liveActualitzat.pansEstacions = removeKeyFromDictionary(this.getLivePansEstacions(), nomEstacio);
+        liveActualitzat.mutesEstacions = removeKeyFromDictionary(this.getLiveMutesEstacions(), nomEstacio);
+        liveActualitzat.solosEstacions = removeKeyFromDictionary(this.getLiveSolosEstacions(), nomEstacio);
+        liveActualitzat.presetsEstacions = removeKeyFromDictionary(this.getLivePresetsEstacions(), nomEstacio);
+        this.setParametreInStore('live', liveActualitzat);
+        const arranjamentActualitat = this.getArranjament();
+        arranjamentActualitat.clips = arranjamentActualitat.clips.filter(clip => clip.estacio !== nomEstacio);
+        this.setParametreInStore('arranjament', arranjamentActualitat);
+
+        // Trigueja  el redraw del component de triar instrument
+        this.setParametreInStore("random_number", Math.random());
+
+        // Guarda la nova sessió al servidor
+        // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
+        if (updateServer){
+            this.saveDataInServer();
+        }
+    }
+
     updateParametreSessio(nomParametre, valor) {
         this.receiveUpdateParametreSessioFromServer(nomParametre, valor, null);
         if (this.localMode) return;
@@ -743,19 +825,23 @@ export class Session {
     }
 }
 
-export const  getNomEstacioFromTitle = (estacioTipus, nExisting) => {
+export const  getNomEstacioFromTipus = (estacioTipus, nExisting) => {
     return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
+}
+
+export const addDefaultLiveParametersToLiveData = (nomEstacio, liveData) => {
+    liveData.gainsEstacions[nomEstacio] = 1.0;
+    liveData.pansEstacions[nomEstacio] = 0.0;
+    liveData.mutesEstacions[nomEstacio] = false;
+    liveData.solosEstacions[nomEstacio] = false;
+    liveData.presetsEstacions[nomEstacio] = 0
 }
 
 export const addInitialEstacioSessionData = (sessionData, estacioClassName) => {
     const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-    const nomEstacio = getNomEstacioFromTitle(estacioClassName, numEstacionsSameClassAlreadyExisting);
+    const nomEstacio = getNomEstacioFromTipus(estacioClassName, numEstacionsSameClassAlreadyExisting);
     const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
     estacio.initialize();
     sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
-    sessionData.live.gainsEstacions[nomEstacio] = 1.0;
-    sessionData.live.pansEstacions[nomEstacio] = 0.0;
-    sessionData.live.mutesEstacions[nomEstacio] = false;
-    sessionData.live.solosEstacions[nomEstacio] = false;
-    sessionData.live.presetsEstacions[nomEstacio] = 0
+    addDefaultLiveParametersToLiveData(nomEstacio, sessionData.live);
 }

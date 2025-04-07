@@ -1,4 +1,4 @@
-import { subscribeToStoreChanges, modelEditaSessioVisible } from "../utils";
+import { subscribeToParameterChanges, modalEditaSessioVisible } from "../utils";
 import { getAudioGraphInstance } from "../audioEngine";
 import icona_play_live from "../../img/play_button.svg"
 import icona_play_arranjament from "../../img/play_button_grid.svg"
@@ -21,8 +21,11 @@ const handlePlayButton = async (playMode) => {
 
 // Aquest play/stop el mostrem a la part superior de les estacions
 export const AudioTransportPlayStop = ({ playMode='live' }) => {
-    subscribeToStoreChanges(getAudioGraphInstance());
 
+    subscribeToParameterChanges(getAudioGraphInstance(), 'usesAudioEngine');
+    subscribeToParameterChanges(getAudioGraphInstance(), 'isPlaying');    
+    subscribeToParameterChanges(getAudioGraphInstance(), 'isPlayingArranjament');    
+    
     const imgSrc = !getAudioGraphInstance().isPlaying() ? playMode === 'live' ? icona_play_live : icona_play_arranjament :
         getAudioGraphInstance().isPlayingArranjament() ? icona_stop_arranjament : icona_stop_live;
     
@@ -39,14 +42,12 @@ export const AudioTransportPlayStop = ({ playMode='live' }) => {
         return () => document.removeEventListener('keydown', handleKbPress);
     }, [])
 
-    const isRecording = getAudioGraphInstance().isRecording();
-
     return (
     <div>
         <button id="transport-toggle"
         title={"Play/stop" + (playMode === 'live' ? '' : ' arranjament')}
         disabled={!getAudioGraphInstance().usesAudioEngine()}
-        className={"btn-white btn-petit " + (isRecording ? "session-recording btn-red" : "")}
+        className={"btn-white btn-petit "}
         onClick={() => handlePlayButton(playMode)}>
             <img height="16px" src={imgSrc}/>
         </button>

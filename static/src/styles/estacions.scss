@@ -26,7 +26,7 @@
     .grid-estacions {
         display: grid;
         grid-template-columns: auto auto auto auto;
-        grid-gap: 10px;
+        grid-gap: 6px;
 
         .grid-estacio-element {
             padding:10px;
@@ -34,7 +34,8 @@
             color: $white;
             border-radius: 10px;
             border: 2px solid var(--accent-color);
-
+            height: 200px;
+            
             cursor: pointer;
 
             &:hover {
@@ -42,8 +43,12 @@
             }
 
             img {
-                height: 160px;
+                height: 148px;
                 margin-bottom: 5px;
+            }
+
+            &.grid-estacio-element-add {
+                align-content: center;
             }
         }
     }

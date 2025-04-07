@@ -1,5 +1,5 @@
 import { useState, createElement } from "react";
-import { getCurrentSession } from "../sessionManager";
+import { getCurrentSession, getNomEstacioFromTipus, estacionsDisponibles } from "../sessionManager";
 import { AudioTransportPlayStop } from "../components/audioTransport";
 import { SessionConnectedUsers } from "../components/sessionConnectedUsers";
 import { EstacioMixerUI } from "../components/estacioMixer";
@@ -12,6 +12,7 @@ import { IkigaiMetronome } from "./widgets";
 import { getAudioGraphInstance } from "../audioEngine";
 import { EditaSessioDialog } from "./editaSessioDialog";
 import { EliminaSessioDialog } from "./eliminaSessioDialog" 
+import { SessionAudioRecorder } from "./sessionAudioRecorder";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -71,6 +72,7 @@ const SessioHeader = ({ estacioSelected }) => {
                     <IkigaiMetronome isMetronomeActive={isMetronomeActive} bpm={getAudioGraphInstance().getBpm()} />
                 </button>
                 <AudioTransportPlayStop playMode="live" />
+                <SessionAudioRecorder />
             </div>
         </div>
     )
@@ -116,6 +118,8 @@ const EstacioUI = ({ estacioSelected, setEstacioSelected }) => {
 }
 
 const SelectorEstacions = ({ setEstacioSelected }) => {
+    subscribeToPartialStoreChanges(getCurrentSession(), "random_number");  // Utilitzat per si hem de forçar redraw d'aquesta part de la UI quan es canvien instruments
+
     const assignaEstacio = (nomEstacio) => {
         // Si l'estació no està disponible, mostrar un missatge d'error
         if (!estacioEstaDisponible(nomEstacio)) {
@@ -126,11 +130,24 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
         }
     }
 
+    const handleAfegeixEstacio = (tipus) => {
+        const numEstacionsSameClassAlreadyExisting = getCurrentSession().getNomsEstacions().filter((nomEstacio) => getCurrentSession().getEstacio(nomEstacio).tipus === tipus).length;
+        const nomEstacio = getNomEstacioFromTipus(tipus, numEstacionsSameClassAlreadyExisting);
+        const estacio = new estacionsDisponibles[tipus](nomEstacio);
+        estacio.initialize();
+        console.log(nomEstacio, estacio.getFullStateObject())
+        getCurrentSession().afegeixEstacio(nomEstacio, estacio.getFullStateObject(), true)
+    }
+
     return(
         <div className="tria-estacions">
             <h3 style={{fontWeight: 400}}>Tria un instrument:</h3>
             <div className="grid-estacions">
-                {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => <div key={nomEstacio} className={"grid-estacio-element" + " estacio-"+getCurrentSession().getEstacio(nomEstacio).tipus} data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}><img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/><div data-nom-estacio={nomEstacio}>{nomEstacio}</div></div>)}
+                {getCurrentSession().getNomsEstacions().map((nomEstacio, i) => 
+                    <div key={nomEstacio} className={"grid-estacio-element" + " estacio-"+getCurrentSession().getEstacio(nomEstacio).tipus} data-nom-estacio={nomEstacio} onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
+                        <img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/>
+                        <div data-nom-estacio={nomEstacio}>{nomEstacio}{getCurrentSession().changeInstrumentsEnabled ? <span onClick={(evt)=>{evt.stopPropagation(); getCurrentSession().eliminaEstacio(nomEstacio, true)}}><img src={appPrefix + "/static/src/img/trash.svg"} style={{height:20, width: 20, cursor:"pointer", verticalAlign: "middle", marginLeft: 10}}/></span> : ""}</div>
+                    </div>)}
                 <div className="grid-estacio-element estacio-mixer" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
                     <img data-nom-estacio="Mixer" src={appPrefix + "/static/src/img/mixer_miniature.jpg"} title="Mixer" />
                     <div data-nom-estacio="Mixer">Mixer</div>
@@ -139,6 +156,7 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
                     <img data-nom-estacio="Computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
                     <div data-nom-estacio="Computer">Computer</div>
                 </div>
+                {getCurrentSession().changeInstrumentsEnabled ? <div className="grid-estacio-element grid-estacio-element-add" onClick={() => handleAfegeixEstacio("synth")}>+ Afegir instrument</div> : ""}
             </div>
         </div>
     )

@@ -162,9 +162,7 @@ export class EstacioSampler extends EstacioBase {
                 }, player.fadeOut);
                 
             }
-
             soundPlayerNodes.player = player;
-            
             soundPlayers.push(soundPlayerNodes)
         }
         
@@ -175,6 +173,30 @@ export class EstacioSampler extends EstacioBase {
         
         this.addEffectChainNodes(lpf, estacioMasterChannel);
         this.isGraphBuilt = true;
+    }
+
+    destroyAudioGraph() {
+        this.onStopAllSounds()
+        for (const key of Object.keys(this.audioNodes)) {
+            if (key == "effects") {
+                for (const key2 of Object.keys(this.audioNodes.effects)) {
+                    const node = this.audioNodes.effects[key2];
+                    node.dispose();
+                }
+            } else if (key == "soundPlayers") {
+                for (const key2 of Object.keys(this.audioNodes.soundPlayers)) {
+                    const soundPlayer = this.audioNodes.soundPlayers[key2];
+                    soundPlayer.player.dispose();
+                    if (this.usePitchShifter) {
+                        soundPlayer.pitchShift.dispose();
+                    }
+                    soundPlayer.channel.dispose();
+                }
+            } else {
+                const node = this.audioNodes[key];
+                node.dispose();
+            }
+        }
     }
 
     setParameterInAudioGraph(name, value, preset) {

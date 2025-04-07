@@ -503,6 +503,36 @@ export class AudioGraph {
             isMetronomeEnabled() {
                 return this.store.getState().isMetronomeEnabled;
             }
+
+            addEstacioToAudioGraph(nomEstacio) {
+                const estacio = getCurrentSession().getEstacio(nomEstacio);
+                
+                const estacioMasterChannel = new Tone.Channel({channelCount: 2});
+                const estacioMuteChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
+                const estacioMeterNode = new Tone.Meter();
+                this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
+                this.estacionsMuteChannelNodes[nomEstacio] = estacioMuteChannel;
+                this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
+
+                estacioMasterChannel.connect(estacioMeterNode);
+                estacioMasterChannel.connect(estacioMuteChannel);
+                estacio.buildEstacioAudioGraph(estacioMasterChannel);
+                estacio.updateAudioGraphFromState(estacio.currentPreset);
+
+                // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
+                getCurrentSession().setLiveGainsEstacions({nomEstacio: getCurrentSession().rawData.live.gainsEstacions[nomEstacio]});
+                getCurrentSession().setLivePansEstacions({nomEstacio: getCurrentSession().rawData.live.pansEstacions[nomEstacio]});
+                getCurrentSession().setLiveMutesEstacions({nomEstacio: getCurrentSession().rawData.live.mutesEstacions[nomEstacio]});
+                getCurrentSession().setLiveSolosEstacions({nomEstacio: getCurrentSession().rawData.live.solosEstacions[nomEstacio]});
+            }
+
+            removeEstacioFromAudioGraph(nomEstacio) {
+                this.estacionsMasterChannelNodes[nomEstacio].dispose();
+                this.estacionsMuteChannelNodes[nomEstacio].dispose();
+                this.estacionsMeterNodes[nomEstacio].dispose();
+                const estacio = getCurrentSession().getEstacio(nomEstacio);
+                estacio.destroyAudioGraph();
+            }
             
             buildAudioGraph() {
                 console.log("Building audio graph")
@@ -538,29 +568,13 @@ export class AudioGraph {
                 
                 // Crea els nodes de cada estació i crea un gain individual per cada node (i guarda una referència a cada gain node)
                 getCurrentSession().getNomsEstacions().forEach(nomEstacio => {
-                    const estacio = getCurrentSession().getEstacio(nomEstacio);
-                    const estacioMasterChannel = new Tone.Channel({channelCount: 2});
-                    const estacioMuteChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
-                    const estacioMeterNode = new Tone.Meter();
-                    this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
-                    this.estacionsMuteChannelNodes[nomEstacio] = estacioMuteChannel;
-                    this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
-                    estacioMasterChannel.connect(estacioMeterNode);
-                    estacioMasterChannel.connect(estacioMuteChannel);
-                    estacio.buildEstacioAudioGraph(estacioMasterChannel);
-                    estacio.updateAudioGraphFromState(estacio.currentPreset);
+                    this.addEstacioToAudioGraph(nomEstacio);
                 })
                 
                 // Marca el graph com a construït
                 this.setParametreInStore('isGraphBuilt', true);
                 
-                // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-                getCurrentSession().setLiveGainsEstacions(getCurrentSession().rawData.live.gainsEstacions);
-                getCurrentSession().setLivePansEstacions(getCurrentSession().rawData.live.pansEstacions);
-                getCurrentSession().setLiveMutesEstacions(getCurrentSession().rawData.live.mutesEstacions);
-                getCurrentSession().setLiveSolosEstacions(getCurrentSession().rawData.live.solosEstacions);
-                
-                // Carrega els paràmetres dels efectes
+                // Carrega els paràmetres dels efectes generals
                 this.applyEffectParameters(this.getEffectParameters());
             }
             

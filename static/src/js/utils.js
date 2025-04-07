@@ -683,3 +683,9 @@ export const downloadedAudioRecordingFilename = () => {
 export const modalEditaSessioVisible = () => {
     return document.querySelector("div[group='editSessio']") !== null 
 }
+
+export const removeKeyFromDictionary = (dictionary, key) => {
+    var duplicate = Object.assign({}, dictionary);
+    delete duplicate[key];
+    return duplicate;
+}

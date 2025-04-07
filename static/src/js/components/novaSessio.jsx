@@ -1,6 +1,6 @@
-import { estacionsDisponibles } from "../sessionManager";
+import { estacionsDisponibles, getNomEstacioFromTipus, addInitialEstacioSessionData} from "../sessionManager";
 import { useState, useRef, useEffect } from "react";
-import { capitalizeFirstLetter, capitalize, sample, getAppVersion } from "../utils";
+import { capitalize, sample, getAppVersion } from "../utils";
 import { SessionLikeFrame } from "./connecta"
 
 const paraules = {
@@ -79,10 +79,6 @@ function generateTitle() {
     return title;
 }
 
-function getNomEstacioFromTitle(estacioTipus, nExisting) {
-    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
-}
-
 export const NovaSessio = () => {
     const defaultTitle = useRef(generateTitle());
     const estacionsDefault = Object.keys(estacionsDisponibles);
@@ -115,16 +111,7 @@ export const NovaSessio = () => {
         sessionData.live = {'gainsEstacions': {}, 'pansEstacions': {}, 'mutesEstacions': {}, 'solosEstacions': {}, 'presetsEstacions': {}, 'effectParameters': {}}
         sessionData.estacions = {}
         estacionsSelected.forEach(estacioClassName => {
-            const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-            const nomEstacio = getNomEstacioFromTitle(estacioClassName, numEstacionsSameClassAlreadyExisting);
-            const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
-            estacio.initialize();
-            sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
-            sessionData.live.gainsEstacions[nomEstacio] = 1.0;
-            sessionData.live.pansEstacions[nomEstacio] = 0.0;
-            sessionData.live.mutesEstacions[nomEstacio] = false;
-            sessionData.live.solosEstacions[nomEstacio] = false;
-            sessionData.live.presetsEstacions[nomEstacio] = 0
+            addInitialEstacioSessionData(sessionData, estacioClassName);
         })
         
         const form = document.querySelector('form');
@@ -149,17 +136,17 @@ export const NovaSessio = () => {
                         </div>                        
                     </div>
                     <div className="estacions-list">
-                        <h3>Estacions de la sessió:</h3>
+                        <h3>Instruments de la sessió:</h3>
                         <div className="selected-cards">
                             {estacionsSelected.map((tipusEstacio, i) => (
                                 <div className="card" key={tipusEstacio + '_' + i}>
-                                    {getNomEstacioFromTitle(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
+                                    {getNomEstacioFromTipus(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
                                     {estacionsSelected.length > 1 &&
                                         <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
                                     }
                                 </div>
                             ))}
-                            <div className="card" key={'computer_'}>Mixer</div>
+                            <div className="card" key={'mixer_'}>Mixer</div>
                             <div className="card" key={'computer_'}>Computer</div>
                         </div>
                         {estacionsSelected.length < 10 ?
@@ -191,10 +178,10 @@ const EstacioAdder = ({handleAddStation}) => {
                 value={selectedOption}
                 onChange={(evt) => setSelectedOption(evt.target.value)}>
                 {Object.keys(estacionsDisponibles).map(tipusEstacio => (
-                    <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTitle(tipusEstacio, -1)}</option>
+                    <option key={tipusEstacio} value={tipusEstacio}>{getNomEstacioFromTipus(tipusEstacio, -1)}</option>
                 ))}
             </select>
-            <button type="button" className="btn-black" onClick={() => handleAddStation(selectedOption)}>+ Afegir Estació</button>
+            <button type="button" className="btn-black" onClick={() => handleAddStation(selectedOption)}>+ Afegir instrument</button>
         </div>
     )
 }
