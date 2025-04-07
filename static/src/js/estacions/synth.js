@@ -78,6 +78,7 @@ export class BaseSynth extends EstacioBase {
     }
 
     setParameterInAudioGraph(name, value, preset) {
+        //console.log(this.tipus, name, value, preset)
         switch (name) {
             case "lpf":
                 if (this.poly) {

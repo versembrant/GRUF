@@ -505,25 +505,30 @@ export class AudioGraph {
             }
 
             addEstacioToAudioGraph(nomEstacio) {
+                if ((Tone.getContext() !== undefined) && (Tone.getContext() !== this.currentAudioContext)) {
+                    console.log("Audio context changed, re-setting context");
+                    Tone.setContext(this.currentAudioContext)
+                }
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 
                 const estacioMasterChannel = new Tone.Channel({channelCount: 2});
-                const estacioMuteChannel = new Tone.Channel({channelCount: 2}).connect(this.masterGainNode);
+                const estacioMuteChannel = new Tone.Channel({channelCount: 2});
                 const estacioMeterNode = new Tone.Meter();
                 this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
                 this.estacionsMuteChannelNodes[nomEstacio] = estacioMuteChannel;
                 this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
-
+                
+                estacioMuteChannel.connect(this.masterGainNode);
                 estacioMasterChannel.connect(estacioMeterNode);
                 estacioMasterChannel.connect(estacioMuteChannel);
                 estacio.buildEstacioAudioGraph(estacioMasterChannel);
                 estacio.updateAudioGraphFromState(estacio.currentPreset);
 
                 // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-                getCurrentSession().setLiveMutesEstacions({[nomEstacio]: getCurrentSession().rawData.live.mutesEstacions[nomEstacio]});
-                getCurrentSession().setLiveSolosEstacions({[nomEstacio]: getCurrentSession().rawData.live.solosEstacions[nomEstacio]});
-                getCurrentSession().setLiveGainsEstacions({[nomEstacio]: getCurrentSession().rawData.live.gainsEstacions[nomEstacio]});
-                getCurrentSession().setLivePansEstacions({[nomEstacio]: getCurrentSession().rawData.live.pansEstacions[nomEstacio]});
+                getCurrentSession().setLiveMutesEstacions({[nomEstacio]: getCurrentSession().getLiveMutesEstacions()[nomEstacio]});
+                getCurrentSession().setLiveSolosEstacions({[nomEstacio]: getCurrentSession().getLiveSolosEstacions()[nomEstacio]});
+                getCurrentSession().setLiveGainsEstacions({[nomEstacio]: getCurrentSession().getLiveGainsEstacions()[nomEstacio]});
+                getCurrentSession().setLivePansEstacions({[nomEstacio]: getCurrentSession().getLivePansEstacions()[nomEstacio]});
             }
 
             removeEstacioFromAudioGraph(nomEstacio) {
@@ -581,6 +586,7 @@ export class AudioGraph {
             async startAudioContext() {
                 if (audioContextIsReady) return;
                 await Tone.start()
+                this.currentAudioContext = Tone.getContext();
                 this.sessionRecorderNode = await createRecorderNode();
                 Tone.getDestination().connect(this.sessionRecorderNode);
                 console.log("Audio context started")

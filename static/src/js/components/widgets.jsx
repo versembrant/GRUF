@@ -538,7 +538,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
     subscribeToPresetChanges();
 
     const parameterDescription=estacio.getParameterDescription(parameterName);
-    const parameterValue=estacio.getParameterValue(parameterName);
+    const parameterValue=estacio.getParameterValue(parameterName);    
     const numSteps =  estacio.getNumSteps();
     const currentStep = getAudioGraphInstance().getMainSequencerCurrentStep() % numSteps;
     const uniqueId = estacio.nom + "_" + parameterDescription.nom

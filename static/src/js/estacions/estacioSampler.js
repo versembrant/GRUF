@@ -181,6 +181,7 @@ export class EstacioSampler extends EstacioBase {
             if (key == "effects") {
                 for (const key2 of Object.keys(this.audioNodes.effects)) {
                     const node = this.audioNodes.effects[key2];
+                    node.context._timeouts.cancel(0);
                     node.dispose();
                 }
             } else if (key == "soundPlayers") {
@@ -188,6 +189,7 @@ export class EstacioSampler extends EstacioBase {
                     const soundPlayer = this.audioNodes.soundPlayers[key2];
                     soundPlayer.player.dispose();
                     if (this.usePitchShifter) {
+                        soundPlayer.pitchShift.context._timeouts.cancel(0);
                         soundPlayer.pitchShift.dispose();
                     }
                     soundPlayer.channel.dispose();

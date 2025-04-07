@@ -331,10 +331,12 @@ export class EstacioBase {
             if (key == "effects") {
                 for (const key2 of Object.keys(this.audioNodes.effects)) {
                     const node = this.audioNodes.effects[key2];
+                    node.context._timeouts.cancel(0);
                     node.dispose();
                 }
             } else {
                 const node = this.audioNodes[key];
+                node.context._timeouts.cancel(0);
                 node.dispose();
             }
         }
@@ -529,7 +531,7 @@ export class Session {
     }
 
     afegeixEstacio(nomEstacio, estacioRawData, updateServer=false) {
-        console.log("Afegint estació " + nomEstacio)
+        
         // Crea l'objecte de l'estació i l'afegeix a la sessió
         if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
             const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
@@ -545,6 +547,9 @@ export class Session {
             this.setParametreInStore('live', liveActualitzat);
         }
 
+        // Configura el paràmetre current preset
+        this.estacions[nomEstacio].currentPreset = liveActualitzat.presetsEstacions[nomEstacio]
+        
         // Si l'àudio graph ja està construït, afegeix l'estació si no hi és
         // Això és útil quan afegim estacions que son noves a una sessió ja existent. Si no és el cas, l'àudio graph ja es crearà quan s'activi (si es necessita)
         if (getAudioGraphInstance().isGraphBuilt()){

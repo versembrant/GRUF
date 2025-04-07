@@ -13,6 +13,7 @@ import { getAudioGraphInstance } from "../audioEngine";
 import { EditaSessioDialog } from "./editaSessioDialog";
 import { EliminaSessioDialog } from "./eliminaSessioDialog" 
 import { SessionAudioRecorder } from "./sessionAudioRecorder";
+import { AfegirInstrumentDialog } from "./afegirInstrumentDialog";
 
 const Estacio = ({estacio, setEstacioSelected}) => {
     return createElement(estacio.getUserInterfaceComponent(), {estacio, setEstacioSelected})
@@ -167,7 +168,7 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
                     <img data-nom-estacio="Computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
                     <div data-nom-estacio="Computer">Computer</div>
                 </div>
-                {(getCurrentSession().changeInstrumentsEnabled && getCurrentSession().getNomsEstacions().length < 10) ? <div className="grid-estacio-element grid-estacio-element-add" onClick={() => handleAfegeixEstacio("synth")}>+ Afegir instrument</div> : ""}
+                {(getCurrentSession().changeInstrumentsEnabled && getCurrentSession().getNomsEstacions().length < 10) ? <AfegirInstrumentDialog callback={(tipus) => handleAfegeixEstacio(tipus)}/> : ""}
             </div>
         </div>
     )

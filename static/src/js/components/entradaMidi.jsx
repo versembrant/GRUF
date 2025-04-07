@@ -17,6 +17,9 @@ export const sendNoteOn = (nomEstacio, noteNumber, noteVelocity, skipTriggerEven
         type: 'noteOn',
         skipTriggerEvent: skipTriggerEvent // Don't trigger event when receiving the note message, in this way it will not be shown in piano rolls
     }
+    if (!document.notesActivades.hasOwnProperty(nomEstacio)) {
+        document.notesActivades[nomEstacio] = new Set();
+    }
     document.notesActivades[nomEstacio].add(noteNumber);
     const doSendToServer = document.getElementById("forwardToServer").checked || false;
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, doSendToServer);
@@ -30,7 +33,9 @@ export const sendNoteOff = (nomEstacio, noteNumber, noteVelocity, extras={}) => 
         type: 'noteOff',
         ...extras
     }
-    document.notesActivades[nomEstacio].delete(noteNumber);
+    if (document.notesActivades.hasOwnProperty(nomEstacio)) {
+        document.notesActivades[nomEstacio].delete(noteNumber);
+    }
     getAudioGraphInstance().sendMidiEvent(nomEstacio, messageData, document.getElementById("forwardToServer")?.checked ?? !getAudioGraphInstance().usesAudioEngine());
 }
 
