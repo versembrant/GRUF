@@ -627,6 +627,14 @@ def on_update_parametre_estacio(data):  # session_id, nom_estacio, nom_parametre
     if s is None:
         raise Exception('Session not found')
     s.update_parametre_estacio(data['nom_estacio'], data['nom_parametre'], data['valor'], data['preset'], origin_socket_id=data['origin_socket_id'])
+
+
+@socketio.on('forward_canvis_estacions')
+def on_forward_canvis_estacions(data):  # session_id, action, new_estacio_data?
+    s = get_session_by_id(data['session_id'])
+    if s is None:
+        raise Exception('Session not found')
+    emit('forward_canvis_estacions', data, to=s.room_name)
     
 
 @socketio.on('update_parametre_audio_graph')

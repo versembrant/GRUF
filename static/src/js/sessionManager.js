@@ -531,6 +531,7 @@ export class Session {
     }
 
     afegeixEstacio(nomEstacio, estacioRawData, updateServer=false) {
+        if (Object.keys(this.estacions).includes(nomEstacio) === true){return;}
         
         // Crea l'objecte de l'estació i l'afegeix a la sessió
         if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
@@ -562,13 +563,16 @@ export class Session {
         this.setParametreInStore("random_number", Math.random());
 
         // Guarda la nova sessió al servidor
-        // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
         if (updateServer && !this.localMode){
             this.saveDataInServer();
+            // Si hi ha altres clients connectats, notifica els canvis perquè els apliquin a la seva sessió
+            sendMessageToServer("forward_canvis_estacions", {accio:"afegeix_estacio", nom_estacio: nomEstacio, estacio_data: estacioRawData});
         }
     }
 
     eliminaEstacio(nomEstacio, updateServer=false) {
+        if (getCurrentSession().getNomsEstacions().includes(nomEstacio) === false){return;}
+
         // Elimina l'estació de l'audio graph
         if (getAudioGraphInstance().isGraphBuilt()){
             getAudioGraphInstance().removeEstacioFromAudioGraph(nomEstacio);
@@ -590,9 +594,10 @@ export class Session {
         this.setParametreInStore("random_number", Math.random());
 
         // Guarda la nova sessió al servidor
-        // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
         if (updateServer && !this.localMode){
             this.saveDataInServer();
+            // Si hi ha altres clients connectats, notifica els canvis perquè els apliquin a la seva sessió
+            sendMessageToServer("forward_canvis_estacions", {accio:"elimina_estacio", nom_estacio: nomEstacio});
         }
     }
 

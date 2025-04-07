@@ -85,10 +85,16 @@ const SessioFooter = ({estacioSelected}) => {
 
     const estacio = estacioSelected ? getCurrentSession().getEstacio(estacioSelected) : undefined;
     let estacioTipus = estacio ? estacio.tipus : undefined;
+    let estacioNumero = -1
     if (estacioSelected === "Mixer") {
         estacioTipus = "mixer";
     } else if (estacioSelected === "Computer") {
         estacioTipus = "computer";
+    } else {
+        if (estacioSelected !== undefined) {
+            const lastSpaceIndex = estacioSelected.lastIndexOf(" ");
+            estacioNumero = parseInt(estacioSelected.substring(lastSpaceIndex + 1));
+        }
     }
 
     return(
@@ -100,7 +106,10 @@ const SessioFooter = ({estacioSelected}) => {
                 {getCurrentSession().localMode ? "": <SessionConnectedUsers />}
                 {(getCurrentSession().localMode && getCurrentSession().saveToServerEnabled ) ? <GuardarSessionWidget /> : ""} 
             </div>
-            <div style={{width: 300}} className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
+            <div className="flex" style={{width: 300, justifyContent: "center", alignItems: "center"}}>
+                <div className={estacioTipus ? "logo-estacio-no-hover estacio-" + estacioTipus + "-logo": ""}></div>
+                {estacioNumero > 0 ? <span className="text-white" style={{fontSize:20}}>- {estacioNumero}</span>:""}
+            </div>
             <div style={{width: 300, textAlign: "right"}}>
                 <a className="btn-petit no-border" href={appPrefix + "/"}>Surt del GRUF</a>
             </div>
@@ -175,11 +184,18 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
 }
 
 export const Sessio = () => {
+    subscribeToPartialStoreChanges(getCurrentSession(), "random_number");  // Utilitzat per si hem de forçar redraw d'aquesta part de la UI quan es canvien instruments
+    
     if (!estacioEstaDisponible(estacioSelectedURLParam)) { 
         onEstacioNoDisponible(estacioSelectedURLParam)
         estacioSelectedURLParam = undefined
     };
     const [estacioSelected, setEstacioSelected] = useState(estacioSelectedURLParam);  // Local state for component Sessio
+    
+    // Si hi ha seleccionada una estació que s'ha eliminat, treure-la de la selecció
+    if (!estacioEstaDisponible(estacioSelected)) {
+        setEstacioSelected(undefined);
+    }
 
     let showMainUI = true;
     if (location.href.indexOf("minimalui=1") != -1) {

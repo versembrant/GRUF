@@ -54,21 +54,26 @@
     }
     &.estacio-piano-logo {
         background-image: url("../img/piano_logo.svg");
+        width: 95px;
     }
     &.estacio-groovebox-logo {
         background-image: url("../img/groovebox_logo.svg");
+        width: 150px;
     }
     &.estacio-synth-logo {
         background-image: url("../img/synth_logo.svg");
+        width: 80px;
     }
     &.estacio-sampler-logo {
         background-image: url("../img/sampler_logo.svg");
+        width: 130px;
     }
     &.estacio-mixer-logo {
         background-image: url("../img/mixer_logo.svg");
     }
     &.estacio-synth_bass-logo {
         background-image: url("../img/synth_bass_logo.svg");
+        width: 150px;
     }
 }
 

@@ -126,7 +126,15 @@ const onMessageFromServer = (name, data) => {
         getAudioGraphInstance().receiveUpdateParametreAudioGraphFromServer(data.nom_parametre, data.valor, data.origin_socket_id);
     } else if (name === 'midi_event'){
         getAudioGraphInstance().receiveMidiEventFromServer(data.nom_estacio, data.midi_event_data);
-    } 
+    } else if (name === 'forward_canvis_estacions'){
+        if (data.origin_socket_id !== getSocketID()){
+            if (data.accio == 'afegeix_estacio') {
+                getCurrentSession().afegeixEstacio(data.nom_estacio, data.estacio_data);
+            } else if (data.accio == 'elimina_estacio') {
+                getCurrentSession().eliminaEstacio(data.nom_estacio);
+            }
+        }
+    }
 }
 
 socket.on('message', function (message) {
@@ -159,4 +167,8 @@ socket.on('update_parametre_audio_graph', function (data) {
 
 socket.on('midi_event', function (data) {
     onMessageFromServer('midi_event', data);
+});
+
+socket.on('forward_canvis_estacions', function (data) {
+    onMessageFromServer('forward_canvis_estacions', data);
 });
