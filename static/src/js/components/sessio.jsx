@@ -169,11 +169,11 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
                         <img data-nom-estacio={nomEstacio} src={appPrefix + "/static/src/img/" + getCurrentSession().getEstacio(nomEstacio).tipus + "_miniature.jpg"} title={nomEstacio}/>
                         <div data-nom-estacio={nomEstacio}>{nomEstacio}{getCurrentSession().changeInstrumentsEnabled ? <span onClick={(evt)=>{evt.stopPropagation(); getCurrentSession().eliminaEstacio(nomEstacio, true)}}><img src={appPrefix + "/static/src/img/trash.svg"} style={{height:20, width: 20, cursor:"pointer", verticalAlign: "middle", marginLeft: 10}}/></span> : ""}</div>
                     </div>)}
-                <div className="grid-estacio-element estacio-mixer" data-nom-estacio="mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
+                <div className="grid-estacio-element estacio-mixer" data-nom-estacio="Mixer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
                     <img data-nom-estacio="Mixer" src={appPrefix + "/static/src/img/mixer_miniature.jpg"} title="Mixer" />
                     <div data-nom-estacio="Mixer">Mixer</div>
                 </div>
-                <div className="grid-estacio-element estacio-computer" data-nom-estacio="computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
+                <div className="grid-estacio-element estacio-computer" data-nom-estacio="Computer" onClick={(evt)=>{assignaEstacio(evt.target.dataset.nomEstacio)}}>
                     <img data-nom-estacio="Computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
                     <div data-nom-estacio="Computer">Computer</div>
                 </div>
@@ -194,7 +194,7 @@ export const Sessio = () => {
     
     // Si hi ha seleccionada una estació que s'ha eliminat, treure-la de la selecció
     if (!estacioEstaDisponible(estacioSelected)) {
-        setEstacioSelected(undefined);
+        //setEstacioSelected(undefined);
     }
 
     let showMainUI = true;
