@@ -5,6 +5,7 @@ import { getCurrentSession } from "../sessionManager";
 import { clamp } from '../utils';
 import { subscribeToStoreChanges } from "../utils";
 import mic_icon from "../../img/microphone.svg";
+import loading_icon from "../../img/loading.gif";
 import stop_icon from "../../img/stop_button.svg";
 
 const recorder = new Tone.Recorder();
@@ -17,6 +18,11 @@ let startedRecordingTime = undefined;
 let recording = undefined;
 
 export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) => {
+
+    const [isRecButtonDisabled, setRecButtonDisabled] = useState(false);
+    const [isStopButtonDisabled, setStopButtonDisabled] = useState(true);
+    const [isSendButtonDisabled, setSendButtonDisabled] = useState(true);
+    const [isSendingToServer, setIsSendingToServer] = useState(false);
 
     subscribeToStoreChanges(getCurrentSession());
     
@@ -62,6 +68,7 @@ export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) 
     }
 
     const handleSendToServerButton = () => {
+        setIsSendingToServer(true);
         const uploadFileUrl = appPrefix + '/upload_file/' + getCurrentSession().getID() + '/';
         const extension = recorder.mimeType.split('/')[1].split(';')[0];
         const filename = 'file_' + new Date().toISOString().replaceAll(':', '-') + '.' + extension;
@@ -73,6 +80,7 @@ export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) 
         }) 
         .then(response => {
             response.json().then(data => {
+                setIsSendingToServer(false);
                 if (!data.error){
                     document.getElementById("serverFileURL").innerHTML = 'Sent to server!: <a href="' + data.url + '" target="_blank">' + data.url + '</a>';
                     if (onRecordUploadedCallback) {
@@ -139,13 +147,9 @@ export const AudioRecorder = ({setInputMeterPercent, onRecordUploadedCallback}) 
         else handleStopAndUploadButton();
     }
 
-    const [isRecButtonDisabled, setRecButtonDisabled] = useState(false);
-    const [isStopButtonDisabled, setStopButtonDisabled] = useState(true);
-    const [isSendButtonDisabled, setSendButtonDisabled] = useState(true);
-
     return (<div className="sampler-record-widget flex justify-between items-center">
         <button className={`sampler-record-btn ${isRecButtonDisabled ? "recording" : ""}`} id="toggleRecording" onClick={handleRecToggle}>
-            <img src={(!isRecButtonDisabled) ? mic_icon : stop_icon}/>
+            <img src={(!isRecButtonDisabled) ? (isSendingToServer ? loading_icon: mic_icon) : stop_icon}/>
         </button>
         <div style={{display:"none"}}>
             <span id="recordingLength"></span>

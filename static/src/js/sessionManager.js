@@ -742,3 +742,20 @@ export class Session {
         this.setParametreInStore('arranjament', arranjamentActualitat);
     }
 }
+
+export const  getNomEstacioFromTitle = (estacioTipus, nExisting) => {
+    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
+}
+
+export const addInitialEstacioSessionData = (sessionData, estacioClassName) => {
+    const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
+    const nomEstacio = getNomEstacioFromTitle(estacioClassName, numEstacionsSameClassAlreadyExisting);
+    const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
+    estacio.initialize();
+    sessionData.estacions[nomEstacio] = estacio.getFullStateObject();
+    sessionData.live.gainsEstacions[nomEstacio] = 1.0;
+    sessionData.live.pansEstacions[nomEstacio] = 0.0;
+    sessionData.live.mutesEstacions[nomEstacio] = false;
+    sessionData.live.solosEstacions[nomEstacio] = false;
+    sessionData.live.presetsEstacions[nomEstacio] = 0
+}
