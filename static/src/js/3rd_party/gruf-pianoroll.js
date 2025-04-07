@@ -1180,20 +1180,21 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
             const realYOffset = this.steph*this.yoffset;
             const octaveHeight = this.steph*12;
             const whiteKeyHeight = octaveHeight/7;
-            const translucidAccentColor = this.colnote + "aa";
-
+            const accentColor = this.colnote;
+            const wrongNoteColor = this.colnotedissalowed;
+            
             if (this.blackWhiteKeyLengthEqual) {
                 for(let n=0;n<128;++n){
                     const midiNote = n
-                    const keyHeight = octaveHeight/12;  // only used if this.blackWhiteKeyLengthEqual is true         
-                    // Check if n (midiNote) corresponds to a black key form the piano
+                    const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(n) > -1;
+                    const keyHeight = octaveHeight/12; 
                     const pc = midiNote % 12;
                     const isWhiteKey = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1][pc] === 1;
-                    this.ctx.fillStyle=isWhiteKey ? this.externalnoteons.has(midiNote) ? translucidAccentColor: "white": "black";     
+                    this.ctx.fillStyle=isWhiteKey ? this.externalnoteons.has(midiNote) ? noteIsAllowed ? accentColor: wrongNoteColor: "white": "black";     
                     let ys = this.height - (n - this.yoffset) * keyHeight;
                     this.ctx.fillRect(this.yruler, ys, this.kbwidth,-keyHeight);
                     if (this.externalnoteons.has(midiNote) && !isWhiteKey) {
-                        this.ctx.fillStyle = translucidAccentColor;
+                        this.ctx.fillStyle =  noteIsAllowed ? accentColor: wrongNoteColor;
                         this.ctx.fillRect(this.yruler, ys, this.kbwidth, -keyHeight);
                     }
                     this.ctx.fillStyle=this.colgrid;
@@ -1207,11 +1208,12 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
                     for(let octave=0;;octave++) {
                         const n = octave*12 + pc;
+                        const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(n) > -1;
                         if (n > 127) break;
                         const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset;
                         // white keys
                         if (this.externalnoteons.has(n)) {
-                            this.ctx.fillStyle = translucidAccentColor;
+                            this.ctx.fillStyle = noteIsAllowed ? accentColor: wrongNoteColor;
                             this.ctx.fillRect(this.yruler, ys, this.kbwidth, -whiteKeyHeight);
                         };
                         // grey lines
@@ -1229,12 +1231,13 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                     const whiteKeyOffset = this.semiflag.slice(0, pc).filter(flag=> !(flag&1)).length * whiteKeyHeight;
                     for(let octave=0;;octave++) {
                         const n = octave*12 + pc;
+                        const noteIsAllowed = this.allowednotes.length === 0 ? true: this.allowednotes.indexOf(n) > -1;
                         if (n > 127) break;
                         const ys=this.height-octaveHeight*octave-whiteKeyOffset+realYOffset+blackKeyHeight/2;
                         this.ctx.fillStyle = "black"; // we always draw the black key
                         this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
                         if (!this.externalnoteons.has(n)) continue;
-                        this.ctx.fillStyle = translucidAccentColor; // and then we draw the colored ones if needed
+                        this.ctx.fillStyle = noteIsAllowed ? accentColor: wrongNoteColor; // and then we draw the colored ones if needed
                         this.ctx.fillRect(this.yruler, ys, this.kbwidth/2, -blackKeyHeight);
                     };
                 }
