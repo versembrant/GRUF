@@ -49,11 +49,11 @@ export const Connecta = ({infoSessions}) => {
     const connectError = document.getElementById('root').dataset.connectError === "True";
     return <SessionLikeFrame content={
         <div className="connectat">
-            {connectError && <p class="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
+            {connectError && <p className="connect-error">Oh no! Aquest Gruf no existeix! :(</p>}
             <div>
                 <h1>ID del GRUF: <input id="grufIdInput" type="text"></input></h1>
                 <ul>
-                    <li><a href={appPrefix + "/nova_sessio"} class="btn btn-black">Crea un nou GRUF</a></li>
+                    <li><a href={appPrefix + "/nova_sessio"} className="btn btn-black">Crea un nou GRUF</a></li>
                     <li><button id="connectaButton" className="btn btn-black--primary"
                         onClick={goToGruf}
                     >Connecta't al GRUF</button></li>

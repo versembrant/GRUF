@@ -135,7 +135,6 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
         const nomEstacio = getNomEstacioFromTipus(tipus, numEstacionsSameClassAlreadyExisting);
         const estacio = new estacionsDisponibles[tipus](nomEstacio);
         estacio.initialize();
-        console.log(nomEstacio, estacio.getFullStateObject())
         getCurrentSession().afegeixEstacio(nomEstacio, estacio.getFullStateObject(), true)
     }
 

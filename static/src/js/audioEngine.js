@@ -520,10 +520,10 @@ export class AudioGraph {
                 estacio.updateAudioGraphFromState(estacio.currentPreset);
 
                 // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-                getCurrentSession().setLiveGainsEstacions({nomEstacio: getCurrentSession().rawData.live.gainsEstacions[nomEstacio]});
-                getCurrentSession().setLivePansEstacions({nomEstacio: getCurrentSession().rawData.live.pansEstacions[nomEstacio]});
-                getCurrentSession().setLiveMutesEstacions({nomEstacio: getCurrentSession().rawData.live.mutesEstacions[nomEstacio]});
-                getCurrentSession().setLiveSolosEstacions({nomEstacio: getCurrentSession().rawData.live.solosEstacions[nomEstacio]});
+                getCurrentSession().setLiveMutesEstacions({[nomEstacio]: getCurrentSession().rawData.live.mutesEstacions[nomEstacio]});
+                getCurrentSession().setLiveSolosEstacions({[nomEstacio]: getCurrentSession().rawData.live.solosEstacions[nomEstacio]});
+                getCurrentSession().setLiveGainsEstacions({[nomEstacio]: getCurrentSession().rawData.live.gainsEstacions[nomEstacio]});
+                getCurrentSession().setLivePansEstacions({[nomEstacio]: getCurrentSession().rawData.live.pansEstacions[nomEstacio]});
             }
 
             removeEstacioFromAudioGraph(nomEstacio) {

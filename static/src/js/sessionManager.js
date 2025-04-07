@@ -529,6 +529,7 @@ export class Session {
     }
 
     afegeixEstacio(nomEstacio, estacioRawData, updateServer=false) {
+        console.log("Afegint estació " + nomEstacio)
         // Crea l'objecte de l'estació i l'afegeix a la sessió
         if (estacionsDisponibles.hasOwnProperty(estacioRawData.tipus)) {
             const estacioObj = new estacionsDisponibles[estacioRawData.tipus](nomEstacio)
@@ -557,7 +558,7 @@ export class Session {
 
         // Guarda la nova sessió al servidor
         // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
-        if (updateServer){
+        if (updateServer && !this.localMode){
             this.saveDataInServer();
         }
     }
@@ -585,7 +586,7 @@ export class Session {
 
         // Guarda la nova sessió al servidor
         // TODO: si hi ha altres clients connectats, haurien d'actualizar també la seva sessió...
-        if (updateServer){
+        if (updateServer && !this.localMode){
             this.saveDataInServer();
         }
     }

@@ -8,7 +8,11 @@ import { sampleLibrary} from "./sampleLibrary";
 
 export const buildAudioGraphIfNotBuilt = async () => {  
     if (!getAudioGraphInstance().isGraphBuilt()) {
-        //await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
+        if (location.href.indexOf("audio=1") == -1) {
+            // Initialize web audio context if not initialized yet
+            // Except if audio=1, in that case context will only get started when pressing "play"
+            await getAudioGraphInstance().startAudioContext();  
+        }
         getAudioGraphInstance().buildAudioGraph();  // Only build audio graph the first time "play" is pressed
     }
 }
