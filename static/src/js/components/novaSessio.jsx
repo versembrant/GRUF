@@ -140,7 +140,7 @@ export const NovaSessio = () => {
                         <div className="selected-cards">
                             {estacionsSelected.map((tipusEstacio, i) => (
                                 <div className="card" key={tipusEstacio + '_' + i}>
-                                    {getNomEstacioFromTipus(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length - 1)}
+                                    {getNomEstacioFromTipus(tipusEstacio, estacionsSelected.filter((tipus, j) => (tipus === tipusEstacio && j<=i)).length)}
                                     {estacionsSelected.length > 1 &&
                                         <div className="delete-btn" onClick={() => handleRemoveStation(i)}><img src={appPrefix + "/static/src/img/trash.svg"}></img></div>
                                     }

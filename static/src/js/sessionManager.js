@@ -826,8 +826,8 @@ export class Session {
     }
 }
 
-export const  getNomEstacioFromTipus = (estacioTipus, nExisting) => {
-    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${nExisting > -1 ? nExisting + 1: ""}`;
+export const  getNomEstacioFromTipus = (estacioTipus, numero=0) => {
+    return `${capitalizeFirstLetter(estacioTipus.replaceAll("_", " "))} ${numero > 0 ? numero: ""}`;
 }
 
 export const addDefaultLiveParametersToLiveData = (nomEstacio, liveData) => {
@@ -840,7 +840,7 @@ export const addDefaultLiveParametersToLiveData = (nomEstacio, liveData) => {
 
 export const addInitialEstacioSessionData = (sessionData, estacioClassName) => {
     const numEstacionsSameClassAlreadyExisting = Object.keys(sessionData.estacions).filter((nomEstacio) => sessionData.estacions[nomEstacio].tipus === estacioClassName).length;
-    const nomEstacio = getNomEstacioFromTipus(estacioClassName, numEstacionsSameClassAlreadyExisting);
+    const nomEstacio = getNomEstacioFromTipus(estacioClassName, numEstacionsSameClassAlreadyExisting + 1);
     const estacio = new estacionsDisponibles[estacioClassName](nomEstacio);
     estacio.initialize();
     sessionData.estacions[nomEstacio] = estacio.getFullStateObject();

@@ -131,8 +131,20 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
     }
 
     const handleAfegeixEstacio = (tipus) => {
-        const numEstacionsSameClassAlreadyExisting = getCurrentSession().getNomsEstacions().filter((nomEstacio) => getCurrentSession().getEstacio(nomEstacio).tipus === tipus).length;
-        const nomEstacio = getNomEstacioFromTipus(tipus, numEstacionsSameClassAlreadyExisting);
+        // Troba l'estacio del mateix tipus que ja existeix i extreu el seu número del nom
+        let biggestNumber = 0;
+        getCurrentSession().getNomsEstacions().forEach((nomEstacio) => {
+            const estacio = getCurrentSession().getEstacio(nomEstacio);
+            if (estacio.tipus === tipus) {
+                // Number is the last part of the name after the last space
+                const lastSpaceIndex = nomEstacio.lastIndexOf(" ");
+                const number = parseInt(nomEstacio.substring(lastSpaceIndex + 1));
+                if (number > biggestNumber) {
+                    biggestNumber = number;
+                }
+            }
+        });
+        const nomEstacio = getNomEstacioFromTipus(tipus, biggestNumber + 1);
         const estacio = new estacionsDisponibles[tipus](nomEstacio);
         estacio.initialize();
         getCurrentSession().afegeixEstacio(nomEstacio, estacio.getFullStateObject(), true)
@@ -155,7 +167,7 @@ const SelectorEstacions = ({ setEstacioSelected }) => {
                     <img data-nom-estacio="Computer" src={appPrefix + "/static/src/img/computer_miniature.jpg"} title="Computer" />
                     <div data-nom-estacio="Computer">Computer</div>
                 </div>
-                {getCurrentSession().changeInstrumentsEnabled ? <div className="grid-estacio-element grid-estacio-element-add" onClick={() => handleAfegeixEstacio("synth")}>+ Afegir instrument</div> : ""}
+                {(getCurrentSession().changeInstrumentsEnabled && getCurrentSession().getNomsEstacions().length < 10) ? <div className="grid-estacio-element grid-estacio-element-add" onClick={() => handleAfegeixEstacio("synth")}>+ Afegir instrument</div> : ""}
             </div>
         </div>
     )
