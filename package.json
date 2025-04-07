@@ -5,7 +5,6 @@
     "static/src/js/pagines/sessio.js",
     "static/src/js/pagines/novaSessio.js",
     "static/src/js/pagines/connecta.js",
-    "static/src/js/favicon.svg",
     "static/src/js/worklets/recorder.js"
   ],
   "scripts": {
