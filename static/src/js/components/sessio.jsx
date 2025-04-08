@@ -194,7 +194,7 @@ export const Sessio = () => {
     
     // Si hi ha seleccionada una estació que s'ha eliminat, treure-la de la selecció
     if (!estacioEstaDisponible(estacioSelected)) {
-        //setEstacioSelected(undefined);
+        setEstacioSelected(undefined);
     }
 
     let showMainUI = true;
