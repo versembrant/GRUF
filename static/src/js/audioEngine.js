@@ -524,13 +524,29 @@ export class AudioGraph {
                 estacioMasterChannel.connect(estacioMeterNode);
                 estacioMasterChannel.connect(estacioMuteChannel);
                 estacio.buildEstacioAudioGraph(estacioMasterChannel);
+
+                // Carrega parameter values del preset actual a l'audio graph
                 estacio.updateAudioGraphFromState(estacio.currentPreset);
 
                 // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
-                getCurrentSession().setLiveMutesEstacions({[nomEstacio]: getCurrentSession().getLiveMutesEstacions()[nomEstacio]});
-                getCurrentSession().setLiveSolosEstacions({[nomEstacio]: getCurrentSession().getLiveSolosEstacions()[nomEstacio]});
-                getCurrentSession().setLiveGainsEstacions({[nomEstacio]: getCurrentSession().getLiveGainsEstacions()[nomEstacio]});
-                getCurrentSession().setLivePansEstacions({[nomEstacio]: getCurrentSession().getLivePansEstacions()[nomEstacio]});
+                // Per fer-ho, simula que s'ha rebut un missatge del servidor per actualitzar aquests valors, i així els actualitza al audio graph
+                // Això també fa que s'actualizti l'store, que no seria estrictament necessari, però no és un gran problema
+                getCurrentSession().receiveUpdateLiveFromServer({
+                    accio: 'set_gains',
+                    gains_estacions: {[nomEstacio]: getCurrentSession().getLiveGainsEstacions()[nomEstacio]},
+                })
+                getCurrentSession().receiveUpdateLiveFromServer({
+                    accio: 'set_pans',
+                    pans_estacions: {[nomEstacio]: getCurrentSession().getLivePansEstacions()[nomEstacio]},
+                })
+                getCurrentSession().receiveUpdateLiveFromServer({
+                    accio: 'set_solos',
+                    solos_estacions: {[nomEstacio]: getCurrentSession().getLiveSolosEstacions()[nomEstacio]},
+                })
+                getCurrentSession().receiveUpdateLiveFromServer({
+                    accio: 'set_mutes',
+                    mutes_estacions: {[nomEstacio]: getCurrentSession().getLiveMutesEstacions()[nomEstacio]},
+                })
             }
 
             removeEstacioFromAudioGraph(nomEstacio) {

@@ -23,11 +23,7 @@ const onSessionDataLoaded = () => {
         // Only set parameters in store if there are any in the session. This is for compatibility with older sessions
         getAudioGraphInstance().setEffectParameters(currentSession.rawData.effectParameters);
     }
-    getCurrentSession().setLiveGainsEstacions(currentSession.rawData.live.gainsEstacions);
-    getCurrentSession().setLivePansEstacions(currentSession.rawData.live.pansEstacions);
-    getCurrentSession().setLiveMutesEstacions(currentSession.rawData.live.mutesEstacions);
-    getCurrentSession().setLiveSolosEstacions(currentSession.rawData.live.solosEstacions);
-    getCurrentSession().setLivePresetsEstacions(currentSession.rawData.live.presetsEstacions);
+
     if (getAudioGraphInstance().isGraphBuilt()) {
         // Si el graph ja està construït, vol dir que estem rebent info nova d'una sessió que
         // ja està carregada. El que fem és re-carregar l'estat a l'audio graph
