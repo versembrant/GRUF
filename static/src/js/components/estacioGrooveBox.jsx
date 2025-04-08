@@ -51,10 +51,10 @@ export const EstacioGrooveBoxUI = ({estacio, setEstacioSelected}) => {
                     {/* Grid OnOff */}
                     <GrufOnOffGridContainer  className="col-start-2 row-start-1" style={{ height: 250 }} estacio={estacio} parameterName="pattern" />
                     {/* Contenidor de ASSR */}
-                    <fieldset className="col-start-3 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gridTemplateRows: "repeat(4, auto)", gap: "10px", alignItems:'center'}}>
+
+                    <fieldset className="col-start-3 row-start-1" style={{display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridTemplateRows: "repeat(3, auto)", gap: "10px", alignItems:'center'}}>
                     {["1", "2", "3", "4"].map(i => (
                         <>
-                            <GrufKnob mida="petit" parameterParent={estacio} parameterName={`attack${i}`} label="Attack" />
                             <GrufKnob mida="petit" parameterParent={estacio} parameterName={`release${i}`} label="Release" />
                             <GrufKnob mida="petit" parameterParent={estacio} parameterName={`reverbSend${i}`} label="Reverb" />
                             <GrufKnob mida="petit" parameterParent={estacio} parameterName={`swing${i}`} label="Swing" />
