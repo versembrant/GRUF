@@ -45,8 +45,7 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                     </fieldset>
                     <GrufSeparatorLine />
                     <fieldset className="flex flex-col justify-between items-center">
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_rate" label="Mod rate"/>
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_depth" label="Mod depth" />
+                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="octave" label="Octave"/>
                     </fieldset>
                 </fieldset>
                 

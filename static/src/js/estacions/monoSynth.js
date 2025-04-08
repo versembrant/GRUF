@@ -50,7 +50,7 @@ export class MonoSynth extends BaseSynth {
         const adjustedNote = this.adjustNoteForWaveform(midiNoteNumber);
         if (!noteOff) {
             if (!extras.skipStack) this.unfinishedNotes.push(midiNoteNumber);
-            this.audioNodes.synth.triggerAttack(Tone.Frequency(adjustedNote, "midi").toNote());
+            this.audioNodes.synth.triggerAttack([this.getNoteFromFromMidiNote(adjustedNote)]);
         }
         else {
             const removedIndex = this.unfinishedNotes.indexOf(midiNoteNumber);

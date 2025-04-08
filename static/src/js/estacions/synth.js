@@ -23,6 +23,7 @@ export class BaseSynth extends EstacioBase {
         harmonicity: {type: 'float', label: 'Detune', min: 0.95, max: 1.05, initial: 1.0},
         lfo_rate: {type: 'float', label: 'LFO Rate', unit: units.hertz, min: 0.1, max: 50.0, initial: 0.5, logarithmic: true},
         lfo_depth: {type: 'float', label: 'LFO Depth', min: 0.0, max: 1.0, initial: 0.0},
+        octave: {type: 'enum', label: 'Octave', options: [-2, -1, 0, 1, 2], initial: 0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel, {poly}) {
@@ -156,6 +157,11 @@ export class BaseSynth extends EstacioBase {
         }
     }
 
+    getNoteFromFromMidiNote(midiNoteNumber) {
+        // Convert a midi note number to a frequency in hertz
+        return Tone.Frequency(midiNoteNumber + this.getParameterValue("octave") * 12, "midi").toNote()
+    }
+
     onSequencerStep(currentMainSequencerStep, time) {
         // Iterate over all the notes in the sequence and trigger those that start in the current beat (step)
         const currentStep = currentMainSequencerStep % this.getNumSteps();
@@ -171,7 +177,7 @@ export class BaseSynth extends EstacioBase {
             if ((note.b >= minBeat) && (note.b < maxBeat)) {
                 let midiNote = note.n;
                 if (this.parametersDescription.notes.isMono) midiNote = this.adjustNoteForWaveform(midiNote)
-                this.audioNodes.synth.triggerAttackRelease(Tone.Frequency(midiNote, "midi").toNote(), note.d * getAudioGraphInstance().get16BeatTime(), time);
+                this.audioNodes.synth.triggerAttackRelease(this.getNoteFromFromMidiNote(midiNote), note.d * getAudioGraphInstance().get16BeatTime(), time);
             }
         }
     }
@@ -239,8 +245,8 @@ export class Synth extends BaseSynth {
         if (!getAudioGraphInstance().isGraphBuilt()) return;
 
         midiNoteNumber = this.adjustMidiNoteToEstacioRange(midiNoteNumber);
-        if (!noteOff) this.audioNodes.synth.triggerAttack([Tone.Frequency(midiNoteNumber, "midi").toNote()]);
-        else this.audioNodes.synth.triggerRelease([Tone.Frequency(midiNoteNumber, "midi").toNote()]);
+        if (!noteOff) this.audioNodes.synth.triggerAttack([this.getNoteFromFromMidiNote(midiNoteNumber)]);
+        else this.audioNodes.synth.triggerRelease([this.getNoteFromFromMidiNote(midiNoteNumber)]);
 
         if (!extras.skipRecording) this.handlePianoRollRecording(midiNoteNumber, midiVelocity, noteOff);
     }
