@@ -71,7 +71,7 @@ export const EntradaMidi = ({estacio}) => {
 }
 
 const EntradaMidiExternal = ({estacio}) => {
-    if (localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
+    if (isWebMidiEnabled() && localStorage.getItem("lastMidiInputDevice", undefined) !== undefined) {
         bindMidiInputDevice(localStorage.getItem("lastMidiInputDevice"), estacio.nom);
     }
     
