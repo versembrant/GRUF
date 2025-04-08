@@ -889,7 +889,7 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 if(this.xscroll)
                     this.xoffset=this.dragging.offsx+(this.dragging.x-pos.x)*(this.xrange/this.width);
                 if(this.yscroll)
-                    this.yoffset=this.dragging.offsy+(pos.y-this.dragging.y)*(this.yrange/this.height);
+                    this.yoffset=this.dragging.offsy+(pos.y-this.dragging.y)*(this.yrange/this.height);                    
                 break;
             case "A":
                 this.dragging.p2=pos;
@@ -1080,7 +1080,6 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
                 } else {
                     this.ctx.fillStyle=y%2==0 ? this.coldk: this.collt;
                 }
-                    
                 let ys = this.height - (y - this.yoffset) * this.steph;
                 this.ctx.fillRect(this.yruler+this.kbwidth, ys|0, this.swidth,-this.steph);
                 this.ctx.fillStyle=this.colgrid;
@@ -1252,6 +1251,13 @@ customElements.define("gruf-pianoroll", class Pianoroll extends HTMLElement {
         this.redraw=function() {
             if(!this.ctx)
                 return;
+            
+            // Force yoffset to be within the range of the keyboard
+            const minyoffset = 0;
+            const maxyoffset = 92;
+            if (this.yoffset < minyoffset) this.yoffset = minyoffset;
+            if (this.yoffset > maxyoffset) this.yoffset = maxyoffset;
+
             this.ctx.clearRect(0,0,this.width,this.height);
             this.stepw = this.swidth/this.xrange;
             this.steph = this.sheight/this.yrange;

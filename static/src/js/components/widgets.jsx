@@ -548,7 +548,7 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
     const tonalityPCs = getPCsFromScaleName(tonality);
     const allowedNotes = [];
 
-    for (let octave = -2; octave <= 8; octave++) { 
+    for (let octave = -3; octave <= 10; octave++) { 
         const octaveOffset = octave * 12; 
         tonalityPCs.forEach(pitchclass => {
             const note = pitchclass + octaveOffset;
@@ -557,13 +557,14 @@ export const GrufPianoRoll = ({ className, estacio, parameterName, width="500px"
             }
         });
     }
-    
+
     const instrumentRange = parameterDescription.notaMesAltaPermesa - parameterDescription.notaMesBaixaPermesa + 1 || 127;
 
     useEffect(() => {
         const jsElement = document.getElementById(uniqueId + "_id")
         if (jsElement.dataset.alreadyBinded === undefined){
             jsElement.dataset.lastTonality = tonality;
+            jsElement.setAllowedNotes(allowedNotes);
 
             jsElement.addEventListener("pianoRollEdited", evt => {
                 const stringifiedData = JSON.stringify(evt.detail)
