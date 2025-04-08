@@ -41,7 +41,6 @@ export class AudioGraph {
         this.estacionsMeterNodes = {};
         this.effectNodes = {};
         this.spectrumSize = 64;
-        
         this.parametersDescription = {
             bpm: {type: 'float', min: 40, max: 300, initial: 90},
             masterGain: {type: 'float', min: 0.0, max: 1.0, initial: 1.0},
@@ -76,7 +75,8 @@ export class AudioGraph {
                     'amajor', 'aminor',
                     'bbmajor', 'bbminor',
                     'bmajor', 'bminor'],
-                    initial: 'cminor'},
+                initial: 'cminor'
+            },
                     effectParameters: {
                         initial: {
                             reverbAWet: 1.0,
@@ -96,7 +96,7 @@ export class AudioGraph {
                         }
                     }
                 }
-                
+                        
                 // Inicialitza un redux store amb les propietats relacionades amb audio
                 const propertiesInStore = Object.keys(this.parametersDescription);
                 const reducers = {};
@@ -111,6 +111,12 @@ export class AudioGraph {
                     }
                 });
                 this.store = makePartial(createStore(combineReducers(reducers)));
+                
+                // Optimize global tone context for playback (mightier latency and use less CPU (?))
+                if (!(location.href.indexOf("interativelatency=1") != -1)){
+                    const context = new Tone.Context({ latencyHint: "playback" });
+                    Tone.setContext(context);
+                }
             }
             
             getParameterDescription(parameterName) {
@@ -230,7 +236,7 @@ export class AudioGraph {
             setBpm(bpm) {
                 this.setParametreInStore('bpm', bpm);
                 if (!this.isGraphBuilt()) return;
-                Tone.Transport.bpm.rampTo(bpm);
+                Tone.getTransport().bpm.rampTo(bpm);
                 this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
             }
             
@@ -505,12 +511,8 @@ export class AudioGraph {
             isMetronomeEnabled() {
                 return this.store.getState().isMetronomeEnabled;
             }
-
+            
             addEstacioToAudioGraph(nomEstacio) {
-                if ((Tone.getContext() !== undefined) && (Tone.getContext() !== this.currentAudioContext)) {
-                    console.log("Audio context changed, re-setting context");
-                    Tone.setContext(this.currentAudioContext)
-                }
                 const estacio = getCurrentSession().getEstacio(nomEstacio);
                 
                 const estacioMasterChannel = new Tone.Channel({channelCount: 2});
@@ -524,10 +526,10 @@ export class AudioGraph {
                 estacioMasterChannel.connect(estacioMeterNode);
                 estacioMasterChannel.connect(estacioMuteChannel);
                 estacio.buildEstacioAudioGraph(estacioMasterChannel);
-
+                
                 // Carrega parameter values del preset actual a l'audio graph
                 estacio.updateAudioGraphFromState(estacio.currentPreset);
-
+                
                 // Carrega els volumns, pans, mute i solo dels channels de cada estació ara que els objectes ha estan creats
                 // Per fer-ho, simula que s'ha rebut un missatge del servidor per actualitzar aquests valors, i així els actualitza al audio graph
                 // Això també fa que s'actualizti l'store, que no seria estrictament necessari, però no és un gran problema
@@ -548,7 +550,7 @@ export class AudioGraph {
                     mutes_estacions: {[nomEstacio]: getCurrentSession().getLiveMutesEstacions()[nomEstacio]},
                 })
             }
-
+            
             removeEstacioFromAudioGraph(nomEstacio) {
                 this.estacionsMasterChannelNodes[nomEstacio].dispose();
                 this.estacionsMuteChannelNodes[nomEstacio].dispose();
@@ -563,7 +565,7 @@ export class AudioGraph {
                 this.setMainSequencerCurrentStep(-1);
                 
                 // Setteja el bpm al valor guardat
-                Tone.Transport.bpm.value = this.getBpm();
+                Tone.getTransport().bpm.value = this.getBpm();
                 
                 // Crea els nodes master  (per tenir un controls general)
                 this.masterMeterNode = new Tone.Meter({ channels:2, channelCount: 2 });
@@ -604,7 +606,6 @@ export class AudioGraph {
             async startAudioContext() {
                 if (audioContextIsReady) return;
                 await Tone.start()
-                this.currentAudioContext = Tone.getContext();
                 this.sessionRecorderNode = await createRecorderNode();
                 Tone.getDestination().connect(this.sessionRecorderNode);
                 console.log("Audio context started")
@@ -614,12 +615,6 @@ export class AudioGraph {
             async transportStart() {
                 if (!this.isGraphBuilt()) return;
                 await getAudioGraphInstance().startAudioContext();  // Initialize web audio context if not initialized yet
-                
-                // Optimize global tone context for playback (mightier latency and use less CPU (?))
-                if (!(location.href.indexOf("interativelatency=1") != -1)){
-                    const context = new Tone.Context({ latencyHint: "playback" });
-                    Tone.setContext(context);
-                }
                 
                 console.log("Transport start")
                 this.setParametreInStore('isPlaying', true);
@@ -643,7 +638,7 @@ export class AudioGraph {
                     const estacio = getCurrentSession().getEstacio(nomEstacio);
                     estacio.onTransportStart();
                 });
-                Tone.Transport.start();
+                Tone.getTransport().start();
             }
             
             transportStop() {
@@ -654,7 +649,7 @@ export class AudioGraph {
                     const estacio = getCurrentSession().getEstacio(nomEstacio);
                     estacio.onTransportStop();
                 });
-                Tone.Transport.stop()
+                Tone.getTransport().stop()
                 
                 // Atura la gravació si estava gravant
                 if (this.isRecording()) {
@@ -783,6 +778,6 @@ export class AudioGraph {
                 }
             }
         }
-        
+
         const audioGraph = new AudioGraph();
         
