@@ -41,11 +41,13 @@ export const EstacioSynthBaseUI = ({estacio, setEstacioSelected, colorNotesPiano
                     <GrufSeparatorLine />
                     <fieldset className="flex flex-col justify-between items-center">
                         <GrufKnob mida="petit" parameterParent={estacio} parameterName={estacio.tipus === "synth_bass" ? "harmonicity":"fxDrive"} />
-                        <GrufKnob mida="petit" parameterParent={estacio} parameterName="hpf" />
+                        <GrufKnob mida="petit" parameterParent={estacio} parameterName={estacio.tipus === "synth_bass" ? "portamento":"hpf"} />
                     </fieldset>
                     <GrufSeparatorLine />
                     <fieldset className="flex flex-col justify-between items-center">
-                        <GrufKnob mida="gran" parameterParent={estacio} parameterName="octave" label="Octave"/>
+                        {estacio.tipus === "synth_bass" ? <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_rate" label="Mod rate"/>
+                        :<GrufKnob mida="gran" parameterParent={estacio} parameterName="octave" label="Octave"/>}
+                        {estacio.tipus === "synth_bass" ? <GrufKnob mida="petit" parameterParent={estacio} parameterName="lfo_depth" label="Mod depth" />:""}
                     </fieldset>
                 </fieldset>
                 

@@ -10,7 +10,7 @@ export class MonoSynth extends BaseSynth {
     static parametersDescription = {
         ...BaseSynth.parametersDescription,
         notes: {...BaseSynth.parametersDescription.notes, isMono: true},
-        portamento: {type: 'float', label: 'Glide', unit: units.second, min: 0.0, max: 0.3, initial: 0.0},
+        portamento: {type: 'float', label: 'Glide', unit: units.second, min: 0.0, max: 1.0, initial: 0.0},
     }
 
     buildEstacioAudioGraph(estacioMasterChannel) {
