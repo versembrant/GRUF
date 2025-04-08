@@ -304,7 +304,8 @@ export class AudioGraph {
             
             getCurrentLevelEstacio(nomEstacio) {
                 if (!this.isGraphBuilt()) return {"db": -60, "gain": 0};
-                const dBFSLevel = this.estacionsMeterNodes[nomEstacio].getValue();
+                const dBFSLevel2Channels = this.estacionsMeterNodes[nomEstacio].getValue();
+                const dBFSLevel = Math.max(dBFSLevel2Channels[0], dBFSLevel2Channels[1]);                
                 const dBuLevel = dBFSLevel + 18;
                 const gainLevel = Tone.dbToGain(dBFSLevel)
                 return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
@@ -318,7 +319,8 @@ export class AudioGraph {
                 if (nomFx === 'delayA') node = this.effectNodes.delayAMeter;
                 if (nomFx === 'delayB') node = this.effectNodes.delayBMeter;
                 if (node === undefined) return {"db": -60, "gain": 0};
-                const dBFSLevel = node.getValue();
+                const dBFSLevel2Channels = node.getValue();
+                const dBFSLevel = Math.max(dBFSLevel2Channels[0], dBFSLevel2Channels[1]);
                 const dBuLevel = dBFSLevel + 18;
                 const gainLevel = Tone.dbToGain(dBFSLevel)
                 return {"db": clamp(dBuLevel, -60, 6), "gain": clamp(gainLevel, 0, 1)};
@@ -372,19 +374,19 @@ export class AudioGraph {
                     reverbA: new Tone.Reverb(),
                     reverbAChannel: new Tone.Channel({ volume: 0 }),
                     reverbAPostChannel: new Tone.Channel({ volume: 0 }),
-                    reverbAMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
+                    reverbAMeter: new Tone.Meter({ channels:2, channelCount: 2 }),
                     reverbB: new Tone.Reverb(),
                     reverbBChannel: new Tone.Channel({ volume: 0 }),
                     reverbBPostChannel: new Tone.Channel({ volume: 0 }),
-                    reverbBMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
+                    reverbBMeter: new Tone.Meter({ channels:2, channelCount: 2 }),
                     delayA: new Tone.FeedbackDelay(),
                     delayAChannel: new Tone.Channel({ volume: 0 }),
                     delayAPostChannel: new Tone.Channel({ volume: 0 }),
-                    delayAMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
+                    delayAMeter: new Tone.Meter({ channels:2, channelCount: 2 }),
                     delayB: new Tone.FeedbackDelay(),
                     delayBChannel: new Tone.Channel({ volume: 0 }),
                     delayBPostChannel: new Tone.Channel({ volume: 0 }),
-                    delayBMeter: new Tone.Meter({ channels:1, channelCount: 1 }),
+                    delayBMeter: new Tone.Meter({ channels:2, channelCount: 2 }),
                 }
                 
                 this.effectNodes.reverbAPostChannel.connect(this.masterGainNode);
@@ -513,7 +515,7 @@ export class AudioGraph {
                 
                 const estacioMasterChannel = new Tone.Channel({channelCount: 2});
                 const estacioMuteChannel = new Tone.Channel({channelCount: 2});
-                const estacioMeterNode = new Tone.Meter();
+                const estacioMeterNode = new Tone.Meter({channelCount: 2, channels: 2});
                 this.estacionsMasterChannelNodes[nomEstacio] = estacioMasterChannel;
                 this.estacionsMuteChannelNodes[nomEstacio] = estacioMuteChannel;
                 this.estacionsMeterNodes[nomEstacio] = estacioMeterNode;
