@@ -113,10 +113,20 @@ export class AudioGraph {
         this.store = makePartial(createStore(combineReducers(reducers)));
         
         // Optimize global tone context for playback (mightier latency and use less CPU (?))
-        if (!(location.href.indexOf("interativelatency=1") != -1)){
-            const context = new Tone.Context({ latencyHint: "playback" });
-            Tone.setContext(context);
+        let latencyHintParam = undefined;
+        const paramName = "latencyHint";
+        var queryString = location.search
+        let params = new URLSearchParams(queryString)
+        if (params.has(paramName)) {
+            latencyHintParam = params.get(paramName)
+        }        
+        let latencyHintValue = latencyHintParam !== undefined ? latencyHintParam: "interactive"
+        if (!isNaN(latencyHintValue)) {
+            latencyHintValue = parseFloat(latencyHintValue)  // In case latency hint is passed as a number in seconds
         }
+        console.log("Starting audio context with latency hint: ", latencyHintValue);
+        const context = new Tone.Context({ latencyHint: latencyHintValue });
+        Tone.setContext(context);
     }
     
     getParameterDescription(parameterName) {
@@ -237,7 +247,6 @@ export class AudioGraph {
         this.setParametreInStore('bpm', bpm);
         if (!this.isGraphBuilt()) return;
         Tone.getTransport().bpm.rampTo(bpm);
-        this.delay.delayTime.value = 60.0/bpm; // Fes que el delay time estigui sincronitzat amb el bpm
     }
     
     getSwing(){

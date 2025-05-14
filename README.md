@@ -191,5 +191,5 @@ Implementa el servidor.
 Es poden utlizar alguns paràmetres opcionals a la URL per poder testejar temes relacionats amb performance:
 
 * `minimalui=1`: no renderitza la UI principal, només el títol de la sessió i el botó de play.
-* `interativelatency=1`: optimiza el contexe the tone js per interactivity (pot tenir pitjor performance però fa servir un lookAhead menor).
+* `latencyhint=interactive|playback|balanced|seconds`: tria el latency hint a utilizar. Veure documentació ToneJS. Pot tenir impacte en la performance.
 * `audio=1`: connecta l'àudio per defecte, sense preguntar-ho a l'usuari (`audio=0` connectarà sense audio).
