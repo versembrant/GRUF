@@ -251,11 +251,11 @@ export const renderReactComponentInElement = (reactComponent, elementID, props={
 }
 
 // Parameter range conversions
-const exponent = 2;
 
 export const norm2Num = (normValue, parameterDescription) => {
     const numMin = getParameterNumericMin(parameterDescription);
     const numMax = getParameterNumericMax(parameterDescription);
+    const exponent = parameterDescription.logarithmExponent ? parameterDescription.logarithmExponent : 2;
 
     if(!parameterDescription.logarithmic) return normValue * (numMax-numMin) + numMin;
     return Math.pow(normValue, exponent)*(numMax-numMin)+numMin;
@@ -264,6 +264,7 @@ export const norm2Num = (normValue, parameterDescription) => {
 export const num2Norm = (numValue, parameterDescription) => {
     const numMin = getParameterNumericMin(parameterDescription);
     const numMax = getParameterNumericMax(parameterDescription);
+    const exponent = parameterDescription.logarithmExponent ? parameterDescription.logarithmExponent : 2;
 
     if(!parameterDescription.logarithmic) return (numValue - numMin)/(numMax-numMin);
     return Math.pow((numValue - numMin)/(numMax-numMin), 1/exponent);
