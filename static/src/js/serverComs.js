@@ -4,6 +4,8 @@ import { getAudioGraphInstance } from './audioEngine';
 import throttle from 'lodash.throttle'
 import debounce from 'lodash.debounce'
 
+const globalMessageThrottleTime = 150; // 150ms
+
 // Initialize socket
 const wsServerURL = ''  // Nothing for same domain where the page is loaded
 const socket = io(wsServerURL, {
@@ -49,7 +51,7 @@ export const sendMessageToServer = (name, data) => {
     } else {
         if (!throttledFunctionsMap.hasOwnProperty(throttledFunctionKey)){
             // If no throttled function exists, create it
-            throttledFunctionsMap[throttledFunctionKey] = throttle((name, data) => socket.emit(name, data), 50);
+            throttledFunctionsMap[throttledFunctionKey] = throttle((name, data) => socket.emit(name, data), globalMessageThrottleTime);
         }
         // Call the throttled version of the funcion
         throttledFunctionsMap[throttledFunctionKey](name, data)

@@ -413,7 +413,7 @@ export class Session {
             this.adminMode = token === data.token;
         }
         this.changeInstrumentsEnabled = this.adminMode
-        this.continuousControlThrottleTime = 50
+        this.continuousControlThrottleTime = 50 // This is mostly for the UI, we also throttle parameter change messages being sent to the server in the server coms file
         
         // Copia totes les dades "raw" de la sessió per tenir-les guardades
         this.rawData = data

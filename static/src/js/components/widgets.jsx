@@ -12,7 +12,6 @@ import { Dropdown } from 'primereact/dropdown';
 import Slider from '@mui/material/Slider';
 import { InputNumber } from 'primereact/inputnumber';
 import isequal from 'lodash.isequal'
-import * as Tone from 'tone';
 import { Dropdown } from 'primereact/dropdown';
 import { sendNoteOn, sendNoteOff } from './entradaMidi';
 import { sampleLibrary} from "../sampleLibrary";
@@ -122,11 +121,11 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
     
     const numValue = real2Num(realValue, parameterDescription) + discreteOffset;
 
-    const handleKnobChange = (newNumValue) => {
+    const updateParameterThrottledFunction = useRef(throttle((newNumValue) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
         const newRealValue = num2Real(newNumValue, parameterDescription);
         setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
         updateParametre(parameterParent, parameterName, newRealValue);
-    }
+    }, getCurrentSession().continuousControlThrottleTime));
 
     let labelClass = "";
     if (colorizeLabel) labelClass = "text-accent"
@@ -144,7 +143,9 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         valueMax={getParameterNumericMax(parameterDescription)}
                         mapTo01={(x) => num2Norm(x, parameterDescription)}
                         mapFrom01={(x) => norm2Num(x, parameterDescription)}
-                        onValueRawChange={throttle(newNumValue => handleKnobChange(newNumValue), getCurrentSession().continuousControlThrottleTime)}
+                        onValueRawChange={newNumValue => {
+                            updateParameterThrottledFunction.current(newNumValue);
+                        }}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
                         valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
                         dragSensitivity="0.009"
@@ -242,10 +243,11 @@ export const GrufDelayFeedback = ({send, top, left}) => {
     const parameterDescription = {type: 'float', label: 'Delay ' + send + ' Feedback', min: 0.0, max: 1.0, initial: 0.5}
     const knobctrlId = useId();
     const numValue = real2Num(parameterValue, parameterDescription);
-    const handleKnobChange = (newNumValue) => {
+    
+    const updateParameterThrottledFunction = useRef(throttle((newNumValue) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
         const newRealValue = num2Real(newNumValue, parameterDescription);
         setMasterEffectsParameter(parameterName, newRealValue);
-    }
+    }, getCurrentSession().continuousControlThrottleTime));
     
     return (
         <div className={ `knob knob-petit` }>
@@ -256,7 +258,9 @@ export const GrufDelayFeedback = ({send, top, left}) => {
                     valueMax={getParameterNumericMax(parameterDescription)}
                     mapTo01={(x) => num2Norm(x, parameterDescription)}
                     mapFrom01={(x) => norm2Num(x, parameterDescription)}
-                    onValueRawChange={throttle(newNumValue => handleKnobChange(newNumValue), getCurrentSession().continuousControlThrottleTime)}
+                    onValueRawChange={newNumValue => {
+                        updateParameterThrottledFunction.current(newNumValue);
+                    }}
                     valueRawRoundFn={(value)=>value.toFixed(2)}
                     valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
                     dragSensitivity="0.009"
@@ -293,6 +297,11 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
         setActiveThumbIndex(activeThumbIndex);
         newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
     }
+
+    const handleSliderChangeThrottledFunction = useRef(throttle((newValues, activeThumbIndex) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
+        setActiveThumbIndex(activeThumbIndex);
+        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
+    }, getCurrentSession().continuousControlThrottleTime));
     
     const realValues = parameterNames.map(parameterName => estacio.getParameterValue(parameterName));
     const sliderId = useId();
@@ -306,7 +315,9 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
                 min={numericMinValue}
                 max={numericMaxValue}
                 marks={marks} 
-                onChange={throttle((_, newValues, activeThumb) => handleSliderChange(newValues, activeThumb), getCurrentSession().continuousControlThrottleTime)}
+                onChange={(_, newValues, activeThumb) => {
+                    handleSliderChangeThrottledFunction.current(newValues, activeThumb);
+                }}
             />
             {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescriptions[0].label}</label>}
             {!noOutput && <output htmlFor={sliderId}>{real2String(realValues[activeThumbIndex], parameterDescriptions[activeThumbIndex])}</output>}
