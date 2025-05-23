@@ -110,7 +110,7 @@ export const GrufButtonBorder = ({className, text, top, left, onClick}) => {
 export const GrufKnob = ({ parameterParent, parameterName, position, top, left, label, mida, colorizeLabel=false, markLabelRed=false, noOutput=false, customWidth=undefined, customHeight=undefined }) => {
     const [discreteOffset, setDiscreteOffset] = useState(0); // for when there are discrete options (parameterDescription.type === 'enum')
     subscribeToParameterChanges(parameterParent, parameterName);
-    
+
     const parameterDescription = parameterParent.getParameterDescription(parameterName);
 
     const realValue =  parameterParent.getParameterValue(parameterName);
@@ -121,10 +121,11 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
     
     const numValue = real2Num(realValue, parameterDescription) + discreteOffset;
 
-    const updateParameterThrottledFunction = useRef(throttle((newNumValue) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
+    const updateParameterThrottledFunction = useRef(throttle((newNumValue, currentParameterName) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
+        // We need to pass parameterName together with newNumValue because there are cases in which the same knob changes the parametre that it controls at render time (basically in the samppler with the pad-dependant controls)
         const newRealValue = num2Real(newNumValue, parameterDescription);
         setDiscreteOffset(newNumValue - real2Num(newRealValue, parameterDescription));
-        updateParametre(parameterParent, parameterName, newRealValue);
+        updateParametre(parameterParent, currentParameterName, newRealValue);
     }, getCurrentSession().continuousControlThrottleTime));
 
     let labelClass = "";
@@ -144,7 +145,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         mapTo01={(x) => num2Norm(x, parameterDescription)}
                         mapFrom01={(x) => norm2Num(x, parameterDescription)}
                         onValueRawChange={newNumValue => {
-                            updateParameterThrottledFunction.current(newNumValue);
+                            updateParameterThrottledFunction.current(newNumValue, parameterName);
                         }}
                         valueRawRoundFn={(value)=>value.toFixed(2)}
                         valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
@@ -293,14 +294,10 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
     if (orientation==='vertical') style.height = size || '80px';
     if (orientation==='horizontal') style.width = size || '200px';
 
-    const handleSliderChange = (newValues, activeThumbIndex) => {
+    const handleSliderChangeThrottledFunction = useRef(throttle((newValues, currentParameterNames, activeThumbIndex) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
+        // We need to pass currentParameterNames together with newNumValue because there are cases in which the same knob changes the parametre that it controls at render time (basically in the samppler with the pad-dependant controls)
         setActiveThumbIndex(activeThumbIndex);
-        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
-    }
-
-    const handleSliderChangeThrottledFunction = useRef(throttle((newValues, activeThumbIndex) => {  // We use a ref to avoid creating a new function on each render which would reset throttle counter
-        setActiveThumbIndex(activeThumbIndex);
-        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(parameterNames[index], num2Real(newValue, parameterDescriptions[index])));
+        newValues.forEach((newValue, index)=> estacio.updateParametreEstacio(currentParameterNames[index], num2Real(newValue, parameterDescriptions[index])));
     }, getCurrentSession().continuousControlThrottleTime));
     
     const realValues = parameterNames.map(parameterName => estacio.getParameterValue(parameterName));
@@ -316,7 +313,7 @@ export const GrufSlider = ({ estacio, parameterName, top, left, orientation='hor
                 max={numericMaxValue}
                 marks={marks} 
                 onChange={(_, newValues, activeThumb) => {
-                    handleSliderChangeThrottledFunction.current(newValues, activeThumb);
+                    handleSliderChangeThrottledFunction.current(newValues, parameterNames, activeThumb);
                 }}
             />
             {!noLabel && <label style={{fontSize: labelSize}} htmlFor={sliderId}>{label || parameterDescriptions[0].label}</label>}
