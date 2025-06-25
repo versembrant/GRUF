@@ -2326,10 +2326,10 @@ react-is@^18.2.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
-react-knob-headless@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/react-knob-headless/-/react-knob-headless-0.3.0.tgz#cbdfb855e09d11e5dd29bcfe7d026b4c735e1101"
-  integrity sha512-YrqH2VMcrJLqlnvlnY0Yi+nJFWlDck75VxNik2gkyw9OYxil3YqXn0tJRJxRxsQGmTmBK02iiNOMsQJFPwGe3Q==
+react-knob-headless@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-knob-headless/-/react-knob-headless-0.4.0.tgz#3f1b0f6cca06f840c56a481bb1f87e50b5a91536"
+  integrity sha512-woqJRwDLVWN78zaOjdRVqyU0FyZHw1PHYMlmYltgAm7Mzg7OWs+aRkctIMqP9Prbhrd/7I9E7XMY2eWbG3r+Eg==
   dependencies:
     "@dsp-ts/math" "^0.1.0"
     "@use-gesture/react" "^10.3.0"
