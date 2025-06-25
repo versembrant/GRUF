@@ -10,7 +10,7 @@ Necessites que [Docker](https://www.docker.com/products/docker-desktop/) estigui
 
 ```shell
 git clone git@github.com:versembrant/GRUF.git
-cd versembrant-gruf/
+cd GRUF
 ```
 
 2. Construeix les imatges de Docker:
