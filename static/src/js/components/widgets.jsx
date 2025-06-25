@@ -150,7 +150,7 @@ export const GrufKnob = ({ parameterParent, parameterName, position, top, left, 
                         valueRawRoundFn={(value)=>value.toFixed(2)}
                         valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
                         dragSensitivity="0.009"
-                        orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
+                        axis='xy'
                     />
                 </div>
                 <label htmlFor={knobctrlId} className={labelClass}>{label || parameterDescription.label}</label>
@@ -265,7 +265,7 @@ export const GrufDelayFeedback = ({send, top, left}) => {
                     valueRawRoundFn={(value)=>value.toFixed(2)}
                     valueRawDisplayFn={(numValue) => real2String(num2Real(numValue, parameterDescription), parameterDescription)}
                     dragSensitivity="0.009"
-                    orientation='vertical' // si knobheadless accepta la proposta de 'vertical-horizontal', ho podrem posar així
+                    axis='xy'
                 />
             </div>
             <label htmlFor={knobctrlId}>Feedback</label>
