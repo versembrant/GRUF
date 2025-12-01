@@ -9,7 +9,7 @@ Necessites que [Docker](https://www.docker.com/products/docker-desktop/) estigui
 1. Clona i fes `cd` al repositori
 
 ```shell
-git clone git@github.com:versembrant/GRUF.git
+git clone ssh://git@codeberg.org/versembrant/GRUF.git
 cd GRUF
 ```
 
