@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> > Hem mogut el desenvolupament de GRUF a [Codeberg](https://codeberg.org/versembrant/GRUF). Ens veiem allà! 
+
+
 <p align="center">
   <img src="_docs/logo_readme.png" alt="logo">
 </p>
